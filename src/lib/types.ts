@@ -29,8 +29,12 @@ export type Database = {
           model: string
           year: number
           fuel_type: string | null
+          engine_type: string | null
+          gearbox: string | null
+          mileage: number | null
           plate_number: string | null
           vin: string | null
+          is_default: boolean
           created_at: string
         }
         Insert: {
@@ -40,8 +44,12 @@ export type Database = {
           model: string
           year: number
           fuel_type?: string | null
+          engine_type?: string | null
+          gearbox?: string | null
+          mileage?: number | null
           plate_number?: string | null
           vin?: string | null
+          is_default?: boolean
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['vehicles']['Insert']>
@@ -163,6 +171,7 @@ export type Database = {
           user_id: string
           preferred_language: string
           notifications_enabled: boolean
+          phone_number: string | null
           created_at: string
         }
         Insert: {
@@ -170,6 +179,7 @@ export type Database = {
           user_id: string
           preferred_language?: string
           notifications_enabled?: boolean
+          phone_number?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['user_settings']['Insert']>

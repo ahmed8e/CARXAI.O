@@ -16,7 +16,7 @@ export default {
           blue: '#0E3882',
           light: '#5DB0EE',
           white: '#F4F7FF',
-          neon: '#CDFF00',
+          neon: '#0070E0',
         },
         teal: {
           DEFAULT: '#0B4E63',
@@ -41,7 +41,7 @@ export default {
         soft: '#F4F7FF',
         muted: '#64748B',
         'on-surface': '#0F172A',
-        neon: '#CDFF00',
+        neon: '#0070E0',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

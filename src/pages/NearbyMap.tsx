@@ -2,11 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
 import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
 import type { NearbyPlace } from '../lib/types'
-import { Map as MapIcon, Users, Truck, Wrench, MapPin, Star, Loader2, AlertCircle } from 'lucide-react'
+import { Map as MapIcon, Users, Truck, Wrench, MapPin, Star, Loader2, AlertCircle, ChevronRight } from 'lucide-react'
 
 const MAP_FILTERS = ['All', 'Mechanics', 'Garages', 'Towing', 'Open Now', 'Top Rated']
-
-
 
 function getPlaceIcon(types: string[]) {
   if (types.includes('towing')) return Truck
@@ -15,8 +13,8 @@ function getPlaceIcon(types: string[]) {
 }
 
 function getPlaceColor(types: string[]): string {
-  if (types.includes('towing')) return '#fb923c'
-  return '#34d399'
+  if (types.includes('towing')) return '#ea580c' // orange-600
+  return '#0070E0' // brand blue
 }
 
 export default function NearbyMap() {
@@ -61,7 +59,14 @@ export default function NearbyMap() {
 
         new google.maps.Marker({
           position: location, map,
-          icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#CDFF00', fillOpacity: 1, strokeColor: '#062B3D', strokeWeight: 3 },
+          icon: { 
+            path: google.maps.SymbolPath.CIRCLE, 
+            scale: 10, 
+            fillColor: '#0070E0', 
+            fillOpacity: 1, 
+            strokeColor: '#FFFFFF', 
+            strokeWeight: 3 
+          },
           title: 'Your Location',
           zIndex: 100
         })
@@ -96,8 +101,8 @@ export default function NearbyMap() {
                   path: google.maps.SymbolPath.CIRCLE, 
                   scale: 8, 
                   fillColor: color, 
-                  fillOpacity: 0.9, 
-                  strokeColor: '#062B3D', 
+                  fillOpacity: 0.8, 
+                  strokeColor: '#FFFFFF', 
                   strokeWeight: 2 
                 },
                 title: place.name
@@ -135,67 +140,117 @@ export default function NearbyMap() {
   })
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5">
-        <div className="flex items-center gap-2 mb-2">
-          <MapIcon className="w-5 h-5 text-purple-400" />
-          <h1 className="font-display font-bold text-soft">Nearby Help Map</h1>
+      <div className="px-6 py-4 border-b border-slate-100">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
+            <MapIcon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-display font-bold text-slate-900 text-lg italic tracking-tight uppercase">Nearby Help Map</h1>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Real-time Service Network</p>
+          </div>
         </div>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
           {MAP_FILTERS.map(f => (
-            <button key={f} onClick={() => setActiveFilter(f)} className={`chip whitespace-nowrap ${activeFilter === f ? 'active' : ''}`}>{f}</button>
+            <button 
+              key={f} 
+              onClick={() => setActiveFilter(f)} 
+              className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border whitespace-nowrap ${
+                activeFilter === f 
+                  ? 'bg-navy text-white border-navy shadow-md shadow-navy/20' 
+                  : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-slate-300'
+              }`}
+            >
+              {f}
+            </button>
           ))}
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Map */}
-        <div ref={mapRef} className="flex-1 min-h-[300px] lg:min-h-0 relative" style={{ background: '#041E2B' }}>
+        <div ref={mapRef} className="flex-1 min-h-[350px] lg:min-h-0 relative bg-slate-100">
           {error && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center p-6 bg-navy/80 backdrop-blur-sm">
-              <div className="card text-center max-w-sm">
-                <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-                <p className="font-display font-bold text-soft mb-1">Map Error</p>
-                <p className="text-sm text-muted">{error}</p>
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-6 bg-white/80 backdrop-blur-sm">
+              <div className="bg-white border border-slate-100 p-8 rounded-3xl text-center max-w-sm shadow-2xl">
+                <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-4" />
+                <p className="font-display font-bold text-slate-900 text-lg mb-2">Map Error</p>
+                <p className="text-sm text-slate-500 font-medium leading-relaxed">{error}</p>
               </div>
             </div>
           )}
           {loading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-navy/50">
-              <Loader2 className="w-8 h-8 text-cyan-DEFAULT animate-spin" />
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-navy animate-spin" />
+                <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Scanning Area...</p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Side list */}
-        <div className="w-full lg:w-72 overflow-y-auto border-t lg:border-t-0 lg:border-l border-white/5">
+        <div className="w-full lg:w-80 overflow-y-auto border-t lg:border-t-0 lg:border-l border-slate-100 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.02)]">
           {filteredPlaces.map((place: NearbyPlace) => {
             const Icon = getPlaceIcon(place.types)
             const color = getPlaceColor(place.types)
+            const isSelected = selected?.id === place.id
+            
             return (
-              <button key={place.id} onClick={() => setSelected(place)}
-                className={`w-full text-left p-4 border-b border-white/5 hover:bg-white/3 transition-colors ${selected?.id === place.id ? 'bg-purple-500/5' : ''}`}>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${color}15` }}>
-                    <Icon className="w-4 h-4" style={{ color }} />
+              <button 
+                key={place.id} 
+                onClick={() => setSelected(place)}
+                className={`w-full text-left p-5 border-b border-slate-50 transition-all group ${
+                  isSelected ? 'bg-navy/[0.03] border-navy/10' : 'hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div 
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                      isSelected ? 'shadow-md' : 'shadow-sm'
+                    }`} 
+                    style={{ backgroundColor: `${color}10` }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-soft text-sm truncate">{place.name}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted mt-0.5">
-                      {place.rating > 0 && <span className="flex items-center gap-0.5"><Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />{formatRating(place.rating)}</span>}
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className={`font-bold text-sm truncate transition-colors ${
+                        isSelected ? 'text-navy' : 'text-slate-900 group-hover:text-navy'
+                      }`}>
+                        {place.name}
+                      </p>
+                      <ChevronRight className={`w-4 h-4 text-slate-300 transition-transform ${
+                        isSelected ? 'translate-x-1 text-navy' : 'group-hover:translate-x-1'
+                      }`} />
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400">
+                      {place.rating > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-slate-700">{formatRating(place.rating)}</span>
+                        </span>
+                      )}
                       {place.distance && <span>{formatDistance(place.distance)}</span>}
-                      <span className={place.isOpen ? 'text-emerald-400' : 'text-red-400'}>{place.isOpen ? 'Open' : 'Closed'}</span>
+                      <span className={`font-bold ${place.isOpen ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {place.isOpen ? 'Open' : 'Closed'}
+                      </span>
                     </div>
                   </div>
                 </div>
               </button>
             )
           })}
-          {filteredPlaces.length === 0 && (
-            <div className="text-center py-12">
-              <MapPin className="w-8 h-8 text-muted mx-auto mb-2" />
-              <p className="text-sm text-muted">No places found</p>
+          
+          {filteredPlaces.length === 0 && !loading && (
+            <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-6">
+                <MapPin className="w-8 h-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">No results found</p>
+              <p className="text-xs text-slate-300 leading-relaxed">Try selecting a different filter or expanding your search area.</p>
             </div>
           )}
         </div>

@@ -1,21 +1,36 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Zap, LayoutDashboard, Users, LogOut, Menu, ShieldAlert, Navigation, Wrench
+  LayoutDashboard, Users, LogOut,
+  Wrench, Car, Zap, ChevronRight, Settings, X,
+  CircuitBoard, MapPin, Sparkles
 } from 'lucide-react'
+import Navbar from './Navbar'
 
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
-  { to: '/dashboard/ai-mechanic', icon: ShieldAlert, label: 'AI Mechanic' },
-  { to: '/dashboard/mechanic', icon: Users, label: 'Human Mechanic' },
-  { to: '/dashboard/towing', icon: Wrench, label: 'Towing' },
-  { to: '/dashboard/map', icon: Navigation, label: 'Nearby Map' },
+// ── Navigation groups ────────────────────────────────────────────────
+const NAV_GROUPS = [
+  {
+    label: 'Diagnosis',
+    items: [
+      { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
+      { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic',    badge: 'AI' },
+      { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles'                },
+    ],
+  },
+  {
+    label: 'Get Help',
+    items: [
+      { to: '/dashboard/mechanic', icon: Users,  label: 'Find a Mechanic' },
+      { to: '/dashboard/towing',   icon: Wrench, label: 'Towing Service'  },
+      { to: '/dashboard/map',      icon: MapPin, label: 'Nearby Map'      },
+    ],
+  },
 ]
 
-interface AppLayoutProps {
-  children: React.ReactNode
-}
+interface AppLayoutProps { children: React.ReactNode }
+
 export default function AppLayout({ children }: AppLayoutProps) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
@@ -26,79 +41,171 @@ export default function AppLayout({ children }: AppLayoutProps) {
     navigate('/')
   }
 
-  const firstName = user?.email?.split('@')[0] ?? 'Driver'
-  const userInitial = firstName[0]?.toUpperCase() ?? 'U'
+  const userInitial = user?.email?.[0]?.toUpperCase() ?? 'U'
+  const userName    = user?.email?.split('@')[0] ?? 'User'
+  const plan        = (user?.user_metadata?.subscription_tier as string) || 'Basic'
+  const isPro       = plan !== 'Basic'
 
-  function SidebarContent() {
+  // ── Sidebar JSX ──────────────────────────────────────────────────
+  function SidebarContent({ mobile = false }: { mobile?: boolean }) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#041E2B', border: '1px solid rgba(205,255,0,0.4)', flexShrink: 0, boxShadow: '0 0 15px rgba(205,255,0,0.1)' }}>
-            <Zap style={{ width: '18px', height: '18px' }} fill="#CDFF00" stroke="#CDFF00" />
+      <div className="flex flex-col h-full" style={{ background: '#F8FAFB' }}>
+
+        {/* ── Brand header ── */}
+        <div className="px-5 pt-5 pb-4 border-b border-slate-100/80">
+          <div className="flex items-center justify-between">
+            <Link
+              to="/"
+              className="flex items-center gap-3.5 group"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <div className="w-9 h-9 rounded-[14px] bg-navy flex items-center justify-center
+                              shadow-[0_4px_12px_rgba(0,112,224,0.35)] group-hover:scale-105 transition-transform flex-shrink-0">
+                <Zap className="w-4 h-4 text-white" fill="currentColor" />
+              </div>
+              <div className="leading-none">
+                <p className="font-display font-black text-[16px] tracking-[-0.04em] text-slate-900">
+                  Carxai
+                </p>
+                <p className="text-[10px] font-medium text-slate-400 mt-[4px] tracking-normal">
+                  AI Mechanic Suite
+                </p>
+              </div>
+            </Link>
+
+            {mobile && (
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="w-7 h-7 rounded-xl flex items-center justify-center
+                           hover:bg-slate-100 transition-colors text-slate-300 hover:text-slate-500 flex-shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
-          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: '18px', letterSpacing: '-0.02em' }}>
-            <span style={{ color: '#FFFFFF' }}>car</span>
-            <span style={{ color: '#CDFF00' }}>x</span>
-            <span style={{ color: '#FFFFFF' }}>.ai</span>
-          </span>
         </div>
 
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/dashboard'}
-              onClick={() => setSidebarOpen(false)}
-              style={({ isActive }) => ({
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 14px',
-                borderRadius: '16px',
-                fontSize: '14px',
-                fontWeight: 600,
-                textDecoration: 'none',
-                transition: 'all 0.2s',
-                background: isActive ? 'rgba(205,255,0,0.08)' : 'transparent',
-                color: isActive ? '#CDFF00' : '#B8C6CC',
-                border: isActive ? '1px solid rgba(205,255,0,0.15)' : '1px solid transparent',
-              })}
-            >
-              <item.icon style={{ width: '18px', height: '18px', flexShrink: 0 }} />
-              {item.label}
-            </NavLink>
+        {/* ── Navigation ── */}
+        <nav className="flex-1 px-3 pt-4 pb-2 space-y-5 overflow-y-auto">
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.label}>
+              {/* Group label */}
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400/80 px-2.5 mb-1.5">
+                {group.label}
+              </p>
+
+              <div className="space-y-0.5">
+                {group.items.map(item => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={'end' in item ? item.end : false}
+                    onClick={() => setSidebarOpen(false)}
+                    className={({ isActive }) => [
+                      'flex items-center gap-2.5 pr-3 pl-2 py-2.5 rounded-2xl font-semibold text-[13.5px]',
+                      'transition-all duration-150 group relative overflow-hidden',
+                      isActive
+                        ? 'bg-white text-navy shadow-[0_1px_6px_rgba(0,112,224,0.10)] border border-navy/10 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:bg-navy'
+                        : 'text-slate-500 hover:bg-white/70 hover:text-slate-800',
+                    ].join(' ')}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {/* Icon container */}
+                        <span className={[
+                          'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-150',
+                          isActive
+                            ? 'bg-navy text-white shadow-sm shadow-navy/30'
+                            : 'bg-transparent text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600',
+                        ].join(' ')}>
+                          <item.icon className="w-[15px] h-[15px]" />
+                        </span>
+
+                        <span className="flex-1 leading-none">{item.label}</span>
+
+                        {/* AI badge */}
+                        {'badge' in item && item.badge && (
+                          <span className={[
+                            'text-[8.5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[5px]',
+                            isActive
+                              ? 'bg-navy/10 text-navy'
+                              : 'bg-navy/8 text-navy/70',
+                          ].join(' ')}>
+                            {item.badge}
+                          </span>
+                        )}
+
+                        {/* Active indicator chevron */}
+                        {isActive && (
+                          <ChevronRight className="w-3 h-3 text-navy/40 flex-shrink-0" />
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+
+              {/* AI status strip — between the two groups */}
+              {gi === 0 && (
+                <div className="mx-1 mt-4 mb-1 flex items-center gap-3 px-3.5 py-3
+                                rounded-2xl bg-white border border-slate-100
+                                shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                  <span className="relative flex-shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 block" />
+                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-bold text-slate-600 leading-none tracking-tight">AI Engine Ready</p>
+                    <p className="text-[9px] text-slate-400 mt-0.5 tracking-wide">Available 24/7</p>
+                  </div>
+                  <Sparkles className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 
-        {/* User */}
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '4px', marginBottom: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 800, flexShrink: 0, background: 'linear-gradient(135deg, #0E3882, #062B3D)', border: '1px solid rgba(255,255,255,0.1)', color: '#F4F7FF' }}>
-              {userInitial}
+        {/* ── Account ── */}
+        <div className="px-3 pt-3 pb-4 border-t border-slate-100/80 space-y-1.5">
+          {/* Profile card */}
+          <Link
+            to="/my-account"
+            onClick={() => setSidebarOpen(false)}
+            className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-100
+                       hover:border-navy/20 hover:shadow-sm transition-all duration-150 group"
+          >
+            {/* Avatar */}
+            <div className={[
+              'w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm',
+              'flex-shrink-0 shadow-sm ring-2 overflow-hidden',
+              isPro ? 'bg-gradient-to-br from-navy to-blue-400 ring-navy/20' : 'bg-gradient-to-br from-slate-600 to-slate-400 ring-slate-200',
+            ].join(' ')}>
+              {user?.user_metadata?.avatar_url
+                ? <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
+                : userInitial}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{firstName}</p>
-              <p style={{ fontSize: '11px', color: '#B8C6CC', margin: 0, opacity: 0.6 }}>{user?.email}</p>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-slate-800 truncate leading-tight">{userName}</p>
+              <span className={[
+                'inline-flex items-center text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[5px] mt-0.5',
+                isPro ? 'bg-navy/10 text-navy' : 'bg-slate-100 text-slate-400',
+              ].join(' ')}>
+                {plan}
+              </span>
             </div>
-          </div>
+
+            <Settings className="w-3.5 h-3.5 text-slate-300 group-hover:text-navy/50 flex-shrink-0 transition-colors" />
+          </Link>
+
+          {/* Sign out — minimal */}
           <button
             onClick={handleSignOut}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#B8C6CC', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'all 0.2s' }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = '#f87171';
-              e.currentTarget.style.background = 'rgba(248,113,113,0.05)';
-              e.currentTarget.style.borderColor = 'rgba(248,113,113,0.1)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = '#B8C6CC';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-            }}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl
+                       text-[11.5px] font-bold text-slate-300 hover:text-red-400
+                       hover:bg-red-50/50 transition-all duration-200 tracking-wide"
           >
-            <LogOut style={{ width: '16px', height: '16px' }} />
+            <LogOut className="w-3 h-3 flex-shrink-0" />
             Sign out
           </button>
         </div>
@@ -107,71 +214,43 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#062B3D', overflow: 'hidden' }}>
-      {/* Desktop Sidebar */}
-      <aside 
-        style={{ 
-          flexDirection: 'column', 
-          width: '260px', 
-          flexShrink: 0, 
-          borderRight: '1px solid rgba(255,255,255,0.05)', 
-          background: '#041E2B'
-        }}
-        className="hidden lg:flex"
-      >
+    <div className="bg-mesh flex h-screen overflow-hidden">
+      <Navbar onMenuClick={() => setSidebarOpen(true)} />
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex flex-col w-[232px] flex-shrink-0
+                        border-r border-slate-100 z-40 pt-[72px]"
+             style={{ background: '#F8FAFB' }}>
         <SidebarContent />
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50 }} className="flex lg:hidden">
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setSidebarOpen(false)} />
-          <aside 
-            style={{ 
-              position: 'relative', 
-              width: '260px', 
-              flexShrink: 0, 
-              zIndex: 10, 
-              borderRight: '1px solid rgba(255,255,255,0.05)', 
-              background: '#041E2B'
-            }}
-          >
-            <SidebarContent />
-          </aside>
-        </div>
-      )}
+      {/* Mobile sidebar overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-[70] flex lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -240 }}
+              animate={{ x: 0 }}
+              exit={{ x: -240 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+              className="relative w-[232px] flex-shrink-0 z-10 shadow-2xl"
+            >
+              <SidebarContent mobile />
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Main content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Top bar (mobile only) */}
-        <div 
-          style={{ 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            padding: '16px 20px', 
-            borderBottom: '1px solid rgba(255,255,255,0.05)', 
-            background: '#062B3D',
-            backdropFilter: 'blur(20px)' 
-          }}
-          className="flex lg:hidden"
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#041E2B', border: '1px solid rgba(205,255,0,0.3)' }}>
-              <Zap style={{ width: '14px', height: '14px' }} fill="#CDFF00" stroke="#CDFF00" />
-            </div>
-            <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '14px' }}>
-              <span style={{ color: '#FFFFFF' }}>car</span>
-              <span style={{ color: '#CDFF00' }}>x</span>
-              <span style={{ color: '#FFFFFF' }}>.ai</span>
-            </span>
-          </div>
-          <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B8C6CC' }}>
-            <Menu style={{ width: '20px', height: '20px' }} />
-          </button>
-        </div>
-
-        {/* Page content */}
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+      <div className="flex-1 flex flex-col overflow-hidden pt-[72px]">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

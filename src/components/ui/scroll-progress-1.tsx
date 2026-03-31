@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"  
+import { useState } from "react"
 
 import { cva, type VariantProps } from "class-variance-authority"
 import {
@@ -10,13 +10,13 @@ import {
   useSpring,
 } from "framer-motion"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 const scrollProgressVariants = cva("fixed z-[100] origin-left", {
   variants: {
     variant: {
-      default: "bg-cyan-accent shadow-[0_0_15px_rgba(32,240,248,0.5)]",
-      carx: "bg-gradient-to-r from-cyan-accent to-cyan-light shadow-[0_0_20px_rgba(32,240,248,0.6)]",
+      default: "bg-navy shadow-[0_0_15px_rgba(0,112,224,0.3)]",
+      carx: "bg-gradient-to-r from-navy to-cyan-light shadow-[0_0_20px_rgba(0,112,224,0.4)]",
       rainbow:
         "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500",
       ocean: "bg-gradient-to-r from-cyan-400 via-blue-500 to-blue-600",
@@ -27,7 +27,7 @@ const scrollProgressVariants = cva("fixed z-[100] origin-left", {
       fire: "bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600",
       ice: "bg-gradient-to-r from-blue-200 via-cyan-300 to-blue-400",
       gold: "bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-600",
-      solid: "bg-cyan-accent",
+      solid: "bg-navy",
       custom: "", // For custom gradients
     },
     size: {
@@ -113,7 +113,7 @@ export function ScrollProgress({
   )
 
   const percentageClasses = cn(
-    "fixed z-[110] text-[10px] font-bold text-cyan-accent bg-navy/80 backdrop-blur-md px-2 py-1 rounded-full border border-cyan-accent/20",
+    "fixed z-[110] text-[10px] font-bold text-navy bg-white/80 backdrop-blur-md px-2 py-1 rounded-full border border-navy/10",
     position === "top" ? "top-4" : "bottom-4",
     percentagePosition === "left" && "left-4",
     percentagePosition === "right" && "right-4",

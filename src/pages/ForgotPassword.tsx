@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Zap, ArrowLeft, CheckCircle } from 'lucide-react'
+import Navbar from '../components/Navbar'
+import { motion } from 'framer-motion'
+import { CheckCircle, ArrowLeft } from 'lucide-react'
 
 export default function ForgotPassword() {
   const { resetPassword } = useAuth()
@@ -24,64 +26,72 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-6" 
-      style={{ 
-        backgroundImage: `linear-gradient(rgba(4, 30, 43, 0.9), rgba(4, 30, 43, 0.9)), url('/section-bg.jpg')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      <div className="w-full max-w-md">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-navy border border-[#CDFF00]/30 shadow-glow-sm">
-            <Zap className="w-5 h-5" style={{ color: '#CDFF00' }} />
-          </div>
-          <span className="font-display font-bold text-xl text-soft">car<span style={{ color: '#CDFF00' }}>x</span>.ai</span>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden pt-24">
+      <Navbar />
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-navy/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-navy/5 rounded-full blur-[120px]" />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Reset Password</h1>
+          <p className="text-slate-500 font-medium">We'll help you get back in</p>
         </div>
 
-        <div className="card">
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50">
           {sent ? (
             <div className="text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-emerald-400" />
+              <div className="w-16 h-16 rounded-3xl bg-emerald-50 flex items-center justify-center mx-auto mb-4 border border-emerald-100">
+                <CheckCircle className="w-8 h-8 text-emerald-500" />
               </div>
-              <h2 className="text-xl font-display font-bold text-soft mb-2">Check your email</h2>
-              <p className="text-muted text-sm mb-6">We've sent a password reset link to <strong className="text-soft">{email}</strong></p>
-              <Link to="/login" className="btn-ghost inline-flex">
+              <h2 className="text-xl font-display font-bold text-slate-900 mb-2">Check your email</h2>
+              <p className="text-slate-500 text-sm mb-6">We've sent a password reset link to <strong className="text-slate-900">{email}</strong></p>
+              <Link to="/auth?mode=login" className="inline-flex items-center gap-2 text-navy font-bold hover:underline">
                 <ArrowLeft className="w-4 h-4" /> Back to login
               </Link>
             </div>
           ) : (
             <>
-              <div className="mb-6">
-                <h1 className="text-2xl font-display font-bold text-soft mb-1">Reset Password</h1>
-                <p className="text-muted text-sm">Enter your email to receive a reset link</p>
-              </div>
-
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+                  <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm">{error}</div>
                 )}
                 <div>
-                  <label className="label-sm block mb-2">Email</label>
-                  <input type="email" className="input-field" placeholder="you@example.com"
-                    value={email} onChange={e => setEmail(e.target.value)} required />
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    className="w-full px-5 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/10 outline-none transition-all placeholder:text-slate-400"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-3.5 text-base rounded-2xl text-navy font-bold hover:brightness-110 transition-all shadow-[0_0_20px_rgba(205,255,0,0.3)] disabled:opacity-50" style={{ background: '#CDFF00' }}>
+                <motion.button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="w-full py-3.5 text-base rounded-2xl bg-navy text-white font-bold shadow-[0_10px_30px_rgba(0,112,224,0.3)] disabled:opacity-50"
+                  whileHover={!loading ? { y: -2, filter: 'brightness(1.1)' } : {}}
+                  whileTap={!loading ? { scale: 0.98 } : {}}
+                >
                   {loading ? 'Sending...' : 'Send Reset Link'}
-                </button>
+                </motion.button>
               </form>
 
-              <p className="text-center text-muted mt-5 text-sm">
+              <p className="text-center text-slate-500 mt-6 text-sm">
                 Remember your password?{' '}
-                <Link to="/login" className="text-cyan-DEFAULT hover:text-cyan-light transition-colors font-medium">Sign in</Link>
+                <Link to="/auth?mode=login" className="text-navy font-bold hover:underline">Sign in</Link>
               </p>
             </>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

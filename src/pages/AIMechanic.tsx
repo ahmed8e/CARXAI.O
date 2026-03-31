@@ -1,15 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { speak, stopSpeaking, getUrgencyColor, getUrgencyBadge } from '../lib/utils'
 import type { Message, DiagnosticResult } from '../lib/types'
 import {
-  Bot, Send, Upload, Camera, Users, Truck, Volume2,
-  VolumeX, Loader2, AlertTriangle, Mic, MicOff, RefreshCw, Zap,
-  CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert
+  Bot, Send, Users, Truck, Volume2,
+  Loader2, AlertTriangle, Mic, MicOff, RefreshCw, Zap, Lock as LockIcon,
+  CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
+  Car, Info, ChevronRight, Sparkles
 } from 'lucide-react'
+import MechanicReport from '../components/MechanicReport'
+import VehicleAddModal from '../components/VehicleAddModal'
+import type { Database } from '../lib/types'
+
+type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
 const ISSUE_CHIPS = [
   { label: 'Engine light', value: 'My check engine light is on', icon: Activity },
@@ -22,7 +28,7 @@ const ISSUE_CHIPS = [
   { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
-const SYSTEM_PROMPT = `You are an expert AI automotive mechanic assistant for carx.ai. 
+const SYSTEM_PROMPT = `You are an expert AI automotive mechanic assistant for Carxai. 
 When a user describes a car problem, respond in the following JSON format ONLY:
 {
   "issueName": "Short name of the issue",
@@ -37,6 +43,10 @@ Be extremely concise. Structure for a stressed user on mobile. Do not use markdo
 export default function AIMechanic() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const plan = user?.user_metadata?.subscription_tier || 'Basic'
+  const isBasic = plan === 'Basic'
+  const isPro = plan === 'Pro'
+  const reportsUsed = user?.user_metadata?.reports_used || 0
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '0',
@@ -54,10 +64,59 @@ export default function AIMechanic() {
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
+  
+  // Mechanic Report States
+  const [showReport, setShowReport] = useState(false)
+  const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
+
+  // Vehicle States
+  const [activeVehicle, setActiveVehicle] = useState<Vehicle | null>(null)
+  const [loadingVehicle, setLoadingVehicle] = useState(true)
+  const [showVehicleModal, setShowVehicleModal] = useState(false)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  useEffect(() => {
+    if (user) {
+      fetchActiveVehicle()
+    }
+  }, [user])
+
+  const fetchActiveVehicle = async () => {
+    setLoadingVehicle(true)
+    try {
+      if (!user?.id) return
+
+      const { data } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_default', true)
+        .maybeSingle()
+      
+      if (data) {
+        setActiveVehicle(data as Vehicle)
+      } else {
+        // Take the latest if no default
+        const { data: latest } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+        
+        if (latest && latest.length > 0) {
+          setActiveVehicle(latest[0] as Vehicle)
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching vehicle context:', err)
+    } finally {
+      setLoadingVehicle(false)
+    }
+  }
 
   useEffect(() => {
     // Initialize Speech Recognition
@@ -148,7 +207,14 @@ export default function AIMechanic() {
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { 
+              role: 'system', 
+              content: `${SYSTEM_PROMPT}\n\nUSER VEHICLE CONTEXT:\n${
+                activeVehicle 
+                  ? `Brand: ${activeVehicle.make}, Model: ${activeVehicle.model}, Year: ${activeVehicle.year}, Fuel: ${activeVehicle.fuel_type}, Engine: ${activeVehicle.engine_type || 'N/A'}, Gearbox: ${activeVehicle.gearbox || 'N/A'}, Mileage: ${activeVehicle.mileage || 'N/A'} km.`
+                  : "No specific vehicle details provided. Ask the user for car details if crucial for diagnosis."
+              }` 
+            },
             ...messages.slice(-6).map(m => ({
               role: m.role,
               content: m.imageUrl
@@ -202,13 +268,21 @@ export default function AIMechanic() {
         })
       }
     } catch (err) {
-      const errMsg: Message = {
+      console.error('AI Error:', err)
+      const demoResult: DiagnosticResult = {
+        issueName: 'Connection Feedback',
+        likelyCause: 'The AI is currently in offline/demo mode. Usually, this would be a real-time diagnosis of your car problem.',
+        urgencyLevel: 'medium',
+        nextStep: 'Check your internet connection or API settings, then try again.',
+      }
+      const demoResponse: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please check your API key and try again.',
+        content: demoResult.likelyCause,
         timestamp: new Date(),
+        issueData: demoResult,
       }
-      setMessages(prev => [...prev, errMsg])
+      setMessages(prev => [...prev, demoResponse])
     }
 
     setLoading(false)
@@ -228,7 +302,7 @@ export default function AIMechanic() {
       stopSpeaking()
       setSpeaking(false)
     } else {
-      speak(`carx.ai says, ${text}`)
+      speak(`Carxai says, ${text}`)
       setSpeaking(true)
       setTimeout(() => setSpeaking(false), 10000)
     }
@@ -254,7 +328,7 @@ export default function AIMechanic() {
   const formatContent = (content: string) => {
     return content.split('\n').map((line, i) => {
       if (line.startsWith('**') && line.endsWith('**')) {
-        return <p key={i} className="font-semibold text-soft mb-1">{line.replace(/\*\*/g, '')}</p>
+        return <p key={i} className="font-semibold text-slate-900 mb-1">{line.replace(/\*\*/g, '')}</p>
       }
       if (line.includes('**')) {
         return <p key={i} className="mb-1">{line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
@@ -264,150 +338,272 @@ export default function AIMechanic() {
   }
 
   return (
-    <div className="flex flex-col h-full max-h-screen relative" style={{
-      backgroundImage: `linear-gradient(rgba(6, 43, 61, 0.94), rgba(6, 43, 61, 0.94)), url('/section-bg.jpg')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }}>
+    <div className="flex flex-col h-full max-h-screen relative bg-transparent">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-navy/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy/[0.03] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 backdrop-blur-md bg-navy/60">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 backdrop-blur-md bg-white/90 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-navy border border-[#CDFF00]/10 shadow-[0_0_20px_rgba(205,255,0,0.05)]">
-            <CircuitBoard className="w-5 h-5 text-[#CDFF00]" />
+          {/* Brand icon */}
+          <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-navy shadow-md shadow-navy/25">
+            <CircuitBoard className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
-            <h1 className="font-display font-black text-white italic tracking-tight">AI Mechanic</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400/80">Active</span>
+            <h1 className="font-display font-bold text-slate-900 italic tracking-tight leading-tight">AI Mechanic</h1>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Online</span>
             </div>
+          </div>
+        </div>
+
+        {/* Right side: vehicle pill + user avatar */}
+        <div className="flex items-center gap-2">
+          {loadingVehicle ? (
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-[10px] text-slate-400">
+              <Loader2 className="w-3 h-3 animate-spin" />
+            </div>
+          ) : activeVehicle ? (
+            <motion.button
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => navigate('/dashboard/vehicles')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy/5 border border-navy/10 hover:bg-navy/10 transition-colors group max-w-[180px]"
+            >
+              <Car className="w-3 h-3 text-navy flex-shrink-0" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-navy truncate">
+                {activeVehicle.make} {activeVehicle.model}
+              </span>
+            </motion.button>
+          ) : (
+            <motion.button
+              onClick={() => setShowVehicleModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Info className="w-3 h-3 text-amber-600" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Add Car</span>
+            </motion.button>
+          )}
+
+          {/* User avatar */}
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-navy to-navy/70 flex items-center justify-center shadow-sm ring-2 ring-white">
+            <span className="text-[11px] font-black text-white uppercase">
+              {user?.email?.[0] ?? '?'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Issue Chips */}
-      <div className="px-4 py-3 flex gap-2 flex-wrap border-b border-white/5 bg-navy/20">
+      <div className="px-4 py-3 flex gap-2 overflow-x-auto scrollbar-hide border-b border-slate-100 bg-slate-50/50 relative z-10">
         {ISSUE_CHIPS.map((chip) => (
           <motion.button
             key={chip.value}
             onClick={() => sendMessage(chip.value)}
             disabled={loading}
-            className="chip flex items-center gap-1.5 text-[11px] font-bold !py-2 !px-3 border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
-            whileHover={{ y: -2, borderColor: 'rgba(205, 255, 0, 0.2)' }}
+            className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-bold py-2 px-4 rounded-full border border-slate-200 bg-white hover:border-navy hover:text-navy transition-all"
+            whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(0, 112, 224, 0.08)' }}
             whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 15 }}
           >
-            <chip.icon className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100" />
+            <chip.icon className="w-3.5 h-3.5" />
             {chip.label}
           </motion.button>
         ))}
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 relative z-10">
+
+        {/* ── No-vehicle onboarding card ── */}
+        {!loadingVehicle && !activeVehicle && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mx-auto max-w-sm"
+          >
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy/5 via-navy/[0.03] to-transparent border border-navy/10 p-6">
+              {/* Glow orb */}
+              <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-navy/10 blur-2xl pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
+                    <Car className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-navy/60">Smarter Diagnosis</p>
+                    <h4 className="font-display font-black italic text-slate-900 leading-tight">Add your vehicle</h4>
+                  </div>
+                </div>
+
+                <p className="text-sm text-slate-500 font-medium leading-relaxed mb-5">
+                  Tell us about your car so the AI can give you precise, model-specific answers — not just generic advice.
+                </p>
+
+                <motion.button
+                  onClick={() => setShowVehicleModal(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-navy text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-navy/25"
+                  whileHover={{ scale: 1.02, filter: 'brightness(1.08)' }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Add Vehicle Info
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </motion.button>
+
+                {/* Skip link — elegant separator style */}
+                <div className="flex items-center gap-3 mt-4">
+                  <div className="flex-1 h-px bg-slate-200" />
+                  <button
+                    onClick={() => {}}
+                    className="text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+                  >
+                    Skip for now
+                  </button>
+                  <div className="flex-1 h-px bg-slate-200" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-1 bg-navy border border-[#CDFF00]/20">
-                <Bot className="w-4 h-4" fill="#CDFF00" stroke="#CDFF00" />
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 mr-3 mt-1 bg-white border border-slate-200 shadow-sm">
+                <Bot className="w-5 h-5 text-navy" />
               </div>
             )}
-            <div className={`max-w-sm lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
+            <div className={`max-w-[85%] lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
               {msg.imageUrl && (
-                <img src={msg.imageUrl} alt="Uploaded" className="rounded-2xl mb-2 max-h-40 object-cover" />
+                <div className="relative rounded-2xl overflow-hidden mb-2 shadow-lg border border-slate-100">
+                  <img src={msg.imageUrl} alt="Uploaded" className="w-full max-h-60 object-cover" />
+                </div>
               )}
-              <div className={`px-4 py-3 rounded-3xl text-sm leading-relaxed ${
+              <div className={`px-5 py-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
                 msg.role === 'user'
-                  ? 'text-soft rounded-br-lg'
-                  : 'text-on-surface rounded-bl-lg'
-              }`} style={msg.role === 'user'
-                ? { background: '#CDFF00', color: '#062B3D', fontWeight: 600 }
-                : { background: 'rgba(13,58,82,0.6)', border: '1px solid rgba(87,214,232,0.08)' }
-              }>
+                  ? 'bg-navy text-white rounded-tr-none'
+                  : 'bg-white border border-slate-100 text-slate-600 rounded-tl-none'
+              }`}>
                 {msg.role === 'assistant' ? (
                   msg.issueData ? (
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-xl md:text-2xl font-display font-black text-white italic tracking-tight mb-2">{msg.issueData.issueName}</h3>
-                        <p className="text-white/70 leading-relaxed font-medium">{msg.issueData.likelyCause}</p>
+                        <h3 className="text-xl font-display font-bold text-slate-900 italic tracking-tight mb-2">{msg.issueData.issueName}</h3>
+                        <p className="text-slate-600 leading-relaxed font-medium">{msg.issueData.likelyCause}</p>
                       </div>
 
-                      <div className="space-y-3 pt-2">
+                      <div className="space-y-3 pt-3 border-t border-slate-50">
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Immediate Next Step</p>
-                          <p className="text-sm font-bold text-[#CDFF00] leading-tight">{msg.issueData.nextStep}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Immediate Next Step</p>
+                          <p className="text-sm font-bold text-navy leading-tight">{msg.issueData.nextStep}</p>
                         </div>
                         
                         {msg.issueData.followUp && (
                           <div className="space-y-1">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Follow-up</p>
-                            <p className="text-xs font-medium text-white/80">{msg.issueData.followUp}</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Follow-up</p>
+                            <p className="text-xs font-medium text-slate-500">{msg.issueData.followUp}</p>
                           </div>
                         )}
                       </div>
                     </div>
                   ) : formatContent(msg.content)
-                ) : msg.content}
+                ) : (
+                  <p className="font-medium">{msg.content}</p>
+                )}
               </div>
 
               {/* Urgency badge + Actions */}
               {msg.issueData && (
-                <div className="mt-3 space-y-3">
+                <div className="mt-4 space-y-4">
                   <div className="flex flex-col gap-2">
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border w-fit ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                      <AlertTriangle className="w-3 h-3" />
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border w-fit ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
+                      <AlertTriangle className="w-3.5 h-3.5" />
                       {getUrgencyBadge(msg.issueData.urgencyLevel)} Urgency
                     </div>
                     {msg.issueData.warning && (
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-red-500 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 w-fit">
-                        <ShieldAlert className="w-3 h-3" />
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-100 w-fit">
+                        <ShieldAlert className="w-3.5 h-3.5" />
                         {msg.issueData.warning}
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex gap-2 flex-wrap pt-1">
+                  <div className="flex gap-2 flex-wrap pb-2">
                     <motion.button 
-                      onClick={() => navigate('/dashboard/mechanic')} 
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-navy shadow-sm" 
-                      style={{ background: '#CDFF00' }}
-                      whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(205, 255, 0, 0.3)' }}
+                      onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/mechanic')} 
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-900 shadow-sm"
+                      whileHover={{ y: -1, borderColor: 'rgba(0, 112, 224, 0.5)', color: '#0070E0' }}
                       whileTap={{ scale: 0.96 }}
                     >
-                      <Users className="w-3 h-3" /> Human Mechanic
+                      <Users className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Mechanic Search' : 'Human Mechanic'}
                     </motion.button>
                     <motion.button 
-                      onClick={() => navigate('/dashboard/towing')} 
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-navy shadow-sm" 
-                      style={{ background: '#CDFF00' }}
-                      whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(205, 255, 0, 0.3)' }}
+                      onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/towing')} 
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-navy/20 ${isBasic ? 'bg-slate-400 text-white' : 'bg-navy text-white'}`}
+                      whileHover={{ y: -1, filter: 'brightness(1.1)' }}
                       whileTap={{ scale: 0.96 }}
                     >
-                      <Truck className="w-3 h-3" /> Get Towing
-                    </motion.button>
-                    <motion.button 
-                      onClick={() => handleSpeak(msg.content)} 
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${speaking ? 'bg-cyan-DEFAULT/20 text-cyan-DEFAULT border border-cyan-DEFAULT/30' : 'bg-white/5 text-muted border border-white/10 hover:text-soft'}`}
-                      whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                      whileTap={{ scale: 0.96 }}
-                    >
-                      {speaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
-                      {speaking ? 'Stop' : 'Listen'}
+                      <Truck className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Towing' : 'Get Towing'}
                     </motion.button>
                   </div>
+
+                  <motion.button 
+                    onClick={async () => {
+                      if (isBasic) return navigate('/my-account?upgrade=pro')
+                      if (isPro && reportsUsed >= 3) return navigate('/my-account?upgrade=advanced')
+                      
+                      if (isPro) {
+                        const newCount = reportsUsed + 1
+                        await supabase.auth.updateUser({
+                          data: { reports_used: newCount }
+                        })
+                      }
+
+                      setReportDiagnosis(msg.issueData!)
+                      setShowReport(true)
+                    }}
+                    className={`w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
+                      isBasic || (isPro && reportsUsed >= 3) 
+                        ? 'bg-slate-100 text-slate-400 border border-slate-200'
+                        : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20'
+                    }`}
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <FileText className="w-3.5 h-3.5" /> 
+                    {isBasic 
+                      ? 'Pro Plan Required for Reports' 
+                      : (isPro && reportsUsed >= 3) 
+                        ? 'Upgrade to Advanced for Unlimited Reports' 
+                        : 'Generate Mechanic Report'}
+                  </motion.button>
                 </div>
               )}
 
               {msg.role === 'assistant' && !msg.issueData && msg.id !== '0' && (
                 <motion.button 
-                  onClick={() => handleSpeak(msg.content)} 
-                  className="mt-1.5 flex items-center gap-1 text-xs text-muted hover:text-cyan-DEFAULT transition-colors"
+                  onClick={() => {
+                    if (isBasic) {
+                      navigate('/my-account?upgrade=pro')
+                    } else {
+                      handleSpeak(msg.content)
+                    }
+                  }} 
+                  className={`mt-2 ml-1 flex items-center gap-2 text-xs font-medium transition-colors ${
+                    isBasic ? 'text-amber-500 hover:text-amber-600' : 'text-slate-400 hover:text-navy'
+                  }`}
                   whileHover={{ x: 2 }}
-                  whileTap={{ scale: 0.96 }}
                 >
-                  <Volume2 className="w-3 h-3" />
-                  Listen
+                  <Volume2 className="w-3.5 h-3.5" />
+                  {isBasic ? 'Unlock Voice Responses' : 'Listen to diagnosis'}
                 </motion.button>
               )}
             </div>
@@ -415,113 +611,202 @@ export default function AIMechanic() {
         ))}
 
         {loading && (
-          <div className="flex justify-start">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center mr-2" style={{ background: 'rgba(87,214,232,0.1)' }}>
-              <Bot className="w-4 h-4 text-cyan-DEFAULT" />
+          <div className="flex justify-start items-start">
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-slate-50 border border-slate-200">
+              <Bot className="w-5 h-5 text-slate-400" />
             </div>
-            <div className="px-4 py-3 rounded-3xl rounded-bl-lg flex items-center gap-2" style={{ background: 'rgba(13,58,82,0.6)', border: '1px solid rgba(87,214,232,0.08)' }}>
-              <Loader2 className="w-4 h-4 text-cyan-DEFAULT animate-spin" />
-              <span className="text-sm text-muted">Analyzing...</span>
+            <div className="px-5 py-4 rounded-3xl rounded-tl-none bg-slate-50 border border-slate-100 flex items-center gap-3">
+              <Loader2 className="w-4 h-4 text-navy animate-spin" />
+              <span className="text-sm font-medium text-slate-400">Analyzing data...</span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Action Buttons */}
-      <div className="px-4 py-3 flex gap-3 border-t border-white/5 bg-navy/20">
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
-        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
-        <motion.button
-          onClick={() => fileInputRef.current?.click()}
-          className="chip flex-1 justify-center gap-2 !py-2.5 !rounded-xl border-white/5 bg-white/[0.04] text-[11px] font-black uppercase tracking-widest text-white/60"
-          disabled={loading}
-          whileHover={{ y: -2, backgroundColor: 'rgba(255,255,255,0.08)', color: '#FFFFFF' }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <ImagePlus className="w-4 h-4" /> Upload
-        </motion.button>
-        <motion.button
-          onClick={() => cameraInputRef.current?.click()}
-          className="chip flex-1 justify-center gap-2 !py-2.5 !rounded-xl border-white/5 bg-white/[0.04] text-[11px] font-black uppercase tracking-widest text-white/60"
-          disabled={loading}
-          whileHover={{ y: -2, backgroundColor: 'rgba(255,255,255,0.08)', color: '#FFFFFF' }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Aperture className="w-4 h-4" /> Take Photo
-        </motion.button>
-      </div>
+      {/* ══ Composer ══ */}
+      <div className="relative z-10 bg-white/95 backdrop-blur-sm border-t border-slate-100/80">
+        {/* Hidden file pickers */}
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+          onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
+          onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
-      {/* Input */}
-      <div className="p-4 pt-2 border-t border-white/5">
-        <div className="flex gap-3 items-end">
-          <div className="flex-1 relative">
-            <textarea
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input) } }}
-              placeholder={isListening ? "Listening..." : "Describe your car issue..."}
-              rows={1}
-              className="input-field resize-none pr-12"
-              style={{ minHeight: '44px', maxHeight: '120px' }}
-              disabled={loading}
-            />
-            {isListening && (
-              <div className="absolute left-0 bottom-full mb-2 w-full animate-pulse flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#CDFF00]/10 border border-[#CDFF00]/20">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#CDFF00]" />
-                <span className="text-[10px] uppercase tracking-wider text-[#CDFF00] font-bold">Recording Speech...</span>
-              </div>
-            )}
+        {/* ── Floating card ── */}
+        <div className="mx-3 mt-3 mb-2 rounded-[28px] border border-slate-200 bg-white shadow-sm
+                        transition-[border-color,box-shadow] duration-200
+                        focus-within:border-navy/25 focus-within:shadow-[0_0_0_4px_rgba(0,71,143,0.06),0_4px_24px_rgba(0,0,0,0.06)]">
+
+          {/* ── Top: text input ── */}
+          <div className="px-5 pt-4 pb-3">
+            <AnimatePresence mode="wait">
+              {isListening ? (
+                /* Listening waveform replaces placeholder */
+                <motion.div
+                  key="waveform"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-1.5 h-[52px]"
+                >
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-[3px] rounded-full bg-navy"
+                      animate={{ scaleY: [0.3, 1, 0.3] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 0.9,
+                        delay: i * 0.04,
+                        ease: 'easeInOut',
+                      }}
+                      style={{ height: 28, transformOrigin: 'center' }}
+                    />
+                  ))}
+                  <span className="ml-3 text-[13px] font-bold text-navy/70 tracking-wide">Listening…</span>
+                </motion.div>
+              ) : (
+                <motion.textarea
+                  key="textarea"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  value={input}
+                  onChange={e => {
+                    setInput(e.target.value)
+                    e.target.style.height = 'auto'
+                    e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px'
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      sendMessage(input)
+                    }
+                  }}
+                  placeholder="Describe your car issue…"
+                  rows={2}
+                  style={{ minHeight: 52, maxHeight: 150 }}
+                  className="w-full bg-transparent outline-none resize-none
+                             text-[15px] font-medium leading-relaxed
+                             text-slate-900 placeholder:text-slate-400"
+                  disabled={loading}
+                />
+              )}
+            </AnimatePresence>
           </div>
-          
-          <motion.button
-            onClick={toggleListening}
-            disabled={loading || isProcessing}
-            className={`p-3 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center ${
-              isListening 
-                ? 'bg-[#CDFF00] text-navy shadow-[#CDFF00]/40' 
-                : 'bg-navy border border-white/10 text-muted hover:text-soft'
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            animate={isListening ? {
-              boxShadow: [
-                "0 0 0px rgba(205,255,0,0)",
-                "0 0 20px rgba(205,255,0,0.4)",
-                "0 0 0px rgba(205,255,0,0)"
-              ]
-            } : {}}
-            transition={isListening ? {
-              repeat: Infinity,
-              duration: 2
-            } : {}}
-          >
-            {isProcessing ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : isListening ? (
-              <MicOff className="w-4 h-4" />
-            ) : (
-              <Mic className="w-4 h-4" />
-            )}
-          </motion.button>
 
-          <motion.button
-            onClick={() => sendMessage(input)}
-            disabled={loading || !input.trim() || isListening}
-            className="p-3 flex-shrink-0 rounded-xl text-navy font-bold shadow-[0_0_15px_rgba(205,255,0,0.3)] disabled:opacity-50"
-            style={{ background: '#CDFF00' }}
-            whileHover={!loading && input.trim() && !isListening ? { 
-              scale: 1.05, 
-              boxShadow: '0 0 25px rgba(205,255,0,0.5)',
-              filter: 'brightness(1.1)' 
-            } : {}}
-            whileTap={!loading && input.trim() && !isListening ? { scale: 0.92 } : {}}
-            transition={{ type: "spring", stiffness: 400, damping: 15 }}
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          </motion.button>
+          {/* ── Bottom: action bar ── */}
+          <div className="flex items-center gap-1 px-3 pb-3">
+            {/* Left — media actions */}
+            <div className="flex items-center gap-0.5 flex-1">
+              {/* Upload */}
+              <motion.button
+                onClick={() => isBasic ? navigate('/my-account?upgrade=pro') : fileInputRef.current?.click()}
+                disabled={loading}
+                title={isBasic ? 'Pro feature — upgrade to upload' : 'Attach photo'}
+                className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
+                           hover:bg-slate-50 active:bg-slate-100"
+                whileTap={{ scale: 0.9 }}
+              >
+                <ImagePlus className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-slate-400'}`} />
+                {isBasic && (
+                  <span className="absolute top-0.5 right-0.5 w-3 h-3 rounded-full bg-amber-400
+                                   flex items-center justify-center ring-1 ring-white">
+                    <LockIcon className="w-1.5 h-1.5 text-white" />
+                  </span>
+                )}
+              </motion.button>
+
+              {/* Camera */}
+              <motion.button
+                onClick={() => isBasic ? navigate('/my-account?upgrade=pro') : cameraInputRef.current?.click()}
+                disabled={loading}
+                title={isBasic ? 'Pro feature — upgrade to use camera' : 'Take photo'}
+                className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
+                           hover:bg-slate-50 active:bg-slate-100"
+                whileTap={{ scale: 0.9 }}
+              >
+                <Aperture className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-slate-400'}`} />
+                {isBasic && (
+                  <span className="absolute top-0.5 right-0.5 w-3 h-3 rounded-full bg-amber-400
+                                   flex items-center justify-center ring-1 ring-white">
+                    <LockIcon className="w-1.5 h-1.5 text-white" />
+                  </span>
+                )}
+              </motion.button>
+
+              {/* Mic */}
+              <motion.button
+                onClick={toggleListening}
+                disabled={loading || isProcessing}
+                title={isListening ? 'Stop listening' : 'Voice input'}
+                className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                  isListening
+                    ? 'bg-red-500 text-white shadow-sm shadow-red-400/40'
+                    : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600 active:bg-slate-100'
+                }`}
+                whileTap={{ scale: 0.9 }}
+              >
+                {isProcessing
+                  ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
+                  : isListening
+                    ? <MicOff className="w-[18px] h-[18px]" />
+                    : <Mic className="w-[18px] h-[18px]" />}
+              </motion.button>
+            </div>
+
+            {/* Right — Send */}
+            <motion.button
+              onClick={() => sendMessage(input)}
+              disabled={loading || (!input.trim() && !isListening)}
+              className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                          transition-all duration-200 ${
+                input.trim() && !loading
+                  ? 'bg-navy text-white shadow-md shadow-navy/30'
+                  : 'bg-slate-100 text-slate-300'
+              }`}
+              whileHover={input.trim() && !loading ? { scale: 1.07 } : {}}
+              whileTap={{ scale: 0.9 }}
+            >
+              {loading
+                ? <Loader2 className="w-4 h-4 animate-spin" />
+                : <Send className="w-4 h-4 translate-x-[1px]" />}
+            </motion.button>
+          </div>
         </div>
+
+        {/* Pro nudge — single understated line */}
+        {isBasic && (
+          <button
+            onClick={() => navigate('/my-account?upgrade=pro')}
+            className="w-full py-1.5 pb-2.5 text-center text-[11px] font-semibold
+                       text-slate-400 hover:text-amber-500 transition-colors"
+          >
+            🔒 Unlock photo &amp; camera diagnosis — <span className="underline underline-offset-2">Upgrade to Pro</span>
+          </button>
+        )}
       </div>
+
+      {/* Mechanic Report Modal */}
+      {reportDiagnosis && (
+        <MechanicReport 
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          user={user}
+          diagnosis={reportDiagnosis}
+          messages={messages}
+          activeVehicle={activeVehicle}
+        />
+      )}
+
+      {/* Vehicle Add Modal — opened from header or onboarding card */}
+      <VehicleAddModal
+        isOpen={showVehicleModal}
+        onClose={() => setShowVehicleModal(false)}
+        onSaved={(vehicle) => {
+          setActiveVehicle(vehicle)
+          setShowVehicleModal(false)
+        }}
+      />
     </div>
   )
 }

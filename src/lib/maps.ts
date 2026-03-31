@@ -49,86 +49,90 @@ export async function loadGoogleMaps(apiKey: string): Promise<void> {
 }
 
 export const GOOGLE_MAPS_STYLE = [
-  { elementType: 'geometry', stylers: [{ color: '#062B3D' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ visibility: 'off' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#B8C6CC' }] },
   {
-    featureType: 'administrative',
-    elementType: 'geometry',
-    stylers: [{ color: '#0B4E63' }]
+    "elementType": "geometry",
+    "stylers": [{ "color": "#f5f5f5" }]
   },
   {
-    featureType: 'administrative.country',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#57D6E8' }]
+    "elementType": "labels.icon",
+    "stylers": [{ "visibility": "off" }]
   },
   {
-    featureType: 'administrative.land_parcel',
-    stylers: [{ visibility: 'off' }]
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#616161" }]
   },
   {
-    featureType: 'administrative.locality',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#B8C6CC' }]
+    "elementType": "labels.text.stroke",
+    "stylers": [{ "color": "#f5f5f5" }]
   },
   {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#8EF3FF', opacity: 0.5 }]
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#bdbdbd" }]
   },
   {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ color: '#041E2B' }]
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#eeeeee" }]
   },
   {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#B8C6CC', opacity: 0.5 }]
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#757575" }]
   },
   {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#0B4E63' }]
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#e5e5e5" }]
   },
   {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#B8C6CC' }]
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#9e9e9e" }]
   },
   {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#0B4E63', weight: 2 }]
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#ffffff" }]
   },
   {
-    featureType: 'road.highway',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#F4F8FB' }]
+    "featureType": "road.arterial",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#757575" }]
   },
   {
-    featureType: 'road.arterial',
-    elementType: 'geometry',
-    stylers: [{ color: '#0B4E63', weight: 1.5 }]
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#dadada" }]
   },
   {
-    featureType: 'transit',
-    elementType: 'geometry',
-    stylers: [{ color: '#062B3D' }]
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#616161" }]
   },
   {
-    featureType: 'transit.station',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#57D6E8' }]
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#9e9e9e" }]
   },
   {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#041E2B' }]
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#e5e5e5" }]
   },
   {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#0B4E63' }]
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#eeeeee" }]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#C9E2FF" }]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#9e9e9e" }]
   }
 ]
