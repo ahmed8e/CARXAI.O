@@ -28,7 +28,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
 
   return (
-    <nav className={`fixed top-[calc(1.5rem+env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-3 ${transparent ? 'bg-white/40' : 'bg-white/80'} backdrop-blur-xl border border-slate-200/60 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-300`}>
+    <nav className={`fixed top-[calc(1.5rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-3 ${transparent ? 'bg-white/40' : 'bg-white/80'} backdrop-blur-xl border border-slate-200/60 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-300`}>
       {/* Logo */}
       <Link to="/" className="flex items-center gap-2 group">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">

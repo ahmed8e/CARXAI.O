@@ -80,7 +80,7 @@ export default function Auth() {
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       
       {/* Simple Top Left Logo instead of Navbar */}
-      <div className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] left-6 md:top-8 md:left-8 z-50">
+      <div className="absolute top-[calc(1.5rem_+_env(safe-area-inset-top))] left-6 md:top-8 md:left-8 z-50">
         <Link to="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
             <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
