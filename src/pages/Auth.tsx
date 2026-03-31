@@ -77,7 +77,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-surface dark:bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
       
       {/* Simple Top Left Logo instead of Navbar */}
       <div className="absolute top-[calc(1.5rem_+_env(safe-area-inset-top))] left-6 md:top-8 md:left-8 z-50">
@@ -85,7 +85,7 @@ export default function Auth() {
           <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
             <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
           </div>
-          <span className="font-display font-bold text-lg tracking-tight text-slate-900">
+          <span className="font-display font-bold text-lg tracking-tight text-on-surface">
             Carxai
           </span>
         </Link>
@@ -110,21 +110,21 @@ export default function Auth() {
           </p>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50">
+        <div className="bg-surface dark:bg-slate-800 p-8 rounded-3xl border border-overlay shadow-2xl shadow-slate-900/10">
           
           {/* Mode Switcher */}
-          <div className="flex p-1 bg-slate-50 border border-slate-100/60 rounded-[14px] mb-8">
+          <div className="flex p-1 bg-surface-low dark:bg-slate-900 border border-overlay rounded-[14px] mb-8">
             <button
               type="button"
               onClick={() => setMode('login')}
-              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'login' ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ring-1 ring-slate-900/5' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'login' ? 'bg-surface dark:bg-slate-800 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => setMode('register')}
-              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'register' ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ring-1 ring-slate-900/5' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'register' ? 'bg-surface dark:bg-slate-800 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
             >
               Sign Up
             </button>
@@ -140,7 +140,7 @@ export default function Auth() {
                   setError('Google sign-in is not configured yet. Please use email.')
                 }
               }}
-              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-white border border-slate-200 text-slate-700 text-[15px] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition-all group"
+              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-slate-700 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
             >
               <div className="absolute left-5 flex items-center justify-center w-6 h-6">
                 <svg className="w-[19px] h-[19px] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
@@ -160,7 +160,7 @@ export default function Auth() {
                   setError('Apple sign-in is not configured yet. Please use email.')
                 }
               }}
-              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-white border border-slate-200 text-slate-700 text-[15px] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition-all group"
+              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-slate-700 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
             >
               <div className="absolute left-5 flex items-center justify-center w-6 h-6 mb-[1px]">
                 <svg className="w-[21px] h-[21px] text-slate-900 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -172,9 +172,9 @@ export default function Auth() {
           </div>
 
           <div className="flex items-center gap-4 mb-6 relative z-10">
-            <div className="h-px bg-slate-100 flex-1"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Or continue with email</span>
-            <div className="h-px bg-slate-100 flex-1"></div>
+            <div className="h-px bg-overlay flex-1"></div>
+            <span className="text-[10px] font-black text-muted uppercase tracking-widest">Or continue with email</span>
+            <div className="h-px bg-overlay flex-1"></div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -199,10 +199,10 @@ export default function Auth() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                  <label className="block text-sm font-semibold text-on-surface mb-2">Full Name</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-slate-400/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all outline-none"
+                    className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
                     placeholder="John Doe"
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
@@ -213,10 +213,10 @@ export default function Auth() {
             </AnimatePresence>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+              <label className="block text-sm font-semibold text-on-surface mb-2">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-slate-400/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
                 placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -225,11 +225,11 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-semibold text-on-surface mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-slate-400/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all outline-none pr-12"
+                  className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none pr-12"
                   placeholder={mode === 'login' ? '••••••••' : 'Min. 6 characters'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -238,7 +238,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-navy transition-colors flex items-center justify-center p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-navy transition-colors flex items-center justify-center p-1"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -260,11 +260,11 @@ export default function Auth() {
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="peer appearance-none w-5 h-5 rounded-md border-2 border-slate-200 checked:bg-navy checked:border-navy transition-all cursor-pointer"
+                        className="peer appearance-none w-5 h-5 rounded-md border-2 border-overlay checked:bg-navy checked:border-navy transition-all cursor-pointer"
                       />
                       <CheckCircle className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                     </div>
-                    <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors select-none">Remember me</span>
+                    <span className="text-sm font-medium text-muted group-hover:text-on-surface transition-colors select-none">Remember me</span>
                   </label>
                   <Link to="/forgot-password" title="sm" className="text-sm text-navy hover:underline font-bold">
                     Forgot password?

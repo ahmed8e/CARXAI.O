@@ -1,14 +1,56 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Users, ChevronRight, AlertCircle, Clock, ShieldAlert, Wrench, ShieldCheck, Radar, Navigation, ArrowRight, Lock } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { 
+  Users, ChevronRight, AlertCircle, 
+  ShieldAlert, Wrench, ShieldCheck, 
+  Navigation, Lock, Car,
+  Zap, Plus, Thermometer, Battery, Activity
+} from 'lucide-react'
 
 export default function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [defaultVehicle, setDefaultVehicle] = useState<any>(null)
+  const [loadingVehicle, setLoadingVehicle] = useState(true)
+  
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
   const plan = user?.user_metadata?.subscription_tier || 'Basic'
   const isBasic = plan === 'Basic'
+
+  useEffect(() => {
+    if (user) fetchDefaultVehicle()
+  }, [user])
+
+  const fetchDefaultVehicle = async () => {
+    try {
+      const { data } = await (supabase as any)
+        .from('vehicles')
+        .select('*')
+        .eq('user_id', user?.id)
+        .eq('is_default', true)
+        .single()
+      
+      if (data) {
+        setDefaultVehicle(data)
+      } else {
+        // Fetch first vehicle if no default is set
+        const { data: firstVal } = await (supabase as any)
+          .from('vehicles')
+          .select('*')
+          .eq('user_id', user?.id)
+          .limit(1)
+          .single()
+        if (firstVal) setDefaultVehicle(firstVal)
+      }
+    } catch (err) {
+      console.log('No default vehicle found')
+    } finally {
+      setLoadingVehicle(false)
+    }
+  }
 
   const modules = [
     {
@@ -54,92 +96,159 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="p-6 lg:p-10 max-w-6xl mx-auto min-h-screen bg-mesh">
-      {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600">System Ready</span>
-          </div>
-          <span className="w-1 h-1 rounded-full bg-slate-300" />
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-navy/5 border border-navy/10 text-navy font-black text-[10px] uppercase tracking-widest">
-            {plan} Plan
-          </div>
+    <div className="p-5 lg:p-8 max-w-5xl mx-auto min-h-screen bg-mesh pb-20">
+      {/* 1. Status Strip */}
+      <div className="flex items-center justify-between gap-3 mb-6 px-1">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/80">System Ready</span>
         </div>
-        <h1 className="text-3xl font-display font-medium text-slate-400 mb-1">
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-navy/5 border border-navy/10 text-navy font-black text-[9px] uppercase tracking-widest">
+            {plan}
+          </div>
+          {defaultVehicle && (
+             <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted">
+               <Car className="w-3 h-3" /> {defaultVehicle.make}
+             </div>
+          )}
+        </div>
+      </div>
+
+      {/* 2. Short Premium Hero */}
+      <div className="mb-8 px-1">
+        <p className="text-xs font-bold text-muted mb-1">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}</p>
+        <h1 className="text-2xl md:text-3xl font-display font-black text-on-surface italic tracking-tight leading-tight">
+          What do you need<br />help with today?
         </h1>
-        <h2 className="text-4xl md:text-5xl font-display font-black text-slate-900 italic tracking-tight">What do you need help with?</h2>
       </div>
 
-      {/* Emergency Banner */}
-      <div className="flex items-center gap-4 p-5 rounded-3xl mb-8 border border-orange-100 bg-orange-50/50">
-        <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-          <AlertCircle className="w-6 h-6 text-orange-600" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-bold text-slate-900">Need emergency help right now?</p>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">Start with AI diagnosis or jump straight to towing.</p>
-        </div>
-        <motion.div 
-          className="flex-shrink-0"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <button 
-            onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/towing')}
-            className={`text-xs font-bold px-5 py-2.5 rounded-xl text-white shadow-lg flex items-center gap-2 ${isBasic ? 'bg-slate-400 shadow-slate-400/20 cursor-pointer' : 'bg-orange-600 shadow-orange-600/20'}`}
-          >
-            {isBasic ? <><Lock className="w-3.5 h-3.5" /> Unlock Towing</> : <>Get Towing <ChevronRight className="w-3.5 h-3.5" /></>}
-          </button>
-        </motion.div>
-      </div>
-
-      {/* Main Module Grid */}
-      <div className="grid md:grid-cols-2 gap-4 lg:gap-6 mb-12">
+      {/* 3. Main Action Grid (2x2) */}
+      <div className="grid grid-cols-2 gap-3 mb-8">
         {modules.map((mod) => (
-          <motion.div key={mod.to} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
-            <Link to={mod.to} className={`card-hover group block h-full !p-8 !rounded-[32px] relative overflow-hidden ${mod.locked ? 'ring-1 ring-slate-200 bg-slate-50/50' : ''}`}>
-              {mod.locked && (
-                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-12 h-12 rounded-full bg-navy flex items-center justify-center text-white mb-3 shadow-xl">
-                    <Lock className="w-5 h-5" />
+          <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
+            <Link 
+              to={mod.to} 
+              className={`relative overflow-hidden block h-full bg-surface dark:bg-slate-900 border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all ${mod.locked ? 'opacity-80' : ''}`}
+            >
+              <div className="flex flex-col h-full">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-sm border border-transparent" style={{ background: mod.bg }}>
+                  <mod.icon className="w-5 h-5" style={{ color: mod.color }} />
+                </div>
+                
+                <h3 className="text-sm font-display font-black text-on-surface leading-tight mb-1 flex items-center gap-1.5">
+                  {mod.label}
+                  {mod.locked && <Lock className="w-3 h-3 text-muted" />}
+                </h3>
+                <p className="text-[10px] text-muted font-medium leading-normal line-clamp-2">{mod.desc}</p>
+                
+                {mod.locked && (
+                  <div className="absolute top-2 right-2">
+                    <Lock className="w-3 h-3 text-muted/40" />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-widest text-navy bg-white px-4 py-2 rounded-full shadow-sm">Upgrade Required</span>
-                </div>
-              )}
-              <div className="flex items-start justify-between mb-8">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm border border-transparent" style={{ background: mod.bg }}>
-                  <mod.icon className="w-6 h-6" style={{ color: mod.color }} />
-                </div>
-                <span className="text-[11px] font-bold uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100" style={{ color: mod.color }}>{mod.badge}</span>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-slate-900 mb-2 group-hover:text-navy transition-colors italic tracking-tight flex items-center gap-2">
-                {mod.label}
-                {mod.locked && <Lock className="w-4 h-4 text-slate-300" />}
-              </h3>
-              <p className="text-base text-slate-500 font-medium leading-relaxed mb-8">{mod.desc}</p>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: mod.locked ? '#94a3b8' : mod.color }}>
-                {mod.locked ? 'Locked' : 'Initiate Process'} {!mod.locked && <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />}
+                )}
               </div>
             </Link>
           </motion.div>
         ))}
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { icon: Radar, label: 'Instant AI Check', value: 'Ready', color: '#0070E0' },
-          { icon: Clock, label: '<10s Avg Response', value: 'Active', color: '#0891b2' },
-          { icon: ShieldCheck, label: '24/7 Access', value: 'Online', color: '#059669' },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white border border-slate-100 rounded-2xl p-5 text-center group hover:border-navy/20 hover:shadow-lg hover:shadow-navy/5 transition-all">
-            <stat.icon className="w-6 h-6 mx-auto mb-3 text-slate-300 group-hover:text-navy transition-colors" style={{ color: stat.color }} />
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-600 transition-colors">{stat.label}</p>
+      {/* 4. Compact Vehicle Card */}
+      <div className="mb-10">
+        {!defaultVehicle && !loadingVehicle ? (
+          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-navy/[0.03] dark:bg-slate-800/40 border border-dashed border-overlay p-4 rounded-3xl transition-all hover:border-navy/30">
+            <div className="w-10 h-10 rounded-full bg-surface dark:bg-slate-800 border border-overlay flex items-center justify-center shadow-sm">
+              <Plus className="w-5 h-5 text-navy" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-black text-on-surface uppercase tracking-tight">Add your vehicle</p>
+              <p className="text-[10px] text-muted font-medium">Unlock precise AI help for your specific car.</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
+          </Link>
+        ) : defaultVehicle ? (
+          <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-surface dark:bg-slate-900 border border-overlay p-4 rounded-3xl shadow-sm hover:shadow-md transition-all group">
+            <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-slate-800 flex items-center justify-center shadow-sm overflow-hidden">
+               <Car className="w-6 h-6 text-navy/40" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-navy uppercase tracking-widest mb-0.5">Active Vehicle</p>
+              <h3 className="text-sm font-display font-black text-on-surface truncate italic tracking-tight">
+                {defaultVehicle.year} {defaultVehicle.make} {defaultVehicle.model}
+              </h3>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
+          </Link>
+        ) : (
+          <div className="h-20 w-full animate-pulse bg-surface-low dark:bg-slate-800 rounded-3xl" />
+        )}
+      </div>
+
+      {/* 5. Quick Issue Shortcuts */}
+      <div className="mb-12">
+        <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">Quick Diagnosis</p>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
+          {[
+            { label: 'Check Engine', icon: Activity },
+            { label: 'Car Won\'t Start', icon: Zap },
+            { label: 'Strange Noise', icon: AlertCircle },
+            { label: 'Battery Prob', icon: Battery },
+            { label: 'Brake Warning', icon: ShieldAlert },
+            { label: 'Overheating', icon: Thermometer },
+          ].map((issue, idx) => (
+            <button 
+              key={idx}
+              onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: issue.label } })}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface dark:bg-slate-900 border border-overlay shadow-sm hover:border-navy/30 transition-all whitespace-nowrap active:scale-95"
+            >
+              <issue.icon className="w-3.5 h-3.5 text-navy" />
+              <span className="text-[11px] font-bold text-on-surface">{issue.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 6. Compact Pro Section */}
+      {isBasic && (
+        <div className="mb-12 p-5 rounded-[2rem] bg-gradient-to-br from-navy to-blue-700 text-white shadow-xl shadow-navy/20 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+            <Zap className="w-20 h-20" fill="currentColor" />
           </div>
-        ))}
+          <div className="relative z-10">
+            <h3 className="text-lg font-display font-black italic tracking-tight mb-1">Unlock Pro Features</h3>
+            <p className="text-[11px] text-white/80 font-medium mb-4 max-w-[200px]">Get Towing, Human Mechanic access, and specialized reports.</p>
+            <button 
+              onClick={() => navigate('/my-account?upgrade=pro')}
+              className="px-6 py-2 rounded-xl bg-white text-navy text-[11px] font-black uppercase tracking-widest shadow-lg shadow-black/10 hover:brightness-110 active:scale-95 transition-all"
+            >
+              Upgrade Now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 7. Lower Utility Zone */}
+      <div>
+        <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">System Utilities</p>
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            { label: 'Diagnostic Reports', icon: ShieldCheck, to: '/dashboard/reports', locked: isBasic },
+            { label: 'Support & Docs', icon: Wrench, to: '/support' },
+            { label: 'Account Maintenance', icon: Users, to: '/my-account' },
+          ].map((item, idx) => (
+            <Link 
+              key={idx} 
+              to={item.to}
+              className="flex items-center gap-4 bg-surface/40 dark:bg-slate-900/40 border border-overlay p-4 rounded-2xl hover:bg-surface dark:hover:bg-slate-800 transition-all group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-surface-high dark:bg-slate-800 flex items-center justify-center text-muted group-hover:text-navy transition-colors">
+                <item.icon className="w-4 h-4" />
+              </div>
+              <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>
+              {item.locked ? <Lock className="w-3.5 h-3.5 text-muted/30" /> : <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy" />}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   )

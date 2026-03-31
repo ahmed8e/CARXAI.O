@@ -26,7 +26,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden pt-24">
+    <div className="min-h-screen bg-surface dark:bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden pt-24">
       <Navbar />
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -40,18 +40,18 @@ export default function ForgotPassword() {
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Reset Password</h1>
-          <p className="text-slate-500 font-medium">We'll help you get back in</p>
+          <h1 className="text-3xl font-display font-bold text-on-surface mb-2">Reset Password</h1>
+          <p className="text-muted font-medium">We'll help you get back in</p>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50">
+        <div className="bg-surface dark:bg-slate-800 p-8 rounded-3xl border border-overlay shadow-2xl">
           {sent ? (
             <div className="text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-emerald-50 flex items-center justify-center mx-auto mb-4 border border-emerald-100">
+              <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
                 <CheckCircle className="w-8 h-8 text-emerald-500" />
               </div>
-              <h2 className="text-xl font-display font-bold text-slate-900 mb-2">Check your email</h2>
-              <p className="text-slate-500 text-sm mb-6">We've sent a password reset link to <strong className="text-slate-900">{email}</strong></p>
+              <h2 className="text-xl font-display font-bold text-on-surface mb-2">Check your email</h2>
+              <p className="text-muted text-sm mb-6">We've sent a password reset link to <strong className="text-on-surface">{email}</strong></p>
               <Link to="/auth?mode=login" className="inline-flex items-center gap-2 text-navy font-bold hover:underline">
                 <ArrowLeft className="w-4 h-4" /> Back to login
               </Link>
@@ -63,10 +63,10 @@ export default function ForgotPassword() {
                   <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm">{error}</div>
                 )}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                  <label className="block text-sm font-semibold text-on-surface mb-2">Email</label>
                   <input
                     type="email"
-                    className="w-full px-5 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/10 outline-none transition-all placeholder:text-slate-400"
+                    className="w-full px-5 py-4 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface font-medium focus:bg-surface focus:border-navy focus:ring-4 focus:ring-navy/10 outline-none transition-all placeholder:text-muted"
                     placeholder="you@example.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -84,7 +84,7 @@ export default function ForgotPassword() {
                 </motion.button>
               </form>
 
-              <p className="text-center text-slate-500 mt-6 text-sm">
+              <p className="text-center text-muted mt-6 text-sm">
                 Remember your password?{' '}
                 <Link to="/auth?mode=login" className="text-navy font-bold hover:underline">Sign in</Link>
               </p>

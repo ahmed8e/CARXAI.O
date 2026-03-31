@@ -117,8 +117,8 @@ export default function MyAccount() {
       setProfileData({
         // @ts-ignore - Supabase type mismatch
         fullName: profile.full_name || metadata?.full_name || '',
-        phoneNumber: metadata?.phone_number || '',
-        preferredLanguage: metadata?.preferred_language || 'English (US)'
+        phoneNumber: profile.phone_number || metadata?.phone_number || '',
+        preferredLanguage: profile.preferred_language || metadata?.preferred_language || 'English (US)'
       })
     } else {
       setProfileData({
@@ -216,7 +216,7 @@ export default function MyAccount() {
       setFeedback({ type: 'error', message: error.message })
     } else {
       setFeedback({ type: 'success', message: 'Profile updated successfully!' })
-      setTimeout(() => setIsEditingProfile(false), 1500)
+      setTimeout(() => window.location.reload(), 1500)
     }
     setFormLoading(false)
   }

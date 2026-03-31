@@ -140,16 +140,16 @@ export default function NearbyMap() {
   })
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-surface dark:bg-slate-900">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100">
+      <div className="px-6 py-4 border-b border-overlay">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
             <MapIcon className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-slate-900 text-lg italic tracking-tight uppercase">Nearby Help Map</h1>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Real-time Service Network</p>
+            <h1 className="font-display font-bold text-on-surface text-lg italic tracking-tight uppercase">Nearby Help Map</h1>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Real-time Service Network</p>
           </div>
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -160,7 +160,7 @@ export default function NearbyMap() {
               className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border whitespace-nowrap ${
                 activeFilter === f 
                   ? 'bg-navy text-white border-navy shadow-md shadow-navy/20' 
-                  : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-slate-300'
+                  : 'bg-surface-low dark:bg-slate-800 text-muted border-overlay hover:border-navy/30'
               }`}
             >
               {f}
@@ -171,18 +171,18 @@ export default function NearbyMap() {
 
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Map */}
-        <div ref={mapRef} className="flex-1 min-h-[350px] lg:min-h-0 relative bg-slate-100">
+        <div ref={mapRef} className="flex-1 min-h-[350px] lg:min-h-0 relative bg-surface-low dark:bg-slate-900">
           {error && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center p-6 bg-white/80 backdrop-blur-sm">
-              <div className="bg-white border border-slate-100 p-8 rounded-3xl text-center max-w-sm shadow-2xl">
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-6 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-sm">
+              <div className="bg-surface dark:bg-slate-800 border border-overlay p-8 rounded-3xl text-center max-w-sm shadow-2xl">
                 <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-4" />
-                <p className="font-display font-bold text-slate-900 text-lg mb-2">Map Error</p>
-                <p className="text-sm text-slate-500 font-medium leading-relaxed">{error}</p>
+                <p className="font-display font-bold text-on-surface text-lg mb-2">Map Error</p>
+                <p className="text-sm text-muted font-medium leading-relaxed">{error}</p>
               </div>
             </div>
           )}
           {loading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/40 dark:bg-slate-900/40 backdrop-blur-[2px]">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="w-8 h-8 text-navy animate-spin" />
                 <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Scanning Area...</p>
@@ -192,7 +192,7 @@ export default function NearbyMap() {
         </div>
 
         {/* Side list */}
-        <div className="w-full lg:w-80 overflow-y-auto border-t lg:border-t-0 lg:border-l border-slate-100 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.02)]">
+        <div className="w-full lg:w-80 overflow-y-auto border-t lg:border-t-0 lg:border-l border-overlay bg-surface dark:bg-slate-900 shadow-2xl">
           {filteredPlaces.map((place: NearbyPlace) => {
             const Icon = getPlaceIcon(place.types)
             const color = getPlaceColor(place.types)
@@ -202,8 +202,8 @@ export default function NearbyMap() {
               <button 
                 key={place.id} 
                 onClick={() => setSelected(place)}
-                className={`w-full text-left p-5 border-b border-slate-50 transition-all group ${
-                  isSelected ? 'bg-navy/[0.03] border-navy/10' : 'hover:bg-slate-50'
+                className={`w-full text-left p-5 border-b border-overlay transition-all group ${
+                  isSelected ? 'bg-navy/[0.03] border-navy/10' : 'hover:bg-surface-high/50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -218,7 +218,7 @@ export default function NearbyMap() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <p className={`font-bold text-sm truncate transition-colors ${
-                        isSelected ? 'text-navy' : 'text-slate-900 group-hover:text-navy'
+                        isSelected ? 'text-navy' : 'text-on-surface group-hover:text-navy'
                       }`}>
                         {place.name}
                       </p>
@@ -226,11 +226,11 @@ export default function NearbyMap() {
                         isSelected ? 'translate-x-1 text-navy' : 'group-hover:translate-x-1'
                       }`} />
                     </div>
-                    <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400">
+                    <div className="flex items-center gap-3 text-[11px] font-medium text-muted">
                       {place.rating > 0 && (
                         <span className="flex items-center gap-1">
                           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-slate-700">{formatRating(place.rating)}</span>
+                          <span className="text-on-surface/80">{formatRating(place.rating)}</span>
                         </span>
                       )}
                       {place.distance && <span>{formatDistance(place.distance)}</span>}
@@ -246,11 +246,11 @@ export default function NearbyMap() {
           
           {filteredPlaces.length === 0 && !loading && (
             <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-6">
-                <MapPin className="w-8 h-8 text-slate-200" />
+              <div className="w-16 h-16 rounded-full bg-surface-low dark:bg-slate-800 border border-overlay flex items-center justify-center mb-6">
+                <MapPin className="w-8 h-8 text-muted/30" />
               </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">No results found</p>
-              <p className="text-xs text-slate-300 leading-relaxed">Try selecting a different filter or expanding your search area.</p>
+              <p className="text-sm font-bold text-muted uppercase tracking-widest mb-2">No results found</p>
+              <p className="text-xs text-muted/60 leading-relaxed italic">Try selecting a different filter or expanding your search area.</p>
             </div>
           )}
         </div>

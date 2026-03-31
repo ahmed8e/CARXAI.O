@@ -97,15 +97,15 @@ export default function Vehicles() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Loader2 className="w-10 h-10 text-navy animate-spin" />
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Loading your garage...</p>
+          <p className="text-xs font-black uppercase tracking-widest text-muted">Loading your garage...</p>
         </div>
       ) : vehicles.length === 0 ? (
-        <div className="bg-white border-2 border-dashed border-slate-200 rounded-[32px] p-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6">
-            <Car className="w-10 h-10 text-slate-300" />
+        <div className="bg-surface dark:bg-slate-900 border-2 border-dashed border-overlay rounded-[32px] p-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-surface-low dark:bg-slate-800 flex items-center justify-center mx-auto mb-6">
+            <Car className="w-10 h-10 text-muted" />
           </div>
-          <h3 className="text-2xl font-display font-bold text-slate-900 mb-2">Your Garage is Empty</h3>
-          <p className="text-slate-500 max-w-md mx-auto mb-8 font-medium">
+          <h3 className="text-2xl font-display font-bold text-on-surface mb-2">Your Garage is Empty</h3>
+          <p className="text-muted max-w-md mx-auto mb-8 font-medium">
             Add your first vehicle to unlock accurate AI mechanic assessments specifically for your car.
           </p>
           <button
@@ -123,15 +123,15 @@ export default function Vehicles() {
               layout
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`group relative bg-white rounded-[32px] p-8 border transition-all duration-300 ${
+              className={`group relative bg-surface dark:bg-slate-900 rounded-[32px] p-8 border transition-all duration-300 ${
                 v.is_default
                   ? 'border-navy shadow-xl shadow-navy/5'
-                  : 'border-slate-100 hover:border-slate-200 hover:shadow-lg hover:shadow-slate-200/50'
+                  : 'border-overlay hover:border-navy/20 hover:shadow-lg hover:shadow-navy/5'
               }`}
             >
               <div className="flex items-start justify-between mb-6">
-                <div className={`w-14 h-14 rounded-2xl ${v.is_default ? 'bg-navy/10' : 'bg-slate-50'} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <Car className={`w-7 h-7 ${v.is_default ? 'text-navy' : 'text-slate-400'}`} />
+                <div className={`w-14 h-14 rounded-2xl ${v.is_default ? 'bg-navy/10' : 'bg-surface-low dark:bg-slate-800'} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <Car className={`w-7 h-7 ${v.is_default ? 'text-navy' : 'text-muted'}`} />
                 </div>
                 {v.is_default && (
                   <div className="px-3 py-1 rounded-full bg-navy text-[10px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 shadow-lg shadow-navy/20">
@@ -141,57 +141,57 @@ export default function Vehicles() {
               </div>
 
               <div className="mb-6">
-                <h3 className="text-xl font-display font-black italic text-slate-900 tracking-tight leading-tight">
+                <h3 className="text-xl font-display font-black italic text-on-surface tracking-tight leading-tight">
                   {v.year} {v.make}
                 </h3>
-                <p className="text-lg font-display font-bold text-slate-500 italic mt-0.5">{v.model}</p>
+                <p className="text-lg font-display font-bold text-muted italic mt-0.5">{v.model}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="flex items-center gap-2">
-                  <Fuel className="w-4 h-4 text-slate-300" />
-                  <span className="text-xs font-bold text-slate-600 truncate">{v.fuel_type || 'N/A'}</span>
+                  <Fuel className="w-4 h-4 text-muted" />
+                  <span className="text-xs font-bold text-on-surface/80 truncate">{v.fuel_type || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Gauge className="w-4 h-4 text-slate-300" />
-                  <span className="text-xs font-bold text-slate-600 truncate">{v.mileage ? `${v.mileage.toLocaleString()} km` : 'N/A'}</span>
+                  <Gauge className="w-4 h-4 text-muted" />
+                  <span className="text-xs font-bold text-on-surface/80 truncate">{v.mileage ? `${v.mileage.toLocaleString()} km` : 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-slate-300" />
-                  <span className="text-xs font-bold text-slate-600 truncate">{v.gearbox || 'N/A'}</span>
+                  <Settings className="w-4 h-4 text-muted" />
+                  <span className="text-xs font-bold text-on-surface/80 truncate">{v.gearbox || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-slate-300" />
-                  <span className="text-xs font-bold text-slate-600 truncate">{v.plate_number || 'No Plate'}</span>
+                  <Hash className="w-4 h-4 text-muted" />
+                  <span className="text-xs font-bold text-on-surface/80 truncate">{v.plate_number || 'No Plate'}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-6 border-t border-slate-50">
+              <div className="flex items-center gap-2 pt-6 border-t border-overlay">
                 {!v.is_default ? (
                   <button
                     onClick={() => handleSetDefault(v)}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-navy hover:text-white transition-all"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-surface-low dark:bg-slate-800 text-[10px] font-black uppercase tracking-widest text-muted hover:bg-navy hover:text-white transition-all underline-offset-4"
                   >
                     Switch to this
                   </button>
                 ) : (
-                  <div className="flex-1 text-[10px] font-black uppercase tracking-widest text-navy text-center flex items-center justify-center gap-1">
+                  <div className="flex-1 text-[10px] font-black uppercase tracking-widest text-navy text-center flex items-center justify-center gap-1 font-display">
                     <CheckCircle2 className="w-3 h-3" /> Current Diagnosis Car
                   </div>
                 )}
                 <button
                   onClick={() => handleOpenModal(v)}
-                  className="p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors"
+                  className="p-2.5 rounded-xl border border-overlay hover:bg-surface-high dark:hover:bg-slate-800 transition-colors"
                   title="Edit"
                 >
-                  <Edit2 className="w-4 h-4 text-slate-400" />
+                  <Edit2 className="w-4 h-4 text-muted" />
                 </button>
                 <button
                   onClick={() => handleDelete(v.id)}
-                  className="p-2.5 rounded-xl border border-slate-100 hover:bg-red-50 group/del transition-colors"
+                  className="p-2.5 rounded-xl border border-overlay hover:bg-red-500/10 group/del transition-colors"
                   title="Remove"
                 >
-                  <Trash2 className="w-4 h-4 text-slate-400 group-hover/del:text-red-500" />
+                  <Trash2 className="w-4 h-4 text-muted group-hover/del:text-red-500" />
                 </button>
               </div>
             </motion.div>

@@ -174,11 +174,11 @@ export default function Towing() {
         
         {/* Map API Key Fallback */}
         {(!import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY === 'placeholder_google_maps_key') && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-white/60 backdrop-blur-sm">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-surface/60 dark:bg-slate-900/60 backdrop-blur-sm">
             <div className="w-16 h-16 rounded-full bg-navy/5 border border-navy/10 flex items-center justify-center mb-4">
               <MapPin className="w-8 h-8 text-navy/20" />
             </div>
-            <h3 className="text-lg font-display font-bold text-slate-900 mb-1">Towing Map</h3>
+            <h3 className="text-lg font-display font-bold text-on-surface mb-1">Towing Map</h3>
             <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Google Maps Integration Required</p>
           </div>
         )}
@@ -191,12 +191,12 @@ export default function Towing() {
           animate={{ y: 0, opacity: 1 }}
           className="flex items-center justify-between max-w-md mx-auto pointer-events-auto"
         >
-          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-xl border border-slate-100 px-6 py-3 rounded-2xl shadow-xl w-full">
+          <div className="flex items-center gap-3 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl border border-overlay px-6 py-3 rounded-2xl shadow-xl w-full">
             <div className="w-8 h-8 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/20">
               <Truck className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="font-display font-bold text-slate-900 italic tracking-tight text-sm uppercase">Quick Towing</h1>
+              <h1 className="font-display font-bold text-on-surface italic tracking-tight text-sm uppercase">Quick Towing</h1>
               <p className="text-[9px] font-bold uppercase tracking-widest text-orange-600/60 hidden md:block">Emergency Assistance</p>
             </div>
           </div>
@@ -210,13 +210,13 @@ export default function Towing() {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="absolute bottom-0 left-0 right-0 z-30 h-[95%] lg:h-[85%] lg:max-w-md lg:left-1/2 lg:-translate-x-1/2 lg:bottom-6 lg:rounded-[32px] overflow-hidden"
       >
-        <div className="h-full bg-white/95 backdrop-blur-3xl border-t lg:border border-slate-100 rounded-t-[32px] lg:rounded-[32px] shadow-[0_-20px_50px_rgba(0,0,0,0.05)] flex flex-col">
+        <div className="h-full bg-surface/95 dark:bg-slate-900/95 backdrop-blur-3xl border-t lg:border border-overlay rounded-t-[32px] lg:rounded-[32px] shadow-2xl flex flex-col">
           {/* Sheet Handle */}
           <div 
             className="w-full py-5 flex flex-col items-center cursor-pointer lg:hidden"
             onClick={() => setIsSheetExpanded(!isSheetExpanded)}
           >
-            <div className="w-12 h-1.5 rounded-full bg-slate-200" />
+            <div className="w-12 h-1.5 rounded-full bg-overlay" />
           </div>
 
           <div className="px-6 pb-4">
@@ -226,18 +226,18 @@ export default function Towing() {
                 <Truck className="w-5 h-5 mb-0.5" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Global Rescue</span>
               </button>
-              <button className="flex-1 bg-white border border-slate-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 transition-all">
+              <button className="flex-1 bg-surface dark:bg-slate-800 border border-overlay p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-surface-high dark:hover:bg-slate-700 transition-all">
                 <Phone className="w-5 h-5 text-navy mb-0.5" />
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Direct Call</span>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-widest italic">Direct Call</span>
               </button>
             </div>
 
             {/* Search Area */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-300" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted" />
               <input 
                 type="text" 
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-navy focus:bg-white transition-all shadow-inner" 
+                className="w-full bg-surface-low dark:bg-slate-800 border border-overlay rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-on-surface placeholder:text-muted focus:outline-none focus:border-navy focus:bg-surface transition-all shadow-inner" 
                 placeholder="Search towing services..."
                 value={searchQuery} 
                 onFocus={() => setIsSheetExpanded(true)}
@@ -271,14 +271,14 @@ export default function Towing() {
                     }}
                     className={`w-full text-left p-5 rounded-2xl transition-all group relative border ${
                       selected?.id === place.id 
-                        ? 'bg-orange-50 border-orange-100' 
-                        : 'bg-white border-slate-50 hover:border-slate-200'
+                        ? 'bg-orange-50/10 border-orange-500/20' 
+                        : 'bg-surface dark:bg-slate-800 border-overlay hover:border-orange-500/20'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="font-bold text-slate-900 text-[15px] leading-tight group-hover:text-orange-600 transition-colors">{place.name}</h3>
-                        <p className="text-[11px] text-slate-400 mt-1 truncate max-w-[180px] font-medium">{place.address}</p>
+                        <h3 className="font-bold text-on-surface text-[15px] leading-tight group-hover:text-orange-600 transition-colors">{place.name}</h3>
+                        <p className="text-[11px] text-muted mt-1 truncate max-w-[180px] font-medium">{place.address}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0 ml-4">
                         <span className="text-[10px] font-bold text-orange-600 italic">ETA {getETA(place.distance || 0)}</span>
@@ -294,9 +294,9 @@ export default function Towing() {
                     
                     <div className="flex items-center gap-4">
                       {place.rating > 0 && (
-                        <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                        <div className="flex items-center gap-1.5 bg-surface-low dark:bg-slate-700 px-2 py-1 rounded-lg border border-overlay">
                           <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                          <span className="text-[11px] font-bold text-slate-600">{formatRating(place.rating)}</span>
+                          <span className="text-[11px] font-bold text-on-surface">{formatRating(place.rating)}</span>
                         </div>
                       )}
                       {place.distance && (
@@ -321,9 +321,9 @@ export default function Towing() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 px-10 text-center">
-                <Truck className="w-12 h-12 text-slate-100 mb-6" />
-                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">No Towing Available</p>
-                <p className="text-xs text-slate-300 max-w-[200px] leading-relaxed font-medium">Try another search or contact emergency help.</p>
+                <Truck className="w-12 h-12 text-muted/30 mb-6" />
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted mb-2">No Towing Available</p>
+                <p className="text-xs text-muted max-w-[200px] leading-relaxed font-medium">Try another search or contact emergency help.</p>
               </div>
             )}
           </div>
@@ -344,34 +344,34 @@ export default function Towing() {
             <div className="relative">
               <div className="flex items-start justify-between mb-6">
                 <div className="pr-4">
-                  <h3 className="text-2xl font-display font-bold text-slate-900 italic tracking-tight mb-1.5">{selected.name}</h3>
-                  <div className="flex items-center gap-2 text-slate-400">
+                  <h3 className="text-2xl font-display font-bold text-on-surface italic tracking-tight mb-1.5">{selected.name}</h3>
+                  <div className="flex items-center gap-2 text-muted">
                     <MapPin className="w-4 h-4" />
                     <p className="text-xs font-medium truncate max-w-[280px]">{selected.address}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setSelected(null)}
-                  className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-all"
+                  className="w-10 h-10 rounded-full bg-surface-low dark:bg-slate-700 flex items-center justify-center text-muted hover:text-orange-600 hover:bg-orange-50 transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-2">Rating</p>
+                <div className="bg-surface-low dark:bg-slate-700 border border-overlay p-4 rounded-2xl">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-2">Rating</p>
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-base font-bold text-slate-900">{formatRating(selected.rating)}</span>
-                    <span className="text-[11px] text-slate-300 font-medium">({selected.userRatingsTotal})</span>
+                    <span className="text-base font-bold text-on-surface">{formatRating(selected.rating)}</span>
+                    <span className="text-[11px] text-muted font-medium">({selected.userRatingsTotal})</span>
                   </div>
                 </div>
-                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl">
+                <div className="bg-surface-low dark:bg-slate-700 border border-overlay p-4 rounded-2xl">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-orange-600 mb-2">Arrival Time</p>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-orange-600" />
-                    <span className="text-base font-bold text-slate-900">{getETA(selected.distance)}</span>
+                    <span className="text-base font-bold text-on-surface">{getETA(selected.distance)}</span>
                   </div>
                 </div>
               </div>
@@ -390,7 +390,7 @@ export default function Towing() {
                   href={`https://www.google.com/maps/dir/?api=1&destination=${selected.location.lat},${selected.location.lng}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-navy hover:bg-navy/5 transition-all"
+                  className="w-16 h-16 rounded-2xl bg-surface-low dark:bg-slate-700 border border-overlay flex items-center justify-center text-navy hover:bg-navy/5 transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

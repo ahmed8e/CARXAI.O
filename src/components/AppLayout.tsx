@@ -49,7 +49,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // ── Sidebar JSX ──────────────────────────────────────────────────
   function SidebarContent({ mobile = false }: { mobile?: boolean }) {
     return (
-      <div className="flex flex-col h-full" style={{ background: '#F8FAFB' }}>
+      <div className="flex flex-col h-full bg-surface-low dark:bg-slate-900">
 
         {/* ── Brand header ── */}
         <div className="px-5 pt-[calc(1.25rem_+_env(safe-area-inset-top))] pb-4 border-b border-slate-100/80">
@@ -64,7 +64,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <Zap className="w-4 h-4 text-white" fill="currentColor" />
               </div>
               <div className="leading-none">
-                <p className="font-display font-black text-[16px] tracking-[-0.04em] text-slate-900">
+                <p className="font-display font-black text-[16px] tracking-[-0.04em] text-on-surface">
                   Carxai
                 </p>
                 <p className="text-[10px] font-medium text-slate-400 mt-[4px] tracking-normal">
@@ -90,7 +90,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label}>
               {/* Group label */}
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400/80 px-2.5 mb-1.5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted/80 px-2.5 mb-1.5">
                 {group.label}
               </p>
 
@@ -105,8 +105,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       'flex items-center gap-2.5 pr-3 pl-2 py-2.5 rounded-2xl font-semibold text-[13.5px]',
                       'transition-all duration-150 group relative overflow-hidden',
                       isActive
-                        ? 'bg-white text-navy shadow-[0_1px_6px_rgba(0,112,224,0.10)] border border-navy/10 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:bg-navy'
-                        : 'text-slate-500 hover:bg-white/70 hover:text-slate-800',
+                        ? 'bg-surface dark:bg-navy/10 text-navy shadow-[0_1px_6px_rgba(0,112,224,0.10)] border border-navy/10 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:bg-navy'
+                        : 'text-muted hover:bg-surface-high/70 hover:text-on-surface',
                     ].join(' ')}
                   >
                     {({ isActive }) => (
@@ -116,7 +116,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                           'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-150',
                           isActive
                             ? 'bg-navy text-white shadow-sm shadow-navy/30'
-                            : 'bg-transparent text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600',
+                            : 'bg-transparent text-muted group-hover:bg-surface-high group-hover:text-on-surface',
                         ].join(' ')}>
                           <item.icon className="w-[15px] h-[15px]" />
                         </span>
@@ -148,15 +148,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {/* AI status strip — between the two groups */}
               {gi === 0 && (
                 <div className="mx-1 mt-4 mb-1 flex items-center gap-3 px-3.5 py-3
-                                rounded-2xl bg-white border border-slate-100
+                                rounded-2xl bg-surface dark:bg-slate-900 border border-overlay
                                 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
                   <span className="relative flex-shrink-0">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 block" />
                     <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold text-slate-600 leading-none tracking-tight">AI Engine Ready</p>
-                    <p className="text-[9px] text-slate-400 mt-0.5 tracking-wide">Available 24/7</p>
+                    <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">AI Engine Ready</p>
+                    <p className="text-[9px] text-muted mt-0.5 tracking-wide">Available 24/7</p>
                   </div>
                   <Sparkles className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
                 </div>
@@ -171,7 +171,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <Link
             to="/my-account"
             onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-100
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface dark:bg-slate-900 border border-overlay
                        hover:border-navy/20 hover:shadow-sm transition-all duration-150 group"
           >
             {/* Avatar */}
@@ -186,7 +186,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-bold text-slate-800 truncate leading-tight">{userName}</p>
+              <p className="text-[13px] font-bold text-on-surface truncate leading-tight">{userName}</p>
               <span className={[
                 'inline-flex items-center text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[5px] mt-0.5',
                 isPro ? 'bg-navy/10 text-navy' : 'bg-slate-100 text-slate-400',
@@ -219,8 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-[232px] flex-shrink-0
-                        border-r border-slate-100 z-40 pt-[calc(4.5rem_+_env(safe-area-inset-top))]"
-             style={{ background: '#F8FAFB' }}>
+                        border-r border-overlay z-40 pt-[calc(4.5rem_+_env(safe-area-inset-top))] bg-surface-low dark:bg-slate-900">
         <SidebarContent />
       </aside>
 
@@ -249,7 +248,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(4.5rem_+_env(safe-area-inset-top))]">
+      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(3.75rem_+_env(safe-area-inset-top))]">
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
