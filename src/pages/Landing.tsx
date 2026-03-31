@@ -177,7 +177,7 @@ export default function Landing() {
         </AnimatePresence>
 
         {/* Hero Section */}
-        <section className="relative min-h-[90vh] flex items-center px-6 pt-32 pb-20 overflow-hidden">
+        <section className="relative min-h-[90vh] flex items-center px-6 pt-[calc(8rem+env(safe-area-inset-top))] pb-20 overflow-hidden">
           <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
             {/* Left Column: Content */}
             <div className="text-left">

@@ -52,7 +52,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div className="flex flex-col h-full" style={{ background: '#F8FAFB' }}>
 
         {/* ── Brand header ── */}
-        <div className="px-5 pt-5 pb-4 border-b border-slate-100/80">
+        <div className="px-5 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-4 border-b border-slate-100/80">
           <div className="flex items-center justify-between">
             <Link
               to="/"
@@ -219,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-[232px] flex-shrink-0
-                        border-r border-slate-100 z-40 pt-[72px]"
+                        border-r border-slate-100 z-40 pt-[calc(4.5rem+env(safe-area-inset-top))]"
              style={{ background: '#F8FAFB' }}>
         <SidebarContent />
       </aside>
@@ -249,7 +249,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[72px]">
+      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(4.5rem+env(safe-area-inset-top))]">
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
