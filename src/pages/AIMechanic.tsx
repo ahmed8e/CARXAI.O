@@ -328,7 +328,7 @@ export default function AIMechanic() {
   const formatContent = (content: string) => {
     return content.split('\n').map((line, i) => {
       if (line.startsWith('**') && line.endsWith('**')) {
-        return <p key={i} className="font-semibold text-slate-900 mb-1">{line.replace(/\*\*/g, '')}</p>
+        return <p key={i} className="font-semibold text-on-surface/90 mb-1">{line.replace(/\*\*/g, '')}</p>
       }
       if (line.includes('**')) {
         return <p key={i} className="mb-1">{line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
@@ -346,7 +346,7 @@ export default function AIMechanic() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-overlay backdrop-blur-md bg-surface/90 dark:bg-slate-900/90 relative z-10">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-overlay backdrop-blur-md bg-surface/90 dark:bg-surface-low/90 relative z-10">
         <div className="flex items-center gap-3">
           {/* Brand icon */}
           <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-navy shadow-md shadow-navy/25">
@@ -364,7 +364,7 @@ export default function AIMechanic() {
         {/* Right side: vehicle pill + user avatar */}
         <div className="flex items-center gap-2">
           {loadingVehicle ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-low dark:bg-slate-800 border border-overlay text-[10px] text-muted">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-low dark:bg-surface-high border border-overlay text-[10px] text-muted">
               <Loader2 className="w-3 h-3 animate-spin" />
             </div>
           ) : activeVehicle ? (
@@ -401,13 +401,13 @@ export default function AIMechanic() {
       </div>
 
       {/* Issue Chips */}
-      <div className="px-4 py-3 flex gap-2 overflow-x-auto scrollbar-hide border-b border-overlay bg-surface-low/50 dark:bg-slate-900/50 relative z-10">
+      <div className="px-4 py-3 flex gap-2 overflow-x-auto scrollbar-hide border-b border-overlay bg-surface-low/50 dark:bg-surface-low/50 relative z-10">
         {ISSUE_CHIPS.map((chip) => (
           <motion.button
             key={chip.value}
             onClick={() => sendMessage(chip.value)}
             disabled={loading}
-            className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-bold py-2 px-4 rounded-full border border-overlay bg-surface dark:bg-slate-800 text-on-surface hover:border-navy hover:text-navy transition-all"
+            className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-bold py-2 px-4 rounded-full border border-overlay bg-surface dark:bg-surface-high text-on-surface hover:border-navy hover:text-navy transition-all"
             whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(0, 112, 224, 0.08)' }}
             whileTap={{ scale: 0.96 }}
           >
@@ -428,7 +428,7 @@ export default function AIMechanic() {
             transition={{ delay: 0.3 }}
             className="mx-auto max-w-sm"
           >
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy/5 via-navy/[0.03] to-transparent border border-navy/10 p-6 bg-surface dark:bg-slate-900">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy/5 via-navy/[0.03] to-transparent border border-navy/10 p-6 bg-surface dark:bg-surface-low">
               {/* Glow orb */}
               <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-navy/10 blur-2xl pointer-events-none" />
 
@@ -443,7 +443,7 @@ export default function AIMechanic() {
                   </div>
                 </div>
 
-                <p className="text-sm text-slate-500 font-medium leading-relaxed mb-5">
+                <p className="text-sm text-muted/80 font-medium leading-relaxed mb-5">
                   Tell us about your car so the AI can give you precise, model-specific answers — not just generic advice.
                 </p>
 
@@ -477,7 +477,7 @@ export default function AIMechanic() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 mr-3 mt-1 bg-surface dark:bg-slate-800 border border-overlay shadow-sm">
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 mr-3 mt-1 bg-surface dark:bg-surface-high border border-overlay shadow-sm">
                 <Bot className="w-5 h-5 text-navy" />
               </div>
             )}
@@ -490,7 +490,7 @@ export default function AIMechanic() {
               <div className={`px-5 py-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
                 msg.role === 'user'
                   ? 'bg-navy text-white rounded-tr-none'
-                  : 'bg-surface dark:bg-slate-800 border border-overlay text-on-surface rounded-tl-none'
+                  : 'bg-surface dark:bg-surface-high border border-overlay text-on-surface rounded-tl-none'
               }`}>
                 {msg.role === 'assistant' ? (
                   msg.issueData ? (
@@ -539,7 +539,7 @@ export default function AIMechanic() {
                   <div className="flex gap-2 flex-wrap pb-2">
                     <motion.button 
                       onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/mechanic')} 
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-900 shadow-sm"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-on-surface/90 shadow-sm"
                       whileHover={{ y: -1, borderColor: 'rgba(0, 112, 224, 0.5)', color: '#0070E0' }}
                       whileTap={{ scale: 0.96 }}
                     >
@@ -572,7 +572,7 @@ export default function AIMechanic() {
                     }}
                     className={`w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
                       isBasic || (isPro && reportsUsed >= 3) 
-                        ? 'bg-surface-low dark:bg-slate-800 text-muted border border-overlay'
+                        ? 'bg-surface-low dark:bg-surface-high text-muted border border-overlay'
                         : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20'
                     }`}
                     whileHover={{ y: -1 }}
@@ -598,7 +598,7 @@ export default function AIMechanic() {
                     }
                   }} 
                   className={`mt-2 ml-1 flex items-center gap-2 text-xs font-medium transition-colors ${
-                    isBasic ? 'text-amber-500 hover:text-amber-600' : 'text-slate-400 hover:text-navy'
+                    isBasic ? 'text-amber-500 hover:text-amber-600' : 'text-muted/70 hover:text-navy'
                   }`}
                   whileHover={{ x: 2 }}
                 >
@@ -612,10 +612,10 @@ export default function AIMechanic() {
 
         {loading && (
           <div className="flex justify-start items-start">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-surface-low dark:bg-slate-800 border border-overlay">
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-surface-low dark:bg-surface-high border border-overlay">
               <Bot className="w-5 h-5 text-muted" />
             </div>
-            <div className="px-5 py-4 rounded-3xl rounded-tl-none bg-surface-low dark:bg-slate-800 border border-overlay flex items-center gap-3">
+            <div className="px-5 py-4 rounded-3xl rounded-tl-none bg-surface-low dark:bg-surface-high border border-overlay flex items-center gap-3">
               <Loader2 className="w-4 h-4 text-navy animate-spin" />
               <span className="text-sm font-medium text-muted">Analyzing data...</span>
             </div>
@@ -625,7 +625,7 @@ export default function AIMechanic() {
       </div>
 
       {/* ══ Composer ══ */}
-      <div className="relative z-10 bg-surface/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-overlay pb-[env(safe-area-inset-bottom)]">
+      <div className="relative z-10 bg-surface/95 dark:bg-surface-low/95 backdrop-blur-sm border-t border-overlay pb-[env(safe-area-inset-bottom)]">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
@@ -633,7 +633,7 @@ export default function AIMechanic() {
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
         {/* ── Floating card ── */}
-        <div className="mx-3 mt-3 mb-2 rounded-[28px] border border-overlay bg-surface dark:bg-slate-800 shadow-sm
+        <div className="mx-3 mt-3 mb-2 rounded-[28px] border border-overlay bg-surface dark:bg-surface-high shadow-sm
                         transition-[border-color,box-shadow] duration-200
                         focus-within:border-navy/25 focus-within:shadow-[0_0_0_4px_rgba(0,71,143,0.06),0_4px_24px_rgba(0,0,0,0.06)]">
 
@@ -704,7 +704,7 @@ export default function AIMechanic() {
                 disabled={loading}
                 title={isBasic ? 'Pro feature — upgrade to upload' : 'Attach photo'}
                 className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
-                           hover:bg-surface-high dark:hover:bg-slate-700 active:bg-surface-highest dark:active:bg-slate-600"
+                           hover:bg-surface-high dark:hover:bg-surface-high/40 active:bg-surface-highest dark:active:bg-surface-high/60"
                 whileTap={{ scale: 0.9 }}
               >
                 <ImagePlus className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-muted'}`} />
@@ -722,7 +722,7 @@ export default function AIMechanic() {
                 disabled={loading}
                 title={isBasic ? 'Pro feature — upgrade to use camera' : 'Take photo'}
                 className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
-                           hover:bg-slate-50 active:bg-slate-100"
+                           hover:bg-surface-high dark:hover:bg-surface-high/40 active:bg-surface-highest dark:active:bg-surface-high/60"
                 whileTap={{ scale: 0.9 }}
               >
                 <Aperture className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-muted'}`} />
@@ -742,7 +742,7 @@ export default function AIMechanic() {
                 className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
                   isListening
                     ? 'bg-red-500 text-white shadow-sm shadow-red-400/40'
-                    : 'text-muted hover:bg-surface-high dark:hover:bg-slate-700 hover:text-on-surface active:bg-surface-highest'
+                    : 'text-muted hover:bg-surface-high dark:hover:bg-surface-high/40 hover:text-on-surface active:bg-surface-highest'
                 }`}
                 whileTap={{ scale: 0.9 }}
               >
@@ -762,7 +762,7 @@ export default function AIMechanic() {
                           transition-all duration-200 ${
                 input.trim() && !loading
                   ? 'bg-navy text-white shadow-md shadow-navy/30'
-                  : 'bg-surface-high dark:bg-slate-700 text-muted'
+                  : 'bg-surface-high dark:bg-surface-high/60 text-muted'
               }`}
               whileHover={input.trim() && !loading ? { scale: 1.07 } : {}}
               whileTap={{ scale: 0.9 }}

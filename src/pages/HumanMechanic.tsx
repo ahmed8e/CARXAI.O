@@ -156,7 +156,7 @@ export default function HumanMechanic() {
         
         {/* Map API Key Fallback */}
         {(!import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY === 'placeholder_google_maps_key') && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-surface/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-surface/60 dark:bg-surface-low/60 backdrop-blur-sm">
             <div className="w-16 h-16 rounded-full bg-navy/5 border border-navy/10 flex items-center justify-center mb-4">
               <MapPin className="w-8 h-8 text-navy/20" />
             </div>
@@ -173,7 +173,7 @@ export default function HumanMechanic() {
           animate={{ y: 0, opacity: 1 }}
           className="flex items-center justify-between max-w-md mx-auto pointer-events-auto"
         >
-          <div className="flex items-center gap-3 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl border border-overlay px-6 py-3 rounded-2xl shadow-xl w-full">
+          <div className="flex items-center gap-3 bg-surface/80 dark:bg-surface-low/80 backdrop-blur-xl border border-overlay px-6 py-3 rounded-2xl shadow-xl w-full">
             <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
               <Users className="w-4 h-4 text-white" />
             </div>
@@ -192,7 +192,7 @@ export default function HumanMechanic() {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="absolute bottom-0 left-0 right-0 z-30 h-[95%] lg:h-[85%] lg:max-w-md lg:left-1/2 lg:-translate-x-1/2 lg:bottom-6 lg:rounded-[32px] overflow-hidden"
       >
-        <div className="h-full bg-surface/95 dark:bg-slate-900/95 backdrop-blur-3xl border-t lg:border border-overlay rounded-t-[32px] lg:rounded-[32px] shadow-2xl flex flex-col">
+        <div className="h-full bg-surface/95 dark:bg-surface-low/95 backdrop-blur-3xl border-t lg:border border-overlay rounded-t-[32px] lg:rounded-[32px] shadow-2xl flex flex-col">
           {/* Sheet Handle */}
           <div 
             className="w-full py-5 flex flex-col items-center cursor-pointer lg:hidden"
@@ -207,7 +207,7 @@ export default function HumanMechanic() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted" />
               <input 
                 type="text" 
-                className="w-full bg-surface-low dark:bg-slate-800 border border-overlay rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-on-surface placeholder:text-muted focus:outline-none focus:border-navy focus:bg-surface transition-all shadow-inner" 
+                className="w-full bg-surface-low dark:bg-surface-high border border-overlay rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-on-surface placeholder:text-muted focus:outline-none focus:border-navy focus:bg-surface transition-all shadow-inner" 
                 placeholder="Find a mechanic near you..."
                 value={searchQuery} 
                 onFocus={() => setIsSheetExpanded(true)}
@@ -224,7 +224,7 @@ export default function HumanMechanic() {
                   className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
                     activeFilter === f 
                       ? 'bg-navy text-white border-navy shadow-lg shadow-navy/20' 
-                      : 'bg-surface dark:bg-slate-800 text-muted border-overlay hover:border-navy/30'
+                      : 'bg-surface dark:bg-surface-high text-muted border-overlay hover:border-navy/30'
                   }`}
                   whileTap={{ scale: 0.96 }}
                 >
@@ -260,7 +260,7 @@ export default function HumanMechanic() {
                     className={`w-full text-left p-5 rounded-2xl transition-all group relative border ${
                       selected?.id === place.id 
                         ? 'bg-navy/[0.03] border-navy/20' 
-                        : 'bg-surface dark:bg-slate-800 border-overlay hover:border-navy/30'
+                        : 'bg-surface dark:bg-surface-high border-overlay hover:border-navy/30'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -279,7 +279,7 @@ export default function HumanMechanic() {
                     
                     <div className="flex items-center gap-4">
                       {place.rating > 0 && (
-                        <div className="flex items-center gap-1.5 bg-surface-low dark:bg-slate-700 px-2 py-1 rounded-md border border-overlay">
+                        <div className="flex items-center gap-1.5 bg-surface-low dark:bg-surface-high/40 px-2 py-1 rounded-md border border-overlay">
                           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                           <span className="text-[11px] font-bold text-on-surface">{formatRating(place.rating)}</span>
                         </div>
@@ -329,14 +329,14 @@ export default function HumanMechanic() {
                 </div>
                 <button 
                   onClick={() => setSelected(null)}
-                  className="w-10 h-10 rounded-full bg-surface-low dark:bg-slate-700 flex items-center justify-center text-muted hover:text-navy hover:bg-navy/5 transition-all"
+                  className="w-10 h-10 rounded-full bg-surface-low dark:bg-surface-high/40 flex items-center justify-center text-muted hover:text-navy hover:bg-navy/5 transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-surface-low dark:bg-slate-700 border border-overlay p-4 rounded-2xl">
+                <div className="bg-surface-low dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-2">Google Rating</p>
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -344,7 +344,7 @@ export default function HumanMechanic() {
                     <span className="text-[11px] text-muted font-medium">({selected.userRatingsTotal})</span>
                   </div>
                 </div>
-                <div className="bg-surface-low dark:bg-slate-700 border border-overlay p-4 rounded-2xl">
+                <div className="bg-surface-low dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-navy mb-2">Distance</p>
                   <div className="flex items-center gap-2">
                     <Navigation className="w-4 h-4 text-navy" />
@@ -366,7 +366,7 @@ export default function HumanMechanic() {
                   href={`https://maps.google.com/?q=${selected.location.lat},${selected.location.lng}`} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="w-16 h-16 rounded-2xl bg-surface-low dark:bg-slate-700 border border-overlay flex items-center justify-center text-navy hover:bg-navy/5 transition-all"
+                  className="w-16 h-16 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay flex items-center justify-center text-navy hover:bg-navy/5 transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

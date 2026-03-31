@@ -129,7 +129,7 @@ export default function Dashboard() {
           <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
             <Link 
               to={mod.to} 
-              className={`relative overflow-hidden block h-full bg-surface dark:bg-slate-900 border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all ${mod.locked ? 'opacity-80' : ''}`}
+              className={`relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all ${mod.locked ? 'opacity-80' : ''}`}
             >
               <div className="flex flex-col h-full">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-sm border border-transparent" style={{ background: mod.bg }}>
@@ -156,8 +156,8 @@ export default function Dashboard() {
       {/* 4. Compact Vehicle Card */}
       <div className="mb-10">
         {!defaultVehicle && !loadingVehicle ? (
-          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-navy/[0.03] dark:bg-slate-800/40 border border-dashed border-overlay p-4 rounded-3xl transition-all hover:border-navy/30">
-            <div className="w-10 h-10 rounded-full bg-surface dark:bg-slate-800 border border-overlay flex items-center justify-center shadow-sm">
+          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-navy/[0.03] dark:bg-surface-high/40 border border-dashed border-overlay p-4 rounded-3xl transition-all hover:border-navy/30">
+            <div className="w-10 h-10 rounded-full bg-surface dark:bg-surface-high/40 border border-overlay flex items-center justify-center shadow-sm">
               <Plus className="w-5 h-5 text-navy" />
             </div>
             <div className="flex-1">
@@ -167,8 +167,8 @@ export default function Dashboard() {
             <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
           </Link>
         ) : defaultVehicle ? (
-          <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-surface dark:bg-slate-900 border border-overlay p-4 rounded-3xl shadow-sm hover:shadow-md transition-all group">
-            <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-slate-800 flex items-center justify-center shadow-sm overflow-hidden">
+          <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-surface dark:bg-surface-low/80 border border-overlay p-4 rounded-3xl shadow-sm hover:shadow-md transition-all group">
+            <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-surface-low flex items-center justify-center shadow-sm overflow-hidden">
                <Car className="w-6 h-6 text-navy/40" />
             </div>
             <div className="flex-1 min-w-0">
@@ -180,7 +180,7 @@ export default function Dashboard() {
             <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
           </Link>
         ) : (
-          <div className="h-20 w-full animate-pulse bg-surface-low dark:bg-slate-800 rounded-3xl" />
+          <div className="h-20 w-full animate-pulse bg-surface-low dark:bg-surface-low rounded-3xl" />
         )}
       </div>
 
@@ -199,7 +199,7 @@ export default function Dashboard() {
             <button 
               key={idx}
               onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: issue.label } })}
-              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface dark:bg-slate-900 border border-overlay shadow-sm hover:border-navy/30 transition-all whitespace-nowrap active:scale-95"
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface dark:bg-surface-low/80 border border-overlay shadow-sm hover:border-navy/30 transition-all whitespace-nowrap active:scale-95"
             >
               <issue.icon className="w-3.5 h-3.5 text-navy" />
               <span className="text-[11px] font-bold text-on-surface">{issue.label}</span>
@@ -239,9 +239,9 @@ export default function Dashboard() {
             <Link 
               key={idx} 
               to={item.to}
-              className="flex items-center gap-4 bg-surface/40 dark:bg-slate-900/40 border border-overlay p-4 rounded-2xl hover:bg-surface dark:hover:bg-slate-800 transition-all group"
+              className="flex items-center gap-4 bg-surface/40 dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl hover:bg-surface dark:hover:bg-slate-800 transition-all group"
             >
-              <div className="w-8 h-8 rounded-xl bg-surface-high dark:bg-slate-800 flex items-center justify-center text-muted group-hover:text-navy transition-colors">
+              <div className="w-8 h-8 rounded-xl bg-surface-high dark:bg-surface-high flex items-center justify-center text-muted group-hover:text-navy transition-colors">
                 <item.icon className="w-4 h-4" />
               </div>
               <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>

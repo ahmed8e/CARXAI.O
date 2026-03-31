@@ -36,27 +36,22 @@
 
 .dark {
   --color-navy: #0070E0;
-  --color-navy-dark: #00428A;
+  --color-navy-dark: #005BB5;
   --color-navy-light: #0A192F;
-  --color-teal: #0D6E8E;
-  --color-teal-dark: #062B3D;
-  --color-teal-light: #1591B8;
-  --color-cyan: #5DB0EE;
-  --color-cyan-light: #0A192F;
-  --color-cyan-dim: #005BB5;
-  --color-overlay: rgba(0, 112, 224, 0.1);
-  --color-soft: #020617;
-  --color-muted: #94A3B8;
-  --color-on-surface: #F8FAFC;
-  --color-surface: #0F172A;
-  --color-surface-low: #020617;
-  --color-surface-high: #1E293B;
-  --color-surface-highest: #334155;
-  --color-surface-container: #0F172A;
-  --shadow-glow: 0 0 30px rgba(0, 112, 224, 0.3);
-  --shadow-glow-lg: 0 0 60px rgba(0, 112, 224, 0.4);
-  --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.5);
-  --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --color-overlay: rgba(255, 255, 255, 0.03);
+  --color-soft: #02040A; /* OLED Black */
+  --color-muted: #A1A1AA; /* Zinc-400 */
+  --color-on-surface: #FFFFFF;
+  --color-surface: #050505;
+  --color-surface-low: #02040A;
+  --color-surface-high: #111111;
+  --color-surface-highest: #1A1A1A;
+  --color-surface-container: #050505;
+  
+  --shadow-glow: 0 0 30px rgba(0, 112, 224, 0.4);
+  --shadow-glow-lg: 0 0 60px rgba(0, 112, 224, 0.5);
+  --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.8);
+  --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 @layer base {

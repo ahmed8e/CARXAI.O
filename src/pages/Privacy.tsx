@@ -2,9 +2,9 @@ import Navbar from '../components/Navbar'
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-surface-low dark:bg-slate-900 pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-surface-low dark:bg-surface-low pt-32 pb-20 px-6">
       <Navbar />
-      <div className="max-w-3xl mx-auto bg-surface dark:bg-slate-800 p-8 md:p-12 rounded-[32px] border border-overlay shadow-sm">
+      <div className="max-w-3xl mx-auto bg-surface dark:bg-surface-high/40 p-8 md:p-12 rounded-[32px] border border-overlay shadow-sm">
         <h1 className="text-3xl font-display font-bold text-on-surface mb-6">Privacy Policy</h1>
         <p className="text-muted mb-4">Last updated: March 31, 2026</p>
         

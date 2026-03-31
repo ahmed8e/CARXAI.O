@@ -30,13 +30,12 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
 
   return (
-    <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-2.5 ${transparent ? 'bg-surface/40 dark:bg-slate-900/40' : 'bg-surface/80 dark:bg-slate-900/80'} backdrop-blur-xl border border-overlay rounded-full shadow-lg transition-all duration-300`}>
-      {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 group">
+    <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-2.5 ${transparent ? 'bg-surface/20 dark:bg-black/40' : 'bg-surface/90 dark:bg-surface-low/90'} backdrop-blur-2xl border border-overlay rounded-full shadow-lg transition-all duration-300`}>
+      <Link to="/" className="flex items-center gap-2 group shrink-0">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
           <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
         </div>
-        <span className="font-display font-bold text-lg tracking-tight text-on-surface">
+        <span className="font-display font-black text-xl tracking-tighter text-on-surface flex items-center">
           car<span className="text-navy">x</span>ai
         </span>
       </Link>
@@ -72,7 +71,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         {/* Theme Toggle */}
         <button 
           onClick={toggleTheme}
-          className="p-2.5 rounded-full border border-overlay bg-surface dark:bg-slate-800 text-muted hover:text-navy hover:border-navy/30 hover:bg-surface-high dark:hover:bg-slate-700 transition-all shadow-sm group"
+          className="p-2.5 rounded-full border border-overlay bg-surface dark:bg-surface-high/40 text-muted hover:text-navy hover:border-navy/30 hover:bg-surface-high dark:hover:bg-surface-high/60 transition-all shadow-sm group"
           title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {isDarkMode ? (
@@ -86,7 +85,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           <div className="relative" ref={accountMenuRef}>
             <button 
               onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-              className="flex items-center gap-2.5 p-1 pr-3.5 rounded-full border border-overlay bg-surface dark:bg-slate-800 hover:border-navy/30 hover:bg-surface-high dark:hover:bg-slate-700 hover:shadow-md transition-all group shadow-sm"
+              className="flex items-center gap-2.5 p-1 pr-3.5 rounded-full border border-overlay bg-surface dark:bg-surface-high/40 hover:border-navy/30 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:shadow-md transition-all group shadow-sm"
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white font-display font-bold text-[10px] shadow-sm overflow-hidden">
                 {user?.user_metadata?.avatar_url ? (
@@ -103,12 +102,12 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-full mt-3 w-56 bg-surface dark:bg-slate-800 rounded-3xl border border-overlay shadow-2xl z-50 overflow-hidden p-2"
+                  className="absolute right-0 top-full mt-3 w-56 bg-surface dark:bg-surface-high/40 rounded-3xl border border-overlay shadow-2xl z-50 overflow-hidden p-2"
                 >
                   <div className="px-3 py-3 mb-1 border-b border-overlay">
                     <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5 px-1">Account</p>
                     <div className="flex items-center gap-2.5 px-1">
-                       <div className="w-8 h-8 rounded-full bg-surface-low dark:bg-slate-900 border border-overlay flex items-center justify-center text-navy font-bold text-xs overflow-hidden">
+                       <div className="w-8 h-8 rounded-full bg-surface-low dark:bg-surface-low/80 border border-overlay flex items-center justify-center text-navy font-bold text-xs overflow-hidden">
                          {user?.user_metadata?.avatar_url ? (
                            <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                          ) : userInitial}
@@ -121,11 +120,11 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   </div>
                   
                   <div className="space-y-0.5">
-                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-slate-700 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
+                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
                       <LayoutDashboard className="w-4 h-4 text-muted group-hover:text-navy" />
                       <span className="text-xs font-bold">Dashboard</span>
                     </Link>
-                    <Link to="/my-account" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-slate-700 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
+                    <Link to="/my-account" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
                       <User className="w-4 h-4 text-muted group-hover:text-navy" />
                       <span className="text-xs font-bold">My Account</span>
                     </Link>
@@ -148,7 +147,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         {/* Mobile menu trigger / Dashboard sidebar trigger */}
         <button 
           onClick={onMenuClick}
-          className="p-2 rounded-full hover:bg-surface-high dark:hover:bg-slate-700 transition-colors text-muted md:hidden"
+          className="p-2 rounded-full hover:bg-surface-high dark:hover:bg-surface-high/60 transition-colors text-muted md:hidden"
         >
           <Menu className="w-5 h-5" />
         </button>

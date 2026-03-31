@@ -24,7 +24,7 @@ interface ActivityItem {
 }
 
 export default function MyAccount() {
-  const { user, signOut, signOutAll, updateProfile, updatePassword } = useAuth()
+  const { user, signOut, signOutAll, updatePassword } = useAuth()
   const navigate = useNavigate()
   
   // App States
@@ -107,26 +107,26 @@ export default function MyAccount() {
     // Check user metadata first
     const metadata = user.user_metadata
     
-    const { data: profile, error } = await supabase
+    // Fetch profile (for full_name)
+    const { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
 
-    if (!error && profile) {
-      setProfileData({
-        // @ts-ignore - Supabase type mismatch
-        fullName: profile.full_name || metadata?.full_name || '',
-        phoneNumber: profile.phone_number || metadata?.phone_number || '',
-        preferredLanguage: profile.preferred_language || metadata?.preferred_language || 'English (US)'
-      })
-    } else {
-      setProfileData({
-        fullName: metadata?.full_name || user.email?.split('@')[0] || 'User',
-        phoneNumber: metadata?.phone_number || '',
-        preferredLanguage: metadata?.preferred_language || 'English (US)'
-      })
-    }
+    // Fetch user_settings (for phone_number, preferred_language)
+    const { data: settings } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    setProfileData({
+      fullName: (profile as any)?.full_name || metadata?.full_name || user.email?.split('@')[0] || 'User',
+      phoneNumber: (settings as any)?.phone_number || metadata?.phone_number || '',
+      preferredLanguage: (settings as any)?.preferred_language || metadata?.preferred_language || 'English (US)'
+    })
+    
     setLoadingProfile(false)
   }
 
@@ -210,14 +210,41 @@ export default function MyAccount() {
     setFormLoading(true)
     setFeedback(null)
 
-    const { error } = await updateProfile(profileData as any)
+    if (!user?.id) return
 
-    if (error) {
-      setFeedback({ type: 'error', message: error.message })
-    } else {
+    try {
+      // 1. Update profiles table (full_name)
+      const { error: profileError } = await (supabase as any)
+        .from('profiles')
+        .update({ full_name: profileData.fullName })
+        .eq('id', user.id)
+      
+      if (profileError) throw profileError
+
+      // 2. Update user_settings table (phone_number, preferred_language)
+      // Note: We use upsert because the row might not exist yet
+      const { error: settingsError } = await (supabase as any)
+        .from('user_settings')
+        .upsert({ 
+          user_id: user.id, 
+          phone_number: profileData.phoneNumber,
+          preferred_language: profileData.preferredLanguage
+        })
+
+      if (settingsError) throw settingsError
+
+      // 3. Optional: Sync to auth metadata so Navbar/Sidebar updates immediately
+      await supabase.auth.updateUser({
+        data: { full_name: profileData.fullName }
+      })
+
       setFeedback({ type: 'success', message: 'Profile updated successfully!' })
       setTimeout(() => window.location.reload(), 1500)
+    } catch (err: any) {
+      console.error('Update error:', err)
+      setFeedback({ type: 'error', message: err.message || 'Failed to update profile.' })
     }
+    
     setFormLoading(false)
   }
 
@@ -274,18 +301,18 @@ export default function MyAccount() {
             className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-bold text-sm text-left group ${
               activeSection === item.id 
               ? 'bg-[#0070E0] text-white shadow-lg shadow-[#0070E0]/20 translate-x-1' 
-              : 'text-slate-500 hover:bg-[var(--color-surface-high)] hover:text-[#0070E0]'
+              : 'text-muted/70 hover:bg-[var(--color-surface-high)] hover:text-[#0070E0]'
             }`}
           >
-            <item.icon className={`w-5 h-5 ${activeSection === item.id ? 'text-white' : 'text-slate-400 group-hover:text-[#0070E0]'}`} />
+            <item.icon className={`w-5 h-5 ${activeSection === item.id ? 'text-white' : 'text-muted/60 group-hover:text-[#0070E0]'}`} />
             {item.label}
             {activeSection === item.id && <motion.div layoutId="activeDot" className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40" />}
           </button>
         ))}
-        <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 lg:px-2">
+        <div className="pt-4 mt-4 border-t bg-surface-high/40 border-overlay dark:border-overlay lg:px-2">
           <button 
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl text-red-500 font-bold text-sm hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+            className="w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl text-red-500 font-bold text-sm hover:bg-red-50 dark:bg-surface-high/40 transition-all"
           >
             <LogOut className="w-5 h-5" />
             Sign Out
@@ -349,7 +376,7 @@ export default function MyAccount() {
                         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
                           <div>
                             <h2 className="text-3xl font-display font-black text-[var(--color-on-surface)] mb-1">{userName}</h2>
-                            <p className="text-slate-400 font-medium tracking-wide flex items-center justify-center md:justify-start gap-2">
+                            <p className="text-muted/60 font-medium tracking-wide flex items-center justify-center md:justify-start gap-2">
                               <Mail className="w-4 h-4" /> {user?.email}
                             </p>
                           </div>
@@ -360,12 +387,12 @@ export default function MyAccount() {
                         </div>
                         <div className="grid grid-cols-2 gap-4 md:flex md:items-center md:gap-10">
                           <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Account Created</p>
+                            <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-1.5 opacity-60">Account Created</p>
                             <p className="text-sm font-bold text-[var(--color-on-surface)]">March 20, 2026</p>
                           </div>
-                          <div className="h-8 w-px bg-slate-100 dark:bg-slate-800 hidden md:block" />
+                          <div className="h-8 w-px bg-slate-100 dark:bg-surface-high hidden md:block" />
                           <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Verified On</p>
+                            <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-1.5 opacity-60">Verified On</p>
                             <div className="flex items-center gap-2">
                               <CheckCircle2 className="w-4 h-4 text-[#0070E0]" />
                               <p className="text-sm font-bold text-[var(--color-on-surface)]">Phone & Email</p>
@@ -408,9 +435,9 @@ export default function MyAccount() {
                           { label: 'Job / Activity', value: 'Fleet Manager', icon: CheckCircle2 },
                         ].map((item, idx) => (
                           <div key={idx} className="group">
-                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 opacity-70 transition-colors">{item.label}</label>
+                            <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2.5 opacity-70 transition-colors">{item.label}</label>
                             <div className="relative">
-                              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors">
+                              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/60 transition-colors">
                                 <item.icon className="w-4.5 h-4.5" />
                               </div>
                               <div className="w-full bg-[var(--color-surface-low)] border border-[var(--color-overlay)] rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-[var(--color-on-surface)] whitespace-nowrap overflow-hidden text-ellipsis">
@@ -444,12 +471,12 @@ export default function MyAccount() {
                     <div className="space-y-6">
                       <div className="p-8 rounded-[32px] border border-[var(--color-overlay)] bg-[var(--color-surface-low)] flex flex-col md:flex-row items-center justify-between gap-6 hover:border-blue-500/30 transition-all group">
                         <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                          <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-muted/60 group-hover:text-blue-500 transition-colors">
                             <ShieldAlert className="w-7 h-7" />
                           </div>
                           <div>
                             <p className="font-black text-[var(--color-on-surface)] uppercase tracking-widest text-xs mb-1">Password</p>
-                            <p className="text-sm text-slate-500 font-medium">Keep your account secure</p>
+                            <p className="text-sm text-muted/70 font-medium">Keep your account secure</p>
                           </div>
                         </div>
                         <button 
@@ -465,7 +492,7 @@ export default function MyAccount() {
 
                       <div className="p-8 rounded-[32px] border border-[var(--color-overlay)] bg-[var(--color-surface-low)] flex flex-col md:flex-row items-center justify-between gap-6 hover:border-blue-500/30 transition-all group">
                         <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                          <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-muted/60 group-hover:text-blue-500 transition-colors">
                             <Monitor className="w-7 h-7" />
                           </div>
                           <div>
@@ -489,7 +516,7 @@ export default function MyAccount() {
                             }
                           }}
                           disabled={loggingOutAll}
-                          className="px-8 py-3.5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-overlay)] text-slate-600 dark:text-slate-400 font-black text-sm uppercase tracking-widest hover:border-red-500/30 hover:text-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[220px]"
+                          className="px-8 py-3.5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-overlay)] text-slate-600 dark:text-muted/60 font-black text-sm uppercase tracking-widest hover:border-red-500/30 hover:text-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[220px]"
                         >
                           {loggingOutAll ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Log Out Everywhere'}
                         </button>
@@ -497,7 +524,7 @@ export default function MyAccount() {
                     </div>
                   </div>
 
-                  <div className="bg-red-500/5 p-10 rounded-[48px] border border-red-500/10">
+                  <div className="bg-surface-high/40 p-10 rounded-[48px] border border-red-500/10">
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center">
                         <AlertTriangle className="w-6 h-6" />
@@ -528,15 +555,15 @@ export default function MyAccount() {
                     </div>
                     <div className="space-y-10">
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Appearance</p>
+                        <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-6">Appearance</p>
                         <div className="flex items-center justify-between bg-[var(--color-surface-low)] p-6 rounded-[32px] border border-[var(--color-overlay)]">
                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-slate-400">
+                              <div className="w-12 h-12 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-muted/60">
                                 <Zap className="w-6 h-6" />
                               </div>
                               <div>
                                 <p className="font-bold text-[var(--color-on-surface)]">Dark Mode</p>
-                                <p className="text-xs text-slate-500 font-medium">Toggle high-end night theme</p>
+                                <p className="text-xs text-muted/70 font-medium">Toggle high-end night theme</p>
                               </div>
                            </div>
                            <button onClick={toggleTheme} className={`w-14 h-8 rounded-full relative transition-colors duration-300 flex items-center px-1 ${isDarkMode ? 'bg-[#0070E0]' : 'bg-slate-200'}`}>
@@ -576,7 +603,7 @@ export default function MyAccount() {
                   {loadingActivity ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                       <Loader2 className="w-10 h-10 text-[#0070E0] animate-spin" />
-                      <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Updating History...</p>
+                      <p className="text-muted/60 font-bold uppercase tracking-widest text-[10px]">Updating History...</p>
                     </div>
                   ) : activities.length > 0 ? (
                     <div className="space-y-4">
@@ -589,7 +616,7 @@ export default function MyAccount() {
                              <div className="flex-1 min-w-0">
                                <h4 className="font-bold text-[var(--color-on-surface)] truncate">{act.title}</h4>
                                <div className="flex items-center gap-3 mt-1">
-                                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{act.date}</p>
+                                 <p className="text-[10px] text-muted/60 font-black uppercase tracking-widest">{act.date}</p>
                                  <span className="w-1 h-1 rounded-full bg-slate-300" />
                                  <p className="text-[10px] text-[#0070E0] font-black uppercase tracking-widest truncate">{act.status}</p>
                                </div>
@@ -603,12 +630,12 @@ export default function MyAccount() {
                     </div>
                   ) : (
                     <div className="bg-[var(--color-surface)] p-20 rounded-[48px] border border-dashed border-[var(--color-overlay)] text-center flex flex-col items-center gap-4">
-                       <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                       <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-surface-high flex items-center justify-center text-muted/60">
                           <History className="w-8 h-8 opacity-20" />
                        </div>
                        <div>
                           <p className="text-[var(--color-on-surface)] font-bold text-lg mb-1">No activity yet</p>
-                          <p className="text-slate-400 text-sm font-medium">Your diagnoses and searches will appear here.</p>
+                          <p className="text-muted/60 text-sm font-medium">Your diagnoses and searches will appear here.</p>
                        </div>
                        <button 
                          onClick={() => navigate('/dashboard')}
@@ -624,7 +651,7 @@ export default function MyAccount() {
               {activeSection === 'support' && (
                 <motion.div key="support" className="text-center bg-[var(--color-surface)] p-10 rounded-[48px] shadow-xl transition-colors border border-[var(--color-overlay)]">
                   <h3 className="text-3xl font-display font-black text-[#0070E0] italic mb-4">How can we help?</h3>
-                  <p className="text-slate-500 font-medium mb-8">Our AI and human mechanic support are here for you 24/7.</p>
+                  <p className="text-muted/70 font-medium mb-8">Our AI and human mechanic support are here for you 24/7.</p>
                   <button className="px-10 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-sm uppercase tracking-widest shadow-xl">Contact Support</button>
                 </motion.div>
               )}
@@ -651,13 +678,13 @@ export default function MyAccount() {
                     >
                       {formLoading ? 'Saving...' : 'Save Profile'}
                     </button>
-                    <button type="button" onClick={() => setIsEditingProfile(false)} className="p-2 hover:bg-[var(--color-surface-low)] rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
+                    <button type="button" onClick={() => setIsEditingProfile(false)} className="p-2 hover:bg-[var(--color-surface-low)] rounded-full transition-colors"><X className="w-5 h-5 text-muted/60" /></button>
                   </div>
                </div>
                <form id="profile-form" onSubmit={handleUpdateProfile} className="p-6 md:p-8 space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
+                      <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2">Full Name</label>
                       <input 
                         required 
                         type="text" 
@@ -667,7 +694,7 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
+                      <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2">Phone Number</label>
                       <input 
                         type="tel" 
                         value={profileData.phoneNumber} 
@@ -676,7 +703,7 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Preferred Language</label>
+                      <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2">Preferred Language</label>
                       <select 
                         value={profileData.preferredLanguage} 
                         onChange={e => setProfileData(prev => ({ ...prev, preferredLanguage: e.target.value }))}
@@ -706,7 +733,7 @@ export default function MyAccount() {
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-[var(--color-surface)] w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden border border-[var(--color-overlay)]">
                <div className="p-8 border-b border-[var(--color-overlay)] flex items-center justify-between">
                   <h2 className="text-2xl font-display font-bold text-[var(--color-on-surface)]">Update Password</h2>
-                  <button onClick={() => setIsUpdatingPass(false)} className="p-2 hover:bg-[var(--color-surface-low)] rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
+                  <button onClick={() => setIsUpdatingPass(false)} className="p-2 hover:bg-[var(--color-surface-low)] rounded-full transition-colors"><X className="w-6 h-6 text-muted/60" /></button>
                </div>
                <form onSubmit={handleUpdatePassword} className="p-8 space-y-6">
                   <div className="space-y-4">
@@ -715,7 +742,7 @@ export default function MyAccount() {
                        <p className="text-xs text-blue-500 font-medium leading-relaxed">For your security, we recommend a password that is at least 6 characters long and includes numbers.</p>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">New Password</label>
+                      <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2">New Password</label>
                       <input 
                         required 
                         type="password" 
@@ -725,7 +752,7 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Confirm New Password</label>
+                      <label className="block text-[10px] font-black text-muted/60 uppercase tracking-widest mb-2">Confirm New Password</label>
                       <input 
                         required 
                         type="password" 

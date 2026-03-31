@@ -77,7 +77,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-soft dark:bg-surface-low flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
       
       {/* Simple Top Left Logo instead of Navbar */}
       <div className="absolute top-[calc(1.5rem_+_env(safe-area-inset-top))] left-6 md:top-8 md:left-8 z-50">
@@ -85,8 +85,8 @@ export default function Auth() {
           <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
             <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
           </div>
-          <span className="font-display font-bold text-lg tracking-tight text-on-surface">
-            Carxai
+          <span className="font-display font-black text-xl tracking-tighter text-on-surface">
+            car<span className="text-navy">x</span>ai
           </span>
         </Link>
       </div>
@@ -102,29 +102,29 @@ export default function Auth() {
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">
+          <h1 className="text-3xl font-display font-black text-on-surface mb-2 tracking-tight italic">
             {mode === 'login' ? 'Welcome back' : 'Create account'}
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-muted font-medium">
             {mode === 'login' ? 'Your AI-powered roadside companion' : 'Join thousands of smart drivers'}
           </p>
         </div>
 
-        <div className="bg-surface dark:bg-slate-800 p-8 rounded-3xl border border-overlay shadow-2xl shadow-slate-900/10">
+        <div className="bg-surface dark:bg-surface p-8 rounded-3xl border border-overlay shadow-2xl shadow-black/10">
           
           {/* Mode Switcher */}
-          <div className="flex p-1 bg-surface-low dark:bg-slate-900 border border-overlay rounded-[14px] mb-8">
+          <div className="flex p-1 bg-surface-low dark:bg-surface-low/60 border border-overlay rounded-[14px] mb-8">
             <button
               type="button"
               onClick={() => setMode('login')}
-              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'login' ? 'bg-surface dark:bg-slate-800 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'login' ? 'bg-surface dark:bg-surface-high/40 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => setMode('register')}
-              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'register' ? 'bg-surface dark:bg-slate-800 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
+              className={`flex-1 py-2 text-sm font-bold rounded-[10px] transition-all duration-300 ${mode === 'register' ? 'bg-surface dark:bg-surface-high/40 text-on-surface shadow-sm' : 'text-muted hover:text-on-surface'}`}
             >
               Sign Up
             </button>
@@ -140,7 +140,7 @@ export default function Auth() {
                   setError('Google sign-in is not configured yet. Please use email.')
                 }
               }}
-              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-slate-700 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
+              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-surface-high/40 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
             >
               <div className="absolute left-5 flex items-center justify-center w-6 h-6">
                 <svg className="w-[19px] h-[19px] group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
@@ -160,10 +160,10 @@ export default function Auth() {
                   setError('Apple sign-in is not configured yet. Please use email.')
                 }
               }}
-              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-slate-700 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
+              className="relative w-full flex items-center justify-center py-3.5 px-4 rounded-[14px] bg-surface dark:bg-surface-high/40 border border-overlay text-on-surface text-[15px] font-semibold shadow-sm hover:surface-high transition-all group"
             >
               <div className="absolute left-5 flex items-center justify-center w-6 h-6 mb-[1px]">
-                <svg className="w-[21px] h-[21px] text-slate-900 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-[21px] h-[21px] text-on-surface group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.34-.73 3.83-.66 1.34.07 2.45.64 3.16 1.64-2.68 1.6-2.22 5.38.48 6.47-.64 1.77-1.8 3.58-2.55 4.72zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.4-1.88 4.41-3.74 4.25z"/>
                 </svg>
               </div>
@@ -202,7 +202,7 @@ export default function Auth() {
                   <label className="block text-sm font-semibold text-on-surface mb-2">Full Name</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
+                    className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-surface-low/60 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
                     placeholder="John Doe"
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
@@ -216,7 +216,7 @@ export default function Auth() {
               <label className="block text-sm font-semibold text-on-surface mb-2">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-surface-low/60 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none"
                 placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -229,7 +229,7 @@ export default function Auth() {
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none pr-12"
+                  className="w-full px-4 py-3.5 rounded-xl bg-surface-low dark:bg-surface-low/60 border border-overlay text-on-surface text-sm font-medium focus:border-navy focus:ring-[3px] focus:ring-navy/10 placeholder:text-muted transition-all outline-none pr-12"
                   placeholder={mode === 'login' ? '••••••••' : 'Min. 6 characters'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}

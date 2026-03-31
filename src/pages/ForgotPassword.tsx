@@ -26,7 +26,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden pt-24">
+    <div className="min-h-screen bg-surface dark:bg-surface-low flex flex-col items-center justify-center p-6 relative overflow-hidden pt-24">
       <Navbar />
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -44,7 +44,7 @@ export default function ForgotPassword() {
           <p className="text-muted font-medium">We'll help you get back in</p>
         </div>
 
-        <div className="bg-surface dark:bg-slate-800 p-8 rounded-3xl border border-overlay shadow-2xl">
+        <div className="bg-surface dark:bg-surface-high/40 p-8 rounded-3xl border border-overlay shadow-2xl">
           {sent ? (
             <div className="text-center py-4">
               <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
                   <label className="block text-sm font-semibold text-on-surface mb-2">Email</label>
                   <input
                     type="email"
-                    className="w-full px-5 py-4 rounded-xl bg-surface-low dark:bg-slate-900 border border-overlay text-on-surface font-medium focus:bg-surface focus:border-navy focus:ring-4 focus:ring-navy/10 outline-none transition-all placeholder:text-muted"
+                    className="w-full px-5 py-4 rounded-xl bg-surface-low dark:bg-surface-low border border-overlay text-on-surface font-medium focus:bg-surface focus:border-navy focus:ring-4 focus:ring-navy/10 outline-none transition-all placeholder:text-muted"
                     placeholder="you@example.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
