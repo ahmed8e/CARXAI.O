@@ -166,7 +166,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </nav>
 
         {/* ── Account ── */}
-        <div className="px-3 pt-3 pb-4 border-t border-slate-100/80 space-y-1.5">
+        <div className="px-3 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-100/80 space-y-1.5">
           {/* Profile card */}
           <Link
             to="/my-account"
@@ -214,7 +214,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div className="bg-mesh flex h-screen overflow-hidden">
+    <div className="bg-mesh flex h-[100dvh] overflow-hidden">
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
       {/* Desktop sidebar */}

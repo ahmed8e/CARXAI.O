@@ -75,8 +75,12 @@
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+    overscroll-behavior-y: none;
     position: relative;
     min-height: 100vh;
+    min-height: 100dvh;
   }
 
   body::before {
@@ -179,7 +183,7 @@
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 1rem;
-    font-size: 0.875rem;
+    font-size: 16px; /* iOS requires 16px to prevent auto-zoom */
     transition: all 0.2s;
     outline: none;
     background: var(--color-surface-low);

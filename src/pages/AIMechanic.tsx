@@ -625,7 +625,7 @@ export default function AIMechanic() {
       </div>
 
       {/* ══ Composer ══ */}
-      <div className="relative z-10 bg-white/95 backdrop-blur-sm border-t border-slate-100/80">
+      <div className="relative z-10 bg-white/95 backdrop-blur-sm border-t border-slate-100/80 pb-[env(safe-area-inset-bottom)]">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
@@ -686,7 +686,7 @@ export default function AIMechanic() {
                   rows={2}
                   style={{ minHeight: 52, maxHeight: 150 }}
                   className="w-full bg-transparent outline-none resize-none
-                             text-[15px] font-medium leading-relaxed
+                             text-[16px] font-medium leading-relaxed
                              text-slate-900 placeholder:text-slate-400"
                   disabled={loading}
                 />
