@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { speak, stopSpeaking, getUrgencyColor, getUrgencyBadge } from '../lib/utils'
+import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
+import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
 import {
-  Bot, Send, Users, Truck, Volume2,
+  Bot, Send, Users, Truck,
   Loader2, Mic, RefreshCw, Zap,
   CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
-  Car
+  Car, AudioLines
 } from 'lucide-react'
 import MechanicReport from '../components/MechanicReport'
 import VehicleAddModal from '../components/VehicleAddModal'
@@ -20,7 +21,7 @@ type Vehicle = Database['public']['Tables']['vehicles']['Row']
 const ISSUE_CHIPS = [
   { label: 'Engine light', value: 'My check engine light is on', icon: Activity },
   { label: 'Car won\'t start', value: 'My car won\'t start', icon: Zap },
-  { label: 'Strange noise', value: 'I hear a strange noise from my car', icon: Volume2 },
+  { label: 'Strange noise', value: 'I hear a strange noise from my car', icon: AudioLines },
   { label: 'Brake warning', value: 'My brake warning light is on', icon: Disc },
   { label: 'Flat tire', value: 'I have a flat tire', icon: Gauge },
   { label: 'Overheating', value: 'My car is overheating', icon: Thermometer },
@@ -53,9 +54,9 @@ export default function AIMechanic() {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -293,17 +294,6 @@ export default function AIMechanic() {
     reader.readAsDataURL(file)
   }
 
-  const handleSpeak = (text: string) => {
-    if (speaking) {
-      stopSpeaking()
-      setSpeaking(false)
-    } else {
-      speak(`Carxai says, ${text}`)
-      setSpeaking(true)
-      setTimeout(() => setSpeaking(false), 10000)
-    }
-  }
-
   const toggleListening = () => {
     if (isListening) {
       recognitionRef.current?.stop()
@@ -507,11 +497,23 @@ export default function AIMechanic() {
                           </div>
                         </div>
                       </div>
-                    ) : formatContent(msg.content)
+                     ) : formatContent(msg.content)
                   ) : (
                     <p className="font-semibold">{msg.content}</p>
                   )}
                 </div>
+
+                {/* Listen button — plain AI messages & structured diagnoses */}
+                {msg.role === 'assistant' && msg.id !== '0' && (
+                  <ListenButton
+                    currentAudioRef={currentAudioRef}
+                    text={
+                      msg.issueData
+                        ? `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`
+                        : msg.content
+                    }
+                  />
+                )}
 
                 {/* ── LUXURY Diagnosis Toolkit 2.0 ── */}
                 {msg.issueData && (
@@ -580,16 +582,7 @@ export default function AIMechanic() {
                   </motion.div>
                 )}
 
-                {/* Voice button */}
-                {msg.role === 'assistant' && !msg.issueData && msg.id !== '0' && (
-                  <motion.button 
-                    onClick={() => handleSpeak(msg.content)} 
-                    className="mt-2 ml-1 flex items-center gap-2 text-xs font-medium transition-colors text-muted/70 hover:text-navy"
-                    whileHover={{ x: 2 }}
-                  >
-                    <Volume2 className="w-3.5 h-3.5" /> Listen to diagnosis
-                  </motion.button>
-                )}
+
               </div>
             </motion.div>
           );

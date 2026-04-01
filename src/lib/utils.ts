@@ -34,30 +34,7 @@ export function getUrgencyBadge(level: string): string {
   }
 }
 
-export function speak(text: string) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    
-    // Improved voice selection
-    const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v => 
-      (v.name.includes('Google US English') || v.name.includes('English (United States)')) && 
-      v.lang.startsWith('en')
-    )
-    if (preferredVoice) utterance.voice = preferredVoice
 
-    utterance.rate = 1.0 // Natural rate
-    utterance.pitch = 1.05 // Clearer pitch
-    window.speechSynthesis.speak(utterance)
-  }
-}
-
-export function stopSpeaking() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
-  }
-}
 
 export function getUserLocation(): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
