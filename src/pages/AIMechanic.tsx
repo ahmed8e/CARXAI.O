@@ -606,7 +606,7 @@ export default function AIMechanic() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ══ Composer ══ */}
+      {/* ══ Compact Composer ══ */}
       <div className="relative z-10 bg-white/95 dark:bg-surface-low/95 backdrop-blur-md border-t border-overlay pb-[env(safe-area-inset-bottom)]">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
@@ -615,12 +615,12 @@ export default function AIMechanic() {
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
         {/* ── Refined Floating Card ── */}
-        <div className="mx-4 mt-4 mb-3 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-[0_8px_30px_rgb(0,0,0,0.04)]
+        <div className="mx-4 mt-2.5 mb-2 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-sm
                         transition-all duration-300
-                        focus-within:border-navy/30 focus-within:shadow-[0_12px_40px_rgba(0,18,51,0.08)]">
+                        focus-within:border-navy/30 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)]">
 
           {/* ── Top: text input ── */}
-          <div className="px-6 pt-4 pb-1">
+          <div className="px-6 pt-3.5 pb-0.5">
             <AnimatePresence mode="wait">
               {isListening ? (
                 <motion.div
@@ -628,12 +628,12 @@ export default function AIMechanic() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-1.5 h-[48px]"
+                  className="flex items-center gap-1.5 h-[40px]"
                 >
                   {Array.from({ length: 24 }).map((_, i) => (
                     <motion.div
                       key={i}
-                      className="w-[3px] rounded-full bg-navy"
+                      className="w-[2.5px] rounded-full bg-navy"
                       animate={{ scaleY: [0.3, 1, 0.3] }}
                       transition={{
                         repeat: Infinity,
@@ -641,10 +641,10 @@ export default function AIMechanic() {
                         delay: i * 0.04,
                         ease: 'easeInOut',
                       }}
-                      style={{ height: 24, transformOrigin: 'center' }}
+                      style={{ height: 20, transformOrigin: 'center' }}
                     />
                   ))}
-                  <span className="ml-3 text-[13px] font-black text-navy uppercase tracking-widest italic">Listening…</span>
+                  <span className="ml-3 text-[12px] font-black text-navy uppercase tracking-widest italic opacity-80">Listening…</span>
                 </motion.div>
               ) : (
                 <motion.textarea
@@ -664,11 +664,11 @@ export default function AIMechanic() {
                     }
                   }}
                   placeholder="Describe your car issue…"
-                  rows={2}
-                  style={{ minHeight: 48, maxHeight: 150 }}
+                  rows={1}
+                  style={{ minHeight: 40, maxHeight: 150 }}
                   className="w-full bg-transparent outline-none resize-none
-                             text-[15px] font-medium leading-relaxed
-                             text-on-surface placeholder:text-muted/60"
+                             text-[15px] font-medium leading-[1.6]
+                             text-on-surface placeholder:text-muted/50"
                   disabled={loading}
                 />
               )}
@@ -676,35 +676,36 @@ export default function AIMechanic() {
           </div>
 
           {/* ── Bottom: action bar ── */}
-          <div className="flex items-center gap-1.5 px-4 pb-3.5">
+          <div className="flex items-center gap-1.5 px-4 pb-3">
             <div className="flex items-center gap-1 flex-1">
-              {/* Media Buttons */}
+              {/* Media Buttons (Left) */}
               {[
-                { icon: ImagePlus, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : fileInputRef.current?.click(), title: 'Attach photo' },
-                { icon: Aperture, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : cameraInputRef.current?.click(), title: 'Take photo' },
+                { icon: ImagePlus, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : fileInputRef.current?.click(), title: 'Photo' },
+                { icon: Aperture, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : cameraInputRef.current?.click(), title: 'Camera' },
               ].map((btn, i) => (
                 <motion.button
                   key={i}
                   onClick={btn.onClick}
                   disabled={loading}
-                  className="relative w-10 h-10 rounded-[18px] flex items-center justify-center transition-all
-                             hover:bg-navy/5 active:scale-90 group"
+                  className="relative w-9 h-9 rounded-[16px] flex items-center justify-center transition-all
+                             hover:bg-navy/5 active:scale-95 group"
                   whileTap={{ scale: 0.9 }}
                 >
-                  <btn.icon className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-500/70 group-hover:text-amber-600' : 'text-muted group-hover:text-navy'}`} />
+                  <btn.icon className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-500/70' : 'text-muted group-hover:text-navy'}`} />
                   {isBasic && (
-                    <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white" />
+                    <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-white" />
                   )}
                 </motion.button>
               ))}
+            </div>
 
-              <div className="w-px h-4 bg-overlay mx-1" />
-
-              {/* Mic */}
+            {/* Primary Actions (Right) */}
+            <div className="flex items-center gap-2">
+              {/* Mic — Now grouped with Send */}
               <motion.button
                 onClick={toggleListening}
                 disabled={loading || isProcessing}
-                className={`w-10 h-10 rounded-[18px] flex items-center justify-center transition-all ${
+                className={`w-9 h-9 rounded-[16px] flex items-center justify-center transition-all ${
                   isListening
                     ? 'bg-red-500 text-white shadow-lg shadow-red-400/30'
                     : 'text-muted hover:bg-navy/5 hover:text-navy active:scale-90'
@@ -713,44 +714,44 @@ export default function AIMechanic() {
               >
                 {isProcessing
                   ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
-                  : <Mic className="w-[18px] h-[18px]" />}
+                  : <Mic className={`w-[18px] h-[18px] ${isListening ? 'text-white' : ''}`} />}
+              </motion.button>
+
+              {/* Send Button */}
+              <motion.button
+                onClick={() => sendMessage(input)}
+                disabled={loading || (!input.trim() && !isListening)}
+                className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
+                            transition-all duration-300 ${
+                  input.trim() && !loading
+                    ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
+                    : 'bg-surface-low text-muted/30 cursor-not-allowed'
+                }`}
+                whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
+                whileTap={{ scale: 0.95 }}
+              >
+                {loading
+                  ? <Loader2 className="w-5 h-5 animate-spin" />
+                  : <Send className="w-5 h-5 translate-x-[1px] translate-y-[-0.5px]" />}
               </motion.button>
             </div>
-
-            {/* Send */}
-            <motion.button
-              onClick={() => sendMessage(input)}
-              disabled={loading || (!input.trim() && !isListening)}
-              className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0
-                          transition-all duration-300 ${
-                input.trim() && !loading
-                  ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
-                  : 'bg-surface-low text-muted/40 cursor-not-allowed'
-              }`}
-              whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
-              whileTap={{ scale: 0.95 }}
-            >
-              {loading
-                ? <Loader2 className="w-5 h-5 animate-spin" />
-                : <Send className="w-5 h-5 translate-x-[1px] translate-y-[-0.5px]" />}
-            </motion.button>
           </div>
         </div>
 
-        {/* Refined Pro Nudge Badge */}
+        {/* Refined Pro Nudge Badge — Slightly tighter */}
         {isBasic && (
-          <div className="px-4 pb-4">
+          <div className="px-5 pb-3.5">
             <button
               onClick={() => navigate('/my-account?upgrade=pro')}
-              className="w-full py-2.5 rounded-2xl bg-amber-50/50 border border-amber-100 flex items-center justify-center gap-2 group transition-all hover:bg-amber-100/50"
+              className="w-full py-2 rounded-2xl bg-amber-50/40 border border-amber-100/50 flex items-center justify-center gap-2 group transition-all hover:bg-amber-100/50"
             >
-              <div className="w-5 h-5 rounded-lg bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <LockIcon className="w-2.5 h-2.5 text-amber-600" />
+              <div className="w-4.5 h-4.5 rounded-lg bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <LockIcon className="w-2 h-2 text-amber-600" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
+              <span className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-700/80">
                 Unlock Pro Photo Diagnosis
               </span>
-              <ChevronRight className="w-3 h-3 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight className="w-3 h-3 text-amber-400/60 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         )}
