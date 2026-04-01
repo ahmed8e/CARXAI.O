@@ -387,9 +387,8 @@ export default function AIMechanic() {
         {/* ── LUXURY Empty State / Diagnostic Pulsar ── */}
         {messages.length === 1 && !loading && (
           <div className="min-h-[55vh] flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
-            {/* Ambient Base — Tech Grid */}
-            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] [background-size:24px_24px] opacity-[0.2] dark:opacity-[0.05]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white dark:via-surface-low/50 dark:to-surface-low" />
+            {/* Ambient Base — Subtle Glow */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white dark:via-surface-low/40 dark:to-surface-low" />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -398,15 +397,10 @@ export default function AIMechanic() {
             >
               {/* The Pulsar — Multi-layered Hero */}
               <div className="relative w-24 h-24 mx-auto mb-8">
-                {/* Outer Halo Rings */}
+                {/* Subtle outer glow */}
                 <motion.div 
-                  className="absolute inset-0 rounded-full border-2 border-navy/5 shadow-[0_0_40px_rgba(0,18,51,0.05)]"
-                  animate={{ scale: [1, 1.15, 1], rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div 
-                  className="absolute inset-[-10px] rounded-full border border-navy/5"
-                  animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
+                  className="absolute inset-[-4px] rounded-full bg-navy/[0.02] blur-xl"
+                  animate={{ opacity: [0.2, 0.4, 0.2] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
                 
@@ -423,8 +417,8 @@ export default function AIMechanic() {
                 </div>
               </div>
 
-              <h2 className="text-3xl font-display font-black text-on-surface italic tracking-tighter mb-3 leading-none">Diagnostic Pulse</h2>
-              <p className="text-muted font-medium max-w-[240px] mx-auto text-[13px] leading-relaxed tracking-tight">Active session — specify a symptom to begin AI assessment.</p>
+              <h2 className="text-2xl font-display font-bold text-on-surface tracking-tight mb-3 leading-none">Diagnostic Center</h2>
+              <p className="text-muted font-medium max-w-[240px] mx-auto text-[13px] leading-relaxed tracking-tight">Active session — describe your symptom to begin AI assessment.</p>
             </motion.div>
 
             {/* Quick Start Grid — Luxury Cockpit Style */}
@@ -447,7 +441,7 @@ export default function AIMechanic() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100" />
                   </div>
                   
-                  <span className="text-[11px] font-display font-black italic uppercase tracking-tight leading-none text-on-surface/80 group-hover:text-navy group-hover:translate-x-0.5 transition-all relative z-10">{chip.label}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wide leading-none text-on-surface/80 group-hover:text-navy group-hover:translate-x-0.5 transition-all relative z-10">{chip.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -502,14 +496,14 @@ export default function AIMechanic() {
                     msg.issueData ? (
                       <div className="space-y-4">
                         <div>
-                          <h3 className="text-xl font-display font-black text-on-surface italic tracking-tight mb-2 leading-none uppercase">{msg.issueData.issueName}</h3>
+                          <h3 className="text-xl font-display font-bold text-on-surface tracking-tight mb-2 leading-none">{msg.issueData.issueName}</h3>
                           <p className="text-on-surface/80 leading-relaxed font-medium text-[13px]">{msg.issueData.likelyCause}</p>
                         </div>
 
                         <div className="space-y-3 pt-4 border-t border-navy/5">
                           <div className="space-y-1.5">
-                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-navy/40">Critical Next Step</p>
-                            <p className="text-[13px] font-black text-navy leading-tight italic">{msg.issueData.nextStep}</p>
+                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">Next Step</p>
+                            <p className="text-[13px] font-bold text-navy leading-tight">{msg.issueData.nextStep}</p>
                           </div>
                         </div>
                       </div>
@@ -524,51 +518,34 @@ export default function AIMechanic() {
                   <motion.div 
                      initial={{ opacity: 0, scale: 0.98, y: 15 }}
                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                     className="mt-6 p-6 rounded-[34px] bg-white/70 dark:bg-surface-high/70 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-[0_25px_60px_rgba(0,18,51,0.15)] relative overflow-hidden group/toolkit"
+                     className="mt-6 p-6 rounded-[34px] bg-white/40 dark:bg-surface-high/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_20px_50px_rgba(0,18,51,0.12)] relative overflow-hidden group/toolkit"
                   >
-                    {/* Subtle Scanning Mesh Background */}
-                    <div className="absolute inset-0 bg-[radial-gradient(#001233_1.5px,transparent_1.5px)] [background-size:20px_20px] opacity-[0.03] pointer-events-none" />
+                    {/* Atmospheric Glow */}
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/[0.03] blur-3xl pointer-events-none" />
                     
                     <div className="flex items-center justify-between mb-6 relative z-10">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-lg bg-navy/5 flex items-center justify-center border border-navy/10">
-                            <Activity className="w-3.5 h-3.5 text-navy" />
+                            <Activity className="w-3.5 h-3.5 text-navy/60" />
                           </div>
-                          <p className="text-[9px] font-black uppercase tracking-[0.25em] text-navy/40 leading-none">Diagnostic Pulse</p>
+                          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40 leading-none">Status Check</p>
                         </div>
-                        <div className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm transition-all duration-500 ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                          <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                          {getUrgencyBadge(msg.issueData.urgencyLevel)} Assessment
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-all duration-500 ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
+                          <div className="w-1 h-1 rounded-full bg-current animate-pulse" />
+                          {getUrgencyBadge(msg.issueData.urgencyLevel)}
                         </div>
                       </div>
                       {msg.issueData.warning && (
-                        <motion.div 
-                          animate={{ opacity: [0.7, 1, 0.7] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-red-600 bg-red-50/90 px-3.5 py-2.5 rounded-2xl border border-red-100/50 shadow-sm"
-                        >
-                          <ShieldAlert className="w-3.5 h-3.5" />
-                          {msg.issueData.warning}
-                        </motion.div>
+                          <motion.div 
+                            animate={{ opacity: [0.8, 1, 0.8] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-red-600 bg-red-50/50 px-3 py-2 rounded-xl border border-red-200/30"
+                          >
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            {msg.issueData.warning}
+                          </motion.div>
                       )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 relative z-10">
-                      <motion.button 
-                        onClick={() => navigate('/dashboard/mechanic')} 
-                        className="flex items-center justify-center gap-3 py-4 rounded-2xl text-[10px] font-display font-black italic uppercase tracking-tight border transition-all bg-white/80 backdrop-blur-md border-white/60 text-on-surface hover:text-navy hover:border-navy shadow-sm"
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        <Users className="w-4 h-4" /> Human Help
-                      </motion.button>
-                      <motion.button 
-                        onClick={() => navigate('/dashboard/towing')} 
-                        className="flex items-center justify-center gap-3 py-4 rounded-2xl text-[10px] font-display font-black italic uppercase tracking-tight transition-all bg-navy text-white shadow-[0_15px_35px_rgba(15,23,42,0.3)] active:brightness-90 active:scale-95"
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        <Truck className="w-4 h-4" /> Emergency
-                      </motion.button>
                     </div>
 
                     <motion.button 
@@ -576,11 +553,28 @@ export default function AIMechanic() {
                         setReportDiagnosis(msg.issueData!)
                         setShowReport(true)
                       }}
-                      className="w-full flex items-center justify-center gap-3 py-4.5 rounded-2xl text-[10px] font-display font-black italic uppercase tracking-[0.2em] transition-all relative z-10 bg-emerald-500 text-white shadow-[0_15px_40px_rgba(16,185,129,0.25)] active:brightness-90 active:scale-[0.98]"
+                      className="w-full flex items-center justify-center gap-3 py-4.5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.15em] transition-all bg-navy text-white shadow-xl shadow-navy/10 hover:shadow-navy/20 active:scale-[0.98] relative z-10"
                       whileTap={{ scale: 0.98 }}
                     >
                       <FileText className="w-4.5 h-4.5" /> Generate Official Report
                     </motion.button>
+
+                    <div className="grid grid-cols-2 gap-3 relative z-10 mt-3">
+                      <motion.button 
+                        onClick={() => navigate('/dashboard/mechanic')} 
+                        className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <Users className="w-4 h-4 text-navy/40" /> Human Help
+                      </motion.button>
+                      <motion.button 
+                        onClick={() => navigate('/dashboard/towing')} 
+                        className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <Truck className="w-4 h-4 text-navy/40" /> Emergency
+                      </motion.button>
+                    </div>
 
                     <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-navy/5 blur-3xl opacity-0 group-hover/toolkit:opacity-100 transition-opacity" />
                   </motion.div>
