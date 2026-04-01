@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
-import { Bot, Users, Truck, Star, CheckCircle2, X, Activity, Radar, ShieldAlert, Camera, DollarSign, Clock, LayoutDashboard, User, LogOut, Zap } from 'lucide-react'
+import { Bot, Users, Truck, Star, CheckCircle2, X, Activity, Radar, ShieldAlert, Camera, DollarSign, Clock, LayoutDashboard, User, LogOut, Zap, MessageSquare, Cpu, MapPin, Navigation } from 'lucide-react'
 
 const features = [
   { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
@@ -20,10 +20,10 @@ const features = [
 // ... (steps, reviews, plans remain the same)
 
 const steps = [
-  { num: '01', title: 'Describe problem', desc: 'Tell us what happened.' },
-  { num: '02', title: 'Instant diagnosis', desc: 'Get AI answers fast.' },
-  { num: '03', title: 'Find nearby help', desc: 'Locate local experts.' },
-  { num: '04', title: 'Take next step', desc: 'Back on the road in minutes.' },
+  { num: '01', title: 'Describe problem', desc: 'Type, speak, or photo your issue in seconds.', icon: MessageSquare },
+  { num: '02', title: 'Instant AI diagnosis', desc: 'Our AI identifies the cause and urgency level.', icon: Cpu },
+  { num: '03', title: 'Find nearby help', desc: 'Locate certified mechanics and garages near you.', icon: MapPin },
+  { num: '04', title: 'Back on the road', desc: 'Get towing, a mechanic, or clear guidance fast.', icon: Navigation },
 ]
 
 const reviews = [
@@ -445,32 +445,84 @@ export default function Landing() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" className="pt-6 pb-12 md:pt-10 md:pb-20 px-0 overflow-hidden">
+        <section id="how-it-works" className="pt-6 pb-12 md:pt-10 md:pb-24 px-0 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">Four simple steps</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">From breakdown to backup in minutes.</p>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">From breakdown to backup</h2>
+            <p className="text-muted text-lg md:text-xl font-medium max-w-xl mx-auto mt-4">Four steps. Minutes, not hours.</p>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto snap-x scrollbar-hide px-6 md:grid md:grid-cols-4 md:max-w-6xl md:mx-auto md:px-0 md:overflow-visible">
+          {/* Steps Grid */}
+          <div className="relative flex gap-4 overflow-x-auto snap-x scrollbar-hide px-6 md:grid md:grid-cols-4 md:max-w-6xl md:mx-auto md:px-0 md:overflow-visible">
+
+            {/* Connector line — desktop only */}
+            <div className="hidden md:block absolute top-[52px] left-[calc(12.5%+28px)] right-[calc(12.5%+28px)] h-px z-0"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.2) 15%, rgba(0,112,224,0.2) 85%, transparent)' }}
+            />
+
             {steps.map((step, i) => (
-              <div 
-                key={i} 
-                className="flex-shrink-0 w-[240px] md:w-auto snap-center p-8 rounded-[32px] bg-surface dark:bg-surface-high/40 border border-overlay shadow-sm relative group hover:border-navy/20 hover:shadow-xl transition-all overflow-hidden"
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                whileHover={{ y: -4 }}
+                className="flex-shrink-0 w-[240px] md:w-auto snap-center relative group"
               >
-                {/* Step Number Backdrop */}
-                <div className="absolute -top-4 -right-2 text-7xl font-display font-black text-on-surface/5 group-hover:text-navy/5 transition-colors pointer-events-none">
-                  {step.num}
+                {/* Numbered Badge */}
+                <div className="flex justify-center mb-5 relative z-10">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center font-display font-black text-lg text-white shadow-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #0070E0, #0055b3)',
+                      boxShadow: '0 8px 20px rgba(0,112,224,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    {step.num}
+                  </div>
                 </div>
-                
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="text-navy text-sm font-black uppercase tracking-widest mb-4 opacity-60 group-hover:opacity-100 transition-opacity">Step {step.num}</div>
-                  <h3 className="text-xl font-bold mb-2 text-on-surface leading-tight tracking-tight">{step.title}</h3>
-                  <p className="text-sm text-muted font-medium leading-relaxed">{step.desc}</p>
+
+                {/* Card */}
+                <div
+                  className="relative overflow-hidden rounded-[28px] p-6 flex flex-col gap-4 transition-all duration-300"
+                  style={{
+                    background: 'linear-gradient(160deg, rgba(255,255,255,0.9) 0%, rgba(248,250,255,0.95) 100%)',
+                    border: '1.5px solid rgba(0,112,224,0.1)',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,112,224,0.14), inset 0 1px 0 rgba(255,255,255,0.9)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,112,224,0.22)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,112,224,0.1)'
+                  }}
+                >
+                  {/* Top shimmer line */}
+                  <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+
+                  {/* Icon */}
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{
+                      background: 'rgba(0,112,224,0.07)',
+                      border: '1px solid rgba(0,112,224,0.15)',
+                    }}
+                  >
+                    <step.icon className="w-5 h-5 text-navy" strokeWidth={1.75} />
+                  </div>
+
+                  {/* Text */}
+                  <div>
+                    <h3 className="font-display font-black text-base text-on-surface leading-tight tracking-tight mb-1.5">{step.title}</h3>
+                    <p className="text-sm text-muted font-medium leading-relaxed">{step.desc}</p>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
