@@ -386,52 +386,52 @@ export default function AIMechanic() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 pt-8 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto p-4 pt-6 space-y-6 relative z-10">
         
         {/* ── Empty State / Quick Start ── */}
         {messages.length === 1 && !loading && (
-          <div className="min-h-[65vh] flex flex-col items-center justify-center py-10 px-4">
+          <div className="min-h-[50vh] flex flex-col items-center justify-center py-6 px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
+              className="text-center mb-8"
             >
-              <div className="w-20 h-20 rounded-[32px] bg-navy flex items-center justify-center shadow-[0_20px_40px_rgba(0,18,51,0.2)] mx-auto mb-8 border border-white/10">
-                <Bot className="w-10 h-10 text-white" />
+              <div className="w-14 h-14 rounded-[22px] bg-navy flex items-center justify-center shadow-xl mx-auto mb-5 border border-white/10">
+                <Bot className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-4xl font-display font-black text-on-surface italic tracking-tighter mb-4">How can I help?</h2>
-              <p className="text-muted font-medium max-w-[280px] mx-auto text-sm leading-relaxed">Pick a common issue below or type anything to start your AI diagnosis.</p>
+              <h2 className="text-2xl font-display font-black text-on-surface italic tracking-tight mb-2">How can I help?</h2>
+              <p className="text-muted font-medium max-w-[260px] mx-auto text-[13px] leading-snug opacity-80">Pick a common issue or type anything to start your AI diagnosis.</p>
             </motion.div>
 
-            {/* Quick Start Grid */}
-            <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-14">
+            {/* Quick Start Grid — Compact & Horizontal */}
+            <div className="grid grid-cols-2 gap-2.5 w-full max-w-sm mb-10">
               {ISSUE_CHIPS.map((chip, idx) => (
                 <motion.button
                   key={chip.value}
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: idx * 0.04 }}
                   onClick={() => sendMessage(chip.value)}
-                  className="flex flex-col items-center gap-3 p-5 rounded-[28px] border border-overlay bg-white dark:bg-surface-high hover:border-navy hover:text-navy transition-all group shadow-sm hover:shadow-md active:scale-95 text-center"
+                  className="flex items-center gap-3 p-3.5 rounded-[22px] border border-overlay bg-white dark:bg-surface-high hover:border-navy hover:text-navy transition-all group shadow-sm active:scale-95 text-left"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center group-hover:bg-navy/5 transition-colors group-hover:scale-110 duration-300">
-                    <chip.icon className="w-5 h-5 text-muted group-hover:text-navy" />
+                  <div className="w-10 h-10 rounded-2xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center group-hover:bg-navy/5 transition-colors group-hover:scale-105 duration-200 flex-shrink-0">
+                    <chip.icon className="w-4.5 h-4.5 text-muted group-hover:text-navy" />
                   </div>
-                  <span className="text-[11px] font-display font-black italic uppercase tracking-tight leading-none">{chip.label}</span>
+                  <span className="text-[10px] font-display font-black italic uppercase tracking-tight leading-none break-words line-clamp-2">{chip.label}</span>
                 </motion.button>
               ))}
             </div>
 
-            {/* Add Vehicle Context (Small Nudge) */}
+            {/* Add Vehicle Context (Refined Nudge) */}
             {!loadingVehicle && !activeVehicle && (
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setShowVehicleModal(true)}
-                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-amber-50/50 border border-amber-100/50 text-amber-600 text-[10px] font-black uppercase tracking-[0.15em] hover:bg-amber-100 transition-colors shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50/50 border border-amber-100/50 text-amber-600 text-[9px] font-black uppercase tracking-[0.15em] hover:bg-amber-100 transition-colors"
               >
-                <Info className="w-3.5 h-3.5" />
-                Add your vehicle for precision results
+                <Info className="w-3 h-3" />
+                Add vehicle context
               </motion.button>
             )}
           </div>
