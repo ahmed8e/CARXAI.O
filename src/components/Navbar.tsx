@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
-import { Sun, Moon, Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react'
+import { Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useTheme } from '../contexts/ThemeContext'
 
 interface NavbarProps {
   onMenuClick?: () => void
@@ -13,7 +12,6 @@ interface NavbarProps {
 
 export default function Navbar({ onMenuClick, showNavLinks = false, transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
-  const { isDarkMode, toggleTheme } = useTheme()
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
   
@@ -128,7 +126,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         ) : (
           <div className="flex items-center gap-4">
             <Link to="/auth?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">Sign In</Link>
-            <Link to="/auth" className="px-5 py-2.5 rounded-full bg-navy text-white text-[13px] font-black shadow-[0_8px_20px_rgba(0,112,224,0.3)] hover:shadow-[0_12px_28px_rgba(0,112,224,0.45)] hover:-translate-y-0.5 transition-all">Start Free</Link>
+            <Link to="/auth" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">Start Free</Link>
           </div>
         )}
         
