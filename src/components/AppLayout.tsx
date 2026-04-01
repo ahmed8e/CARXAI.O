@@ -248,7 +248,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(3.75rem_+_env(safe-area-inset-top))]">
+      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(4.75rem_+_env(safe-area-inset-top))]">
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
