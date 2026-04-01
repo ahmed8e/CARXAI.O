@@ -68,18 +68,6 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
 
       {/* Right Actions */}
       <div className="flex items-center gap-3">
-        {/* Theme Toggle */}
-        <button 
-          onClick={toggleTheme}
-          className="p-2.5 rounded-full border border-overlay bg-surface dark:bg-surface-high/40 text-muted hover:text-navy hover:border-navy/30 hover:bg-surface-high dark:hover:bg-surface-high/60 transition-all shadow-sm group"
-          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {isDarkMode ? (
-            <Sun className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-          ) : (
-            <Moon className="w-4 h-4 group-hover:-rotate-12 transition-transform" />
-          )}
-        </button>
 
         {user ? (
           <div className="relative" ref={accountMenuRef}>

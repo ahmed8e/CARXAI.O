@@ -555,19 +555,19 @@ export default function MyAccount() {
                     </div>
                     <div className="space-y-10">
                       <div>
-                        <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-6">Appearance</p>
+                        <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-6">Language & Region</p>
                         <div className="flex items-center justify-between bg-[var(--color-surface-low)] p-6 rounded-[32px] border border-[var(--color-overlay)]">
                            <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-2xl bg-[var(--color-surface)] shadow-sm flex items-center justify-center text-muted/60">
-                                <Zap className="w-6 h-6" />
+                                <Globe className="w-6 h-6" />
                               </div>
                               <div>
-                                <p className="font-bold text-[var(--color-on-surface)]">Dark Mode</p>
-                                <p className="text-xs text-muted/70 font-medium">Toggle high-end night theme</p>
+                                <p className="font-bold text-[var(--color-on-surface)]">Interface Language</p>
+                                <p className="text-xs text-muted/70 font-medium">Currently set to {profileData.preferredLanguage}</p>
                               </div>
                            </div>
-                           <button onClick={toggleTheme} className={`w-14 h-8 rounded-full relative transition-colors duration-300 flex items-center px-1 ${isDarkMode ? 'bg-[#0070E0]' : 'bg-slate-200'}`}>
-                             <motion.div animate={{ x: isDarkMode ? 24 : 0 }} className="w-6 h-6 rounded-full bg-white shadow-lg" />
+                           <button onClick={() => setIsEditingProfile(true)} className="px-6 py-2.5 rounded-xl bg-white border border-overlay text-navy font-black text-[10px] uppercase tracking-widest hover:border-navy/30 transition-all">
+                             Change
                            </button>
                         </div>
                       </div>
