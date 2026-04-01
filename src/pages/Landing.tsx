@@ -210,73 +210,123 @@ export default function Landing() {
                 AI mechanic, real mechanic, and towing in one smart platform.
               </motion.p>
 
-              {/* Service Cards (Grid in Hero) */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
+              {/* Service Pillar Cards */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-10 sm:mb-12"
+                className="grid grid-cols-3 gap-3 mb-10 sm:mb-12"
               >
                 {[
                   {
                     icon: Bot,
                     title: 'AI Mechanic',
-                    label: 'Instant Diagnosis',
-                    color: '#0070E0',
-                    bg: 'linear-gradient(135deg, rgba(0,112,224,0.12) 0%, rgba(0,112,224,0.04) 100%)',
-                    border: 'rgba(0,112,224,0.18)',
-                    glow: '0 8px 24px rgba(0,112,224,0.18)',
+                    desc: 'Instant diagnosis from a voice or photo.',
+                    tag: 'AI-Powered',
+                    accent: '#0070E0',
+                    halo: 'rgba(0,112,224,0.22)',
+                    bg: 'rgba(0,112,224,0.05)',
+                    tagBg: 'rgba(0,112,224,0.08)',
+                    tagBorder: 'rgba(0,112,224,0.2)',
                   },
                   {
                     icon: Users,
-                    title: 'Human Mechanic',
-                    label: 'Local Experts',
-                    color: '#0891b2',
-                    bg: 'linear-gradient(135deg, rgba(8,145,178,0.12) 0%, rgba(8,145,178,0.04) 100%)',
-                    border: 'rgba(8,145,178,0.18)',
-                    glow: '0 8px 24px rgba(8,145,178,0.18)',
+                    title: 'Real Mechanic',
+                    desc: 'Locate certified garages near you.',
+                    tag: 'Network',
+                    accent: '#0891b2',
+                    halo: 'rgba(8,145,178,0.22)',
+                    bg: 'rgba(8,145,178,0.05)',
+                    tagBg: 'rgba(8,145,178,0.08)',
+                    tagBorder: 'rgba(8,145,178,0.2)',
                   },
                   {
                     icon: Truck,
                     title: 'Towing',
-                    label: 'Emergency Help',
-                    color: '#ea580c',
-                    bg: 'linear-gradient(135deg, rgba(234,88,12,0.12) 0%, rgba(234,88,12,0.04) 100%)',
-                    border: 'rgba(234,88,12,0.18)',
-                    glow: '0 8px 24px rgba(234,88,12,0.18)',
+                    desc: 'Emergency roadside help in minutes.',
+                    tag: 'Emergency',
+                    accent: '#ea580c',
+                    halo: 'rgba(234,88,12,0.22)',
+                    bg: 'rgba(234,88,12,0.05)',
+                    tagBg: 'rgba(234,88,12,0.08)',
+                    tagBorder: 'rgba(234,88,12,0.2)',
                   },
                 ].map((sol, i) => (
                   <motion.div
                     key={i}
-                    whileHover={{ y: -3, scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                    className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-4 p-4 sm:p-5 rounded-[22px] sm:rounded-[28px] bg-surface border shadow-sm cursor-default transition-shadow duration-300"
+                    whileHover={{ y: -5 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                    className="relative flex flex-col items-start overflow-hidden rounded-[20px] sm:rounded-[26px] bg-surface cursor-default"
                     style={{
-                      borderColor: sol.border,
+                      border: `1.5px solid ${sol.accent}22`,
+                      boxShadow: `0 2px 16px ${sol.halo}`,
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.boxShadow = sol.glow)}
-                    onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.boxShadow = `0 8px 32px ${sol.halo}, 0 0 0 1.5px ${sol.accent}40`
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.boxShadow = `0 2px 16px ${sol.halo}`
+                    }}
                   >
-                    {/* Icon Container */}
+                    {/* Top Accent Bar */}
                     <div
-                      className="w-14 h-14 sm:w-12 sm:h-12 shrink-0 rounded-2xl flex items-center justify-center border"
-                      style={{
-                        background: sol.bg,
-                        borderColor: sol.border,
-                      }}
-                    >
-                      <sol.icon className="w-7 h-7 sm:w-6 sm:h-6" style={{ color: sol.color }} />
-                    </div>
+                      className="w-full h-[3px] shrink-0"
+                      style={{ background: `linear-gradient(90deg, ${sol.accent}, ${sol.accent}33)` }}
+                    />
 
-                    {/* Text */}
-                    <div className="flex flex-col text-left">
-                      <div className="font-display font-bold text-sm text-on-surface leading-tight tracking-tight">{sol.title}</div>
-                      <div className="text-[10px] text-muted font-bold mt-1 uppercase tracking-widest" style={{ color: sol.color + 'aa' }}>{sol.label}</div>
+                    {/* Card Body */}
+                    <div className="flex flex-col items-start gap-3 sm:gap-4 p-3 sm:p-5">
+                      {/* Icon Orb */}
+                      <div className="relative mt-1">
+                        {/* Halo ring */}
+                        <div
+                          className="absolute inset-0 rounded-full blur-[14px] scale-150 opacity-60"
+                          style={{ background: sol.halo }}
+                        />
+                        <div
+                          className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center"
+                          style={{
+                            background: `radial-gradient(circle at 30% 30%, ${sol.accent}28, ${sol.bg})`,
+                            border: `1.5px solid ${sol.accent}30`,
+                            boxShadow: `0 4px 16px ${sol.halo}, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                          }}
+                        >
+                          <sol.icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sol.accent }} strokeWidth={1.75} />
+                        </div>
+                      </div>
+
+                      {/* Text */}
+                      <div>
+                        <div
+                          className="font-display font-black text-xs sm:text-base leading-tight tracking-tight text-on-surface mb-1"
+                        >
+                          {sol.title}
+                        </div>
+                        <p className="text-[9px] sm:text-[11px] text-muted font-medium leading-snug hidden sm:block">
+                          {sol.desc}
+                        </p>
+                      </div>
+
+                      {/* Capability Tag */}
+                      <div
+                        className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest"
+                        style={{
+                          background: sol.tagBg,
+                          border: `1px solid ${sol.tagBorder}`,
+                          color: sol.accent,
+                        }}
+                      >
+                        <div
+                          className="w-1 h-1 rounded-full animate-pulse"
+                          style={{ background: sol.accent }}
+                        />
+                        {sol.tag}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
               </motion.div>
+
 
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
