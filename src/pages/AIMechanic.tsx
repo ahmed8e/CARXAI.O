@@ -345,137 +345,109 @@ export default function AIMechanic() {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy/[0.03] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
       </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-overlay backdrop-blur-md bg-surface/90 dark:bg-surface-low/90 relative z-10">
-        <div className="flex items-center gap-3">
-          {/* Brand icon */}
-          <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-navy shadow-md shadow-navy/25">
-            <CircuitBoard className="w-4.5 h-4.5 text-white" />
+      {/* Header — Slim & Premium */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-overlay backdrop-blur-md bg-white/80 dark:bg-surface-low/80 relative z-20">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-navy shadow-lg shadow-navy/20">
+            <CircuitBoard className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-on-surface italic tracking-tight leading-tight">AI Mechanic</h1>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Online</span>
+            <h1 className="font-display font-black text-sm text-on-surface italic tracking-tight leading-none mb-0.5">AI Mechanic</h1>
+            <div className="flex items-center gap-1">
+              <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Active</span>
             </div>
           </div>
         </div>
 
-        {/* Right side: vehicle pill + user avatar */}
         <div className="flex items-center gap-2">
           {loadingVehicle ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-low dark:bg-surface-high border border-overlay text-[10px] text-muted">
-              <Loader2 className="w-3 h-3 animate-spin" />
+            <div className="w-8 h-6 flex items-center justify-center">
+              <Loader2 className="w-3 h-3 animate-spin text-muted" />
             </div>
           ) : activeVehicle ? (
             <motion.button
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               onClick={() => navigate('/dashboard/vehicles')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy/5 border border-navy/10 hover:bg-navy/10 transition-colors group max-w-[180px]"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy/5 border border-navy/10 hover:bg-navy/10 transition-colors"
             >
-              <Car className="w-3 h-3 text-navy flex-shrink-0" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-navy truncate">
-                {activeVehicle.make} {activeVehicle.model}
+              <Car className="w-2.5 h-2.5 text-navy opacity-70" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-navy truncate max-w-[100px]">
+                {activeVehicle.make}
               </span>
             </motion.button>
-          ) : (
-            <motion.button
-              onClick={() => setShowVehicleModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <Info className="w-3 h-3 text-amber-600" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Add Car</span>
-            </motion.button>
-          )}
+          ) : null}
 
-          {/* User avatar */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-navy to-navy/70 flex items-center justify-center shadow-sm ring-2 ring-white">
-            <span className="text-[11px] font-black text-white uppercase">
-              {user?.email?.[0] ?? '?'}
-            </span>
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-navy to-navy/70 flex items-center justify-center shadow-lg ring-2 ring-white">
+            <span className="text-[10px] font-black text-white uppercase">{user?.email?.[0] ?? '?'}</span>
           </div>
         </div>
-      </div>
-
-      {/* Issue Chips */}
-      <div className="px-4 py-3 flex gap-2 overflow-x-auto scrollbar-hide border-b border-overlay bg-surface-low/50 dark:bg-surface-low/50 relative z-10">
-        {ISSUE_CHIPS.map((chip) => (
-          <motion.button
-            key={chip.value}
-            onClick={() => sendMessage(chip.value)}
-            disabled={loading}
-            className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-bold py-2 px-4 rounded-full border border-overlay bg-surface dark:bg-surface-high text-on-surface hover:border-navy hover:text-navy transition-all"
-            whileHover={{ y: -1, boxShadow: '0 4px 12px rgba(0, 112, 224, 0.08)' }}
-            whileTap={{ scale: 0.96 }}
-          >
-            <chip.icon className="w-3.5 h-3.5" />
-            {chip.label}
-          </motion.button>
-        ))}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 relative z-10">
-
-        {/* ── No-vehicle onboarding card ── */}
-        {!loadingVehicle && !activeVehicle && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mx-auto max-w-sm"
-          >
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy/5 via-navy/[0.03] to-transparent border border-navy/10 p-6 bg-surface dark:bg-surface-low">
-              {/* Glow orb */}
-              <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-navy/10 blur-2xl pointer-events-none" />
-
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
-                    <Car className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-navy/60">Smarter Diagnosis</p>
-                    <h4 className="font-display font-black italic text-on-surface leading-tight">Add your vehicle</h4>
-                  </div>
-                </div>
-
-                <p className="text-sm text-muted/80 font-medium leading-relaxed mb-5">
-                  Tell us about your car so the AI can give you precise, model-specific answers — not just generic advice.
-                </p>
-
-                <motion.button
-                  onClick={() => setShowVehicleModal(true)}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-navy text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-navy/25"
-                  whileHover={{ scale: 1.02, filter: 'brightness(1.08)' }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Add Vehicle Info
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </motion.button>
-
-                {/* Skip link — elegant separator style */}
-                <div className="flex items-center gap-3 mt-4">
-                  <div className="flex-1 h-px bg-overlay" />
-                  <button
-                    onClick={() => {}}
-                    className="text-[10px] font-bold text-muted hover:text-on-surface transition-colors whitespace-nowrap"
-                  >
-                    Skip for now
-                  </button>
-                  <div className="flex-1 h-px bg-overlay" />
-                </div>
+        
+        {/* ── Empty State / Quick Start ── */}
+        {messages.length === 1 && !loading && (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center py-10 px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-10"
+            >
+              <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-2xl shadow-navy/30 mx-auto mb-6">
+                <Bot className="w-8 h-8 text-white" />
               </div>
+              <h2 className="text-3xl font-display font-black text-on-surface italic tracking-tight mb-3">How can I help you?</h2>
+              <p className="text-muted font-medium max-w-[280px] mx-auto">Pick a common issue below or type anything to start your AI diagnosis.</p>
+            </motion.div>
+
+            {/* Quick Start Grid */}
+            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-12">
+              {ISSUE_CHIPS.map((chip, idx) => (
+                <motion.button
+                  key={chip.value}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => sendMessage(chip.value)}
+                  className="flex items-center gap-3 p-3.5 rounded-2xl border border-overlay bg-white dark:bg-surface-high hover:border-navy hover:text-navy transition-all group shadow-sm active:scale-95"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center group-hover:bg-navy/5 transition-colors">
+                    <chip.icon className="w-4 h-4 text-muted group-hover:text-navy" />
+                  </div>
+                  <span className="text-xs font-black tracking-tight">{chip.label}</span>
+                </motion.button>
+              ))}
             </div>
-          </motion.div>
+
+            {/* Add Vehicle Context (Small Nudge) */}
+            {!loadingVehicle && !activeVehicle && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={() => setShowVehicleModal(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-colors"
+              >
+                <Info className="w-3.5 h-3.5" />
+                Add your vehicle for better results
+              </motion.button>
+            )}
+          </div>
         )}
 
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+        {messages.map((msg, idx) => {
+          // Skip the initial greeting bubble if we are showing the centered empty state
+          if (messages.length === 1 && idx === 0) return null;
+          
+          return (
+            <motion.div 
+              key={msg.id} 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
             {msg.role === 'assistant' && (
               <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 mr-3 mt-1 bg-surface dark:bg-surface-high border border-overlay shadow-sm">
                 <Bot className="w-5 h-5 text-navy" />
@@ -520,36 +492,45 @@ export default function AIMechanic() {
                 )}
               </div>
 
-              {/* Urgency badge + Actions */}
+              {/* Diagnosis Toolkit */}
               {msg.issueData && (
-                <div className="mt-4 space-y-4">
-                  <div className="flex flex-col gap-2">
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border w-fit ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      {getUrgencyBadge(msg.issueData.urgencyLevel)} Urgency
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-4 p-4 rounded-3xl bg-surface-low dark:bg-surface-high border border-overlay shadow-sm space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted">Diagnosis Toolkit</p>
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border w-fit ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
+                        <AlertTriangle className="w-3 h-3" />
+                        {getUrgencyBadge(msg.issueData.urgencyLevel)} Risk
+                      </div>
                     </div>
                     {msg.issueData.warning && (
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-100 w-fit">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1.5 rounded-xl border border-red-100 animate-pulse">
                         <ShieldAlert className="w-3.5 h-3.5" />
                         {msg.issueData.warning}
                       </div>
                     )}
                   </div>
-                  
-                  <div className="flex gap-2 flex-wrap pb-2">
+
+                  <div className="grid grid-cols-2 gap-2">
                     <motion.button 
                       onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/mechanic')} 
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-on-surface/90 shadow-sm"
-                      whileHover={{ y: -1, borderColor: 'rgba(0, 112, 224, 0.5)', color: '#0070E0' }}
-                      whileTap={{ scale: 0.96 }}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                        isBasic ? 'bg-white border-overlay text-muted hover:text-navy hover:border-navy' : 'bg-white border-overlay text-on-surface hover:text-navy hover:border-navy'
+                      }`}
+                      whileTap={{ scale: 0.97 }}
                     >
-                      <Users className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Mechanic Search' : 'Human Mechanic'}
+                      <Users className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Mechanic' : 'Human Help'}
                     </motion.button>
                     <motion.button 
                       onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/towing')} 
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-navy/20 ${isBasic ? 'bg-slate-400 text-white' : 'bg-navy text-white'}`}
-                      whileHover={{ y: -1, filter: 'brightness(1.1)' }}
-                      whileTap={{ scale: 0.96 }}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        isBasic ? 'bg-slate-100 text-muted border border-overlay' : 'bg-navy text-white shadow-lg shadow-navy/20 active:brightness-90'
+                      }`}
+                      whileTap={{ scale: 0.97 }}
                     >
                       <Truck className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Towing' : 'Get Towing'}
                     </motion.button>
@@ -570,22 +551,21 @@ export default function AIMechanic() {
                       setReportDiagnosis(msg.issueData!)
                       setShowReport(true)
                     }}
-                    className={`w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
+                    className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
                       isBasic || (isPro && reportsUsed >= 3) 
-                        ? 'bg-surface-low dark:bg-surface-high text-muted border border-overlay'
-                        : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                        : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:brightness-90'
                     }`}
-                    whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FileText className="w-3.5 h-3.5" /> 
+                    <FileText className="w-4 h-4" /> 
                     {isBasic 
-                      ? 'Pro Plan Required for Reports' 
+                      ? 'Pro: Generate Full Report' 
                       : (isPro && reportsUsed >= 3) 
-                        ? 'Upgrade to Advanced for Unlimited Reports' 
+                        ? 'Upgrade for Unlimited Reports' 
                         : 'Generate Mechanic Report'}
                   </motion.button>
-                </div>
+                </motion.div>
               )}
 
               {msg.role === 'assistant' && !msg.issueData && msg.id !== '0' && (
@@ -606,9 +586,11 @@ export default function AIMechanic() {
                   {isBasic ? 'Unlock Voice Responses' : 'Listen to diagnosis'}
                 </motion.button>
               )}
+              {/* Speak button or other assistants actions can go here */}
             </div>
-          </div>
-        ))}
+          </motion.div>
+        )
+      })}
 
         {loading && (
           <div className="flex justify-start items-start">
