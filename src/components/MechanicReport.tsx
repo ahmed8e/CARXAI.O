@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, Download, Copy, Share2,
-  Truck, ShieldAlert, CheckCircle2, User,
+  Truck, ShieldAlert, User,
   Car, Info, AlertTriangle, FileText,
   Calendar, Hash, Loader2
 } from 'lucide-react'
@@ -88,9 +88,27 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
   }
 
   const copySummary = () => {
-    const text = `Mechanic Report ${reportId}\nIssue: ${diagnosis.issueName}\nUrgency: ${diagnosis.urgencyLevel}\nDiagnosis: ${diagnosis.likelyCause}\nNext Step: ${diagnosis.nextStep}`
+    const text = `Carxai Mechanic Report ${reportId}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName}\nSeverity: ${diagnosis.urgencyLevel}\nLikely Cause: ${diagnosis.likelyCause}\nRecommended Action: ${diagnosis.nextStep}`
     navigator.clipboard.writeText(text)
-    alert('Summary copied to clipboard!')
+    alert('Report summary copied to clipboard!')
+  }
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
+      text: `Diagnostic report for ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName}.`,
+      url: window.location.href
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        copySummary()
+      }
+    } catch (err) {
+      console.error('Error sharing:', err)
+    }
   }
 
   if (!isOpen) return null
@@ -103,17 +121,53 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-surface-low/60 backdrop-blur-md"
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm print:hidden"
         />
+        
+        <style dangerouslySetInnerHTML={{ __html: `
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            #printable-report, #printable-report * {
+              visibility: visible;
+            }
+            #printable-report {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              box-shadow: none !important;
+              border: none !important;
+              background: white !important;
+              color: black !important;
+            }
+            .print\\:hidden {
+              display: none !important;
+            }
+            @page {
+              margin: 2cm;
+            }
+            div {
+              break-inside: auto;
+            }
+            h1, h2, h3, h4 {
+              break-after: avoid;
+            }
+          }
+        `}} />
         
         <motion.div 
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_30px_90px_rgba(0,0,0,0.3)] flex flex-col border border-white/10"
+          id="printable-report"
+          className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_30px_90px_rgba(0,0,0,0.3)] flex flex-col border border-white/10 print:max-h-none print:overflow-visible print:rounded-none"
         >
           {/* 1. Strong Top Header */}
-          <div className="px-8 py-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-20">
+          <div className="px-8 py-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-20 print:hidden">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-navy flex items-center justify-center shadow-xl shadow-navy/20">
                 <FileText className="w-6 h-6 text-white" />
@@ -299,7 +353,7 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
 
           {/* 6. Action Section (Organized & Unified) */}
           {!loading && (
-            <div className="px-10 py-10 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 backdrop-blur-xl z-30">
+            <div className="px-10 py-10 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 backdrop-blur-xl z-30 print:hidden">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                 <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                   <button 
@@ -323,7 +377,10 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
                   >
                     <Copy className="w-4 h-4 text-slate-400" /> Copy
                   </button>
-                  <button className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-7 py-5 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.95]">
+                  <button 
+                    onClick={handleShare}
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-7 py-5 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.95]"
+                  >
                     <Share2 className="w-4 h-4 text-slate-400" /> Share
                   </button>
                 </div>
