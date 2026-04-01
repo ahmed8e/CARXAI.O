@@ -96,7 +96,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="p-5 lg:p-8 max-w-5xl mx-auto min-h-screen bg-mesh pb-20">
+    <div className="p-4 lg:p-6 max-w-5xl mx-auto bg-transparent">
       {/* 1. Status Strip */}
       <div className="flex items-center justify-between gap-3 mb-6 px-1">
         <div className="flex items-center gap-2">

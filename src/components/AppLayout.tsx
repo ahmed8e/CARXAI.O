@@ -219,7 +219,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-[232px] flex-shrink-0
-                        border-r border-overlay z-40 pt-[calc(4.5rem_+_env(safe-area-inset-top))] bg-surface-low dark:bg-surface-low">
+                        border-r border-overlay z-40 pt-[calc(4rem_+_env(safe-area-inset-top))] bg-surface-low dark:bg-surface-low">
         <SidebarContent />
       </aside>
 

@@ -90,7 +90,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-full mt-3 w-56 bg-surface dark:bg-surface-high/40 rounded-3xl border border-overlay shadow-2xl z-50 overflow-hidden p-2"
+                  className="absolute right-[-8px] top-full mt-4 w-60 bg-surface/98 dark:bg-surface-low backdrop-blur-3xl rounded-[32px] border border-overlay shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[70] overflow-hidden p-2"
                 >
                   <div className="px-3 py-3 mb-1 border-b border-overlay">
                     <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5 px-1">Account</p>
