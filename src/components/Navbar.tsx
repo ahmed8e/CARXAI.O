@@ -126,9 +126,9 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
             </AnimatePresence>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <Link to="/auth?mode=login" className="hidden sm:block text-xs font-bold text-muted hover:text-navy px-3 transition-colors">Sign In</Link>
-            <Link to="/auth" className="px-4 py-2 rounded-full bg-navy text-white text-xs font-black shadow-lg shadow-navy/20 hover:brightness-110 transition-all">Start Free</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/auth?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">Sign In</Link>
+            <Link to="/auth" className="px-5 py-2.5 rounded-full bg-navy text-white text-[13px] font-black shadow-[0_8px_20px_rgba(0,112,224,0.3)] hover:shadow-[0_12px_28px_rgba(0,112,224,0.45)] hover:-translate-y-0.5 transition-all">Start Free</Link>
           </div>
         )}
         
