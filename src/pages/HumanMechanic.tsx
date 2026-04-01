@@ -4,14 +4,10 @@ import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
 import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
 import type { NearbyPlace } from '../lib/types'
 import { Users, MapPin, Star, Phone, Navigation, Search, Loader2, X } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
-import { Navigate } from 'react-router-dom'
 
 const FILTERS = ['All', 'Open Now', 'Closest', 'Top Rated', 'Garage', 'Mechanic']
 
 export default function HumanMechanic() {
-  const { user } = useAuth()
-  const plan = user?.user_metadata?.subscription_tier || 'Basic'
   const [places, setPlaces] = useState<NearbyPlace[]>([])
   const [selected, setSelected] = useState<NearbyPlace | null>(null)
   const [loading, setLoading] = useState(true)
@@ -22,9 +18,6 @@ export default function HumanMechanic() {
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
 
-  if (plan === 'Basic') {
-    return <Navigate to="/my-account?upgrade=pro" replace />
-  }
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY

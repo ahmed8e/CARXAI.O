@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useTheme } from '../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { 
-  User, Mail, Shield, CreditCard, 
+  User, Mail, Shield, 
   ShieldAlert, Users, LogOut,
-  Zap, CheckCircle2, Monitor, Globe, 
+  CheckCircle2, Monitor, Globe, 
   HelpCircle, Settings, Camera, Smartphone, AlertTriangle,
   History, X, Loader2, Navigation, Wrench
 } from 'lucide-react'
@@ -29,7 +28,6 @@ export default function MyAccount() {
   
   // App States
   const [activeSection, setActiveSection] = useState<Section>('profile')
-  const { isDarkMode, toggleTheme } = useTheme()
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
@@ -286,7 +284,6 @@ export default function MyAccount() {
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'preferences', label: 'Preferences', icon: Settings },
-    { id: 'billing', label: 'Subscription', icon: CreditCard },
     { id: 'activity', label: 'Activity', icon: History },
     { id: 'support', label: 'Support', icon: HelpCircle },
   ]
@@ -381,8 +378,8 @@ export default function MyAccount() {
                             </p>
                           </div>
                           <div className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-black uppercase tracking-widest md:ml-2 h-fit self-center">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Active Member
+                            <CheckCircle2 className="w-3 h-3" />
+                            Verified Member
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 md:flex md:items-center md:gap-10">
@@ -576,20 +573,6 @@ export default function MyAccount() {
                 </motion.div>
               )}
 
-              {activeSection === 'billing' && (
-                <motion.div key="billing" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-                  <div className="bg-[#0E3882] p-10 rounded-[48px] shadow-2xl shadow-[#0E3882]/20 relative overflow-hidden">
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-                      <div className="text-center md:text-left text-white">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[10px] uppercase font-black tracking-widest mb-6">Current Plan</div>
-                        <h3 className="text-4xl font-display font-black italic mb-2">Carxai Pro</h3>
-                        <p className="text-[#5DB0EE] font-bold text-lg mb-8">Premium Automotive Intelligence</p>
-                      </div>
-                      <button className="px-10 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-sm uppercase tracking-widest shadow-xl hover:scale-102 transition-all">Upgrade to Premium</button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
 
               {activeSection === 'activity' && (
                 <motion.div key="activity" className="space-y-4">

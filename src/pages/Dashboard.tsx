@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 import { 
   Users, ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
-  Navigation, Lock, Car,
+  Navigation, Car,
   Zap, Plus, Thermometer, Battery, Activity
 } from 'lucide-react'
 
@@ -17,8 +17,6 @@ export default function Dashboard() {
   const [loadingVehicle, setLoadingVehicle] = useState(true)
   
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
-  const plan = user?.user_metadata?.subscription_tier || 'Basic'
-  const isBasic = plan === 'Basic'
 
   useEffect(() => {
     if (user) fetchDefaultVehicle()
@@ -64,24 +62,24 @@ export default function Dashboard() {
       locked: false,
     },
     {
-      to: isBasic ? '/my-account?upgrade=pro' : '/dashboard/mechanic',
+      to: '/dashboard/mechanic',
       icon: Users,
       label: 'Human Mechanic',
       desc: 'Find nearby mechanics and garages fast.',
       color: '#0891b2',
       bg: 'rgba(8, 145, 178, 0.06)',
       badge: 'Nearby',
-      locked: isBasic,
+      locked: false,
     },
     {
-      to: isBasic ? '/my-account?upgrade=pro' : '/dashboard/towing',
+      to: '/dashboard/towing',
       icon: Wrench,
       label: 'Towing / Dépannage',
       desc: 'Get emergency towing help in minutes.',
       color: '#ea580c',
       bg: 'rgba(234, 88, 12, 0.06)',
       badge: 'Emergency',
-      locked: isBasic,
+      locked: false,
     },
     {
       to: '/dashboard/map',
@@ -105,7 +103,7 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-navy/5 border border-navy/10 text-navy font-black text-[9px] uppercase tracking-widest">
-            {plan}
+            AI Pro Unlocked
           </div>
           {defaultVehicle && (
              <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted">
@@ -129,24 +127,16 @@ export default function Dashboard() {
           <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
             <Link 
               to={mod.to} 
-              className={`relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all ${mod.locked ? 'opacity-80' : ''}`}
+              className="relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all"
             >
               <div className="flex flex-col h-full">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-sm border border-transparent" style={{ background: mod.bg }}>
                   <mod.icon className="w-5 h-5" style={{ color: mod.color }} />
                 </div>
-                
-                <h3 className="text-sm font-display font-black text-on-surface leading-tight mb-1 flex items-center gap-1.5">
+                <h3 className="text-sm font-display font-black text-on-surface leading-tight mb-1">
                   {mod.label}
-                  {mod.locked && <Lock className="w-3 h-3 text-muted" />}
                 </h3>
                 <p className="text-[10px] text-muted font-medium leading-normal line-clamp-2">{mod.desc}</p>
-                
-                {mod.locked && (
-                  <div className="absolute top-2 right-2">
-                    <Lock className="w-3 h-3 text-muted/40" />
-                  </div>
-                )}
               </div>
             </Link>
           </motion.div>
@@ -208,31 +198,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 6. Compact Pro Section */}
-      {isBasic && (
-        <div className="mb-12 p-5 rounded-[2rem] bg-gradient-to-br from-navy to-blue-700 text-white shadow-xl shadow-navy/20 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <Zap className="w-20 h-20" fill="currentColor" />
-          </div>
-          <div className="relative z-10">
-            <h3 className="text-lg font-display font-black italic tracking-tight mb-1">Unlock Pro Features</h3>
-            <p className="text-[11px] text-white/80 font-medium mb-4 max-w-[200px]">Get Towing, Human Mechanic access, and specialized reports.</p>
-            <button 
-              onClick={() => navigate('/my-account?upgrade=pro')}
-              className="px-6 py-2 rounded-xl bg-white text-navy text-[11px] font-black uppercase tracking-widest shadow-lg shadow-black/10 hover:brightness-110 active:scale-95 transition-all"
-            >
-              Upgrade Now
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 7. Lower Utility Zone */}
       <div>
         <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">System Utilities</p>
         <div className="grid grid-cols-1 gap-2">
           {[
-            { label: 'Diagnostic Reports', icon: ShieldCheck, to: '/dashboard/reports', locked: isBasic },
+            { label: 'Diagnostic Reports', icon: ShieldCheck, to: '/dashboard/reports' },
             { label: 'Support & Docs', icon: Wrench, to: '/support' },
             { label: 'Account Maintenance', icon: Users, to: '/my-account' },
           ].map((item, idx) => (
@@ -245,7 +217,7 @@ export default function Dashboard() {
                 <item.icon className="w-4 h-4" />
               </div>
               <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>
-              {item.locked ? <Lock className="w-3.5 h-3.5 text-muted/30" /> : <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy" />}
+              <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy" />
             </Link>
           ))}
         </div>

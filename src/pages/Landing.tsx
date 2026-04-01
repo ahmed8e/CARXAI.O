@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
 import { Bot, Users, Truck, Star, CheckCircle2, X, Activity, Radar, ShieldAlert, Camera, DollarSign, Clock, LayoutDashboard, User, LogOut, Zap, MessageSquare, Cpu, MapPin, Navigation } from 'lucide-react'
 
+
 const features = [
   { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
   { icon: Zap, title: 'Warning Light Help', desc: 'Understand dashboard alerts' },
@@ -15,15 +16,6 @@ const features = [
   { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s urgent' },
   { icon: Camera, title: 'Photo Analysis', desc: 'AI checks visible damage' },
   { icon: CheckCircle2, title: 'Clear Guidance', desc: 'Step-by-step next steps' },
-]
-
-// ... (steps, reviews, plans remain the same)
-
-const steps = [
-  { num: '01', title: 'Describe problem', desc: 'Type, speak, or photo your issue in seconds.', icon: MessageSquare },
-  { num: '02', title: 'Instant AI diagnosis', desc: 'Our AI identifies the cause and urgency level.', icon: Cpu },
-  { num: '03', title: 'Find nearby help', desc: 'Locate certified mechanics and garages near you.', icon: MapPin },
-  { num: '04', title: 'Back on the road', desc: 'Get towing, a mechanic, or clear guidance fast.', icon: Navigation },
 ]
 
 const reviews = [
@@ -37,50 +29,11 @@ const reviews = [
   { name: 'Emily R.', car: 'Nissan Qashqai', rating: 5, text: 'The AI mechanic is surprisingly accurate.', image: '/JBJ RIV 8.jpg' },
 ]
 
-const plans = [
-  { 
-    name: 'Basic', 
-    price: '$7', 
-    period: '/month',
-    features: [
-      'AI Mechanic chat',
-      '1 active vehicle',
-      'My Account access',
-      'Vehicle Information'
-    ],
-    popular: false,
-    cta: 'Get Basic'
-  },
-  { 
-    name: 'Pro', 
-    price: '$15', 
-    period: '/month',
-    features: [
-      '3-day free trial included',
-      'AI Mechanic chat & audio',
-      'Take & upload photos',
-      'Human Mechanic & Towing',
-      '3 PDF Mechanic Reports/mo',
-      '1 active vehicle'
-    ],
-    popular: true,
-    cta: 'Start 3-Day Free Trial'
-  },
-  { 
-    name: 'Advanced', 
-    price: '$29', 
-    period: '/month',
-    features: [
-      'Everything in Pro',
-      'Unlimited PDF reports',
-      'Multiple vehicles',
-      'Saved report history',
-      'Advanced account tools',
-      'Priority support'
-    ],
-    popular: false,
-    cta: 'Get Advanced'
-  },
+const steps = [
+  { num: '01', title: 'Describe problem', desc: 'Type, speak, or photo your issue in seconds.', icon: MessageSquare },
+  { num: '02', title: 'Instant AI diagnosis', desc: 'Our AI identifies the cause and urgency level.', icon: Cpu },
+  { num: '03', title: 'Find nearby help', desc: 'Locate certified mechanics and garages near you.', icon: MapPin },
+  { num: '04', title: 'Back on the road', desc: 'Get towing, a mechanic, or clear guidance fast.', icon: Navigation },
 ]
 
 export default function Landing() {
@@ -124,7 +77,6 @@ export default function Landing() {
                 { name: 'Features', id: 'features' },
                 { name: 'How it works', id: 'how-it-works' },
                 { name: 'Reviews', id: 'reviews' },
-                { name: 'Pricing', id: 'pricing' },
               ].map((link) => (
                 <a 
                   key={link.id}
@@ -653,65 +605,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Pricing */}
-        <section id="pricing" className="py-12 md:py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center flex flex-col items-center mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Transparent Pricing</span>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">Choose your plan</h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              {plans.map((plan, i) => (
-                <div key={i} className={`p-10 rounded-[32px] border transition-all ${plan.popular ? 'bg-surface dark:bg-surface-high/40 border-navy shadow-2xl scale-105 z-10' : 'bg-surface-low dark:bg-surface-high/40 border-overlay shadow-sm hover:shadow-xl'} relative group`}>
-                  {plan.popular && (
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-1.5 rounded-full bg-navy text-white text-[11px] font-black uppercase tracking-[0.2em]">
-                      Most Popular
-                    </div>
-                  )}
-                  <div className="mb-10">
-                    <div className="text-2xl font-bold mb-4 text-on-surface">{plan.name}</div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-display font-black tracking-tight text-on-surface">{plan.price}</span>
-                      <span className="text-muted text-base font-bold uppercase tracking-widest">{plan.period}</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-5 mb-12">
-                    {plan.features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-4 text-sm font-bold text-on-surface/70">
-                        <CheckCircle2 className={`w-5 h-5 ${plan.popular ? 'text-navy' : 'text-muted'}`} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button 
-                    onClick={() => {
-                      if (!user) {
-                        // Not logged in: send them to register with the plan appended
-                        const planParam = plan.name === 'Pro' ? 'trial' : plan.name.toLowerCase();
-                        navigate(`/auth?plan=${planParam}`);
-                      } else {
-                        // Logged in
-                        if (plan.name === 'Pro') {
-                          // Already testing/trialing: send to dashboard
-                          navigate('/dashboard');
-                        } else {
-                          // Upgrade flows
-                          navigate(`/my-account?upgrade=${plan.name.toLowerCase()}`);
-                        }
-                      }
-                    }}
-                    className={`w-full py-5 rounded-2xl font-black transition-all text-base ${plan.popular ? 'bg-navy text-white shadow-xl hover:-translate-y-1' : 'bg-surface dark:bg-surface-high border border-overlay text-on-surface hover:bg-surface-high'}`}
-                  >
-                    {plan.cta || 'Get Started'}
-                  </button>
-                </div>
-              ))}
-            </div>
-            <p className="text-center text-slate-400 text-xs font-black uppercase tracking-widest mt-16">No credit card required for the 3-day free trial. Cancel anytime.</p>
-          </div>
-        </section>
 
         {/* Final CTA */}
         <section className="relative py-20 md:py-32 px-6 text-center flex flex-col items-center">
@@ -728,11 +621,11 @@ export default function Landing() {
               >
                 Get Started Now
               </button>
-              <button 
-                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+               <button 
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
               >
-                View Plans
+                Learn More
               </button>
             </div>
           </div>

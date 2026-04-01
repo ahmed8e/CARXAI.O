@@ -15,7 +15,7 @@ const NAV_GROUPS = [
     label: 'Diagnosis',
     items: [
       { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
-      { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic',    badge: 'AI' },
+      { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic' },
       { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles'                },
     ],
   },
@@ -43,8 +43,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const userInitial = user?.email?.[0]?.toUpperCase() ?? 'U'
   const userName    = user?.email?.split('@')[0] ?? 'User'
-  const plan        = (user?.user_metadata?.subscription_tier as string) || 'Basic'
-  const isPro       = plan !== 'Basic'
 
   // ── Sidebar JSX ──────────────────────────────────────────────────
   function SidebarContent({ mobile = false }: { mobile?: boolean }) {
@@ -123,17 +121,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
                         <span className="flex-1 leading-none">{item.label}</span>
 
-                        {/* AI badge */}
-                        {'badge' in item && item.badge && (
-                          <span className={[
-                            'text-[8.5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[5px]',
-                            isActive
-                              ? 'bg-navy/10 text-navy'
-                              : 'bg-navy/8 text-navy/70',
-                          ].join(' ')}>
-                            {item.badge}
-                          </span>
-                        )}
 
                         {/* Active indicator chevron */}
                         {isActive && (
@@ -177,8 +164,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             {/* Avatar */}
             <div className={[
               'w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm',
-              'flex-shrink-0 shadow-sm ring-2 overflow-hidden',
-              isPro ? 'bg-gradient-to-br from-navy to-blue-400 ring-navy/20' : 'bg-surface-high/40 text-muted/60 ring-overlay',
+              'flex-shrink-0 shadow-sm ring-2 overflow-hidden ring-navy/20 bg-gradient-to-br from-navy to-blue-400',
             ].join(' ')}>
               {user?.user_metadata?.avatar_url
                 ? <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -187,12 +173,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-on-surface truncate leading-tight">{userName}</p>
-              <span className={[
-                'inline-flex items-center text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[5px] mt-0.5',
-                isPro ? 'bg-navy/10 text-navy' : 'bg-slate-100 text-muted/70',
-              ].join(' ')}>
-                {plan}
-              </span>
             </div>
 
             <Settings className="w-3.5 h-3.5 text-muted/60 group-hover:text-navy/50 flex-shrink-0 transition-colors" />
@@ -248,7 +228,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(4.75rem_+_env(safe-area-inset-top))]">
+      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(5.5rem_+_env(safe-area-inset-top))]">
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>

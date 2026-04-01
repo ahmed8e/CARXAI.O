@@ -7,7 +7,6 @@ import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
 import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
 import type { NearbyPlace } from '../lib/types'
 import { Truck, MapPin, Star, Phone, Loader2, Clock, Navigation, X, Search } from 'lucide-react'
-import { Navigate } from 'react-router-dom'
 
 declare global {
   interface Window {
@@ -23,7 +22,6 @@ function getETA(distance?: number): string {
 
 export default function Towing() {
   const { user } = useAuth()
-  const plan = user?.user_metadata?.subscription_tier || 'Basic'
   const [places, setPlaces] = useState<NearbyPlace[]>([])
   const [selected, setSelected] = useState<NearbyPlace | null>(null)
   const [loading, setLoading] = useState(true)
@@ -33,9 +31,6 @@ export default function Towing() {
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
 
-  if (plan === 'Basic') {
-    return <Navigate to="/my-account?upgrade=pro" replace />
-  }
 
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
