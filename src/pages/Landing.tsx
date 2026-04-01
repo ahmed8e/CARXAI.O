@@ -218,19 +218,63 @@ export default function Landing() {
                 className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-10 sm:mb-12"
               >
                 {[
-                  { icon: Bot, title: 'AI Mechanic', label: 'Instant' },
-                  { icon: Users, title: 'Human Mechanic', label: 'Local' },
-                  { icon: Truck, title: 'Towing', label: 'Urgent' },
+                  {
+                    icon: Bot,
+                    title: 'AI Mechanic',
+                    label: 'Instant Diagnosis',
+                    color: '#0070E0',
+                    bg: 'linear-gradient(135deg, rgba(0,112,224,0.12) 0%, rgba(0,112,224,0.04) 100%)',
+                    border: 'rgba(0,112,224,0.18)',
+                    glow: '0 8px 24px rgba(0,112,224,0.18)',
+                  },
+                  {
+                    icon: Users,
+                    title: 'Human Mechanic',
+                    label: 'Local Experts',
+                    color: '#0891b2',
+                    bg: 'linear-gradient(135deg, rgba(8,145,178,0.12) 0%, rgba(8,145,178,0.04) 100%)',
+                    border: 'rgba(8,145,178,0.18)',
+                    glow: '0 8px 24px rgba(8,145,178,0.18)',
+                  },
+                  {
+                    icon: Truck,
+                    title: 'Towing',
+                    label: 'Emergency Help',
+                    color: '#ea580c',
+                    bg: 'linear-gradient(135deg, rgba(234,88,12,0.12) 0%, rgba(234,88,12,0.04) 100%)',
+                    border: 'rgba(234,88,12,0.18)',
+                    glow: '0 8px 24px rgba(234,88,12,0.18)',
+                  },
                 ].map((sol, i) => (
-                  <div key={i} className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-3 p-3.5 sm:p-5 rounded-[20px] sm:rounded-[32px] bg-surface dark:bg-surface-high/40 border border-overlay shadow-sm hover:border-navy/20 hover:shadow-xl transition-all group">
-                    <div className="w-11 h-11 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-2xl bg-navy/5 flex items-center justify-center border border-navy/10 group-hover:bg-navy group-hover:text-white transition-all">
-                      <sol.icon className="w-5 h-5 text-navy group-hover:text-white transition-colors" />
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-4 p-4 sm:p-5 rounded-[22px] sm:rounded-[28px] bg-surface border shadow-sm cursor-default transition-shadow duration-300"
+                    style={{
+                      borderColor: sol.border,
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = sol.glow)}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}
+                  >
+                    {/* Icon Container */}
+                    <div
+                      className="w-14 h-14 sm:w-12 sm:h-12 shrink-0 rounded-2xl flex items-center justify-center border"
+                      style={{
+                        background: sol.bg,
+                        borderColor: sol.border,
+                      }}
+                    >
+                      <sol.icon className="w-7 h-7 sm:w-6 sm:h-6" style={{ color: sol.color }} />
                     </div>
+
+                    {/* Text */}
                     <div className="flex flex-col text-left">
-                      <div className="font-bold text-sm text-on-surface leading-tight">{sol.title}</div>
-                      <div className="text-[10px] sm:text-[9px] text-muted uppercase tracking-widest font-black mt-0.5 sm:mt-0">{sol.label}</div>
+                      <div className="font-display font-bold text-sm text-on-surface leading-tight tracking-tight">{sol.title}</div>
+                      <div className="text-[10px] text-muted font-bold mt-1 uppercase tracking-widest" style={{ color: sol.color + 'aa' }}>{sol.label}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </motion.div>
 
