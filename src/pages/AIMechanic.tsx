@@ -6,9 +6,10 @@ import { supabase } from '../lib/supabase'
 import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
 import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
+import { Loader2 } from 'lucide-react'
 import {
   Bot, Send, Users, Truck,
-  Loader2, Mic, RefreshCw, Zap,
+  Mic, RefreshCw, Zap,
   CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
   Car, AudioLines
 } from 'lucide-react'
@@ -61,7 +62,7 @@ export default function AIMechanic() {
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
-  
+
   // Mechanic Report States
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
@@ -92,7 +93,7 @@ export default function AIMechanic() {
         .eq('user_id', user.id)
         .eq('is_default', true)
         .maybeSingle()
-      
+
       if (data) {
         setActiveVehicle(data as Vehicle)
       } else {
@@ -103,7 +104,7 @@ export default function AIMechanic() {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1)
-        
+
         if (latest && latest.length > 0) {
           setActiveVehicle(latest[0] as Vehicle)
         }
@@ -169,7 +170,7 @@ export default function AIMechanic() {
     if (!content.trim() && !imageUrl) return
     setLoading(true)
     setInput('')
- 
+
     addMessage({ role: 'user', content, imageUrl })
 
     try {
@@ -204,13 +205,12 @@ export default function AIMechanic() {
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { 
-              role: 'system', 
-              content: `${SYSTEM_PROMPT}\n\nUSER VEHICLE CONTEXT:\n${
-                activeVehicle 
+            {
+              role: 'system',
+              content: `${SYSTEM_PROMPT}\n\nUSER VEHICLE CONTEXT:\n${activeVehicle
                   ? `Brand: ${activeVehicle.make}, Model: ${activeVehicle.model}, Year: ${activeVehicle.year}, Fuel: ${activeVehicle.fuel_type}, Engine: ${activeVehicle.engine_type || 'N/A'}, Gearbox: ${activeVehicle.gearbox || 'N/A'}, Mileage: ${activeVehicle.mileage || 'N/A'} km.`
                   : "No specific vehicle details provided. Ask the user for car details if crucial for diagnosis."
-              }` 
+                }`
             },
             ...messages.slice(-6).map(m => ({
               role: m.role,
@@ -373,7 +373,7 @@ export default function AIMechanic() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 pt-28 space-y-6 relative z-10">
-        
+
         {/* ── LUXURY Empty State / Diagnostic Pulsar ── */}
         {messages.length === 1 && !loading && (
           <div className="min-h-[55vh] flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
@@ -388,18 +388,18 @@ export default function AIMechanic() {
               {/* The Pulsar — Multi-layered Hero */}
               <div className="relative w-24 h-24 mx-auto mb-8">
                 {/* Subtle outer glow */}
-                <motion.div 
+                <motion.div
                   className="absolute inset-[-4px] rounded-full bg-navy/[0.02] blur-xl"
                   animate={{ opacity: [0.2, 0.4, 0.2] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
-                
+
                 {/* Core Orb — Glassmorphism */}
                 <div className="absolute inset-0 rounded-[28px] bg-navy flex items-center justify-center shadow-[0_20px_50px_rgba(0,18,51,0.25)] border border-white/20 z-10 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
                   <Bot className="w-10 h-10 text-white relative z-20" />
                   {/* Internal Glow Pulse */}
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 bg-blue-400/20 blur-xl"
                     animate={{ opacity: [0, 0.5, 0] }}
                     transition={{ duration: 3, repeat: Infinity }}
@@ -424,13 +424,13 @@ export default function AIMechanic() {
                 >
                   {/* Subtle Inner Highlight */}
                   <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  
+
                   {/* Icon Orb */}
                   <div className="w-10 h-10 rounded-2xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center border border-overlay shadow-inner group-hover:bg-navy group-hover:scale-110 transition-all duration-300 relative z-10 overflow-hidden">
                     <chip.icon className="w-5 h-5 text-muted group-hover:text-white transition-colors" />
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100" />
                   </div>
-                  
+
                   <span className="text-[11px] font-bold uppercase tracking-wide leading-none text-on-surface/80 group-hover:text-navy group-hover:translate-x-0.5 transition-all relative z-10">{chip.label}</span>
                 </motion.button>
               ))}
@@ -454,10 +454,10 @@ export default function AIMechanic() {
         {messages.map((msg, idx) => {
           // Skip the initial greeting bubble if we are showing the centered empty state
           if (messages.length === 1 && idx === 0) return null;
-          
+
           return (
-            <motion.div 
-              key={msg.id} 
+            <motion.div
+              key={msg.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
@@ -475,13 +475,12 @@ export default function AIMechanic() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
                 )}
-                
+
                 {/* Message Bubble — LUXE */}
-                <div className={`px-6 py-4.5 rounded-[26px] text-sm leading-relaxed shadow-sm transition-all ${
-                  msg.role === 'user'
+                <div className={`px-6 py-4.5 rounded-[26px] text-sm leading-relaxed shadow-sm transition-all ${msg.role === 'user'
                     ? 'bg-navy text-white rounded-tr-none shadow-navy/20'
                     : 'bg-white dark:bg-surface-high border border-overlay text-on-surface rounded-tl-none shadow-[0_2px_15px_rgba(0,0,0,0.02)]'
-                }`}>
+                  }`}>
                   {msg.role === 'assistant' ? (
                     msg.issueData ? (
                       <div className="space-y-4">
@@ -497,7 +496,7 @@ export default function AIMechanic() {
                           </div>
                         </div>
                       </div>
-                     ) : formatContent(msg.content)
+                    ) : formatContent(msg.content)
                   ) : (
                     <p className="font-semibold">{msg.content}</p>
                   )}
@@ -517,14 +516,14 @@ export default function AIMechanic() {
 
                 {/* ── LUXURY Diagnosis Toolkit 2.0 ── */}
                 {msg.issueData && (
-                  <motion.div 
-                     initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                     className="mt-6 p-6 rounded-[34px] bg-white/40 dark:bg-surface-high/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_20px_50px_rgba(0,18,51,0.12)] relative overflow-hidden group/toolkit"
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.98, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="mt-6 p-6 rounded-[34px] bg-white/40 dark:bg-surface-high/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_20px_50px_rgba(0,18,51,0.12)] relative overflow-hidden group/toolkit"
                   >
                     {/* Atmospheric Glow */}
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/[0.03] blur-3xl pointer-events-none" />
-                    
+
                     <div className="flex items-center justify-between mb-6 relative z-10">
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
@@ -539,18 +538,18 @@ export default function AIMechanic() {
                         </div>
                       </div>
                       {msg.issueData.warning && (
-                          <motion.div 
-                            animate={{ opacity: [0.8, 1, 0.8] }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-red-600 bg-red-50/50 px-3 py-2 rounded-xl border border-red-200/30"
-                          >
-                            <ShieldAlert className="w-3.5 h-3.5" />
-                            {msg.issueData.warning}
-                          </motion.div>
+                        <motion.div
+                          animate={{ opacity: [0.8, 1, 0.8] }}
+                          transition={{ duration: 3, repeat: Infinity }}
+                          className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-red-600 bg-red-50/50 px-3 py-2 rounded-xl border border-red-200/30"
+                        >
+                          <ShieldAlert className="w-3.5 h-3.5" />
+                          {msg.issueData.warning}
+                        </motion.div>
                       )}
                     </div>
 
-                    <motion.button 
+                    <motion.button
                       onClick={() => {
                         setReportDiagnosis(msg.issueData!)
                         setShowReport(true)
@@ -562,15 +561,15 @@ export default function AIMechanic() {
                     </motion.button>
 
                     <div className="grid grid-cols-2 gap-3 relative z-10 mt-3">
-                      <motion.button 
-                        onClick={() => navigate('/dashboard/mechanic')} 
+                      <motion.button
+                        onClick={() => navigate('/dashboard/mechanic')}
                         className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
                         whileTap={{ scale: 0.97 }}
                       >
                         <Users className="w-4 h-4 text-navy/40" /> Human Help
                       </motion.button>
-                      <motion.button 
-                        onClick={() => navigate('/dashboard/towing')} 
+                      <motion.button
+                        onClick={() => navigate('/dashboard/towing')}
                         className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
                         whileTap={{ scale: 0.97 }}
                       >
@@ -614,7 +613,7 @@ export default function AIMechanic() {
         <div className="mx-4 mt-2.5 mb-2 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-sm
                         transition-all duration-300
                         focus-within:border-navy/30 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] overflow-hidden">
-          
+
           {/* Pro Nudge Removed — Full Experience Unlocked */}
 
           {/* ── Top: text input ── */}
@@ -701,11 +700,10 @@ export default function AIMechanic() {
               <motion.button
                 onClick={toggleListening}
                 disabled={loading || isProcessing}
-                className={`w-9 h-9 rounded-[16px] flex items-center justify-center transition-all ${
-                  isListening
+                className={`w-9 h-9 rounded-[16px] flex items-center justify-center transition-all ${isListening
                     ? 'bg-red-500 text-white shadow-lg shadow-red-400/30'
                     : 'text-muted hover:bg-navy/5 hover:text-navy active:scale-90'
-                }`}
+                  }`}
                 whileTap={{ scale: 0.9 }}
               >
                 {isProcessing
@@ -718,11 +716,10 @@ export default function AIMechanic() {
                 onClick={() => sendMessage(input)}
                 disabled={loading || (!input.trim() && !isListening)}
                 className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
-                            transition-all duration-300 ${
-                  input.trim() && !loading
+                            transition-all duration-300 ${input.trim() && !loading
                     ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
                     : 'bg-surface-low text-muted/30 cursor-not-allowed'
-                }`}
+                  }`}
                 whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
                 whileTap={{ scale: 0.95 }}
               >
@@ -738,7 +735,7 @@ export default function AIMechanic() {
 
       {/* Mechanic Report Modal */}
       {reportDiagnosis && (
-        <MechanicReport 
+        <MechanicReport
           isOpen={showReport}
           onClose={() => setShowReport(false)}
           user={user}
