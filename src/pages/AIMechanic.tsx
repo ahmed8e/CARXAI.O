@@ -7,9 +7,9 @@ import { speak, stopSpeaking, getUrgencyColor, getUrgencyBadge } from '../lib/ut
 import type { Message, DiagnosticResult } from '../lib/types'
 import {
   Bot, Send, Users, Truck, Volume2,
-  Loader2, AlertTriangle, Mic, MicOff, RefreshCw, Zap, Lock as LockIcon,
+  Loader2, AlertTriangle, Mic, RefreshCw, Zap, Lock as LockIcon,
   CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
-  Car, Info, ChevronRight, Sparkles
+  Car, Info, ChevronRight
 } from 'lucide-react'
 import MechanicReport from '../components/MechanicReport'
 import VehicleAddModal from '../components/VehicleAddModal'
@@ -386,25 +386,25 @@ export default function AIMechanic() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto p-4 pt-8 space-y-6 relative z-10">
         
         {/* ── Empty State / Quick Start ── */}
         {messages.length === 1 && !loading && (
-          <div className="min-h-[60vh] flex flex-col items-center justify-center py-10 px-4">
+          <div className="min-h-[65vh] flex flex-col items-center justify-center py-10 px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-10"
+              className="text-center mb-12"
             >
-              <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-2xl shadow-navy/30 mx-auto mb-6">
-                <Bot className="w-8 h-8 text-white" />
+              <div className="w-20 h-20 rounded-[32px] bg-navy flex items-center justify-center shadow-[0_20px_40px_rgba(0,18,51,0.2)] mx-auto mb-8 border border-white/10">
+                <Bot className="w-10 h-10 text-white" />
               </div>
-              <h2 className="text-3xl font-display font-black text-on-surface italic tracking-tight mb-3">How can I help you?</h2>
-              <p className="text-muted font-medium max-w-[280px] mx-auto">Pick a common issue below or type anything to start your AI diagnosis.</p>
+              <h2 className="text-4xl font-display font-black text-on-surface italic tracking-tighter mb-4">How can I help?</h2>
+              <p className="text-muted font-medium max-w-[280px] mx-auto text-sm leading-relaxed">Pick a common issue below or type anything to start your AI diagnosis.</p>
             </motion.div>
 
             {/* Quick Start Grid */}
-            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-12">
+            <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-14">
               {ISSUE_CHIPS.map((chip, idx) => (
                 <motion.button
                   key={chip.value}
@@ -412,12 +412,12 @@ export default function AIMechanic() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => sendMessage(chip.value)}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl border border-overlay bg-white dark:bg-surface-high hover:border-navy hover:text-navy transition-all group shadow-sm active:scale-95"
+                  className="flex flex-col items-center gap-3 p-5 rounded-[28px] border border-overlay bg-white dark:bg-surface-high hover:border-navy hover:text-navy transition-all group shadow-sm hover:shadow-md active:scale-95 text-center"
                 >
-                  <div className="w-8 h-8 rounded-xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center group-hover:bg-navy/5 transition-colors">
-                    <chip.icon className="w-4 h-4 text-muted group-hover:text-navy" />
+                  <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center group-hover:bg-navy/5 transition-colors group-hover:scale-110 duration-300">
+                    <chip.icon className="w-5 h-5 text-muted group-hover:text-navy" />
                   </div>
-                  <span className="text-xs font-black tracking-tight">{chip.label}</span>
+                  <span className="text-[11px] font-display font-black italic uppercase tracking-tight leading-none">{chip.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -428,10 +428,10 @@ export default function AIMechanic() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setShowVehicleModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-amber-50/50 border border-amber-100/50 text-amber-600 text-[10px] font-black uppercase tracking-[0.15em] hover:bg-amber-100 transition-colors shadow-sm"
               >
                 <Info className="w-3.5 h-3.5" />
-                Add your vehicle for better results
+                Add your vehicle for precision results
               </motion.button>
             )}
           </div>
@@ -492,47 +492,47 @@ export default function AIMechanic() {
                 )}
               </div>
 
-              {/* Diagnosis Toolkit */}
+              {/* Diagnosis Toolkit — Refined & High-End */}
               {msg.issueData && (
                 <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="mt-4 p-4 rounded-3xl bg-surface-low dark:bg-surface-high border border-overlay shadow-sm space-y-4"
+                   initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                   className="mt-6 p-5 rounded-[32px] bg-white/60 dark:bg-surface-high/60 backdrop-blur-sm border border-overlay shadow-sm space-y-5"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1.5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted">Diagnosis Toolkit</p>
-                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border w-fit ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                        <AlertTriangle className="w-3 h-3" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted leading-none">Diagnostic Toolkit</p>
+                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border w-fit shadow-sm ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                         {getUrgencyBadge(msg.issueData.urgencyLevel)} Risk
                       </div>
                     </div>
                     {msg.issueData.warning && (
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1.5 rounded-xl border border-red-100 animate-pulse">
-                        <ShieldAlert className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-50/80 px-3 py-2 rounded-2xl border border-red-100 animate-pulse">
+                        <ShieldAlert className="w-4 h-4" />
                         {msg.issueData.warning}
                       </div>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <motion.button 
                       onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/mechanic')} 
-                      className={`flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                        isBasic ? 'bg-white border-overlay text-muted hover:text-navy hover:border-navy' : 'bg-white border-overlay text-on-surface hover:text-navy hover:border-navy'
+                      className={`flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-display font-black italic uppercase tracking-tight border transition-all ${
+                        isBasic ? 'bg-white border-overlay text-muted hover:text-navy hover:border-navy' : 'bg-white border-overlay text-on-surface hover:text-navy hover:border-navy shadow-sm'
                       }`}
                       whileTap={{ scale: 0.97 }}
                     >
-                      <Users className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Mechanic' : 'Human Help'}
+                      <Users className="w-4 h-4" /> {isBasic ? 'Unlock Mechanic' : 'Human Help'}
                     </motion.button>
                     <motion.button 
                       onClick={() => navigate(isBasic ? '/my-account?upgrade=pro' : '/dashboard/towing')} 
-                      className={`flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                        isBasic ? 'bg-slate-100 text-muted border border-overlay' : 'bg-navy text-white shadow-lg shadow-navy/20 active:brightness-90'
+                      className={`flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-display font-black italic uppercase tracking-tight transition-all ${
+                        isBasic ? 'bg-slate-50 text-muted border border-overlay' : 'bg-navy text-white shadow-lg shadow-navy/20 active:brightness-90 active:scale-95'
                       }`}
                       whileTap={{ scale: 0.97 }}
                     >
-                      <Truck className="w-3.5 h-3.5" /> {isBasic ? 'Unlock Towing' : 'Get Towing'}
+                      <Truck className="w-4 h-4" /> {isBasic ? 'Unlock Towing' : 'Get Towing'}
                     </motion.button>
                   </div>
 
@@ -551,19 +551,19 @@ export default function AIMechanic() {
                       setReportDiagnosis(msg.issueData!)
                       setShowReport(true)
                     }}
-                    className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                    className={`w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl text-[11px] font-display font-black italic uppercase tracking-widest transition-all ${
                       isBasic || (isPro && reportsUsed >= 3) 
-                        ? 'bg-amber-50 text-amber-700 border border-amber-100'
-                        : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 active:brightness-90'
+                        ? 'bg-amber-50/50 text-amber-700 border border-amber-100'
+                        : 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 active:brightness-90 active:scale-[0.98]'
                     }`}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FileText className="w-4 h-4" /> 
+                    <FileText className="w-4.5 h-4.5" /> 
                     {isBasic 
-                      ? 'Pro: Generate Full Report' 
+                      ? 'Pro: Full Diagnostic Report' 
                       : (isPro && reportsUsed >= 3) 
                         ? 'Upgrade for Unlimited Reports' 
-                        : 'Generate Mechanic Report'}
+                        : 'Generate Detailed Report'}
                   </motion.button>
                 </motion.div>
               )}
@@ -607,29 +607,28 @@ export default function AIMechanic() {
       </div>
 
       {/* ══ Composer ══ */}
-      <div className="relative z-10 bg-surface/95 dark:bg-surface-low/95 backdrop-blur-sm border-t border-overlay pb-[env(safe-area-inset-bottom)]">
+      <div className="relative z-10 bg-white/95 dark:bg-surface-low/95 backdrop-blur-md border-t border-overlay pb-[env(safe-area-inset-bottom)]">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
-        {/* ── Floating card ── */}
-        <div className="mx-3 mt-3 mb-2 rounded-[28px] border border-overlay bg-surface dark:bg-surface-high shadow-sm
-                        transition-[border-color,box-shadow] duration-200
-                        focus-within:border-navy/25 focus-within:shadow-[0_0_0_4px_rgba(0,71,143,0.06),0_4px_24px_rgba(0,0,0,0.06)]">
+        {/* ── Refined Floating Card ── */}
+        <div className="mx-4 mt-4 mb-3 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-[0_8px_30px_rgb(0,0,0,0.04)]
+                        transition-all duration-300
+                        focus-within:border-navy/30 focus-within:shadow-[0_12px_40px_rgba(0,18,51,0.08)]">
 
           {/* ── Top: text input ── */}
-          <div className="px-5 pt-4 pb-3">
+          <div className="px-6 pt-4 pb-1">
             <AnimatePresence mode="wait">
               {isListening ? (
-                /* Listening waveform replaces placeholder */
                 <motion.div
                   key="waveform"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-1.5 h-[52px]"
+                  className="flex items-center gap-1.5 h-[48px]"
                 >
                   {Array.from({ length: 24 }).map((_, i) => (
                     <motion.div
@@ -642,10 +641,10 @@ export default function AIMechanic() {
                         delay: i * 0.04,
                         ease: 'easeInOut',
                       }}
-                      style={{ height: 28, transformOrigin: 'center' }}
+                      style={{ height: 24, transformOrigin: 'center' }}
                     />
                   ))}
-                  <span className="ml-3 text-[13px] font-bold text-navy/70 tracking-wide">Listening…</span>
+                  <span className="ml-3 text-[13px] font-black text-navy uppercase tracking-widest italic">Listening…</span>
                 </motion.div>
               ) : (
                 <motion.textarea
@@ -666,10 +665,10 @@ export default function AIMechanic() {
                   }}
                   placeholder="Describe your car issue…"
                   rows={2}
-                  style={{ minHeight: 52, maxHeight: 150 }}
+                  style={{ minHeight: 48, maxHeight: 150 }}
                   className="w-full bg-transparent outline-none resize-none
-                             text-[16px] font-medium leading-relaxed
-                             text-on-surface placeholder:text-muted"
+                             text-[15px] font-medium leading-relaxed
+                             text-on-surface placeholder:text-muted/60"
                   disabled={loading}
                 />
               )}
@@ -677,94 +676,83 @@ export default function AIMechanic() {
           </div>
 
           {/* ── Bottom: action bar ── */}
-          <div className="flex items-center gap-1 px-3 pb-3">
-            {/* Left — media actions */}
-            <div className="flex items-center gap-0.5 flex-1">
-              {/* Upload */}
-              <motion.button
-                onClick={() => isBasic ? navigate('/my-account?upgrade=pro') : fileInputRef.current?.click()}
-                disabled={loading}
-                title={isBasic ? 'Pro feature — upgrade to upload' : 'Attach photo'}
-                className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
-                           hover:bg-surface-high dark:hover:bg-surface-high/40 active:bg-surface-highest dark:active:bg-surface-high/60"
-                whileTap={{ scale: 0.9 }}
-              >
-                <ImagePlus className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-muted'}`} />
-                {isBasic && (
-                  <span className="absolute top-0.5 right-0.5 w-3 h-3 rounded-full bg-amber-400
-                                   flex items-center justify-center ring-1 ring-white">
-                    <LockIcon className="w-1.5 h-1.5 text-white" />
-                  </span>
-                )}
-              </motion.button>
+          <div className="flex items-center gap-1.5 px-4 pb-3.5">
+            <div className="flex items-center gap-1 flex-1">
+              {/* Media Buttons */}
+              {[
+                { icon: ImagePlus, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : fileInputRef.current?.click(), title: 'Attach photo' },
+                { icon: Aperture, onClick: () => isBasic ? navigate('/my-account?upgrade=pro') : cameraInputRef.current?.click(), title: 'Take photo' },
+              ].map((btn, i) => (
+                <motion.button
+                  key={i}
+                  onClick={btn.onClick}
+                  disabled={loading}
+                  className="relative w-10 h-10 rounded-[18px] flex items-center justify-center transition-all
+                             hover:bg-navy/5 active:scale-90 group"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <btn.icon className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-500/70 group-hover:text-amber-600' : 'text-muted group-hover:text-navy'}`} />
+                  {isBasic && (
+                    <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white" />
+                  )}
+                </motion.button>
+              ))}
 
-              {/* Camera */}
-              <motion.button
-                onClick={() => isBasic ? navigate('/my-account?upgrade=pro') : cameraInputRef.current?.click()}
-                disabled={loading}
-                title={isBasic ? 'Pro feature — upgrade to use camera' : 'Take photo'}
-                className="relative w-9 h-9 rounded-2xl flex items-center justify-center transition-colors
-                           hover:bg-surface-high dark:hover:bg-surface-high/40 active:bg-surface-highest dark:active:bg-surface-high/60"
-                whileTap={{ scale: 0.9 }}
-              >
-                <Aperture className={`w-[18px] h-[18px] ${isBasic ? 'text-amber-400' : 'text-muted'}`} />
-                {isBasic && (
-                  <span className="absolute top-0.5 right-0.5 w-3 h-3 rounded-full bg-amber-400
-                                   flex items-center justify-center ring-1 ring-white">
-                    <LockIcon className="w-1.5 h-1.5 text-white" />
-                  </span>
-                )}
-              </motion.button>
+              <div className="w-px h-4 bg-overlay mx-1" />
 
               {/* Mic */}
               <motion.button
                 onClick={toggleListening}
                 disabled={loading || isProcessing}
-                title={isListening ? 'Stop listening' : 'Voice input'}
-                className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                className={`w-10 h-10 rounded-[18px] flex items-center justify-center transition-all ${
                   isListening
-                    ? 'bg-red-500 text-white shadow-sm shadow-red-400/40'
-                    : 'text-muted hover:bg-surface-high dark:hover:bg-surface-high/40 hover:text-on-surface active:bg-surface-highest'
+                    ? 'bg-red-500 text-white shadow-lg shadow-red-400/30'
+                    : 'text-muted hover:bg-navy/5 hover:text-navy active:scale-90'
                 }`}
                 whileTap={{ scale: 0.9 }}
               >
                 {isProcessing
                   ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
-                  : isListening
-                    ? <MicOff className="w-[18px] h-[18px]" />
-                    : <Mic className="w-[18px] h-[18px]" />}
+                  : <Mic className="w-[18px] h-[18px]" />}
               </motion.button>
             </div>
 
-            {/* Right — Send */}
+            {/* Send */}
             <motion.button
               onClick={() => sendMessage(input)}
               disabled={loading || (!input.trim() && !isListening)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
-                          transition-all duration-200 ${
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0
+                          transition-all duration-300 ${
                 input.trim() && !loading
-                  ? 'bg-navy text-white shadow-md shadow-navy/30'
-                  : 'bg-surface-high dark:bg-surface-high/60 text-muted'
+                  ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
+                  : 'bg-surface-low text-muted/40 cursor-not-allowed'
               }`}
-              whileHover={input.trim() && !loading ? { scale: 1.07 } : {}}
-              whileTap={{ scale: 0.9 }}
+              whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
+              whileTap={{ scale: 0.95 }}
             >
               {loading
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <Send className="w-4 h-4 translate-x-[1px]" />}
+                ? <Loader2 className="w-5 h-5 animate-spin" />
+                : <Send className="w-5 h-5 translate-x-[1px] translate-y-[-0.5px]" />}
             </motion.button>
           </div>
         </div>
 
-        {/* Pro nudge — single understated line */}
+        {/* Refined Pro Nudge Badge */}
         {isBasic && (
-          <button
-            onClick={() => navigate('/my-account?upgrade=pro')}
-            className="w-full py-1.5 pb-2.5 text-center text-[11px] font-semibold
-                       text-muted hover:text-amber-500 transition-colors"
-          >
-            🔒 Unlock photo &amp; camera diagnosis — <span className="underline underline-offset-2">Upgrade to Pro</span>
-          </button>
+          <div className="px-4 pb-4">
+            <button
+              onClick={() => navigate('/my-account?upgrade=pro')}
+              className="w-full py-2.5 rounded-2xl bg-amber-50/50 border border-amber-100 flex items-center justify-center gap-2 group transition-all hover:bg-amber-100/50"
+            >
+              <div className="w-5 h-5 rounded-lg bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <LockIcon className="w-2.5 h-2.5 text-amber-600" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
+                Unlock Pro Photo Diagnosis
+              </span>
+              <ChevronRight className="w-3 h-3 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
         )}
       </div>
 
