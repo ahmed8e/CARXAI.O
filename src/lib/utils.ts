@@ -16,7 +16,7 @@ export function formatRating(rating: number): string {
 
 export function getUrgencyColor(level: string): string {
   switch (level) {
-    case 'critical': return 'text-red-500 bg-red-50 border-red-100'
+    case 'stop_driving': return 'text-red-500 bg-red-50 border-red-100'
     case 'high': return 'text-orange-600 bg-orange-50 border-orange-100'
     case 'medium': return 'text-amber-600 bg-amber-50 border-amber-100'
     case 'low': return 'text-emerald-600 bg-emerald-50 border-emerald-100'
@@ -26,7 +26,7 @@ export function getUrgencyColor(level: string): string {
 
 export function getUrgencyBadge(level: string): string {
   switch (level) {
-    case 'critical': return 'Critical Status'
+    case 'stop_driving': return 'Stop driving'
     case 'high': return 'High Urgency'
     case 'medium': return 'Medium Priority'
     case 'low': return 'Safe / Low Urgency'

@@ -201,7 +201,7 @@ export interface Message {
 export interface DiagnosticResult {
   issueName: string
   likelyCause: string
-  urgencyLevel: 'low' | 'medium' | 'high' | 'critical'
+  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving'
   nextStep: string
   warning?: string
   followUp?: string
@@ -226,4 +226,4 @@ export interface NearbyPlace {
   placeId: string
 }
 
-export type UrgencyLevel = 'low' | 'medium' | 'high' | 'critical'
+export type UrgencyLevel = 'low' | 'medium' | 'high' | 'stop_driving'

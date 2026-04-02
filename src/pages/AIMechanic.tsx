@@ -31,28 +31,34 @@ const ISSUE_CHIPS = [
   { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
-const SYSTEM_PROMPT = `You are an expert AI automotive mechanic assistant for Carxai. 
-Your goal is to provide high-fidelity, vehicle-specific automotive diagnoses.
-
-ALWAYS utilize the provided VEHICLE CONTEXT and DIAGNOSTIC HISTORY to make your response relevant to the user's specific car and past issues.
+const SYSTEM_PROMPT = `You are "Sarge", a friendly, experienced, and no-nonsense AI Mechanic for Carxai. 
+Your goal is to provide simple, practical, and vehicle-specific automotive help for everyday drivers.
 
 GUIDELINES:
-1. NEVER give generic advice. If the car is a Tesla, do not talk about spark plugs. If it's old (pre-1996), mention OBD-I vs OBD-II.
-2. If the user mentions a symptom that was previously diagnosed in the history, analyze if it's a recurring issue.
-3. STRUCTURE: Every response must be in the following JSON format ONLY:
+1. BE PRACTICAL: Use simple, plain English. Avoid deep technical jargon. Imagine you're talking to a friend who doesn't know much about cars.
+2. BE VEHICLE-AWARE: Always use the provided VEHICLE CONTEXT. If it's a Tesla, don't mention spark plugs or oil. If it's high mileage (over 150k km), consider wear-and-tear items.
+3. CHECK HISTORY: Carefully review the DIAGNOSTIC HISTORY. If the user has reported this issue before or if there's a pattern (e.g., repeating battery, starting, or overheating issues), mention it and adjust the diagnosis accordingly.
+4. MULTI-MODAL REASONING: If an image is provided (like a dashboard warning light), combine what you see in the image with the vehicle info and history to find the most likely cause.
+5. FALLBACK: If vehicle info is missing, provide a helpful general diagnosis but remind the user that adding their car details would make it much more accurate.
+6. RESPONSE TONE: Keep it short, clear, and reassuring. Focus on what it means, how serious it is, and exactly what to do next.
+
+STRUCTURE: You MUST return a JSON object ONLY.
+Danger levels MUST be one of: low, medium, high, stop_driving.
+
+Format:
 {
-  "issueName": "Technical name of the issue",
-  "likelyCause": "Detailed explaination (2-3 sentences) specific to this vehicle type",
-  "urgencyLevel": "low|medium|high|critical",
-  "warning": "CRITICAL safety warning if applicable",
+  "issueName": "Short, clear name of the problem",
+  "likelyCause": "What it likely means in 1-2 simple sentences.",
+  "urgencyLevel": "low|medium|high|stop_driving",
+  "warning": "Short safety alert if needed (otherwise empty)",
   "canDrive": true|false,
-  "nextStep": "Immediate actionable step (e.g., Check fuse #10, top up oil)",
-  "followUp": "Long-term suggestion",
+  "nextStep": "Exactly what to do now in 1 simple sentence.",
+  "followUp": "Next practical step (e.g., check oil level, visit a local shop).",
   "mechanicRecommended": true|false,
   "towingRecommended": true|false,
-  "missingInfo": "Specific question if you need more info (e.g., Does it happen only when cold?)"
-}
-4. DO NOT use markdown formatting inside JSON string values.`
+  "missingInfo": "Ask ONE specific question if you need more info (otherwise empty).",
+  "spokenSummary": "A very short (1 sentence), reassuring spoken summary."
+}`
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -211,23 +217,41 @@ export default function AIMechanic() {
     addMessage({ role: 'user', content, imageUrl })
 
     try {
+      const vehicleContext = activeVehicle ? `
+VEHICLE CONTEXT:
+- Brand: ${activeVehicle.make}
+- Model: ${activeVehicle.model}
+- Year: ${activeVehicle.year}
+- Fuel Type: ${activeVehicle.fuel_type || 'Unknown'}
+- Engine Type: ${activeVehicle.engine_type || 'Unknown'}
+- Gearbox: ${activeVehicle.gearbox || 'Unknown'}
+- Mileage: ${activeVehicle.mileage || 'Unknown'} km
+- VIN: ${activeVehicle.vin || 'Not provided'}` 
+: 'VEHICLE CONTEXT: No specific vehicle selected. Provide a general diagnosis.'
+
+      const historyContext = diagnosticHistory ? `
+DIAGNOSTIC HISTORY (Last 5 sessions):
+${diagnosticHistory}` 
+: 'DIAGNOSTIC HISTORY: No previous history available.'
+
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY
       if (!apiKey || apiKey === 'sk-placeholder') {
-        // Demo mode - simulate response
+        // Demo mode
         await new Promise(r => setTimeout(r, 1500))
         const demoResult: DiagnosticResult = {
           issueName: 'Demo Mode Active',
           likelyCause: 'OpenAI API key not configured',
           urgencyLevel: 'low',
-          nextStep: 'Add your OpenAI API key to the .env file to enable real AI diagnosis.',
+          nextStep: 'Add your OpenAI API key to the .env file.',
           canDrive: true,
           mechanicRecommended: false,
-          towingRecommended: false
+          towingRecommended: false,
+          spokenSummary: 'I am currently in demo mode.'
         }
         const demoResponse: Message = {
           id: Date.now().toString(),
           role: 'assistant',
-          content: `⚠️ **Demo Mode**: Add your OpenAI API key to enable real diagnosis.\n\n**Issue**: ${demoResult.issueName}\n**Urgency**: ${demoResult.urgencyLevel}\n**Next Step**: ${demoResult.nextStep}`,
+          content: 'Add your OpenAI API key to enable real diagnosis.',
           timestamp: new Date(),
           issueData: demoResult,
         }
@@ -243,33 +267,18 @@ export default function AIMechanic() {
           'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           stream: true,
           messages: [
-            {
-              role: 'system',
-              content: `${SYSTEM_PROMPT}
-
-VEHICLE CONTEXT:
-${activeVehicle 
-  ? `Brand: ${activeVehicle.make}, Model: ${activeVehicle.model}, Year: ${activeVehicle.year}, Fuel: ${activeVehicle.fuel_type}, Engine: ${activeVehicle.engine_type || 'N/A'}, Gearbox: ${activeVehicle.gearbox || 'N/A'}, Mileage: ${activeVehicle.mileage || 'N/A'} km, VIN: ${activeVehicle.vin || 'N/A'}.`
-  : "No specific vehicle details provided."
-}
-
-DIAGNOSTIC HISTORY:
-${diagnosticHistory || "No previous diagnostic history found."}`
-            },
-            ...messages.slice(-10).map(m => ({
-              role: m.role,
-              content: m.imageUrl
-                ? [{ type: 'text', text: m.content }, { type: 'image_url', image_url: { url: m.imageUrl } }]
-                : m.content
-            })),
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: `${vehicleContext}\n${historyContext}` },
+            ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
             {
               role: 'user',
-              content: imageUrl
-                ? [{ type: 'text', text: content }, { type: 'image_url', image_url: { url: imageUrl } }]
-                : content
+              content: imageUrl ? [
+                { type: 'text', text: content || 'Analyze this car issue image.' },
+                { type: 'image_url', image_url: { url: imageUrl } }
+              ] : content
             }
           ],
           response_format: { type: "json_object" },

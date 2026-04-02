@@ -99,7 +99,7 @@ export default function MechanicReport({
   }
 
   const copySummary = () => {
-    const text = `Carxai Mechanic Report ${reportId}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName}\nSeverity: ${diagnosis.urgencyLevel}\nLikely Cause: ${diagnosis.likelyCause}\nRecommended Action: ${diagnosis.nextStep}`
+    const text = `Carxai Mechanic Report ${reportId}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel)}\nLikely Cause: ${diagnosis.likelyCause}\nRecommended Action: ${diagnosis.nextStep}`
     navigator.clipboard.writeText(text)
     alert('Report summary copied to clipboard!')
   }
@@ -333,7 +333,7 @@ export default function MechanicReport({
 
                     <div className="md:col-span-12 lg:col-span-5 flex flex-col gap-4 relative z-10">
                       <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-3">Critical Status / Severity</p>
+                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-3">Danger Level / Severity</p>
                         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wider">
                           {getUrgencyBadge(diagnosis.urgencyLevel)}
                         </div>
