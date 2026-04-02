@@ -205,6 +205,11 @@ export interface DiagnosticResult {
   nextStep: string
   warning?: string
   followUp?: string
+  canDrive: boolean
+  mechanicRecommended: boolean
+  towingRecommended: boolean
+  missingInfo?: string
+  spokenSummary?: string
 }
 
 export interface NearbyPlace {

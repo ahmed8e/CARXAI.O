@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
+import { useTTS } from '../lib/useTTS'
 import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
 import { Loader2 } from 'lucide-react'
@@ -31,16 +32,27 @@ const ISSUE_CHIPS = [
 ]
 
 const SYSTEM_PROMPT = `You are an expert AI automotive mechanic assistant for Carxai. 
-When a user describes a car problem, respond in the following JSON format ONLY:
+Your goal is to provide high-fidelity, vehicle-specific automotive diagnoses.
+
+ALWAYS utilize the provided VEHICLE CONTEXT and DIAGNOSTIC HISTORY to make your response relevant to the user's specific car and past issues.
+
+GUIDELINES:
+1. NEVER give generic advice. If the car is a Tesla, do not talk about spark plugs. If it's old (pre-1996), mention OBD-I vs OBD-II.
+2. If the user mentions a symptom that was previously diagnosed in the history, analyze if it's a recurring issue.
+3. STRUCTURE: Every response must be in the following JSON format ONLY:
 {
-  "issueName": "Short name of the issue",
-  "likelyCause": "Brief explanation of what's likely causing it (1-2 sentences)",
+  "issueName": "Technical name of the issue",
+  "likelyCause": "Detailed explaination (2-3 sentences) specific to this vehicle type",
   "urgencyLevel": "low|medium|high|critical",
-  "warning": "Optional short warning (e.g., Do not continue driving) for high urgency",
-  "nextStep": "Immediate, clear, actionable next step",
-  "followUp": "Optional short follow-up action"
+  "warning": "CRITICAL safety warning if applicable",
+  "canDrive": true|false,
+  "nextStep": "Immediate actionable step (e.g., Check fuse #10, top up oil)",
+  "followUp": "Long-term suggestion",
+  "mechanicRecommended": true|false,
+  "towingRecommended": true|false,
+  "missingInfo": "Specific question if you need more info (e.g., Does it happen only when cold?)"
 }
-Be extremely concise. Structure for a stressed user on mobile. Do not use markdown bold/italic inside JSON values.`
+4. DO NOT use markdown formatting inside JSON string values.`
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -57,11 +69,14 @@ export default function AIMechanic() {
   const [loading, setLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const cameraInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
+  const { ttsStatus, stopTTS, prefetch } = useTTS({
+    currentAudioRef
+  })
 
   // Mechanic Report States
   const [showReport, setShowReport] = useState(false)
@@ -71,6 +86,9 @@ export default function AIMechanic() {
   const [activeVehicle, setActiveVehicle] = useState<Vehicle | null>(null)
   const [loadingVehicle, setLoadingVehicle] = useState(true)
   const [showVehicleModal, setShowVehicleModal] = useState(false)
+  const [diagnosticHistory, setDiagnosticHistory] = useState<string>('')
+  const [streamingMessage, setStreamingMessage] = useState<string>('')
+  const [isPreparingAudio, setIsPreparingAudio] = useState(false)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -107,6 +125,24 @@ export default function AIMechanic() {
 
         if (latest && latest.length > 0) {
           setActiveVehicle(latest[0] as Vehicle)
+        }
+      }
+
+      // Fetch last 5 diagnostic sessions for context
+      if (user?.id) {
+        const { data: history } = await supabase
+          .from('ai_chats')
+          .select('issue_name, likely_cause, created_at')
+          .eq('user_id', user.id)
+          .not('issue_name', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(5)
+
+        if (history && (history as any[]).length > 0) {
+          const historySummary = (history as any[]).map(h => 
+            `- ${new Date(h.created_at).toLocaleDateString()}: ${h.issue_name} (Cause: ${h.likely_cause})`
+          ).join('\n')
+          setDiagnosticHistory(historySummary)
         }
       }
     } catch (err) {
@@ -168,6 +204,7 @@ export default function AIMechanic() {
 
   const sendMessage = async (content: string, imageUrl?: string) => {
     if (!content.trim() && !imageUrl) return
+    stopTTS() // Interrupt any playing audio
     setLoading(true)
     setInput('')
 
@@ -183,6 +220,9 @@ export default function AIMechanic() {
           likelyCause: 'OpenAI API key not configured',
           urgencyLevel: 'low',
           nextStep: 'Add your OpenAI API key to the .env file to enable real AI diagnosis.',
+          canDrive: true,
+          mechanicRecommended: false,
+          towingRecommended: false
         }
         const demoResponse: Message = {
           id: Date.now().toString(),
@@ -204,15 +244,22 @@ export default function AIMechanic() {
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
+          stream: true,
           messages: [
             {
               role: 'system',
-              content: `${SYSTEM_PROMPT}\n\nUSER VEHICLE CONTEXT:\n${activeVehicle
-                  ? `Brand: ${activeVehicle.make}, Model: ${activeVehicle.model}, Year: ${activeVehicle.year}, Fuel: ${activeVehicle.fuel_type}, Engine: ${activeVehicle.engine_type || 'N/A'}, Gearbox: ${activeVehicle.gearbox || 'N/A'}, Mileage: ${activeVehicle.mileage || 'N/A'} km.`
-                  : "No specific vehicle details provided. Ask the user for car details if crucial for diagnosis."
-                }`
+              content: `${SYSTEM_PROMPT}
+
+VEHICLE CONTEXT:
+${activeVehicle 
+  ? `Brand: ${activeVehicle.make}, Model: ${activeVehicle.model}, Year: ${activeVehicle.year}, Fuel: ${activeVehicle.fuel_type}, Engine: ${activeVehicle.engine_type || 'N/A'}, Gearbox: ${activeVehicle.gearbox || 'N/A'}, Mileage: ${activeVehicle.mileage || 'N/A'} km, VIN: ${activeVehicle.vin || 'N/A'}.`
+  : "No specific vehicle details provided."
+}
+
+DIAGNOSTIC HISTORY:
+${diagnosticHistory || "No previous diagnostic history found."}`
             },
-            ...messages.slice(-6).map(m => ({
+            ...messages.slice(-10).map(m => ({
               role: m.role,
               content: m.imageUrl
                 ? [{ type: 'text', text: m.content }, { type: 'image_url', image_url: { url: m.imageUrl } }]
@@ -225,40 +272,102 @@ export default function AIMechanic() {
                 : content
             }
           ],
-          max_tokens: 500,
+          response_format: { type: "json_object" },
+          max_tokens: 800,
         }),
       })
 
-      const data = await response.json()
-      const rawContent = data.choices?.[0]?.message?.content ?? ''
+      if (!response.body) throw new Error('No response body')
+      
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let accumulatedJSON = ''
+      
+      setStreamingMessage('Analyzing systems...')
+
+      while (true) {
+        const { value, done } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            try {
+              const json = JSON.parse(line.replace('data: ', ''))
+              const delta = json.choices[0]?.delta?.content || ''
+              accumulatedJSON += delta
+              
+              // Perceived speed: Show the user something is happening
+              // Since it's JSON, we can't easily show partial text without regex
+              // but we can update a generic status or try to extract likelyCause
+              if (accumulatedJSON.includes('"likelyCause": "')) {
+                const parts = accumulatedJSON.split('"likelyCause": "')
+                if (parts.length > 1) {
+                  const likelyCausePartial = parts[1].split('"')[0]
+                  if (likelyCausePartial) {
+                    setStreamingMessage(likelyCausePartial)
+                  }
+                }
+              }
+
+              // Extract spokenSummary as it appears
+              if (accumulatedJSON.includes('"spokenSummary": "')) {
+                const parts = accumulatedJSON.split('"spokenSummary": "')
+                if (parts.length > 1) {
+                  const spokenSummaryPartial = parts[1].split('"')[0]
+                  if (spokenSummaryPartial.length > 10 && !isPreparingAudio) {
+                    // Start pre-fetching the summary as soon as we have a decent chunk
+                    setIsPreparingAudio(true)
+                    prefetch(spokenSummaryPartial).finally(() => setIsPreparingAudio(false))
+                  }
+                }
+              }
+            } catch (e) {
+              // Ignore partial JSON parse errors
+            }
+          }
+        }
+      }
 
       let issueData: DiagnosticResult | undefined
-      let displayContent = rawContent
+      let finalDisplayContent = ''
 
       try {
-        const parsed = JSON.parse(rawContent)
+        const parsed = JSON.parse(accumulatedJSON)
         issueData = parsed
-        displayContent = parsed.likelyCause
-      } catch {
-        // Use raw content if not JSON
+        finalDisplayContent = parsed.likelyCause || parsed.issueName
+        
+        // Start/Ensure preparing voice immediately in background (parallel)
+        // If prefetch was already started, the hook will handle it
+        setIsPreparingAudio(true)
+        const ttsText = parsed.spokenSummary || finalDisplayContent
+        prefetch(ttsText).finally(() => setIsPreparingAudio(false))
+
+      } catch (err) {
+        console.error('Failed to parse AI JSON:', accumulatedJSON)
+        finalDisplayContent = "I encountered an issue processing the diagnostic data. Please try again."
       }
 
       const assistantMsg: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: displayContent,
+        content: finalDisplayContent,
         timestamp: new Date(),
         issueData,
       }
+      
+      setStreamingMessage('')
       setMessages(prev => [...prev, assistantMsg])
 
       // Save to Supabase
       if (user && issueData) {
-        // @ts-ignore - Supabase type inference issue with this table
+        // @ts-ignore
         await supabase.from('ai_chats').insert({
           user_id: user.id,
           user_message: content,
-          ai_response: displayContent,
+          ai_response: finalDisplayContent,
           issue_name: issueData.issueName,
           likely_cause: issueData.likelyCause,
           urgency_level: issueData.urgencyLevel,
@@ -268,21 +377,24 @@ export default function AIMechanic() {
       console.error('AI Error:', err)
       const demoResult: DiagnosticResult = {
         issueName: 'Connection Feedback',
-        likelyCause: 'The AI is currently in offline/demo mode. Usually, this would be a real-time diagnosis of your car problem.',
+        likelyCause: 'The AI is currently in offline/demo mode. Please check your connection.',
         urgencyLevel: 'medium',
         nextStep: 'Check your internet connection or API settings, then try again.',
+        canDrive: true,
+        mechanicRecommended: true,
+        towingRecommended: false
       }
-      const demoResponse: Message = {
+      setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
         content: demoResult.likelyCause,
         timestamp: new Date(),
         issueData: demoResult,
-      }
-      setMessages(prev => [...prev, demoResponse])
+      }])
+    } finally {
+      setLoading(false)
+      setStreamingMessage('')
     }
-
-    setLoading(false)
   }
 
   const handleFileUpload = async (file: File) => {
@@ -508,7 +620,7 @@ export default function AIMechanic() {
                     currentAudioRef={currentAudioRef}
                     text={
                       msg.issueData
-                        ? `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`
+                        ? (msg.issueData.spokenSummary || `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`)
                         : msg.content
                     }
                   />
@@ -587,19 +699,68 @@ export default function AIMechanic() {
           );
         })}
 
-        {loading && (
+        {(loading || streamingMessage) && (
           <div className="flex justify-start items-start">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-surface-low dark:bg-surface-high border border-overlay">
-              <Bot className="w-5 h-5 text-muted" />
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-navy shadow-lg border border-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+              <Bot className="w-4 h-4 text-white relative z-10" />
             </div>
-            <div className="px-5 py-4 rounded-3xl rounded-tl-none bg-surface-low dark:bg-surface-high border border-overlay flex items-center gap-3">
-              <Loader2 className="w-4 h-4 text-navy animate-spin" />
-              <span className="text-sm font-medium text-muted">Analyzing data...</span>
+            <div className="space-y-2 max-w-[85%] lg:max-w-lg">
+              <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-white dark:bg-surface-high border border-overlay text-on-surface shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Loader2 className="w-3 h-3 text-navy animate-spin" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-navy/60">
+                      {streamingMessage ? 'Live Analysis' : 'Connecting to Systems'}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed text-on-surface/90 font-medium">
+                    {streamingMessage || 'Initializing diagnostic modules...'}
+                  </p>
+                </div>
+              </div>
+
+              {isPreparingAudio && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy/5 border border-navy/10 w-fit ml-2"
+                >
+                  <AudioLines className="w-3 h-3 text-navy animate-pulse" />
+                  <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">Preparing voice...</span>
+                </motion.div>
+              )}
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Premium Voice Activity Indicator */}
+      <AnimatePresence>
+        {(ttsStatus === 'playing' || ttsStatus === 'loading') && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/90 dark:bg-surface-high/90 backdrop-blur-xl border border-navy/20 shadow-2xl shadow-navy/10 pointer-events-none"
+          >
+            <div className="flex items-end gap-1 h-3">
+              {[0, 0.1, 0.05, 0.15].map((delay, i) => (
+                <motion.div
+                  key={i}
+                  className="w-1 rounded-full bg-navy"
+                  animate={{ height: ttsStatus === 'playing' ? [4, 12, 4] : [4, 6, 4] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay }}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-navy">
+              {ttsStatus === 'playing' ? 'Premium Voice Active' : 'Generating Voice...'}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ══ Compact Composer ══ */}
       <div className="relative z-10 bg-white/95 dark:bg-surface-low/95 backdrop-blur-md border-t border-overlay pb-[env(safe-area-inset-bottom)]">
@@ -742,6 +903,7 @@ export default function AIMechanic() {
           diagnosis={reportDiagnosis}
           messages={messages}
           activeVehicle={activeVehicle}
+          currentAudioRef={currentAudioRef}
         />
       )}
 

@@ -10,6 +10,7 @@ interface UseTTSOptions {
 interface UseTTSReturn {
   status: TTSStatus
   play: (text: string) => Promise<void>
+  prefetch: (text: string) => Promise<string | null>
   pause: () => void
   resume: () => void
   replay: () => void
@@ -64,7 +65,6 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     try {
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY
       if (!apiKey || apiKey === 'sk-placeholder') {
-        // Graceful fallback — no-op with an error state
         setStatus('error')
         return
       }
@@ -100,6 +100,39 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     }
   }, [stopCurrentGlobal, createAudio])
 
+  const prefetch = useCallback(async (text: string) => {
+    if (blobUrlRef.current) return blobUrlRef.current
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+      if (!apiKey || apiKey === 'sk-placeholder') return null
+
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'tts-1-hd',
+          voice: 'nova',
+          input: text,
+          response_format: 'mp3',
+          speed: 1.0,
+        }),
+      })
+
+      if (!response.ok) return null
+
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      blobUrlRef.current = url
+      return url
+    } catch {
+      return null
+    }
+  }, [])
+
   const pause = useCallback(() => {
     audioRef.current?.pause()
   }, [])
@@ -126,5 +159,5 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     setStatus('idle')
   }, [])
 
-  return { status, play, pause, resume, replay, stop }
+  return { status, play, prefetch, pause, resume, replay, stop }
 }

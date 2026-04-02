@@ -5,11 +5,13 @@ import {
   X, Download, Copy, Share2,
   Truck, ShieldAlert, User,
   Car, Info, AlertTriangle, FileText,
-  Calendar, Hash, Loader2
+  Calendar, Hash, Loader2,
+  ShieldCheck
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Message, DiagnosticResult, Database } from '../lib/types'
 import { getUrgencyBadge } from '../lib/utils'
+import ListenButton from './ui/ListenButton'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
@@ -20,9 +22,18 @@ interface MechanicReportProps {
   diagnosis: DiagnosticResult
   messages: Message[]
   activeVehicle?: Vehicle | null
+  currentAudioRef: React.MutableRefObject<HTMLAudioElement | null>
 }
 
-export default function MechanicReport({ isOpen, onClose, user, diagnosis, messages, activeVehicle }: MechanicReportProps) {
+export default function MechanicReport({ 
+  isOpen, 
+  onClose, 
+  user, 
+  diagnosis, 
+  messages, 
+  activeVehicle,
+  currentAudioRef
+}: MechanicReportProps) {
   const navigate = useNavigate()
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
@@ -185,12 +196,18 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
                 </div>
               </div>
             </div>
-            <button 
-              onClick={onClose}
-              className="p-3 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl transition-all active:scale-95 group"
-            >
-              <X className="w-6 h-6 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
-            </button>
+            <div className="flex items-center gap-2">
+              <ListenButton 
+                currentAudioRef={currentAudioRef}
+                text={diagnosis.spokenSummary || `${diagnosis.issueName}. ${diagnosis.likelyCause}`}
+              />
+              <button 
+                onClick={onClose}
+                className="p-3 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl transition-all active:scale-95 group"
+              >
+                <X className="w-6 h-6 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
+              </button>
+            </div>
           </div>
 
           {/* Report Content */}
@@ -296,14 +313,21 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/20 rounded-full blur-[100px] group-hover:bg-navy/30 transition-colors" />
                     
                     <div className="md:col-span-12 lg:col-span-7 space-y-6 relative z-10">
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Issue Identification</p>
-                        <h4 className="text-3xl font-display font-bold tracking-tight">{diagnosis.issueName}</h4>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Probable Cause</p>
-                        <p className="text-base text-blue-100/80 leading-relaxed font-medium">{diagnosis.likelyCause}</p>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Identified Issue</label>
+                          <h4 className="text-3xl font-display font-bold tracking-tight">{diagnosis.issueName}</h4>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Root Cause Analysis</label>
+                          <p className="text-blue-100/80 leading-relaxed font-medium">{diagnosis.likelyCause}</p>
+                        </div>
+                        {diagnosis.missingInfo && (
+                          <div className="bg-orange-500/10 p-4 rounded-xl border border-orange-500/20 border-dashed">
+                            <label className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Clarification Needed</label>
+                            <p className="text-sm text-orange-100 mt-1">{diagnosis.missingInfo}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -312,6 +336,25 @@ export default function MechanicReport({ isOpen, onClose, user, diagnosis, messa
                         <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-3">Critical Status / Severity</p>
                         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wider">
                           {getUrgencyBadge(diagnosis.urgencyLevel)}
+                        </div>
+                        
+                        {/* Safety Status Mini-Badge */}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${
+                            diagnosis.canDrive 
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' 
+                              : 'bg-red-500/20 text-red-400 border border-red-500/20'
+                          }`}>
+                            {diagnosis.canDrive ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
+                            {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
+                          </div>
+
+                          {diagnosis.towingRecommended && (
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-orange-500/20 text-orange-400 border border-orange-500/20">
+                              <Truck className="w-3 h-3" />
+                              Towing Required
+                            </div>
+                          )}
                         </div>
                       </div>
 
