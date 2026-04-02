@@ -74,7 +74,7 @@ export default function AIMechanic() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const currentAudioRef = useRef<HTMLAudioElement | null>(null)
-  const { ttsStatus, stopTTS, prefetch } = useTTS({
+  const { status, stop, prefetch } = useTTS({
     currentAudioRef
   })
 
@@ -204,7 +204,7 @@ export default function AIMechanic() {
 
   const sendMessage = async (content: string, imageUrl?: string) => {
     if (!content.trim() && !imageUrl) return
-    stopTTS() // Interrupt any playing audio
+    stop() // Interrupt any playing audio
     setLoading(true)
     setInput('')
 
@@ -738,7 +738,7 @@ ${diagnosticHistory || "No previous diagnostic history found."}`
 
       {/* Premium Voice Activity Indicator */}
       <AnimatePresence>
-        {(ttsStatus === 'playing' || ttsStatus === 'loading') && (
+        {(status === 'playing' || status === 'loading') && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -750,13 +750,13 @@ ${diagnosticHistory || "No previous diagnostic history found."}`
                 <motion.div
                   key={i}
                   className="w-1 rounded-full bg-navy"
-                  animate={{ height: ttsStatus === 'playing' ? [4, 12, 4] : [4, 6, 4] }}
+                  animate={{ height: status === 'playing' ? [4, 12, 4] : [4, 6, 4] }}
                   transition={{ duration: 0.6, repeat: Infinity, delay }}
                 />
               ))}
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest text-navy">
-              {ttsStatus === 'playing' ? 'Premium Voice Active' : 'Generating Voice...'}
+              {status === 'playing' ? 'Premium Voice Active' : 'Generating Voice...'}
             </span>
           </motion.div>
         )}
