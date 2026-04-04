@@ -1,10 +1,32 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
-import { Bot, Users, Truck, Star, CheckCircle2, X, Activity, Radar, ShieldAlert, Camera, DollarSign, Clock, LayoutDashboard, User, LogOut, Zap, MessageSquare, Cpu, MapPin, Navigation } from 'lucide-react'
+import { 
+  Bot, 
+  Users, 
+  Truck, 
+  CheckCircle2, 
+  Star, 
+  Zap,
+  Clock,
+  Check,
+  X, 
+  Activity, 
+  Radar, 
+  ShieldAlert, 
+  Camera, 
+  DollarSign, 
+  LayoutDashboard, 
+  User, 
+  LogOut, 
+  MessageSquare, 
+  Cpu, 
+  MapPin, 
+  Navigation 
+} from 'lucide-react'
 
 
 const features = [
@@ -47,6 +69,30 @@ export default function Landing() {
   }
 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
+
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (isMobile) {
+      timerRef.current = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % steps.length)
+      }, 5000)
+    }
+  }
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    resetTimer()
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [isMobile])
 
   return (
     <div className="relative min-h-screen bg-surface dark:bg-surface-low text-on-surface selection:bg-navy/10 transition-colors duration-300">
@@ -305,11 +351,16 @@ export default function Landing() {
                 </button>
               </motion.div>
 
-              <div className="flex flex-wrap gap-x-10 gap-y-3 mt-12">
+              <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center sm:justify-start gap-y-6 sm:gap-x-12 mt-8 py-6 border-t border-navy/5">
                 {['Diagnose fast', 'Find help nearby', 'Get back on the road'].map((point, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-[10px] font-black text-muted tracking-widest uppercase">
-                    <CheckCircle2 className="w-4 h-4 text-navy/70" />
-                    {point}
+                  <div 
+                    key={i} 
+                    className={`flex items-center justify-center sm:justify-start gap-2 ${i === 2 ? 'col-span-2' : ''}`}
+                  >
+                    <Check className="w-3 h-3 text-navy/60" strokeWidth={3} />
+                    <span className="text-[9px] font-bold text-muted uppercase tracking-[0.15em] whitespace-nowrap">
+                      {point}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -411,76 +462,94 @@ export default function Landing() {
             <p className="text-muted text-lg md:text-xl font-medium max-w-xl mx-auto mt-4">Four steps. Minutes, not hours.</p>
           </div>
 
-          {/* Steps Grid */}
-          <div className="relative flex gap-4 overflow-x-auto snap-x scrollbar-hide px-6 md:grid md:grid-cols-4 md:max-w-6xl md:mx-auto md:px-0 md:overflow-visible">
+          {/* Steps Grid / Carousel */}
+          <div className="relative overflow-hidden md:overflow-visible py-4">
+            <motion.div 
+              className="flex md:grid md:grid-cols-4 gap-6 px-6 md:px-0 md:max-w-6xl md:mx-auto"
+              drag={isMobile ? "x" : false}
+              dragConstraints={{ 
+                right: 0, 
+                left: isMobile ? -(steps.length - 1) * (window.innerWidth - 24) : 0 
+              }}
+              animate={{ x: isMobile ? -activeIndex * (window.innerWidth - 24) : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              onDragEnd={(_, info) => {
+                resetTimer();
+                const shift = info.offset.x;
+                if (shift < -50 && activeIndex < steps.length - 1) setActiveIndex(prev => prev + 1);
+                if (shift > 50 && activeIndex > 0) setActiveIndex(prev => prev - 1);
+              }}
+            >
+              {/* Connector line — desktop only */}
+              <div className="hidden md:block absolute top-[52px] left-[calc(12.5%+28px)] right-[calc(12.5%+28px)] h-px z-0"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.2) 15%, rgba(0,112,224,0.2) 85%, transparent)' }}
+              />
 
-            {/* Connector line — desktop only */}
-            <div className="hidden md:block absolute top-[52px] left-[calc(12.5%+28px)] right-[calc(12.5%+28px)] h-px z-0"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.2) 15%, rgba(0,112,224,0.2) 85%, transparent)' }}
-            />
-
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                whileHover={{ y: -4 }}
-                className="flex-shrink-0 w-[240px] md:w-auto snap-center relative group"
-              >
-                {/* Numbered Badge */}
-                <div className="flex justify-center mb-5 relative z-10">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center font-display font-black text-lg text-white shadow-lg"
-                    style={{
-                      background: 'linear-gradient(135deg, #0070E0, #0055b3)',
-                      boxShadow: '0 8px 20px rgba(0,112,224,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    {step.num}
-                  </div>
-                </div>
-
-                {/* Card */}
-                <div
-                  className="relative overflow-hidden rounded-[28px] p-6 flex flex-col gap-4 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(160deg, rgba(255,255,255,0.9) 0%, rgba(248,250,255,0.95) 100%)',
-                    border: '1.5px solid rgba(0,112,224,0.1)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,112,224,0.14), inset 0 1px 0 rgba(255,255,255,0.9)'
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,112,224,0.22)'
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)'
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,112,224,0.1)'
-                  }}
+              {steps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  transition={{ duration: 0.5 }}
+                  className={`flex-shrink-0 w-[calc(100vw-48px)] md:w-auto relative group transition-all duration-700 ${isMobile && activeIndex === i ? 'scale-100 opacity-100' : isMobile ? 'scale-95 opacity-40 blur-[1px]' : ''}`}
                 >
-                  {/* Top shimmer line */}
-                  <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                  {/* Numbered Badge */}
+                  <div className="flex justify-center mb-5 relative z-10">
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center font-display font-black text-lg text-white shadow-lg"
+                      style={{
+                        background: 'linear-gradient(135deg, #0070E0, #0055b3)',
+                        boxShadow: '0 8px 20px rgba(0,112,224,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+                      }}
+                    >
+                      {step.num}
+                    </div>
+                  </div>
 
-                  {/* Icon */}
+                  {/* Card */}
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    className="relative overflow-hidden rounded-[28px] p-8 flex flex-col gap-4 transition-all duration-300"
                     style={{
-                      background: 'rgba(0,112,224,0.07)',
-                      border: '1px solid rgba(0,112,224,0.15)',
+                      background: 'linear-gradient(160deg, rgba(255,255,255,0.9) 0%, rgba(248,250,255,0.95) 100%)',
+                      border: '1.5px solid rgba(0,112,224,0.1)',
+                      boxShadow: activeIndex === i ? "0 20px 40px rgba(0,112,224,0.12)" : "0 4px 24px rgba(0,0,0,0.06)",
                     }}
                   >
-                    <step.icon className="w-5 h-5 text-navy" strokeWidth={1.75} />
-                  </div>
+                    {/* Top shimmer line */}
+                    <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
 
-                  {/* Text */}
-                  <div>
-                    <h3 className="font-display font-black text-base text-on-surface leading-tight tracking-tight mb-1.5">{step.title}</h3>
-                    <p className="text-sm text-muted font-medium leading-relaxed">{step.desc}</p>
+                    {/* Icon */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: 'rgba(0,112,224,0.07)',
+                        border: '1px solid rgba(0,112,224,0.15)',
+                      }}
+                    >
+                      <step.icon className="w-6 h-6 text-navy" strokeWidth={1.75} />
+                    </div>
+
+                    {/* Text */}
+                    <div>
+                      <h3 className="font-display font-black text-lg text-on-surface leading-tight tracking-tight mb-2">{step.title}</h3>
+                      <p className="text-base text-muted font-medium leading-relaxed">{step.desc}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Pagination Dots (Mobile Only) */}
+            <div className="flex md:hidden justify-center items-center gap-3 mt-10">
+              {steps.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setActiveIndex(i);
+                    resetTimer();
+                  }}
+                  className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-navy' : 'w-4 bg-navy/10'}`}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
