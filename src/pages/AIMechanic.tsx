@@ -234,37 +234,13 @@ DIAGNOSTIC HISTORY (Last 5 sessions):
 ${diagnosticHistory}` 
 : 'DIAGNOSTIC HISTORY: No previous history available.'
 
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-      if (!apiKey || apiKey === 'sk-placeholder') {
-        // Demo mode
-        await new Promise(r => setTimeout(r, 1500))
-        const demoResult: DiagnosticResult = {
-          issueName: 'Demo Mode Active',
-          likelyCause: 'OpenAI API key not configured',
-          urgencyLevel: 'low',
-          nextStep: 'Add your OpenAI API key to the .env file.',
-          canDrive: true,
-          mechanicRecommended: false,
-          towingRecommended: false,
-          spokenSummary: 'I am currently in demo mode.'
-        }
-        const demoResponse: Message = {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: 'Add your OpenAI API key to enable real diagnosis.',
-          timestamp: new Date(),
-          issueData: demoResult,
-        }
-        setMessages(prev => [...prev, demoResponse])
-        setLoading(false)
-        return
-      }
+      // API Logic moved to server-side proxy (/api/chat) for security and CORS
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      // Use our serverless proxy to avoid CORS issues and protect the API key
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o',
@@ -356,7 +332,7 @@ ${diagnosticHistory}`
 
       } catch (err) {
         console.error('Failed to parse AI JSON:', accumulatedJSON)
-        finalDisplayContent = "I encountered an issue processing the diagnostic data. Please try again."
+        finalDisplayContent = "I've analyzed your input, but I'm having trouble finalizing the diagnostic data structure. Please describe the issue again with more detail."
       }
 
       const assistantMsg: Message = {
@@ -384,21 +360,22 @@ ${diagnosticHistory}`
       }
     } catch (err) {
       console.error('AI Error:', err)
-      const demoResult: DiagnosticResult = {
-        issueName: 'Connection Feedback',
-        likelyCause: 'The AI is currently in offline/demo mode. Please check your connection.',
+      const errorResult: DiagnosticResult = {
+        issueName: 'Diagnosis Unavailable',
+        likelyCause: 'I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.',
         urgencyLevel: 'medium',
-        nextStep: 'Check your internet connection or API settings, then try again.',
+        nextStep: 'Please check your internet connection and try submitting your request again in a few moments.',
         canDrive: true,
-        mechanicRecommended: true,
-        towingRecommended: false
+        mechanicRecommended: false,
+        towingRecommended: false,
+        spokenSummary: 'I am having trouble connecting to my diagnostic systems right now.'
       }
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: demoResult.likelyCause,
+        content: errorResult.likelyCause,
         timestamp: new Date(),
-        issueData: demoResult,
+        issueData: errorResult,
       }])
     } finally {
       setLoading(false)

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import InstallPrompt from '../components/InstallPrompt'
 import { 
   Users, ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
@@ -222,6 +223,7 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+      <InstallPrompt />
     </div>
   )
 }

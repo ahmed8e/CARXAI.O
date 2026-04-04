@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import type { Database } from '../lib/types'
 
 interface AuthContextType {
   user: User | null
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (!error && data.user) {
       try {
-        const { error: profileError } = await supabase.from('profiles').upsert({
+        const { error: profileError } = await (supabase as any).from('profiles').upsert({
           id: data.user.id,
           email,
           full_name: fullName,
@@ -117,18 +118,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (authError) return { error: authError }
 
-    // 2. Update/Upsert into Profiles table
-    const { error: dbError } = await supabase
+    // 2. Update Profiles table (only valid columns)
+    const { error: dbError } = await (supabase as any)
       .from('profiles')
       .upsert({
         id: user.id,
-        full_name: updates.fullName,
-        phone_number: updates.phoneNumber,
-        preferred_language: updates.preferredLanguage,
-        email: user.email // Ensure email is present
+        full_name: updates.fullName || null,
+        email: user.email || ''
       })
+
+    if (dbError) console.error('Database Profile Error:', dbError)
+
+    // 3. Update User Settings table
+    const { error: settingsError } = await (supabase as any)
+      .from('user_settings')
+      .upsert({
+        user_id: user.id,
+        preferred_language: updates.preferredLanguage || 'en',
+        phone_number: updates.phoneNumber || null
+      })
+
+    if (settingsError) console.error('Database Settings Error:', settingsError)
     
-    return { error: dbError }
+    return { error: dbError || settingsError || null }
   }
 
   const updatePassword = async (newPassword: string) => {

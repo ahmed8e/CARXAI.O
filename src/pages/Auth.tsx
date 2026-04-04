@@ -6,8 +6,15 @@ import { useAuth } from '../contexts/AuthContext'
 
 export default function Auth() {
   const [searchParams] = useSearchParams()
-  const { signIn, signUp, signInWithOAuth } = useAuth()
+  const { user, signIn, signUp, signInWithOAuth } = useAuth()
   const navigate = useNavigate()
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard')
+    }
+  }, [user, navigate])
   
   // Decide default mode based on localStorage or URL param
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 

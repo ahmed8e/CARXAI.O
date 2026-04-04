@@ -180,6 +180,7 @@ export default function Landing() {
                     bg: 'rgba(0,112,224,0.05)',
                     tagBg: 'rgba(0,112,224,0.08)',
                     tagBorder: 'rgba(0,112,224,0.2)',
+                    destination: '/dashboard/ai-mechanic',
                   },
                   {
                     icon: Users,
@@ -191,6 +192,7 @@ export default function Landing() {
                     bg: 'rgba(8,145,178,0.05)',
                     tagBg: 'rgba(8,145,178,0.08)',
                     tagBorder: 'rgba(8,145,178,0.2)',
+                    destination: '/dashboard/mechanic',
                   },
                   {
                     icon: Truck,
@@ -202,27 +204,30 @@ export default function Landing() {
                     bg: 'rgba(234,88,12,0.05)',
                     tagBg: 'rgba(234,88,12,0.08)',
                     tagBorder: 'rgba(234,88,12,0.2)',
+                    destination: '/dashboard/towing',
                   },
                 ].map((sol, i) => (
                   <motion.div
                     key={i}
-                    whileHover={{ y: -5 }}
-                    transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-                    className="relative flex flex-col items-start overflow-hidden rounded-[20px] sm:rounded-[26px] bg-surface cursor-default"
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                    onClick={() => navigate(user ? sol.destination : '/auth')}
+                    className="relative flex flex-col items-start overflow-hidden rounded-[20px] sm:rounded-[26px] bg-surface cursor-pointer group active:brightness-95"
                     style={{
                       border: `1.5px solid ${sol.accent}22`,
-                      boxShadow: `0 2px 16px ${sol.halo}`,
+                      boxShadow: `0 4px 20px ${sol.halo}`,
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.boxShadow = `0 8px 32px ${sol.halo}, 0 0 0 1.5px ${sol.accent}40`
+                      e.currentTarget.style.boxShadow = `0 12px 40px ${sol.halo}, 0 0 0 2px ${sol.accent}40`
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.boxShadow = `0 2px 16px ${sol.halo}`
+                      e.currentTarget.style.boxShadow = `0 4px 20px ${sol.halo}`
                     }}
                   >
                     {/* Top Accent Bar */}
                     <div
-                      className="w-full h-[3px] shrink-0"
+                      className="w-full h-[4px] shrink-0"
                       style={{ background: `linear-gradient(90deg, ${sol.accent}, ${sol.accent}33)` }}
                     />
 

@@ -6,7 +6,7 @@ import {
   Truck, ShieldAlert, User,
   Car, Info, AlertTriangle, FileText,
   Calendar, Hash, Loader2,
-  ShieldCheck
+  ShieldCheck, Zap
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Message, DiagnosticResult, Database } from '../lib/types'
@@ -55,7 +55,7 @@ export default function MechanicReport({
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
       
       // Fetch Settings (for phone)
       const { data: settings } = await supabase
@@ -108,7 +108,7 @@ export default function MechanicReport({
     const shareData = {
       title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
       text: `Diagnostic report for ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName}.`,
-      url: window.location.href
+      url: window.location.hostname === 'localhost' ? 'https://carx.ai' : window.location.href
     }
 
     try {
@@ -288,79 +288,103 @@ export default function MechanicReport({
                   </div>
                 </div>
 
-                {/* 4. Problem Summary */}
-                <div className="space-y-4 pt-4">
-                  <div className="flex items-center gap-2">
-                    <Info className="w-4 h-4 text-amber-600" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Problem Summary</h3>
-                  </div>
-                  <div className="bg-amber-50 dark:bg-amber-900/10 p-8 rounded-[32px] border border-amber-100 dark:border-amber-900/20">
-                    <p className="text-lg font-bold text-amber-900 dark:text-amber-100 italic leading-relaxed">
-                      "{messages.find(m => m.role === 'user')?.content || 'User reported vehicle issue'}"
-                    </p>
-                  </div>
-                </div>
-
-                {/* 5. Diagnosis Result */}
-                <div className="space-y-6 pt-4">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-navy" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Diagnostic Result</h3>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-12 gap-6 bg-slate-900 dark:bg-black rounded-[40px] p-10 text-white shadow-2xl relative overflow-hidden group">
-                    {/* Decorative element */}
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/20 rounded-full blur-[100px] group-hover:bg-navy/30 transition-colors" />
-                    
-                    <div className="md:col-span-12 lg:col-span-7 space-y-6 relative z-10">
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Identified Issue</label>
-                          <h4 className="text-3xl font-display font-bold tracking-tight">{diagnosis.issueName}</h4>
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Root Cause Analysis</label>
-                          <p className="text-blue-100/80 leading-relaxed font-medium">{diagnosis.likelyCause}</p>
-                        </div>
-                        {diagnosis.missingInfo && (
-                          <div className="bg-orange-500/10 p-4 rounded-xl border border-orange-500/20 border-dashed">
-                            <label className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Clarification Needed</label>
-                            <p className="text-sm text-orange-100 mt-1">{diagnosis.missingInfo}</p>
-                          </div>
-                        )}
-                      </div>
+                {/* 4. Unified Diagnostic Analysis */}
+                <div className="space-y-8 pt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-navy/5 flex items-center justify-center border border-navy/10">
+                      <ShieldAlert className="w-4 h-4 text-navy" />
                     </div>
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Official Diagnostic Analysis</h3>
+                  </div>
 
-                    <div className="md:col-span-12 lg:col-span-5 flex flex-col gap-4 relative z-10">
-                      <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-3">Danger Level / Severity</p>
-                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wider">
-                          {getUrgencyBadge(diagnosis.urgencyLevel)}
+                  <div className="grid lg:grid-cols-12 gap-8">
+                    {/* Main Analysis Column */}
+                    <div className="lg:col-span-12 space-y-8">
+                      {/* Issue Reported Card */}
+                      <div className="p-8 rounded-[32px] bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5">
+                          <Info className="w-16 h-16 text-navy" />
                         </div>
-                        
-                        {/* Safety Status Mini-Badge */}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${
-                            diagnosis.canDrive 
-                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' 
-                              : 'bg-red-500/20 text-red-400 border border-red-500/20'
-                          }`}>
-                            {diagnosis.canDrive ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
-                            {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
-                          </div>
-
-                          {diagnosis.towingRecommended && (
-                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-orange-500/20 text-orange-400 border border-orange-500/20">
-                              <Truck className="w-3 h-3" />
-                              Towing Required
-                            </div>
-                          )}
-                        </div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Issue Reported by User</p>
+                        <p className="text-xl font-display font-medium text-slate-900 dark:text-white italic leading-relaxed relative z-10">
+                          "{messages.find(m => m.role === 'user')?.content || 'Vehicle performance issue reported'}"
+                        </p>
                       </div>
 
-                      <div className="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-sm">
-                        <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Recommended Next Step</p>
-                        <p className="text-sm font-bold text-emerald-50 leading-snug">{diagnosis.nextStep}</p>
+                      {/* Likely Cause Card — The Core Result */}
+                      <div className="bg-slate-900 dark:bg-black rounded-[40px] p-10 text-white shadow-2xl relative overflow-hidden group">
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/20 rounded-full blur-[100px] group-hover:bg-navy/30 transition-colors" />
+                        
+                        <div className="grid md:grid-cols-2 gap-10 relative z-10">
+                          <div className="space-y-8">
+                            <div>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Professional Diagnosis</p>
+                              <h4 className="text-3xl font-display font-black tracking-tight italic mb-2">
+                                {diagnosis.issueName}
+                              </h4>
+                              {diagnosis.urgencyLevel && (
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                  diagnosis.urgencyLevel === 'stop_driving' || diagnosis.urgencyLevel === 'high'
+                                    ? 'bg-red-500/20 text-red-400 border-red-500/20'
+                                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20'
+                                }`}>
+                                  <div className="w-1 h-1 rounded-full bg-current animate-pulse" />
+                                  {getUrgencyBadge(diagnosis.urgencyLevel)}
+                                </div>
+                              )}
+                            </div>
+
+                            <div>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Likely Root Cause</p>
+                              <p className="text-lg text-blue-100/90 leading-relaxed font-medium">
+                                {diagnosis.likelyCause}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-6">
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Action Required Now</p>
+                              <p className="text-base font-bold text-emerald-50 leading-snug">
+                                {diagnosis.nextStep}
+                              </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3">
+                              <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${
+                                diagnosis.canDrive 
+                                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' 
+                                  : 'bg-red-500/20 text-red-400 border-red-500/20'
+                              }`}>
+                                {diagnosis.canDrive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                                {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
+                              </div>
+
+                              {diagnosis.towingRecommended && (
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-orange-500/20 text-orange-400 border border-orange-500/20">
+                                  <Truck className="w-4 h-4" />
+                                  Towing Recommended
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Certification Seal */}
+                        <div className="mt-10 pt-8 border-t border-white/10 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full border-2 border-navy/30 flex items-center justify-center p-1 opacity-50">
+                               <Zap className="w-5 h-5 text-navy" fill="currentColor" />
+                            </div>
+                            <div>
+                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Certified AI Assessment</p>
+                              <p className="text-[10px] font-bold text-gray-500 uppercase">Verification ID: {reportId}</p>
+                            </div>
+                          </div>
+                          <div className="hidden md:block">
+                             <p className="text-[8px] italic text-gray-600">Document generated by Carxai Automotive Intelligence Engine v4.0</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
