@@ -27,10 +27,10 @@ export function getUrgencyColor(level: string): string {
 export function getUrgencyBadge(level: string): string {
   switch (level) {
     case 'stop_driving': return 'Stop driving'
-    case 'high': return 'High Urgency'
-    case 'medium': return 'Medium Priority'
-    case 'low': return 'Safe / Low Urgency'
-    default: return 'Status Unknown'
+    case 'high': return 'High'
+    case 'medium': return 'Medium'
+    case 'low': return 'Low'
+    default: return 'Unknown'
   }
 }
 

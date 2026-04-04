@@ -35,12 +35,12 @@ const SYSTEM_PROMPT = `You are "Sarge", a friendly, experienced, and no-nonsense
 Your goal is to provide simple, practical, and vehicle-specific automotive help for everyday drivers.
 
 GUIDELINES:
-1. BE PRACTICAL: Use simple, plain English. Avoid deep technical jargon. Imagine you're talking to a friend who doesn't know much about cars.
-2. BE VEHICLE-AWARE: Always use the provided VEHICLE CONTEXT. If it's a Tesla, don't mention spark plugs or oil. If it's high mileage (over 150k km), consider wear-and-tear items.
-3. CHECK HISTORY: Carefully review the DIAGNOSTIC HISTORY. If the user has reported this issue before or if there's a pattern (e.g., repeating battery, starting, or overheating issues), mention it and adjust the diagnosis accordingly.
-4. MULTI-MODAL REASONING: If an image is provided (like a dashboard warning light), combine what you see in the image with the vehicle info and history to find the most likely cause.
-5. FALLBACK: If vehicle info is missing, provide a helpful general diagnosis but remind the user that adding their car details would make it much more accurate.
-6. RESPONSE TONE: Keep it short, clear, and reassuring. Focus on what it means, how serious it is, and exactly what to do next.
+1. BE PRACTICAL: Use simple, plain English. Avoid deep technical jargon. Focus on what a normal driver needs to know.
+2. BE VEHICLE-AWARE: Always use the provided VEHICLE CONTEXT (Brand, Model, Year, Fuel, Engine, Gearbox, Mileage). Adjust your diagnosis based on these specs. For example, high mileage (>150k km) suggests wear-and-tear; electric cars don't have spark plugs.
+3. ANALYSIS OF PATTERNS: Carefully review the DIAGNOSTIC HISTORY. If the user has reported the SAME OR RELATED issue before (e.g., repeating battery, starting, or overheating issues), explicitly mention this pattern and adjust the diagnosis for a recurring problem.
+4. MULTI-MODAL REASONING: If an image is provided (like a dashboard warning light), prioritize its analysis while combining it with vehicle info and history.
+5. FALLBACK: If vehicle info is missing, provide a helpful general diagnosis but suggest that adding car details would improve accuracy.
+6. RESPONSE STYLE: Keep it short, professional, and reassuring. No long paragraphs.
 
 STRUCTURE: You MUST return a JSON object ONLY.
 Danger levels MUST be one of: low, medium, high, stop_driving.
@@ -48,15 +48,15 @@ Danger levels MUST be one of: low, medium, high, stop_driving.
 Format:
 {
   "issueName": "Short, clear name of the problem",
-  "likelyCause": "What it likely means in 1-2 simple sentences.",
+  "likelyCause": "What it likely means: 1-2 simple, clear sentences.",
   "urgencyLevel": "low|medium|high|stop_driving",
   "warning": "Short safety alert if needed (otherwise empty)",
   "canDrive": true|false,
-  "nextStep": "Exactly what to do now in 1 simple sentence.",
-  "followUp": "Next practical step (e.g., check oil level, visit a local shop).",
+  "nextStep": "What to do now: 1 practical, immediate action sentence.",
+  "followUp": "A secondary practical step (e.g., check fluid level, visit a shop).",
   "mechanicRecommended": true|false,
   "towingRecommended": true|false,
-  "missingInfo": "Ask ONE specific question if you need more info (otherwise empty).",
+  "missingInfo": "Ask ONE specific question if key info is missing (otherwise empty).",
   "spokenSummary": "A very short (1 sentence), reassuring spoken summary."
 }`
 
@@ -208,7 +208,7 @@ export default function AIMechanic() {
     return newMsg
   }
 
-  const sendMessage = async (content: string, imageUrl?: string) => {
+  const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
     if (!content.trim() && !imageUrl) return
     stop() // Interrupt any playing audio
     setLoading(true)
@@ -217,22 +217,25 @@ export default function AIMechanic() {
     addMessage({ role: 'user', content, imageUrl })
 
     try {
+      const symptomContext = chipLabel ? `USER SELECTED SYMPTOM: ${chipLabel}` : '';
+      
       const vehicleContext = activeVehicle ? `
 VEHICLE CONTEXT:
 - Brand: ${activeVehicle.make}
 - Model: ${activeVehicle.model}
 - Year: ${activeVehicle.year}
 - Fuel Type: ${activeVehicle.fuel_type || 'Unknown'}
-- Engine Type: ${activeVehicle.engine_type || 'Unknown'}
+- Engine: ${activeVehicle.engine_type || 'Unknown'}
 - Gearbox: ${activeVehicle.gearbox || 'Unknown'}
 - Mileage: ${activeVehicle.mileage || 'Unknown'} km
 - VIN: ${activeVehicle.vin || 'Not provided'}` 
-: 'VEHICLE CONTEXT: No specific vehicle selected. Provide a general diagnosis.'
+: 'VEHICLE CONTEXT: Not available. Provide a general diagnosis.'
 
       const historyContext = diagnosticHistory ? `
-DIAGNOSTIC HISTORY (Last 5 sessions):
-${diagnosticHistory}` 
-: 'DIAGNOSTIC HISTORY: No previous history available.'
+DIAGNOSTIC HISTORY (Last 5 events):
+${diagnosticHistory}
+(Note: Use this history to spot recurring patterns or unresolved issues.)` 
+: 'DIAGNOSTIC HISTORY: Initial session. No previous records.'
 
       // API Logic moved to server-side proxy (/api/chat) for security and CORS
 
@@ -247,7 +250,7 @@ ${diagnosticHistory}`
           stream: true,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'system', content: `${vehicleContext}\n${historyContext}` },
+            { role: 'system', content: `${symptomContext}\n\n${vehicleContext}\n\n${historyContext}` },
             ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
             {
               role: 'user',
@@ -517,7 +520,7 @@ ${diagnosticHistory}`
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + idx * 0.05, type: 'spring', damping: 20 }}
-                  onClick={() => sendMessage(chip.value)}
+                  onClick={() => sendMessage(chip.value, undefined, chip.label)}
                   className="group relative flex items-center gap-3.5 p-4 rounded-[24px] bg-white/70 dark:bg-surface-high/70 backdrop-blur-md border border-white/60 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:border-navy/20 dark:hover:border-navy/40 transition-all active:scale-[0.97] overflow-hidden"
                 >
                   {/* Subtle Inner Highlight */}
@@ -589,7 +592,7 @@ ${diagnosticHistory}`
 
                         <div className="space-y-3 pt-4 border-t border-navy/5">
                           <div className="space-y-1.5">
-                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">Next Step</p>
+                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">What to do now</p>
                             <p className="text-[13px] font-bold text-navy leading-tight">{msg.issueData.nextStep}</p>
                           </div>
                         </div>
