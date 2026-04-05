@@ -20,7 +20,7 @@ export default function HumanMechanic() {
 
 
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    const apiKey = import.meta.env.GOOGLE_MAPS_API_KEY
     if (!apiKey || apiKey === 'placeholder_google_maps_key') {
       setLoading(false)
       setError('Google Maps API key is missing.')
@@ -148,7 +148,7 @@ export default function HumanMechanic() {
         <div ref={mapRef} className="h-full w-full" />
         
         {/* Map API Key Fallback */}
-        {(!import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY === 'placeholder_google_maps_key') && (
+        {(!import.meta.env.GOOGLE_MAPS_API_KEY || import.meta.env.GOOGLE_MAPS_API_KEY === 'placeholder_google_maps_key') && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-surface/60 dark:bg-surface-low/60 backdrop-blur-sm">
             <div className="w-16 h-16 rounded-full bg-navy/5 border border-navy/10 flex items-center justify-center mb-4">
               <MapPin className="w-8 h-8 text-navy/20" />

@@ -63,7 +63,7 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     stopCurrentGlobal()
 
     try {
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+      const apiKey = import.meta.env.OPENAI_API_KEY
       if (!apiKey || apiKey === 'sk-placeholder') {
         setStatus('error')
         return
@@ -104,7 +104,7 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     if (blobUrlRef.current) return blobUrlRef.current
 
     try {
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+      const apiKey = import.meta.env.OPENAI_API_KEY
       if (!apiKey || apiKey === 'sk-placeholder') return null
 
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
