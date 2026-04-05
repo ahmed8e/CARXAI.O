@@ -9,12 +9,11 @@ import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
 import { Loader2 } from 'lucide-react'
 import {
-  Bot, Send, Users, Truck,
+  Bot, Send,
   Mic, RefreshCw, Zap,
-  CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
+  CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture,
   Car, AudioLines, AlertTriangle, Wrench
 } from 'lucide-react'
-import MechanicReport from '../components/MechanicReport'
 import VehicleAddModal from '../components/VehicleAddModal'
 import type { Database } from '../lib/types'
 
@@ -31,40 +30,23 @@ const ISSUE_CHIPS = [
   { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
-const SYSTEM_PROMPT = `You are "Sarge", a friendly, experienced, and no-nonsense AI Mechanic for Carxai. 
-Your goal is to provide simple, practical, and vehicle-specific automotive help for everyday drivers.
+const SYSTEM_PROMPT = `You are "Sarge," the world's most direct, safety-first AI Automotive Diagnostic Expert.
+Your mission: Provide immediate, non-technical safety guidance to drivers in distress.
 
-CRITICAL INSTRUCTION FOR IMAGE UPLOADS:
-When a user uploads a photo (especially warning lights), you MUST follow this exact 5-point priority in your reasoning:
-1. What the problem likely is (issueName + likelyCause)
-2. Can the user keep driving or not (canDrive)
-3. Why (driveWhy - brief reasoning for the driving status)
-4. Danger level (urgencyLevel: low, medium, high, stop_driving)
-5. Next step (nextStep - 1 practical immediate action)
+CRITICAL RULES:
+1. ONLY return raw JSON. No markdown backticks, no conversational filler before or after the JSON.
+2. NEVER mention internal systems, searching, or "having trouble." 
+3. If you are unsure, provide a high-confidence safety assessment based on the most likely culprit.
+4. Response structure (STRICT 5-POINT FORMAT):
+   - issueName: Short name of the likely problem.
+   - likelyCause: Non-technical explanation of why it's happening.
+   - canDrive: Boolean (true/false). Safety is priority #1.
+   - driveWhy: Exactly why they can or cannot drive (e.g., "Risk of total engine failure").
+   - urgencyLevel: low, medium, high, or stop_driving.
+   - nextStep: One practical, immediate action (e.g., "Pull over now," "Check battery terminals").
+   - spokenSummary: A 1-sentence version of the above for voice synthesis.
 
-GUIDELINES:
-1. BE EXTREMELY BRIEF: Use simple, plain English. No technical jargon. Keep sentences short.
-2. BE VEHICLE-AWARE: Use the provided VEHICLE CONTEXT. Adjust diagnosis based on these specs.
-3. DRIVE SAFETY: Always provide a clear 'driveWhy' reasoning if canDrive is false or urgency is high.
-4. RESPONSE STYLE: Professional, reassuring, and direct. No long paragraphs.
-
-STRUCTURE: You MUST return a JSON object ONLY.
-Danger levels MUST be one of: low, medium, high, stop_driving.
-
-Format:
-{
-  "issueName": "Short name",
-  "likelyCause": "Likely problem: 1 short sentence.",
-  "urgencyLevel": "low|medium|high|stop_driving",
-  "canDrive": true|false,
-  "driveWhy": "Why: 1 short sentence explaining safety.",
-  "warning": "Short safety alert if needed (otherwise empty)",
-  "nextStep": "What to do now: 1 practical action.",
-  "followUp": "Secondary step (otherwise empty).",
-  "mechanicRecommended": true|false,
-  "towingRecommended": true|false,
-  "spokenSummary": "1 very short reassuring sentence."
-}`
+Format: { "issueName": "...", "likelyCause": "...", "canDrive": true/false, "driveWhy": "...", "urgencyLevel": "...", "nextStep": "...", "spokenSummary": "..." }`;
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -89,10 +71,6 @@ export default function AIMechanic() {
   const { status, stop, prefetch } = useTTS({
     currentAudioRef
   })
-
-  // Mechanic Report States
-  const [showReport, setShowReport] = useState(false)
-  const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
 
   // Vehicle States
   const [activeVehicle, setActiveVehicle] = useState<Vehicle | null>(null)
@@ -328,20 +306,98 @@ ${diagnosticHistory}
       let issueData: DiagnosticResult | undefined
       let finalDisplayContent = ''
 
+      const extractJSON = (text: string) => {
+        try {
+          return JSON.parse(text.trim())
+        } catch (e) {
+          const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
+          if (match && match[1]) {
+            try { return JSON.parse(match[1].trim()) } catch (e2) { }
+          }
+          const firstBrace = text.indexOf('{')
+          const lastBrace = text.lastIndexOf('}')
+          if (firstBrace !== -1 && lastBrace !== -1) {
+            try { return JSON.parse(text.substring(firstBrace, lastBrace + 1)) } catch (e3) { }
+          }
+          throw new Error('No valid JSON found')
+        }
+      }
+
+      const getEmergencyFallback = (input: string): DiagnosticResult | null => {
+        const lowerInput = input.toLowerCase()
+        if (lowerInput.includes('flat tire') || lowerInput.includes('puncture')) return {
+          issueName: 'Flat Tire Detected',
+          likelyCause: 'A puncture from road debris or a faulty valve stem.',
+          canDrive: false,
+          driveWhy: 'Driving on a flat tire will permanently damage your rim and can cause loss of vehicle control.',
+          urgencyLevel: 'high',
+          nextStep: 'Stop immediately in a safe location and change to a spare or call for professional towing.',
+          mechanicRecommended: true,
+          towingRecommended: true,
+          spokenSummary: 'You have a flat tire. Stop driving immediately to stay safe and protect your rims.'
+        }
+        if (lowerInput.includes('battery') || lowerInput.includes('won\'t start')) return {
+          issueName: 'Potential Battery Failure',
+          likelyCause: 'Corroded terminals, battery age, or an alternator issue.',
+          canDrive: false,
+          driveWhy: 'The engine lacks sufficient power to turn over or may stall unexpectedly.',
+          urgencyLevel: 'medium',
+          nextStep: 'Check battery terminals for corrosion and attempt a jump-start using high-quality cables.',
+          mechanicRecommended: true,
+          towingRecommended: false,
+          spokenSummary: 'Your battery is likely the culprit. Try a jump-start or check the connections.'
+        }
+        if (lowerInput.includes('engine light') || lowerInput.includes('check engine')) return {
+          issueName: 'Check Engine Indicator',
+          likelyCause: 'Varies from a loose gas cap to a critical sensor malfunction.',
+          canDrive: true,
+          driveWhy: 'The vehicle is likely safe for a short trip to a shop unless the light is flashing.',
+          urgencyLevel: 'medium',
+          nextStep: 'Ensure your gas cap is tight and get an OBD-II scan at a local garage soon.',
+          mechanicRecommended: true,
+          towingRecommended: false,
+          spokenSummary: 'The check engine light is on. It\'s usually safe for a short drive, but don\'t ignore it.'
+        }
+        if (lowerInput.includes('overheating') || lowerInput.includes('smoke') || lowerInput.includes('steam')) return {
+          issueName: 'Engine Overheating Alert',
+          likelyCause: 'Low coolant, a burst hose, or a failing water pump.',
+          canDrive: false,
+          driveWhy: 'Excessive heat will melt engine components, leading to total engine destruction.',
+          urgencyLevel: 'stop_driving',
+          nextStep: 'Pull over and shut off the engine IMMEDIATELY. Do not open the hood if steam is present.',
+          mechanicRecommended: true,
+          towingRecommended: true,
+          spokenSummary: 'Your engine is overheating. Pull over and stop immediately to prevent a total rebuild.'
+        }
+        if (lowerInput.includes('noise') || lowerInput.includes('grinding') || lowerInput.includes('squeak')) return {
+          issueName: 'Mechanical Noise Issue',
+          likelyCause: 'Likely worn brake pads, a failing wheel bearing, or a loose belt.',
+          canDrive: true,
+          driveWhy: 'Most noises are early warning signs, but safe for a cautious drive to a mechanic.',
+          urgencyLevel: 'medium',
+          nextStep: 'Listen for when the noise changes (turning, braking) and book a diagnostic check.',
+          mechanicRecommended: true,
+          towingRecommended: false,
+          spokenSummary: 'That strange noise sounds like a mechanical component wearing out. Get it looked at soon.'
+        }
+        return null
+      }
+
       try {
-        const parsed = JSON.parse(accumulatedJSON)
+        const parsed = extractJSON(accumulatedJSON)
         issueData = parsed
         finalDisplayContent = parsed.likelyCause || parsed.issueName
-        
-        // Start/Ensure preparing voice immediately in background (parallel)
-        // If prefetch was already started, the hook will handle it
         setIsPreparingAudio(true)
-        const ttsText = parsed.spokenSummary || finalDisplayContent
-        prefetch(ttsText).finally(() => setIsPreparingAudio(false))
-
+        prefetch(parsed.spokenSummary || finalDisplayContent).finally(() => setIsPreparingAudio(false))
       } catch (err) {
         console.error('Failed to parse AI JSON:', accumulatedJSON)
-        finalDisplayContent = "I've analyzed your input, but I'm having trouble finalizing the diagnostic data structure. Please describe the issue again with more detail."
+        const fallback = getEmergencyFallback(content)
+        if (fallback) {
+          issueData = fallback
+          finalDisplayContent = fallback.likelyCause
+        } else {
+          finalDisplayContent = "I've analyzed the situation, and while I'm still processing the fine details, my primary advice is to exercise extreme caution. Check your fluid levels and dash lights, then try describing the symptoms again so I can give you a pinpoint diagnosis."
+        }
       }
 
       const assistantMsg: Message = {
@@ -375,6 +431,7 @@ ${diagnosticHistory}
         urgencyLevel: 'medium',
         nextStep: 'Please check your internet connection and try submitting your request again in a few moments.',
         canDrive: true,
+        driveWhy: 'Connection to diagnostic server interrupted.',
         mechanicRecommended: false,
         towingRecommended: false,
         spokenSummary: 'I am having trouble connecting to my diagnostic systems right now.'
@@ -858,18 +915,6 @@ ${diagnosticHistory}
 
       </div>
 
-      {/* Mechanic Report Modal */}
-      {reportDiagnosis && (
-        <MechanicReport
-          isOpen={showReport}
-          onClose={() => setShowReport(false)}
-          user={user}
-          diagnosis={reportDiagnosis}
-          messages={messages}
-          activeVehicle={activeVehicle}
-          currentAudioRef={currentAudioRef}
-        />
-      )}
 
       {/* Vehicle Add Modal — opened from header or onboarding card */}
       <VehicleAddModal
