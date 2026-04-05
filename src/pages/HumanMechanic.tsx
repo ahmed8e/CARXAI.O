@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
 import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
 import type { NearbyPlace } from '../lib/types'
@@ -8,12 +9,13 @@ import { Users, MapPin, Star, Phone, Navigation, Search, Loader2, X } from 'luci
 const FILTERS = ['All', 'Open Now', 'Closest', 'Top Rated', 'Garage', 'Mechanic']
 
 export default function HumanMechanic() {
+  const location = useLocation()
   const [places, setPlaces] = useState<NearbyPlace[]>([])
   const [selected, setSelected] = useState<NearbyPlace | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeFilter, setActiveFilter] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(location.state?.initialSearch || '')
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])

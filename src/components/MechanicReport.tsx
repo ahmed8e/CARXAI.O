@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, Download, Copy, Share2,
@@ -34,7 +33,6 @@ export default function MechanicReport({
   activeVehicle,
   currentAudioRef
 }: MechanicReportProps) {
-  const navigate = useNavigate()
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
   const [loading, setLoading] = useState(true)
@@ -175,21 +173,21 @@ export default function MechanicReport({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           id="printable-report"
-          className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_30px_90px_rgba(0,0,0,0.3)] flex flex-col border border-white/10 print:max-h-none print:overflow-visible print:rounded-none"
+          className="relative w-full max-w-4xl max-h-[92vh] overflow-hidden bg-white rounded-[32px] shadow-[0_20px_70px_rgba(0,0,0,0.08)] flex flex-col border border-slate-200 print:max-h-none print:overflow-visible print:rounded-none"
         >
           {/* 1. Strong Top Header */}
-          <div className="px-8 py-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-20 print:hidden">
+          <div className="px-8 py-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-20 print:hidden">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-navy flex items-center justify-center shadow-xl shadow-navy/20">
+              <div className="w-12 h-12 rounded-2xl bg-[#0070E0] flex items-center justify-center shadow-xl shadow-[#0070E0]/20">
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <h2 className="text-xl font-display font-bold text-slate-900 dark:text-white tracking-tight">Mechanic Report</h2>
+                <h2 className="text-xl font-display font-bold text-slate-900 tracking-tight">Mechanic Report</h2>
                 <div className="flex items-center gap-3 mt-0.5">
                   <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     <Hash className="w-3 h-3" /> {reportId}
                   </div>
-                  <div className="w-1 h-1 rounded-full bg-slate-300" />
+                  <div className="w-1 h-1 rounded-full bg-slate-200" />
                   <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     <Calendar className="w-3 h-3" /> {date}
                   </div>
@@ -203,19 +201,19 @@ export default function MechanicReport({
               />
               <button 
                 onClick={onClose}
-                className="p-3 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl transition-all active:scale-95 group"
+                className="p-3 hover:bg-slate-50 rounded-2xl transition-all active:scale-95 group"
               >
-                <X className="w-6 h-6 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
+                <X className="w-6 h-6 text-slate-400 group-hover:text-slate-900 transition-colors" />
               </button>
             </div>
           </div>
 
           {/* Report Content */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-12 pb-24">
+          <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-12 pb-24 bg-white">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 text-navy animate-spin" />
-                <p className="text-xs font-black uppercase tracking-widest text-muted/70">Assembling Report Data...</p>
+                <Loader2 className="w-10 h-10 text-[#0070E0] animate-spin" />
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Assembling Report Data...</p>
               </div>
             ) : (
               <>
@@ -224,22 +222,22 @@ export default function MechanicReport({
                   {/* Customer Left Column */}
                   <div className="lg:col-span-1 space-y-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <User className="w-4 h-4 text-navy" />
+                      <User className="w-4 h-4 text-[#0070E0]" />
                       <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Customer Data</h3>
                     </div>
                     
-                    <div className="p-6 rounded-3xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 space-y-5">
+                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 space-y-5">
                       <div>
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</p>
-                        <p className="text-[15px] font-bold text-slate-900 dark:text-white">{profile?.full_name || user.email?.split('@')[0] || 'Verified Member'}</p>
+                        <p className="text-[15px] font-bold text-slate-900">{profile?.full_name || user.email?.split('@')[0] || 'Verified Member'}</p>
                       </div>
                       <div>
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone Number</p>
-                        <p className="text-[15px] font-bold text-slate-900 dark:text-white">{profile?.phone}</p>
+                        <p className="text-[15px] font-bold text-slate-900">{profile?.phone}</p>
                       </div>
                       <div className="pt-2">
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Record Email</p>
-                        <p className="text-xs font-bold text-slate-600 dark:text-slate-400 truncate">{user.email}</p>
+                        <p className="text-xs font-bold text-slate-600 truncate">{user.email}</p>
                       </div>
                     </div>
                   </div>
@@ -247,36 +245,36 @@ export default function MechanicReport({
                   {/* Vehicle Right Column */}
                   <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <Car className="w-4 h-4 text-navy" />
+                      <Car className="w-4 h-4 text-[#0070E0]" />
                       <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Vehicle Specification</h3>
                     </div>
 
-                    <div className="p-8 rounded-3xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5">
+                    <div className="p-8 rounded-3xl bg-slate-50 border border-slate-100">
                       {vehicle ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-12">
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Brand & Model</p>
-                            <p className="text-[15px] font-bold text-slate-900 dark:text-white leading-tight">{vehicle.make} {vehicle.model}</p>
+                            <p className="text-[15px] font-bold text-slate-900 leading-tight">{vehicle.make} {vehicle.model}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Model Year</p>
-                            <p className="text-[15px] font-bold text-slate-900 dark:text-white">{vehicle.year}</p>
+                            <p className="text-[15px] font-bold text-slate-900">{vehicle.year}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Plate Number</p>
-                            <p className="text-[15px] font-bold text-slate-900 dark:text-white tracking-widest">{vehicle.plate_number || '---'}</p>
+                            <p className="text-[15px] font-bold text-slate-900 tracking-widest">{vehicle.plate_number || '---'}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Engine Type</p>
-                            <p className="text-[13px] font-bold text-slate-600 dark:text-slate-300 uppercase">{vehicle.engine_type || 'N/A'}</p>
+                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.engine_type || 'N/A'}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Gearbox</p>
-                            <p className="text-[13px] font-bold text-slate-600 dark:text-slate-300 uppercase">{vehicle.gearbox || 'N/A'}</p>
+                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.gearbox || 'N/A'}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Mileage</p>
-                            <p className="text-[15px] font-bold text-slate-900 dark:text-white">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : '---'}</p>
+                            <p className="text-[15px] font-bold text-slate-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : '---'}</p>
                           </div>
                         </div>
                       ) : (
@@ -291,8 +289,8 @@ export default function MechanicReport({
                 {/* 4. Unified Diagnostic Analysis */}
                 <div className="space-y-8 pt-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-navy/5 flex items-center justify-center border border-navy/10">
-                      <ShieldAlert className="w-4 h-4 text-navy" />
+                    <div className="w-8 h-8 rounded-xl bg-[#0070E0]/5 flex items-center justify-center border border-[#0070E0]/10">
+                      <ShieldAlert className="w-4 h-4 text-[#0070E0]" />
                     </div>
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Official Diagnostic Analysis</h3>
                   </div>
@@ -301,32 +299,32 @@ export default function MechanicReport({
                     {/* Main Analysis Column */}
                     <div className="lg:col-span-12 space-y-8">
                       {/* Issue Reported Card */}
-                      <div className="p-8 rounded-[32px] bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 relative overflow-hidden">
+                      <div className="p-8 rounded-[32px] bg-slate-50 border border-slate-100 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-5">
-                          <Info className="w-16 h-16 text-navy" />
+                          <Info className="w-16 h-16 text-[#0070E0]" />
                         </div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Issue Reported by User</p>
-                        <p className="text-xl font-display font-medium text-slate-900 dark:text-white italic leading-relaxed relative z-10">
+                        <p className="text-xl font-display font-medium text-slate-900 italic leading-relaxed relative z-10">
                           "{messages.find(m => m.role === 'user')?.content || 'Vehicle performance issue reported'}"
                         </p>
                       </div>
 
-                      {/* Likely Cause Card — The Core Result */}
-                      <div className="bg-slate-900 dark:bg-black rounded-[40px] p-10 text-white shadow-2xl relative overflow-hidden group">
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/20 rounded-full blur-[100px] group-hover:bg-navy/30 transition-colors" />
+                      {/* Professional Diagnosis Card — The Core Result (Light Premium Redesign) */}
+                      <div className="bg-[#F0F7FF] rounded-[40px] p-10 text-slate-900 shadow-[0_15px_50px_rgba(0,112,224,0.08)] relative overflow-hidden group border border-[#0070E0]/10">
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#0070E0]/5 rounded-full blur-[100px]" />
                         
                         <div className="grid md:grid-cols-2 gap-10 relative z-10">
                           <div className="space-y-8">
                             <div>
-                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Professional Diagnosis</p>
-                              <h4 className="text-3xl font-display font-black tracking-tight italic mb-2">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Professional Diagnosis</p>
+                              <h4 className="text-3xl font-display font-black tracking-tight italic mb-2 text-[#0E1B39]">
                                 {diagnosis.issueName}
                               </h4>
                               {diagnosis.urgencyLevel && (
-                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
                                   diagnosis.urgencyLevel === 'stop_driving' || diagnosis.urgencyLevel === 'high'
-                                    ? 'bg-red-500/20 text-red-400 border-red-500/20'
-                                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20'
+                                    ? 'bg-red-50 text-red-600 border-red-100'
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                 }`}>
                                   <div className="w-1 h-1 rounded-full bg-current animate-pulse" />
                                   {getUrgencyBadge(diagnosis.urgencyLevel)}
@@ -335,17 +333,17 @@ export default function MechanicReport({
                             </div>
 
                             <div>
-                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Likely Root Cause</p>
-                              <p className="text-lg text-blue-100/90 leading-relaxed font-medium">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Likely Root Cause</p>
+                              <p className="text-lg text-[#0E1B39]/90 leading-relaxed font-medium">
                                 {diagnosis.likelyCause}
                               </p>
                             </div>
                           </div>
 
                           <div className="space-y-6">
-                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3">Action Required Now</p>
-                              <p className="text-base font-bold text-emerald-50 leading-snug">
+                            <div className="p-7 rounded-3xl bg-white shadow-sm border border-[#0070E0]/20">
+                              <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-3">Action Required Now</p>
+                              <p className="text-base font-bold text-slate-900 leading-snug">
                                 {diagnosis.nextStep}
                               </p>
                             </div>
@@ -353,15 +351,15 @@ export default function MechanicReport({
                             <div className="flex flex-wrap gap-3">
                               <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${
                                 diagnosis.canDrive 
-                                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20' 
-                                  : 'bg-red-500/20 text-red-400 border-red-500/20'
+                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                  : 'bg-red-50 text-red-600 border-red-100'
                               }`}>
                                 {diagnosis.canDrive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
                                 {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
                               </div>
 
                               {diagnosis.towingRecommended && (
-                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-orange-500/20 text-orange-400 border border-orange-500/20">
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-orange-50 text-orange-600 border border-orange-100">
                                   <Truck className="w-4 h-4" />
                                   Towing Recommended
                                 </div>
@@ -371,18 +369,18 @@ export default function MechanicReport({
                         </div>
 
                         {/* Certification Seal */}
-                        <div className="mt-10 pt-8 border-t border-white/10 flex items-center justify-between">
+                        <div className="mt-10 pt-8 border-t border-[#0070E0]/10 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full border-2 border-navy/30 flex items-center justify-center p-1 opacity-50">
-                               <Zap className="w-5 h-5 text-navy" fill="currentColor" />
+                            <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center p-1 opacity-70">
+                               <Zap className="w-5 h-5 text-[#0070E0]" fill="currentColor" />
                             </div>
                             <div>
-                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Certified AI Assessment</p>
-                              <p className="text-[10px] font-bold text-gray-500 uppercase">Verification ID: {reportId}</p>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Certified AI Assessment</p>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase">Verification ID: {reportId}</p>
                             </div>
                           </div>
                           <div className="hidden md:block">
-                             <p className="text-[8px] italic text-gray-600">Document generated by Carxai Automotive Intelligence Engine v4.0</p>
+                             <p className="text-[8px] italic text-slate-400">Document generated by Carxai Automotive Intelligence Engine v4.0</p>
                           </div>
                         </div>
                       </div>
@@ -390,13 +388,13 @@ export default function MechanicReport({
                   </div>
                 </div>
 
-                {/* 7. Attached Media (Mock) */}
+                {/* 7. Attached Media */}
                 {messages.some(m => m.imageUrl) && (
                   <div className="space-y-6 pt-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-on-surface/90 dark:text-white">Attached Evidence</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Attached Evidence</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {messages.filter(m => m.imageUrl).map((m, idx) => (
-                        <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 dark:border-overlay shadow-sm transition-transform hover:scale-105">
+                        <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-105">
                           <img src={m.imageUrl} alt="Diagnosis Evidence" className="w-full h-full object-cover" />
                         </div>
                       ))}
@@ -404,12 +402,12 @@ export default function MechanicReport({
                   </div>
                 )}
 
-                {/* 8. Disclaimer */}
-                <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-3xl border border-red-100 dark:border-red-900/20 flex gap-4">
+                {/* 8. Disclaimer Column Style */}
+                <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex gap-4">
                   <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
                   <div>
                     <h5 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Disclaimer</h5>
-                    <p className="text-xs text-red-800/70 dark:text-red-400/70 font-medium leading-relaxed">
+                    <p className="text-xs text-red-900/60 font-medium leading-relaxed">
                       This is a preliminary AI-generated report for informational purposes. While highly accurate, this report does not replace a physical inspection. A certified mechanic must confirm the final diagnosis before performing repairs.
                     </p>
                   </div>
@@ -418,38 +416,42 @@ export default function MechanicReport({
             )}
           </div>
 
-          {/* 6. Action Section (Organized & Unified) */}
+          {/* 6. Action Section (Premium Light Mode Flow) */}
           {!loading && (
-            <div className="px-10 py-10 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 backdrop-blur-xl z-30 print:hidden">
-              <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                  <button 
+            <div className="px-10 py-10 border-t border-slate-200 bg-white sticky bottom-0 z-30 print:hidden">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                {/* Primary Action */}
+                <div className="w-full lg:w-auto">
+                  <motion.button 
+                    whileHover={{ y: -2, boxShadow: '0 15px 50px rgba(0,112,224,0.25)' }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => window.print()}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-navy text-white text-[11px] font-bold uppercase tracking-widest shadow-2xl shadow-navy/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    className="relative overflow-hidden w-full lg:w-auto flex items-center justify-center gap-3 px-12 py-5 rounded-[20px] bg-[#0070E0] text-white text-[12px] font-bold uppercase tracking-[0.2em] shadow-[0_10px_40px_rgba(0,112,224,0.18)] transition-all duration-300 group"
                   >
-                    <Download className="w-4 h-4" /> Download Official PDF
-                  </button>
-                  <button 
-                    onClick={() => navigate('/dashboard/towing')}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[11px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  >
-                    <Truck className="w-4 h-4" /> Order Pro Towing
-                  </button>
+                    {/* Sophisticated White Sheen Sweep */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                    <Download className="w-5 h-5 stroke-[2.5]" /> Download Official PDF
+                  </motion.button>
                 </div>
 
-                <div className="flex items-center gap-3 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-white/10 pt-6 lg:pt-0 lg:pl-6">
-                  <button 
-                    onClick={copySummary}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-7 py-5 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.95]"
-                  >
-                    <Copy className="w-4 h-4 text-slate-400" /> Copy
-                  </button>
-                  <button 
+                {/* Secondary Utility Actions */}
+                <div className="flex items-center gap-4 w-full lg:w-auto lg:border-l border-slate-200 lg:pl-8 pt-6 lg:pt-0 border-t lg:border-t-0">
+                  <motion.button 
+                    whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleShare}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-3 px-7 py-5 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.95]"
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300"
                   >
-                    <Share2 className="w-4 h-4 text-slate-400" /> Share
-                  </button>
+                    <Share2 className="w-4 h-4" /> Share Report
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={copySummary}
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300"
+                  >
+                    <Copy className="w-4 h-4" /> Copy Summary
+                  </motion.button>
                 </div>
               </div>
             </div>

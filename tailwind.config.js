@@ -69,13 +69,6 @@ export default {
         'dark-gradient': 'linear-gradient(180deg, #062B3D 0%, #041E2B 100%)',
         'hero-mesh': 'radial-gradient(ellipse at 70% 50%, rgba(87,214,232,0.08) 0%, transparent 60%)',
       },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'slide-up': 'slideUp 0.4s ease-out',
-        'fade-in': 'fadeIn 0.3s ease-out',
-      },
       keyframes: {
         glowPulse: {
           '0%, 100%': { boxShadow: '0 0 20px rgba(87, 214, 232, 0.2)' },
@@ -93,6 +86,17 @@ export default {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        }
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'slide-up': 'slideUp 0.4s ease-out',
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'shimmer': 'shimmer 2s infinite',
       },
     },
   },

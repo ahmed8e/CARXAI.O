@@ -1,6 +1,7 @@
 /// <reference types="google.maps" />
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
@@ -153,8 +154,9 @@ export default function Towing() {
     }
   }
 
+  const location = useLocation()
   const [isSheetExpanded, setIsSheetExpanded] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(location.state?.initialSearch || '')
 
   const filteredPlaces = places.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

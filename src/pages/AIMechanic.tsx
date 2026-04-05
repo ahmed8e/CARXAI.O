@@ -12,9 +12,10 @@ import {
   Bot, Send,
   Mic, RefreshCw, Zap,
   CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture,
-  Car, AudioLines, AlertTriangle, Wrench
+  Car, AudioLines, AlertTriangle, Wrench, Search, Truck, FileText
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
+import MechanicReport from '../components/MechanicReport'
 import type { Database } from '../lib/types'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
@@ -80,6 +81,8 @@ export default function AIMechanic() {
   const [diagnosticHistory, setDiagnosticHistory] = useState<string>('')
   const [streamingMessage, setStreamingMessage] = useState<string>('')
   const [isPreparingAudio, setIsPreparingAudio] = useState(false)
+  const [showReport, setShowReport] = useState(false)
+  const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -696,6 +699,53 @@ ${diagnosticHistory}
                           </div>
                           <p className="text-[13px] font-bold text-navy leading-snug">{msg.issueData.nextStep}</p>
                         </div>
+
+                        {/* Stage 1: Action Buttons (Premium Brand Redesign #0070E0) */}
+                        <div className="pt-8 flex flex-col gap-4.5">
+                          <motion.button
+                            whileHover={{ y: -2, boxShadow: '0 15px 50px rgba(0,112,224,0.25)' }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => {
+                              setReportDiagnosis(msg.issueData!);
+                              setShowReport(true);
+                            }}
+                            className="relative overflow-hidden w-full flex items-center justify-center gap-3.5 px-8 py-5 rounded-[22px] bg-[#0070E0] text-white text-[13px] font-bold uppercase tracking-[0.18em] shadow-[0_10px_40px_rgba(0,112,224,0.18)] transition-all duration-300 group"
+                          >
+                            {/* Sophisticated White Sheen Sweep */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                            
+                            <motion.div whileHover={{ scale: 1.1 }}>
+                              <FileText className="w-5.5 h-5.5 stroke-[2.5]" />
+                            </motion.div>
+                            Generate Official Report
+                          </motion.button>
+                          
+                          <div className="flex gap-4 w-full">
+                            <motion.button
+                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.issueName } })}
+                              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-4.5 rounded-[22px] bg-white border-[1.5px] border-[#E2E8F0] text-[#0E1B39] text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
+                            >
+                              <motion.div whileHover={{ scale: 1.1 }}>
+                                <Search className="w-5 h-5 stroke-[2.5]" />
+                              </motion.div>
+                              Find Mechanic
+                            </motion.button>
+                            
+                            <motion.button
+                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.issueName } })}
+                              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-4.5 rounded-[22px] bg-white border-[1.5px] border-[#E2E8F0] text-[#0E1B39] text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
+                            >
+                              <motion.div whileHover={{ scale: 1.1 }}>
+                                <Truck className="w-5 h-5 stroke-[2.5]" />
+                              </motion.div>
+                              Request Towing
+                            </motion.button>
+                          </div>
+                        </div>
                       </div>
                     ) : formatContent(msg.content)
                   ) : (
@@ -926,6 +976,19 @@ ${diagnosticHistory}
           setShowVehicleModal(false)
         }}
       />
+
+      {/* Mechanic Report Modal — Stage 2 Actions inside */}
+      {reportDiagnosis && (
+        <MechanicReport
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          user={user}
+          diagnosis={reportDiagnosis}
+          messages={messages}
+          activeVehicle={activeVehicle}
+          currentAudioRef={currentAudioRef}
+        />
+      )}
     </div>
   )
 }
