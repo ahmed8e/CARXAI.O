@@ -12,7 +12,12 @@ export default function Auth() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/dashboard')
+      if (sessionStorage.getItem('newly_signed_up') === 'true') {
+        sessionStorage.removeItem('newly_signed_up')
+        navigate('/choose-plan')
+      } else {
+        navigate('/dashboard')
+      }
     }
   }, [user, navigate])
   
@@ -75,7 +80,8 @@ export default function Auth() {
         // Check if user is confirmed. If not, don't redirect, show message.
         if (data?.session) {
           // If session is present, they are logged in (likely email confirm is OFF)
-          navigate('/dashboard')
+          sessionStorage.setItem('newly_signed_up', 'true')
+          navigate('/choose-plan')
         } else {
           // No session usually means email confirmation is sent
           setIsSuccess(true)

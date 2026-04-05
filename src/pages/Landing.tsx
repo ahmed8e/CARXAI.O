@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
+import Pricing from '../components/Pricing'
 import { 
   Bot, 
   Users, 
@@ -122,6 +123,7 @@ export default function Landing() {
               {[
                 { name: 'Features', id: 'features' },
                 { name: 'How it works', id: 'how-it-works' },
+                { name: 'Pricing', id: 'pricing' },
                 { name: 'Reviews', id: 'reviews' },
               ].map((link) => (
                 <a 
@@ -338,16 +340,16 @@ export default function Landing() {
                 className="flex flex-col sm:flex-row items-center gap-5"
               >
                 <button 
-                  onClick={() => navigate('/register')} 
+                  onClick={() => navigate('/auth?mode=register')} 
                   className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_40px_rgba(0,112,224,0.25)] hover:translate-y-[-4px] hover:brightness-110 transition-all"
                 >
-                  Get Started
+                  Start 3 Days Free
                 </button>
                 <button 
-                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} 
+                  onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
                   className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
                 >
-                  See How It Works
+                  View Pricing
                 </button>
               </motion.div>
 
@@ -679,6 +681,7 @@ export default function Landing() {
           </div>
         </section>
 
+        <Pricing />
 
         {/* Final CTA */}
         <section className="relative py-20 md:py-32 px-6 text-center flex flex-col items-center">

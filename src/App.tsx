@@ -16,6 +16,7 @@ import Towing from './pages/Towing'
 import NearbyMap from './pages/NearbyMap'
 import MyAccount from './pages/MyAccount'
 import Vehicles from './pages/Vehicles'
+import ChoosePlan from './pages/ChoosePlan'
 
 export default function App() {
   return (
@@ -33,6 +34,11 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
 
             {/* Protected app routes */}
+            <Route path="/choose-plan" element={
+              <ProtectedRoute>
+                <ChoosePlan />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <AppLayout>
