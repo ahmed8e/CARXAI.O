@@ -199,17 +199,18 @@ export interface Message {
 }
 
 export interface DiagnosticResult {
-  issueName: string
-  likelyCause: string
-  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving'
-  nextStep: string
-  warning?: string
-  followUp?: string
-  canDrive: boolean
-  mechanicRecommended: boolean
-  towingRecommended: boolean
-  missingInfo?: string
-  spokenSummary?: string
+  issueName: string;
+  likelyCause: string;
+  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving';
+  canDrive: boolean;
+  driveWhy: string;
+  nextStep: string;
+  warning?: string;
+  followUp?: string;
+  mechanicRecommended: boolean;
+  towingRecommended: boolean;
+  missingInfo?: string;
+  spokenSummary?: string;
 }
 
 export interface NearbyPlace {

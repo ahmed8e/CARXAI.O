@@ -12,7 +12,7 @@ import {
   Bot, Send, Users, Truck,
   Mic, RefreshCw, Zap,
   CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture, ShieldAlert, FileText,
-  Car, AudioLines
+  Car, AudioLines, AlertTriangle, Wrench
 } from 'lucide-react'
 import MechanicReport from '../components/MechanicReport'
 import VehicleAddModal from '../components/VehicleAddModal'
@@ -34,30 +34,36 @@ const ISSUE_CHIPS = [
 const SYSTEM_PROMPT = `You are "Sarge", a friendly, experienced, and no-nonsense AI Mechanic for Carxai. 
 Your goal is to provide simple, practical, and vehicle-specific automotive help for everyday drivers.
 
+CRITICAL INSTRUCTION FOR IMAGE UPLOADS:
+When a user uploads a photo (especially warning lights), you MUST follow this exact 5-point priority in your reasoning:
+1. What the problem likely is (issueName + likelyCause)
+2. Can the user keep driving or not (canDrive)
+3. Why (driveWhy - brief reasoning for the driving status)
+4. Danger level (urgencyLevel: low, medium, high, stop_driving)
+5. Next step (nextStep - 1 practical immediate action)
+
 GUIDELINES:
-1. BE PRACTICAL: Use simple, plain English. Avoid deep technical jargon. Focus on what a normal driver needs to know.
-2. BE VEHICLE-AWARE: Always use the provided VEHICLE CONTEXT (Brand, Model, Year, Fuel, Engine, Gearbox, Mileage). Adjust your diagnosis based on these specs. For example, high mileage (>150k km) suggests wear-and-tear; electric cars don't have spark plugs.
-3. ANALYSIS OF PATTERNS: Carefully review the DIAGNOSTIC HISTORY. If the user has reported the SAME OR RELATED issue before (e.g., repeating battery, starting, or overheating issues), explicitly mention this pattern and adjust the diagnosis for a recurring problem.
-4. MULTI-MODAL REASONING: If an image is provided (like a dashboard warning light), prioritize its analysis while combining it with vehicle info and history.
-5. FALLBACK: If vehicle info is missing, provide a helpful general diagnosis but suggest that adding car details would improve accuracy.
-6. RESPONSE STYLE: Keep it short, professional, and reassuring. No long paragraphs.
+1. BE EXTREMELY BRIEF: Use simple, plain English. No technical jargon. Keep sentences short.
+2. BE VEHICLE-AWARE: Use the provided VEHICLE CONTEXT. Adjust diagnosis based on these specs.
+3. DRIVE SAFETY: Always provide a clear 'driveWhy' reasoning if canDrive is false or urgency is high.
+4. RESPONSE STYLE: Professional, reassuring, and direct. No long paragraphs.
 
 STRUCTURE: You MUST return a JSON object ONLY.
 Danger levels MUST be one of: low, medium, high, stop_driving.
 
 Format:
 {
-  "issueName": "Short, clear name of the problem",
-  "likelyCause": "What it likely means: 1-2 simple, clear sentences.",
+  "issueName": "Short name",
+  "likelyCause": "Likely problem: 1 short sentence.",
   "urgencyLevel": "low|medium|high|stop_driving",
-  "warning": "Short safety alert if needed (otherwise empty)",
   "canDrive": true|false,
-  "nextStep": "What to do now: 1 practical, immediate action sentence.",
-  "followUp": "A secondary practical step (e.g., check fluid level, visit a shop).",
+  "driveWhy": "Why: 1 short sentence explaining safety.",
+  "warning": "Short safety alert if needed (otherwise empty)",
+  "nextStep": "What to do now: 1 practical action.",
+  "followUp": "Secondary step (otherwise empty).",
   "mechanicRecommended": true|false,
   "towingRecommended": true|false,
-  "missingInfo": "Ask ONE specific question if key info is missing (otherwise empty).",
-  "spokenSummary": "A very short (1 sentence), reassuring spoken summary."
+  "spokenSummary": "1 very short reassuring sentence."
 }`
 
 export default function AIMechanic() {
@@ -584,17 +590,53 @@ ${diagnosticHistory}
                   }`}>
                   {msg.role === 'assistant' ? (
                     msg.issueData ? (
-                      <div className="space-y-4">
+                      <div className="space-y-5">
+                        {/* 1. Likely Problem */}
                         <div>
-                          <h3 className="text-xl font-display font-bold text-on-surface tracking-tight mb-2 leading-none">{msg.issueData.issueName}</h3>
-                          <p className="text-on-surface/80 leading-relaxed font-medium text-[13px]">{msg.issueData.likelyCause}</p>
+                          <h3 className="text-lg font-bold text-navy tracking-tight mb-1">{msg.issueData.issueName}</h3>
+                          <p className="text-on-surface/80 leading-relaxed text-[13px] font-medium">{msg.issueData.likelyCause}</p>
                         </div>
 
-                        <div className="space-y-3 pt-4 border-t border-navy/5">
-                          <div className="space-y-1.5">
-                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">What to do now</p>
-                            <p className="text-[13px] font-bold text-navy leading-tight">{msg.issueData.nextStep}</p>
+                        {/* 2 & 3. Driving Safety + Why */}
+                        <div className="pt-4 border-t border-navy/5">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${msg.issueData.canDrive ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
+                              {msg.issueData.canDrive ? (
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                              ) : (
+                                <AlertTriangle className={`w-3 h-3 ${msg.issueData.canDrive ? 'text-emerald-500' : 'text-rose-500'}`} />
+                              )}
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Can you keep driving?</p>
                           </div>
+                          <div className="flex flex-col gap-1.5 pl-7">
+                            <p className={`text-sm font-bold ${msg.issueData.canDrive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                              {msg.issueData.canDrive ? 'Yes, but be careful' : 'No, stop as soon as safe'}
+                            </p>
+                            <p className="text-[12px] text-on-surface/60 italic leading-tight">{msg.issueData.driveWhy}</p>
+                          </div>
+                        </div>
+
+                        {/* 4. Danger Level */}
+                        <div className="pt-4 border-t border-navy/5">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Activity className="w-3.5 h-3.5 text-navy/30" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Danger Level</p>
+                          </div>
+                          <div className="pl-7">
+                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
+                              {getUrgencyBadge(msg.issueData.urgencyLevel)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 5. Next Step */}
+                        <div className="pt-4 border-t border-navy/5 bg-navy/[0.02] -mx-6 -mb-4.5 px-6 pb-4.5 rounded-b-[26px]">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <Wrench className="w-3.5 h-3.5 text-navy/40" />
+                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">Next Step</p>
+                          </div>
+                          <p className="text-[13px] font-bold text-navy leading-snug">{msg.issueData.nextStep}</p>
                         </div>
                       </div>
                     ) : formatContent(msg.content)
@@ -613,73 +655,6 @@ ${diagnosticHistory}
                         : msg.content
                     }
                   />
-                )}
-
-                {/* ── LUXURY Diagnosis Toolkit 2.0 ── */}
-                {msg.issueData && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="mt-6 p-6 rounded-[34px] bg-white/40 dark:bg-surface-high/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_20px_50px_rgba(0,18,51,0.12)] relative overflow-hidden group/toolkit"
-                  >
-                    {/* Atmospheric Glow */}
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-navy/[0.03] blur-3xl pointer-events-none" />
-
-                    <div className="flex items-center justify-between mb-6 relative z-10">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-lg bg-navy/5 flex items-center justify-center border border-navy/10">
-                            <Activity className="w-3.5 h-3.5 text-navy/60" />
-                          </div>
-                          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40 leading-none">Status Check</p>
-                        </div>
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-all duration-500 ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                          <div className="w-1 h-1 rounded-full bg-current animate-pulse" />
-                          {getUrgencyBadge(msg.issueData.urgencyLevel)}
-                        </div>
-                      </div>
-                      {msg.issueData.warning && (
-                        <motion.div
-                          animate={{ opacity: [0.8, 1, 0.8] }}
-                          transition={{ duration: 3, repeat: Infinity }}
-                          className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-red-600 bg-red-50/50 px-3 py-2 rounded-xl border border-red-200/30"
-                        >
-                          <ShieldAlert className="w-3.5 h-3.5" />
-                          {msg.issueData.warning}
-                        </motion.div>
-                      )}
-                    </div>
-
-                    <motion.button
-                      onClick={() => {
-                        setReportDiagnosis(msg.issueData!)
-                        setShowReport(true)
-                      }}
-                      className="w-full flex items-center justify-center gap-3 py-4.5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.15em] transition-all bg-navy text-white shadow-xl shadow-navy/10 hover:shadow-navy/20 active:scale-[0.98] relative z-10"
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <FileText className="w-4.5 h-4.5" /> Generate Official Report
-                    </motion.button>
-
-                    <div className="grid grid-cols-2 gap-3 relative z-10 mt-3">
-                      <motion.button
-                        onClick={() => navigate('/dashboard/mechanic')}
-                        className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        <Users className="w-4 h-4 text-navy/40" /> Human Help
-                      </motion.button>
-                      <motion.button
-                        onClick={() => navigate('/dashboard/towing')}
-                        className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-[10px] font-bold uppercase tracking-wide border border-overlay bg-surface/50 text-on-surface hover:bg-surface transition-all"
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        <Truck className="w-4 h-4 text-navy/40" /> Emergency
-                      </motion.button>
-                    </div>
-
-                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-navy/5 blur-3xl opacity-0 group-hover/toolkit:opacity-100 transition-opacity" />
-                  </motion.div>
                 )}
 
 
