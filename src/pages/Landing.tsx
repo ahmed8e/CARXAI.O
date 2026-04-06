@@ -5,12 +5,12 @@ import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
 import Pricing from '../components/Pricing'
+import ReviewsSlider from '../components/ReviewsSlider'
 import { 
   Bot, 
   Users, 
   Truck, 
   CheckCircle2, 
-  Star, 
   Zap,
   Clock,
   Check,
@@ -42,14 +42,12 @@ const features = [
 ]
 
 const reviews = [
-  { name: 'Jason M.', car: 'Toyota RAV4', rating: 5, text: 'Saved me from an unnecessary garage visit.', image: '/JBJ RIV 1.jpg' },
-  { name: 'Jessica W.', car: 'BMW 3 Series', rating: 5, text: 'I understood the warning light in seconds.', image: '/JBJ RIV 2.jpg' },
-  { name: 'Sarah J.', car: 'VW Golf', rating: 5, text: 'Found towing in minutes.', image: '/JBJ RIV 3.jpg' },
-  { name: 'Michael B.', car: 'Audi A3', rating: 5, text: 'Simple, clear, and actually useful.', image: '/JBJ RIV 4.jpg' },
-  { name: 'Robert T.', car: 'Mercedes C-Class', rating: 5, text: 'I found help nearby much faster.', image: '/JBJ RIV 5.jpg' },
-  { name: 'Ryan K.', car: 'Peugeot 208', rating: 5, text: 'Much clearer than a mechanic\'s explanation.', image: '/JBJ RIV 6.jpg' },
-  { name: 'David S.', car: 'Ford Focus', rating: 5, text: 'Everything you need in one smart app.', image: '/JBJ RIV 7.jpg' },
-  { name: 'Emily R.', car: 'Nissan Qashqai', rating: 5, text: 'The AI mechanic is surprisingly accurate.', image: '/JBJ RIV 8.jpg' },
+  { name: 'Jason M.', car: 'Toyota RAV4', rating: 5, text: 'Saved me from an unnecessary garage visit. The AI diagnosis was spot on and explained the warning light in simple terms.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
+  { name: 'Jessica W.', car: 'BMW 3 Series', rating: 5, text: 'I understood the warning light in seconds. Usually, I\'d spend an hour Googling and getting more confused.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
+  { name: 'Sarah J.', car: 'VW Golf', rating: 5, text: 'Found towing in minutes when I was stuck on the highway. Truly a lifesaver in stressful situations.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
+  { name: 'Michael B.', car: 'Audi A3', rating: 5, text: 'Simple, clear, and actually useful. It feels like having a professional mechanic in my pocket at all times.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
+  { name: 'Robert T.', car: 'Mercedes C-Class', rating: 5, text: 'I found help nearby much faster than using traditional search. The map view is incredibly helpful.', date: '5 days ago', image: '/JBJ RIV 5.jpg' },
+  { name: 'Ryan K.', car: 'Peugeot 208', rating: 5, text: 'Much clearer than a mechanic\'s explanation. I finally feel like I actually understand what\'s happening with my car.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
 ]
 
 const steps = [
@@ -607,78 +605,16 @@ export default function Landing() {
         </section>
 
         {/* Reviews Section */}
-        <section id="reviews" className="py-12 md:py-20 px-0 overflow-hidden">
+        <section id="reviews" className="py-20 md:py-32 px-0 bg-[#f9fafc]">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Testimonials</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">Trusted by drivers</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community.</p>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Carxai</h2>
+            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community of supported drivers.</p>
           </div>
 
-          <div className="relative group/marquee">
-            {/* Gradient Masks for edges */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none" />
-
-            <motion.div 
-              className="flex gap-6 px-6"
-              drag="x"
-              dragConstraints={{ right: 0, left: -2400 }}
-              animate={{ x: [0, -2400] }}
-              transition={{
-                x: {
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 60,
-                  ease: "linear",
-                }
-              }}
-              whileHover={{ transition: { duration: 120 } }} 
-              style={{ width: "fit-content" }}
-            >
-              {[...reviews, ...reviews, ...reviews].map((rev, i) => (
-                <div 
-                  key={i} 
-                  className="flex-shrink-0 w-[320px] md:w-[400px] p-10 rounded-[32px] bg-surface dark:bg-surface-high/40 border border-overlay shadow-sm relative group transition-all duration-500 overflow-hidden hover:shadow-xl hover:border-navy/20"
-                >
-                  <div className="relative z-10 flex flex-col h-full">
-                    {/* Stars */}
-                    <div className="flex gap-1.5 mb-8 text-navy">
-                      {[...Array(5)].map((_, j) => (
-                        <Star key={j} className="w-5 h-5 fill-current filter drop-shadow-[0_0_8px_rgba(0,112,224,0.3)]" />
-                      ))}
-                    </div>
-
-                    {/* Review Quote */}
-                    <p className="text-xl md:text-2xl font-bold mb-10 text-on-surface italic leading-tight flex-grow">"{rev.text}"</p>
-                    
-                    {/* Footer / Metadata */}
-                    <div className="flex items-center justify-between mt-auto pt-6 border-t border-overlay">
-                      <div className="flex items-center gap-4">
-                        {/* Reviewer Avatar */}
-                        <div className="relative w-12 h-12 rounded-full border-2 border-surface shadow-md overflow-hidden ring-4 ring-surface-low dark:ring-slate-900 group-hover:ring-navy/5 transition-all">
-                          <img 
-                            src={rev.image} 
-                            alt={rev.name} 
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <div className="font-bold text-on-surface text-base mb-0.5">{rev.name}</div>
-                          <div className="text-[9px] text-navy font-black uppercase tracking-[0.2em]">{rev.car}</div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-1.5 text-navy/40">
-                         <Star className="w-3.5 h-3.5 fill-current" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+          <ReviewsSlider reviews={reviews} />
         </section>
 
         <Pricing />
@@ -715,10 +651,10 @@ export default function Landing() {
               {/* Brand Col */}
               <div className="flex flex-col items-start gap-6 max-w-sm">
                 <div className="flex items-center gap-3 group">
-                  <div className="w-12 h-12 rounded-xl bg-surface dark:bg-surface-low border border-overlay flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:border-navy/30 transition-all">
-                    <Zap className="w-6 h-6 text-navy" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <Zap size={24} className="group-hover:scale-110 transition-transform" />
                   </div>
-                  <span className="font-display font-black text-2xl tracking-tighter text-on-surface">
+                  <span className="font-display font-black text-3xl tracking-tighter text-on-surface -ml-1">
                     car<span className="text-navy">x</span>ai
                   </span>
                 </div>
