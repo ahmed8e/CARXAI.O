@@ -645,11 +645,11 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-20 px-6 bg-surface-low dark:bg-surface-low border-t border-overlay">
+        <footer className="py-16 md:py-24 px-6 bg-surface-low dark:bg-surface-low border-t border-overlay/80 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-16 md:gap-24 mb-16">
+            <div className="flex flex-col md:flex-row gap-14 md:gap-24 mb-16">
               {/* Brand Col */}
-              <div className="flex flex-col items-start gap-6 max-w-sm">
+              <div className="flex flex-col items-start gap-5 max-w-xs">
                 <div className="flex items-center gap-3 group">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
                     <Zap size={24} className="group-hover:scale-110 transition-transform" />
@@ -658,15 +658,15 @@ export default function Landing() {
                     car<span className="text-navy">x</span>ai
                   </span>
                 </div>
-                <p className="text-muted font-medium leading-relaxed">
-                  Your all-in-one digital mechanic. Instant AI diagnosis, local expert connection, and fast roadside support.
+                <p className="text-[15px] font-medium text-muted leading-relaxed">
+                  Your personal AI mechanic. Instant diagnostics, trusted network, and roadside support.
                 </p>
               </div>
 
               {/* Links Cols */}
-              <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-10">
-                <div className="flex flex-col gap-5">
-                  <h4 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface mb-2">Platform</h4>
+              <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-12">
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Platform</h4>
                   {[
                     { name: 'Features', id: 'features' },
                     { name: 'How It Works', id: 'how-it-works' },
@@ -682,15 +682,15 @@ export default function Landing() {
                           el.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="text-sm font-bold text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
+                      className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
                     >
                       {item.name}
                     </a>
                   ))}
                 </div>
 
-                <div className="flex flex-col gap-5">
-                  <h4 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface mb-2">Company</h4>
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Company</h4>
                   {[
                     { name: 'Reviews', id: 'reviews' },
                     { name: 'Contact', id: 'contact' },
@@ -715,7 +715,7 @@ export default function Landing() {
                             el.scrollIntoView({ behavior: 'smooth' });
                           }
                         }}
-                        className="text-sm font-bold text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
+                        className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
                       >
                         {item.name}
                       </a>
@@ -723,29 +723,27 @@ export default function Landing() {
                   ))}
                 </div>
 
-                <div className="flex flex-col gap-5 col-span-2 md:col-span-1 border-t border-overlay pt-8 md:border-0 md:pt-0">
-                  <h4 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface mb-2">Stay Updated</h4>
-                  <p className="text-sm font-medium text-muted mb-4">Follow our journey and get the latest automotive AI news.</p>
+                <div className="flex flex-col gap-4 col-span-2 md:col-span-1 pt-6 md:pt-0 mt-4 md:mt-0">
+                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Social</h4>
                   <div className="flex gap-3">
-                    <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-surface dark:bg-surface-low border border-overlay flex items-center justify-center text-muted hover:text-navy hover:border-navy/30 hover:shadow-md transition-all">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                    <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-2xl bg-white border border-overlay flex items-center justify-center text-muted hover:text-navy hover:border-navy/30 hover:shadow-lg transition-all group">
+                      <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                     </a>
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-surface dark:bg-surface-low border border-overlay flex items-center justify-center text-muted hover:text-navy hover:border-navy/30 hover:shadow-md transition-all">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="w-12 h-12 rounded-2xl bg-white border border-overlay flex items-center justify-center text-muted hover:text-navy hover:border-navy/30 hover:shadow-lg transition-all group">
+                      <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
                     </a>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-overlay">
-              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-overlay">
+              <p className="text-muted/80 text-[13px] font-medium tracking-wide">
                 © 2026 Carxai. All rights reserved.
               </p>
               <div className="flex gap-6">
-                <Link to="/privacy" className="text-xs font-bold text-muted hover:text-navy transition-colors">Privacy Policy</Link>
-                <Link to="/terms" className="text-xs font-bold text-muted hover:text-navy transition-colors">Terms of Service</Link>
+                <Link to="/privacy" className="text-[13px] font-medium text-muted hover:text-navy transition-colors">Privacy Policy</Link>
+                <Link to="/terms" className="text-[13px] font-medium text-muted hover:text-navy transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>

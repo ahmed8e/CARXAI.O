@@ -52,12 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    const now = new Date();
+    const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
     const { data, error } = await supabase.auth.signUp({ 
       email, 
       password,
       options: {
         data: {
           full_name: fullName,
+          subscription_status: 'trialing',
+          trial_started_at: now.toISOString(),
+          trial_ends_at: threeDaysLater.toISOString(),
+          plan: 'Pro',
+          is_paid_user: false
         }
       }
     })

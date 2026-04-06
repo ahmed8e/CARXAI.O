@@ -8,6 +8,7 @@ import {
   CircuitBoard, MapPin, Sparkles
 } from 'lucide-react'
 import Navbar from './Navbar'
+import Paywall from './Paywall'
 
 // ── Navigation groups ────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -43,6 +44,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const userInitial = user?.email?.[0]?.toUpperCase() ?? 'U'
   const userName    = user?.email?.split('@')[0] ?? 'User'
+
+  // Trial expiration logic
+  const trialEndsAtStr = user?.user_metadata?.trial_ends_at
+  const subscriptionStatus = user?.user_metadata?.subscription_status || 'free'
+  
+  let isExpired = false
+  if (trialEndsAtStr && subscriptionStatus !== 'active') {
+    const trialEndsAt = new Date(trialEndsAtStr)
+    if (new Date() > trialEndsAt) {
+      isExpired = true
+    }
+  }
 
   // ── Sidebar JSX ──────────────────────────────────────────────────
   function SidebarContent({ mobile = false }: { mobile?: boolean }) {
@@ -228,9 +241,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(5.5rem_+_env(safe-area-inset-top))]">
-        <main className="flex-1 overflow-y-auto">
-          {children}
+      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(5.5rem_+_env(safe-area-inset-top))] relative">
+        <main className="flex-1 overflow-y-auto relative">
+          {isExpired ? <Paywall /> : children}
         </main>
       </div>
     </div>
