@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 import { Crown, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react'
-import { POLAR_LINKS } from '../lib/pricing'
+import { POLAR_CHECKOUT_URLS } from '../lib/pricing'
 
 export default function Paywall() {
   const handleUpgrade = () => {
     // Lead user to the default Pro Monthly checkout
-    window.location.href = POLAR_LINKS.proMonthly
+    window.location.href = POLAR_CHECKOUT_URLS.pro.monthly
   }
 
   return (

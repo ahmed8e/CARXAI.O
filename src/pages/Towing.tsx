@@ -5,17 +5,13 @@ import { supabase } from '../lib/supabase'
 import { getUserLocation, haversineDistance, formatDistance } from '../lib/utils'
 import {
   Truck, MapPin, Star, Phone, Navigation, Search,
-  ShieldCheck, Clock, AlertTriangle, PhoneCall, ExternalLink, X
+  ShieldCheck, Clock, AlertTriangle, PhoneCall, ExternalLink, X, Map
 } from 'lucide-react'
 
 // ── Towing-related category keywords ─────────────────────────────────
 const TOWING_CATEGORIES = [
-  'remorquage',
-  'towing',
-  'transporteur de véhicules',
-  'vehicle transport',
-  'dépannage',
-  'roadside',
+  'remorquage', 'towing', 'transporteur de véhicules',
+  'vehicle transport', 'dépannage', 'roadside', 'depannage',
 ]
 
 function isTowingCategory(cat: string | null): boolean {
@@ -24,7 +20,48 @@ function isTowingCategory(cat: string | null): boolean {
   return TOWING_CATEGORIES.some(kw => lower.includes(kw))
 }
 
-// ── Provider type after processing ───────────────────────────────────
+// ── Branded fallback trust messages ─────────────────────────────────
+const TRUST_MESSAGES = [
+  'Verified provider in the Carxai assistance network.',
+  'Trusted nearby roadside assistance, available now.',
+  'Reliable local automotive support through Carxai.',
+  'Nearby verified help when you need it most.',
+  'Available through the Carxai assistance network.',
+]
+
+/** Strip literal "null" / "undefined" strings from Supabase data */
+function clean(val: string | null | undefined): string | null {
+  if (!val || val === 'null' || val === 'undefined' || val.trim() === '') return null
+  return val.trim()
+}
+
+function trustFallback(id: number): string {
+  return TRUST_MESSAGES[id % TRUST_MESSAGES.length]
+}
+
+function isIOS(): boolean {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
+// ── Build map app links for a destination ─────────────────────────────
+function getMapLinks(lat: number, lng: number, label: string, userLat?: number, userLng?: number) {
+  const encodedLabel = encodeURIComponent(label)
+  const origin = userLat != null && userLng != null
+    ? `saddr=${userLat},${userLng}&`
+    : ''
+
+  return {
+    googleMaps: `https://www.google.com/maps/dir/?api=1&${origin}destination=${lat},${lng}`,
+    googleMapsApp: `comgooglemaps://?${origin}daddr=${lat},${lng}&directionsmode=driving`,
+    waze: `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
+    wazeApp: `waze://?ll=${lat},${lng}&navigate=yes`,
+    appleMaps: `maps://?q=${encodedLabel}&ll=${lat},${lng}${userLat != null ? `&saddr=${userLat},${userLng}` : ''}`,
+    appleMapsWeb: `https://maps.apple.com/?q=${encodedLabel}&ll=${lat},${lng}`,
+  }
+}
+
+// ── Provider type ─────────────────────────────────────────────────────
 interface TowingProvider {
   id: number
   name: string
@@ -36,7 +73,7 @@ interface TowingProvider {
   imageUrl: string | null
   lat: number
   lng: number
-  distance: number | null       // meters, null if no user location
+  distance: number | null
   workingHours: string | null
   website: string | null
   mapLink: string | null
@@ -44,7 +81,17 @@ interface TowingProvider {
   category: string | null
 }
 
-// ── Skeleton loader ──────────────────────────────────────────────────
+// ── Sort providers by distance ascending ─────────────────────────────
+function sortByDistance(list: TowingProvider[]): TowingProvider[] {
+  return [...list].sort((a, b) => {
+    if (a.distance === null && b.distance === null) return 0
+    if (a.distance === null) return 1
+    if (b.distance === null) return -1
+    return a.distance - b.distance
+  })
+}
+
+// ── Skeleton ─────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
     <div className="p-5 rounded-2xl border border-overlay bg-white animate-pulse">
@@ -60,34 +107,161 @@ function SkeletonCard() {
   )
 }
 
+// ── MapChooser sheet ──────────────────────────────────────────────────
+interface MapChooserProps {
+  provider: TowingProvider
+  userCoords: { lat: number; lng: number } | null
+  onClose: () => void
+}
+
+function MapChooser({ provider, userCoords, onClose }: MapChooserProps) {
+  const links = getMapLinks(
+    provider.lat, provider.lng, provider.name,
+    userCoords?.lat, userCoords?.lng
+  )
+  const ios = isIOS()
+
+  const options: { label: string; icon: string; primary: string; fallback: string; color: string }[] = [
+    {
+      label: 'Google Maps',
+      icon: '🗺️',
+      primary: links.googleMapsApp,
+      fallback: links.googleMaps,
+      color: 'from-[#4285F4] to-[#2563EB]',
+    },
+    {
+      label: 'Waze',
+      icon: '🚗',
+      primary: links.wazeApp,
+      fallback: links.waze,
+      color: 'from-[#09D3AC] to-[#05A584]',
+    },
+    ...(ios ? [{
+      label: 'Apple Maps',
+      icon: '🍎',
+      primary: links.appleMaps,
+      fallback: links.appleMapsWeb,
+      color: 'from-slate-600 to-slate-800',
+    }] : []),
+  ]
+
+  const handleOpen = (primary: string, fallback: string) => {
+    // Try opening the app URI; after a short timeout fall back to browser
+    const start = Date.now()
+    window.location.href = primary
+    setTimeout(() => {
+      // If still on page (app didn't open), open web fallback
+      if (Date.now() - start < 2000) {
+        window.open(fallback, '_blank', 'noreferrer')
+      }
+    }, 1500)
+    onClose()
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+        onClick={e => e.stopPropagation()}
+        className="w-full max-w-lg bg-white rounded-t-[32px] shadow-2xl pb-8"
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-4 pb-5">
+          <div className="w-10 h-1.5 rounded-full bg-overlay" />
+        </div>
+
+        {/* Header */}
+        <div className="px-6 mb-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Navigate to</p>
+              <h3 className="text-lg font-display font-black text-on-surface tracking-tight leading-tight">{provider.name}</h3>
+              {provider.city && <p className="text-[13px] text-muted mt-0.5">{provider.city}</p>}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-surface-low flex items-center justify-center text-muted hover:text-on-surface transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Map options */}
+        <div className="px-5 space-y-2.5">
+          {options.map(opt => (
+            <motion.button
+              key={opt.label}
+              onClick={() => handleOpen(opt.primary, opt.fallback)}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r ${opt.color} text-white shadow-lg hover:shadow-xl hover:-translate-y-[1px] transition-all`}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="text-2xl w-10 text-center">{opt.icon}</span>
+              <div className="flex-1 text-left">
+                <p className="font-bold text-[15px]">{opt.label}</p>
+                <p className="text-[11px] text-white/70">Open in {opt.label}</p>
+              </div>
+              <Navigation className="w-5 h-5 text-white/50" />
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Web fallback note */}
+        <p className="text-center text-[10px] font-bold text-muted uppercase tracking-widest mt-5 px-6">
+          Will open app if installed, otherwise opens in browser
+        </p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// ── Main component ────────────────────────────────────────────────────
 export default function Towing() {
   const { user } = useAuth()
+  const [rawProviders, setRawProviders] = useState<TowingProvider[]>([])
   const [providers, setProviders] = useState<TowingProvider[]>([])
   const [loading, setLoading] = useState(true)
+  const [locating, setLocating] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationDenied, setLocationDenied] = useState(false)
   const [citySearch, setCitySearch] = useState('')
   const [selectedProvider, setSelectedProvider] = useState<TowingProvider | null>(null)
+  const [mapChooserProvider, setMapChooserProvider] = useState<TowingProvider | null>(null)
   const [requested, setRequested] = useState<number | null>(null)
 
-  // ── Fetch providers from Supabase ────────────────────────────────
+  // ── Step 1: Get location first ──────────────────────────────────
   useEffect(() => {
+    setLocating(true)
+    getUserLocation()
+      .then(pos => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      })
+      .catch(() => {
+        setLocationDenied(true)
+      })
+      .finally(() => {
+        setLocating(false)
+      })
+  }, [])
+
+  // ── Step 2: Fetch providers once location resolves ──────────────
+  useEffect(() => {
+    if (locating) return // Wait for location attempt to complete
+
     const load = async () => {
       setLoading(true)
       setError(null)
 
-      // 1. Try to get user location
-      let coords: { lat: number; lng: number } | null = null
-      try {
-        const pos = await getUserLocation()
-        coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-        setUserCoords(coords)
-      } catch {
-        setLocationDenied(true)
-      }
-
-      // 2. Fetch towing providers from Supabase
       try {
         const { data, error: fetchError } = await supabase
           .from('service_providers_raw')
@@ -95,21 +269,21 @@ export default function Towing() {
 
         if (fetchError) throw fetchError
         if (!data || data.length === 0) {
+          setRawProviders([])
           setProviders([])
           setLoading(false)
           return
         }
 
-        // 3. Filter to towing categories & parse
+        const coords = userCoords // captured at time of fetch
+
         const mapped: TowingProvider[] = (data as any[])
           .filter(row => isTowingCategory(row.Category))
-          .filter(row => row.Lat && row.Long && row.Business_name)
+          .filter(row => row.Business_name && row.Lat && row.Long)
           .map(row => {
-            const lat = parseFloat(row.Lat!)
-            const lng = parseFloat(row.Long!)
-            const dist = coords && !isNaN(lat) && !isNaN(lng)
-              ? haversineDistance(coords.lat, coords.lng, lat, lng)
-              : null
+            const lat = parseFloat(row.Lat)
+            const lng = parseFloat(row.Long)
+            const validCoords = !isNaN(lat) && !isNaN(lng)
 
             return {
               id: row.id,
@@ -120,26 +294,22 @@ export default function Towing() {
               rating: row.Rating ? parseFloat(row.Rating) : 0,
               reviewCount: row.Review ? parseInt(row.Review, 10) : 0,
               imageUrl: row.image1 || null,
-              lat,
-              lng,
-              distance: isNaN(lat) || isNaN(lng) ? null : dist,
-              workingHours: row.Working_hour || null,
-              website: row.Website_url || null,
-              mapLink: row.MapLink || null,
-              description: row.BusinessDescription || null,
-              category: row.Category || null,
+              lat: validCoords ? lat : 0,
+              lng: validCoords ? lng : 0,
+              distance: (validCoords && coords)
+                ? haversineDistance(coords.lat, coords.lng, lat, lng)
+                : null,
+              workingHours: clean(row.Working_hour),
+              website: clean(row.Website_url),
+              mapLink: clean(row.MapLink),
+              description: clean(row.BusinessDescription),
+              category: clean(row.Category),
             }
           })
 
-        // 4. Sort by distance ascending (null distances go last)
-        mapped.sort((a, b) => {
-          if (a.distance === null && b.distance === null) return 0
-          if (a.distance === null) return 1
-          if (b.distance === null) return -1
-          return a.distance - b.distance
-        })
-
-        setProviders(mapped)
+        const sorted = sortByDistance(mapped)
+        setRawProviders(sorted)
+        setProviders(sorted)
       } catch (err: any) {
         console.error('[Towing] Fetch error:', err)
         setError('Failed to load towing providers. Please try again.')
@@ -149,9 +319,23 @@ export default function Towing() {
     }
 
     load()
-  }, [])
+  }, [locating, userCoords])
 
-  // ── Handle towing request ────────────────────────────────────────
+  // ── Step 3: If location comes in AFTER data, re-sort ───────────
+  useEffect(() => {
+    if (!userCoords || rawProviders.length === 0) return
+
+    const resorted = rawProviders.map(p => ({
+      ...p,
+      distance: (p.lat !== 0 && p.lng !== 0)
+        ? haversineDistance(userCoords.lat, userCoords.lng, p.lat, p.lng)
+        : null,
+    }))
+
+    setProviders(sortByDistance(resorted))
+  }, [userCoords])
+
+  // ── Handle request ──────────────────────────────────────────────
   const handleRequest = async (provider: TowingProvider) => {
     setRequested(provider.id)
     if (user) {
@@ -163,7 +347,7 @@ export default function Towing() {
     }
   }
 
-  // ── City filter ──────────────────────────────────────────────────
+  // ── Filter (city search) ────────────────────────────────────────
   const filteredProviders = citySearch.trim()
     ? providers.filter(p =>
         p.city.toLowerCase().includes(citySearch.toLowerCase()) ||
@@ -174,6 +358,8 @@ export default function Towing() {
 
   const featured = filteredProviders[0] || null
   const rest = filteredProviders.slice(1)
+
+  const isLoadingData = locating || loading
 
   return (
     <div className="min-h-full bg-[#f8f9fb]">
@@ -187,12 +373,12 @@ export default function Towing() {
             <div>
               <h1 className="text-lg font-display font-black text-on-surface tracking-tight">Emergency Towing</h1>
               <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
-                {userCoords ? 'Nearest help first' : 'Search by city'}
+                {locating ? 'Getting your location...' : userCoords ? 'Sorted by nearest first' : 'Search by city'}
               </p>
             </div>
           </div>
 
-          {/* Search / city fallback */}
+          {/* Search */}
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
             <input
@@ -210,6 +396,13 @@ export default function Towing() {
               <p className="text-[11px] font-bold text-amber-700">Location access denied — showing all providers. Search by city above.</p>
             </div>
           )}
+
+          {locating && (
+            <div className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl">
+              <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0 animate-pulse" />
+              <p className="text-[11px] font-bold text-blue-600">Detecting your location…</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -221,7 +414,7 @@ export default function Towing() {
           </div>
         )}
 
-        {loading ? (
+        {isLoadingData ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
@@ -244,7 +437,7 @@ export default function Towing() {
               >
                 <button
                   onClick={() => setSelectedProvider(featured)}
-                  className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15 group"
+                  className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15"
                 >
                   <div className="absolute top-3 right-3">
                     <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white/90">
@@ -253,7 +446,7 @@ export default function Towing() {
                   </div>
                   <div className="flex items-start gap-4 mt-2">
                     {featured.imageUrl ? (
-                      <img src={featured.imageUrl} alt="" className="w-16 h-16 rounded-2xl object-cover border-2 border-white/20 shrink-0" />
+                      <img src={featured.imageUrl} alt="" className="w-16 h-16 rounded-2xl object-cover border-2 border-white/20 shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
                       <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 shrink-0">
                         <Truck className="w-7 h-7 text-white/50" />
@@ -287,21 +480,18 @@ export default function Towing() {
                         <PhoneCall className="w-4 h-4" /> Call Now
                       </a>
                     )}
-                    <a
-                      href={featured.mapLink || `https://www.google.com/maps/dir/?api=1&destination=${featured.lat},${featured.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
+                    <button
+                      onClick={e => { e.stopPropagation(); setMapChooserProvider(featured) }}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/10 border border-white/10 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-white/20 transition-all"
                     >
                       <Navigation className="w-4 h-4" /> Directions
-                    </a>
+                    </button>
                   </div>
                 </button>
               </motion.div>
             )}
 
-            {/* ── Results count ────────────────────────────────── */}
+            {/* ── Count row ────────────────────────────────────── */}
             <div className="flex items-center justify-between mb-4">
               <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
                 {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''} found
@@ -324,7 +514,7 @@ export default function Towing() {
                 >
                   <div className="flex gap-4">
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt="" className="w-14 h-14 rounded-2xl object-cover border border-overlay shrink-0" />
+                      <img src={p.imageUrl} alt="" className="w-14 h-14 rounded-2xl object-cover border border-overlay shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
                       <div className="w-14 h-14 rounded-2xl bg-surface-low border border-overlay flex items-center justify-center shrink-0">
                         <Truck className="w-6 h-6 text-muted/30" />
@@ -378,7 +568,7 @@ export default function Towing() {
         )}
       </div>
 
-      {/* ── Detail overlay ────────────────────────────────────── */}
+      {/* ── Provider detail overlay ────────────────────────────── */}
       <AnimatePresence>
         {selectedProvider && (
           <motion.div
@@ -396,26 +586,23 @@ export default function Towing() {
               onClick={e => e.stopPropagation()}
               className="w-full max-w-lg bg-white rounded-t-[32px] shadow-2xl max-h-[85vh] overflow-y-auto"
             >
-              {/* Handle */}
               <div className="flex justify-center pt-4 pb-2">
                 <div className="w-10 h-1.5 rounded-full bg-overlay" />
               </div>
 
               <div className="px-6 pb-8">
-                {/* Close */}
                 <div className="flex justify-end mb-2">
                   <button
                     onClick={() => setSelectedProvider(null)}
-                    className="w-9 h-9 rounded-full bg-surface-low flex items-center justify-center text-muted hover:text-on-surface transition-colors"
+                    className="w-9 h-9 rounded-full bg-surface-low flex items-center justify-center text-muted"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                
-                {/* Provider header */}
+
                 <div className="flex items-start gap-4 mb-6">
                   {selectedProvider.imageUrl ? (
-                    <img src={selectedProvider.imageUrl} alt="" className="w-20 h-20 rounded-2xl object-cover border border-overlay" />
+                    <img src={selectedProvider.imageUrl} alt="" className="w-20 h-20 rounded-2xl object-cover border border-overlay" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   ) : (
                     <div className="w-20 h-20 rounded-2xl bg-surface-low border border-overlay flex items-center justify-center">
                       <Truck className="w-8 h-8 text-muted/30" />
@@ -430,7 +617,6 @@ export default function Towing() {
                   </div>
                 </div>
 
-                {/* Stats grid */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {selectedProvider.distance !== null && (
                     <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
@@ -455,7 +641,6 @@ export default function Towing() {
                   )}
                 </div>
 
-                {/* Working hours */}
                 {selectedProvider.workingHours && (
                   <div className="flex items-center gap-3 px-4 py-3 bg-[#f3f4f6] rounded-xl border border-overlay mb-6">
                     <Clock className="w-4 h-4 text-muted shrink-0" />
@@ -463,32 +648,30 @@ export default function Towing() {
                   </div>
                 )}
 
-                {/* Description */}
-                {selectedProvider.description && (
-                  <p className="text-sm text-muted leading-relaxed mb-6">{selectedProvider.description}</p>
-                )}
+                {/* Description or branded fallback */}
+                <div className="mb-6 px-4 py-3.5 bg-gradient-to-r from-navy/[0.04] to-transparent border border-navy/10 rounded-2xl">
+                  <p className="text-[12px] font-medium text-on-surface/70 leading-relaxed">
+                    {selectedProvider.description || trustFallback(selectedProvider.id)}
+                  </p>
+                </div>
 
-                {/* Actions */}
                 <div className="flex gap-2.5">
                   {selectedProvider.phone && (
                     <a
                       href={`tel:${selectedProvider.phone}`}
-                      className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-navy to-[#0F172A] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-navy/20 hover:shadow-xl hover:-translate-y-[1px] transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-navy to-[#0F172A] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-navy/20 hover:-translate-y-[1px] transition-all"
                     >
                       <PhoneCall className="w-4 h-4" /> Call Now
                     </a>
                   )}
-                  <a
-                    href={selectedProvider.mapLink || `https://www.google.com/maps/dir/?api=1&destination=${selectedProvider.lat},${selectedProvider.lng}`}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={() => { setSelectedProvider(null); setMapChooserProvider(selectedProvider) }}
                     className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-surface-low border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest hover:bg-navy/5 transition-all"
                   >
-                    <Navigation className="w-4 h-4" /> Directions
-                  </a>
+                    <Map className="w-4 h-4" /> Directions
+                  </button>
                 </div>
 
-                {/* Request towing */}
                 <motion.button
                   onClick={() => handleRequest(selectedProvider)}
                   disabled={requested === selectedProvider.id}
@@ -499,14 +682,12 @@ export default function Towing() {
                   }`}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {requested === selectedProvider.id ? (
-                    <><ShieldCheck className="w-4 h-4" /> Towing Requested</>
-                  ) : (
-                    <><Truck className="w-4 h-4" /> Request Towing</>
-                  )}
+                  {requested === selectedProvider.id
+                    ? <><ShieldCheck className="w-4 h-4" /> Towing Requested</>
+                    : <><Truck className="w-4 h-4" /> Request Towing</>
+                  }
                 </motion.button>
 
-                {/* Website link */}
                 {selectedProvider.website && (
                   <a
                     href={selectedProvider.website}
@@ -520,6 +701,17 @@ export default function Towing() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Map app chooser ────────────────────────────────────── */}
+      <AnimatePresence>
+        {mapChooserProvider && (
+          <MapChooser
+            provider={mapChooserProvider}
+            userCoords={userCoords}
+            onClose={() => setMapChooserProvider(null)}
+          />
         )}
       </AnimatePresence>
     </div>
