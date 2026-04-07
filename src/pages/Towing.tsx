@@ -1,403 +1,527 @@
-/// <reference types="google.maps" />
-import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
-import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
-import type { NearbyPlace } from '../lib/types'
-import { Truck, MapPin, Star, Phone, Loader2, Clock, Navigation, X, Search } from 'lucide-react'
+import { getUserLocation, haversineDistance, formatDistance } from '../lib/utils'
+import {
+  Truck, MapPin, Star, Phone, Navigation, Search,
+  ShieldCheck, Clock, AlertTriangle, PhoneCall, ExternalLink, X
+} from 'lucide-react'
 
-declare global {
-  interface Window {
-    google: any;
-  }
+// ── Towing-related category keywords ─────────────────────────────────
+const TOWING_CATEGORIES = [
+  'remorquage',
+  'towing',
+  'transporteur de véhicules',
+  'vehicle transport',
+  'dépannage',
+  'roadside',
+]
+
+function isTowingCategory(cat: string | null): boolean {
+  if (!cat) return false
+  const lower = cat.toLowerCase()
+  return TOWING_CATEGORIES.some(kw => lower.includes(kw))
 }
 
-function getETA(distance?: number): string {
-  if (!distance) return '15-20 min'
-  const mins = Math.round((distance / 1000) * 3 + 5)
-  return `${mins}-${mins + 5} min`
+// ── Provider type after processing ───────────────────────────────────
+interface TowingProvider {
+  id: number
+  name: string
+  address: string
+  city: string
+  phone: string | null
+  rating: number
+  reviewCount: number
+  imageUrl: string | null
+  lat: number
+  lng: number
+  distance: number | null       // meters, null if no user location
+  workingHours: string | null
+  website: string | null
+  mapLink: string | null
+  description: string | null
+  category: string | null
+}
+
+// ── Skeleton loader ──────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="p-5 rounded-2xl border border-overlay bg-white animate-pulse">
+      <div className="flex gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-surface-low shrink-0" />
+        <div className="flex-1 space-y-2.5 py-1">
+          <div className="h-4 bg-surface-low rounded-lg w-3/4" />
+          <div className="h-3 bg-surface-low rounded-lg w-1/2" />
+          <div className="h-3 bg-surface-low rounded-lg w-1/3" />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function Towing() {
   const { user } = useAuth()
-  const [places, setPlaces] = useState<NearbyPlace[]>([])
-  const [selected, setSelected] = useState<NearbyPlace | null>(null)
+  const [providers, setProviders] = useState<TowingProvider[]>([])
   const [loading, setLoading] = useState(true)
-  const [requested, setRequested] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<google.maps.Map | null>(null)
-  const markersRef = useRef<google.maps.Marker[]>([])
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationDenied, setLocationDenied] = useState(false)
+  const [citySearch, setCitySearch] = useState('')
+  const [selectedProvider, setSelectedProvider] = useState<TowingProvider | null>(null)
+  const [requested, setRequested] = useState<number | null>(null)
 
-
+  // ── Fetch providers from Supabase ────────────────────────────────
   useEffect(() => {
-    const apiKey = import.meta.env.GOOGLE_MAPS_API_KEY
-    if (!apiKey || apiKey === 'placeholder_google_maps_key') {
-      setPlaces([])
-      setLoading(false)
-      return
-    }
-
     const load = async () => {
+      setLoading(true)
+      setError(null)
+
+      // 1. Try to get user location
+      let coords: { lat: number; lng: number } | null = null
       try {
-        let location = { lat: 48.8566, lng: 2.3522 }; // Default: Paris
-        
-        try {
-          const pos = await getUserLocation();
-          location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        } catch (geoError) {
-          console.warn('[Towing Map] Geolocation failed. Using fallback location.', geoError);
-        }
-
-        if (!window.google) {
-          await loadGoogleMaps(apiKey)
-        }
-
-        const map = new google.maps.Map(mapRef.current!, {
-          center: location, zoom: 12,
-          styles: GOOGLE_MAPS_STYLE,
-          disableDefaultUI: true, zoomControl: true,
-        })
-        mapInstanceRef.current = map
-
-        new google.maps.Marker({
-          position: location, map,
-          icon: { 
-            path: google.maps.SymbolPath.CIRCLE, 
-            scale: 10, 
-            fillColor: '#ea580c', 
-            fillOpacity: 1, 
-            strokeColor: '#FFFFFF', 
-            strokeWeight: 3 
-          },
-          title: 'Your Location',
-          zIndex: 100
-        })
-
-        const service = new google.maps.places.PlacesService(map)
-        service.nearbySearch({ 
-          location, 
-          radius: 15000, 
-          keyword: 'towing service roadside assistance dépannage remorquage' 
-        }, (results, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const mapped: NearbyPlace[] = results.map(p => ({
-              id: p.place_id!, name: p.name!, address: p.vicinity ?? '',
-              rating: p.rating ?? 0, userRatingsTotal: p.user_ratings_total ?? 0,
-              isOpen: p.opening_hours?.isOpen() ?? false,
-              location: { lat: p.geometry!.location!.lat(), lng: p.geometry!.location!.lng() },
-              types: p.types ?? [], placeId: p.place_id!,
-              distance: google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(location), p.geometry!.location!),
-            }))
-            
-            const sorted = mapped.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity))
-            setPlaces(sorted)
-
-            // Clear old markers
-            markersRef.current.forEach(m => m.setMap(null))
-            
-            // Add new markers
-            markersRef.current = sorted.map(place => {
-              const marker = new google.maps.Marker({
-                position: place.location, map,
-                icon: { 
-                  path: google.maps.SymbolPath.CIRCLE, 
-                  scale: 8, 
-                  fillColor: '#ea580c', 
-                  fillOpacity: 0.8, 
-                  strokeColor: '#FFFFFF', 
-                  strokeWeight: 2 
-                },
-                title: place.name
-              })
-              marker.addListener('click', () => setSelected(place))
-              return marker
-            })
-          } else {
-            console.error('[Towing Map] Search failed:', status);
-            if (status === 'ZERO_RESULTS') {
-              setError('No nearby towing providers found in this area.')
-            } else {
-              setError(`Google Maps Error: ${status}`)
-            }
-          }
-          setLoading(false)
-        })
-      } catch (err) {
-        console.error('[Towing Map] Critical error:', err);
-        setLoading(false)
+        const pos = await getUserLocation()
+        coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        setUserCoords(coords)
+      } catch {
+        setLocationDenied(true)
       }
+
+      // 2. Fetch towing providers from Supabase
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('service_providers_raw')
+          .select('*')
+
+        if (fetchError) throw fetchError
+        if (!data || data.length === 0) {
+          setProviders([])
+          setLoading(false)
+          return
+        }
+
+        // 3. Filter to towing categories & parse
+        const mapped: TowingProvider[] = (data as any[])
+          .filter(row => isTowingCategory(row.Category))
+          .filter(row => row.Lat && row.Long && row.Business_name)
+          .map(row => {
+            const lat = parseFloat(row.Lat!)
+            const lng = parseFloat(row.Long!)
+            const dist = coords && !isNaN(lat) && !isNaN(lng)
+              ? haversineDistance(coords.lat, coords.lng, lat, lng)
+              : null
+
+            return {
+              id: row.id,
+              name: row.Business_name || 'Unknown Provider',
+              address: row.Address || '',
+              city: row.City || '',
+              phone: row.Phone || null,
+              rating: row.Rating ? parseFloat(row.Rating) : 0,
+              reviewCount: row.Review ? parseInt(row.Review, 10) : 0,
+              imageUrl: row.image1 || null,
+              lat,
+              lng,
+              distance: isNaN(lat) || isNaN(lng) ? null : dist,
+              workingHours: row.Working_hour || null,
+              website: row.Website_url || null,
+              mapLink: row.MapLink || null,
+              description: row.BusinessDescription || null,
+              category: row.Category || null,
+            }
+          })
+
+        // 4. Sort by distance ascending (null distances go last)
+        mapped.sort((a, b) => {
+          if (a.distance === null && b.distance === null) return 0
+          if (a.distance === null) return 1
+          if (b.distance === null) return -1
+          return a.distance - b.distance
+        })
+
+        setProviders(mapped)
+      } catch (err: any) {
+        console.error('[Towing] Fetch error:', err)
+        setError('Failed to load towing providers. Please try again.')
+      }
+
+      setLoading(false)
     }
+
     load()
   }, [])
 
-  useEffect(() => {
-    if (selected && mapInstanceRef.current) {
-      mapInstanceRef.current.panTo(selected.location)
-      mapInstanceRef.current.setZoom(14)
-    }
-  }, [selected])
-
-  const handleRequest = async (place: NearbyPlace) => {
-    setRequested(place.id)
+  // ── Handle towing request ────────────────────────────────────────
+  const handleRequest = async (provider: TowingProvider) => {
+    setRequested(provider.id)
     if (user) {
-      // @ts-ignore
-      await supabase.from('towing_requests').insert({
+      await (supabase as any).from('towing_requests').insert({
         user_id: user.id,
-        provider_name: place.name,
-        provider_place_id: place.placeId,
+        provider_name: provider.name,
         status: 'requested',
       })
     }
   }
 
-  const location = useLocation()
-  const [isSheetExpanded, setIsSheetExpanded] = useState(false)
-  const [searchQuery, setSearchQuery] = useState(location.state?.initialSearch || '')
+  // ── City filter ──────────────────────────────────────────────────
+  const filteredProviders = citySearch.trim()
+    ? providers.filter(p =>
+        p.city.toLowerCase().includes(citySearch.toLowerCase()) ||
+        p.name.toLowerCase().includes(citySearch.toLowerCase()) ||
+        p.address.toLowerCase().includes(citySearch.toLowerCase())
+      )
+    : providers
 
-  const filteredPlaces = places.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.address.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const featured = filteredProviders[0] || null
+  const rest = filteredProviders.slice(1)
 
   return (
-    <div className="relative h-full overflow-hidden bg-transparent">
-      {/* Map Background */}
-      <div className="absolute inset-0 z-0">
-        <div ref={mapRef} className="h-full w-full" />
-        
-        {/* Map API Key Fallback */}
-        {(!import.meta.env.GOOGLE_MAPS_API_KEY || import.meta.env.GOOGLE_MAPS_API_KEY === 'placeholder_google_maps_key') && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-surface/60 dark:bg-surface-low/60 backdrop-blur-sm">
-            <div className="w-16 h-16 rounded-full bg-navy/5 border border-navy/10 flex items-center justify-center mb-4">
-              <MapPin className="w-8 h-8 text-navy/20" />
+    <div className="min-h-full bg-[#f8f9fb]">
+      {/* ── Header ────────────────────────────────────────────────── */}
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-overlay">
+        <div className="max-w-2xl mx-auto px-5 py-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <Truck className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-lg font-display font-bold text-on-surface mb-1">Towing Map</h3>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Google Maps Integration Required</p>
+            <div>
+              <h1 className="text-lg font-display font-black text-on-surface tracking-tight">Emergency Towing</h1>
+              <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
+                {userCoords ? 'Nearest help first' : 'Search by city'}
+              </p>
+            </div>
           </div>
+
+          {/* Search / city fallback */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+            <input
+              type="text"
+              value={citySearch}
+              onChange={e => setCitySearch(e.target.value)}
+              placeholder={locationDenied ? 'Search by city name...' : 'Filter towing providers...'}
+              className="w-full bg-[#f3f4f6] border border-overlay rounded-2xl py-3.5 pl-11 pr-4 text-sm font-medium text-on-surface placeholder:text-muted/60 focus:outline-none focus:border-navy/40 focus:bg-white transition-all"
+            />
+          </div>
+
+          {locationDenied && (
+            <div className="mt-3 flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-100 rounded-xl">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <p className="text-[11px] font-bold text-amber-700">Location access denied — showing all providers. Search by city above.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Content ───────────────────────────────────────────────── */}
+      <div className="max-w-2xl mx-auto px-5 py-6 pb-32">
+        {error && (
+          <div className="p-5 bg-red-50 border border-red-100 rounded-2xl mb-5">
+            <p className="text-xs font-bold text-red-600">{error}</p>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : filteredProviders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-20 h-20 rounded-full bg-surface-low border border-overlay flex items-center justify-center mb-5">
+              <Truck className="w-9 h-9 text-muted/30" />
+            </div>
+            <h3 className="text-base font-bold text-on-surface mb-1">No towing providers found</h3>
+            <p className="text-sm text-muted max-w-[260px]">Try adjusting your search or broadening the area.</p>
+          </div>
+        ) : (
+          <>
+            {/* ── Featured Card ────────────────────────────────── */}
+            {featured && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5"
+              >
+                <button
+                  onClick={() => setSelectedProvider(featured)}
+                  className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15 group"
+                >
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white/90">
+                      <MapPin className="w-3 h-3" /> Nearest to you
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-4 mt-2">
+                    {featured.imageUrl ? (
+                      <img src={featured.imageUrl} alt="" className="w-16 h-16 rounded-2xl object-cover border-2 border-white/20 shrink-0" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 shrink-0">
+                        <Truck className="w-7 h-7 text-white/50" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[17px] font-bold truncate leading-tight mb-1">{featured.name}</h3>
+                      <p className="text-[13px] text-white/60 truncate mb-2">{featured.city}{featured.address ? ` · ${featured.address}` : ''}</p>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {featured.distance !== null && (
+                          <span className="flex items-center gap-1 text-[12px] font-bold text-orange-300">
+                            <Navigation className="w-3 h-3" /> {formatDistance(featured.distance)}
+                          </span>
+                        )}
+                        {featured.rating > 0 && (
+                          <span className="flex items-center gap-1 text-[12px] font-bold text-yellow-300">
+                            <Star className="w-3 h-3 fill-yellow-300" /> {featured.rating.toFixed(1)}
+                            {featured.reviewCount > 0 && <span className="text-white/40">({featured.reviewCount})</span>}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-5">
+                    {featured.phone && (
+                      <a
+                        href={`tel:${featured.phone}`}
+                        onClick={e => e.stopPropagation()}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-orange-500 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-orange-400 transition-all"
+                      >
+                        <PhoneCall className="w-4 h-4" /> Call Now
+                      </a>
+                    )}
+                    <a
+                      href={featured.mapLink || `https://www.google.com/maps/dir/?api=1&destination=${featured.lat},${featured.lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/10 border border-white/10 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-white/20 transition-all"
+                    >
+                      <Navigation className="w-4 h-4" /> Directions
+                    </a>
+                  </div>
+                </button>
+              </motion.div>
+            )}
+
+            {/* ── Results count ────────────────────────────────── */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
+                {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''} found
+              </p>
+              {userCoords && (
+                <p className="text-[10px] font-bold text-navy/50 uppercase tracking-widest">Sorted by distance</p>
+              )}
+            </div>
+
+            {/* ── Provider list ────────────────────────────────── */}
+            <div className="space-y-2.5">
+              {rest.map((p, i) => (
+                <motion.button
+                  key={p.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  onClick={() => setSelectedProvider(p)}
+                  className="w-full text-left p-4 rounded-2xl bg-white border border-overlay hover:border-navy/20 hover:shadow-md transition-all group"
+                >
+                  <div className="flex gap-4">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt="" className="w-14 h-14 rounded-2xl object-cover border border-overlay shrink-0" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl bg-surface-low border border-overlay flex items-center justify-center shrink-0">
+                        <Truck className="w-6 h-6 text-muted/30" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[15px] font-bold text-on-surface truncate leading-tight group-hover:text-navy transition-colors">{p.name}</h3>
+                      <p className="text-[12px] text-muted truncate mt-0.5">{p.city}{p.address ? ` · ${p.address}` : ''}</p>
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {p.distance !== null && (
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-navy/70">
+                            <MapPin className="w-3 h-3" /> {formatDistance(p.distance)}
+                          </span>
+                        )}
+                        {p.rating > 0 && (
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-on-surface/60">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {p.rating.toFixed(1)}
+                          </span>
+                        )}
+                        {p.workingHours && (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-muted/60">
+                            <Clock className="w-3 h-3" /> {p.workingHours}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {p.phone && (
+                      <a
+                        href={`tel:${p.phone}`}
+                        onClick={e => e.stopPropagation()}
+                        className="w-11 h-11 rounded-xl bg-navy/5 border border-navy/10 flex items-center justify-center text-navy hover:bg-navy hover:text-white transition-all self-center shrink-0"
+                      >
+                        <Phone className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+
+                  {requested === p.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-3 pt-3 border-t border-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" /> Request sent
+                    </motion.div>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
-      {/* Floating Top Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-6 md:p-8 pointer-events-none">
-        <motion.div 
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="flex items-center justify-between max-w-md mx-auto pointer-events-auto"
-        >
-          <div className="flex items-center gap-3 bg-surface/80 dark:bg-surface-low/80 backdrop-blur-xl border border-overlay px-6 py-3 rounded-2xl shadow-xl w-full">
-            <div className="w-8 h-8 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/20">
-              <Truck className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex-1">
-              <h1 className="font-display font-bold text-on-surface italic tracking-tight text-sm uppercase">Quick Towing</h1>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-orange-600/60 hidden md:block">Emergency Assistance</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Bottom Sheet */}
-      <motion.div 
-        initial={{ y: '100%' }}
-        animate={{ y: isSheetExpanded ? '10%' : '55%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="absolute bottom-0 left-0 right-0 z-30 h-[95%] lg:h-[85%] lg:max-w-md lg:left-1/2 lg:-translate-x-1/2 lg:bottom-6 lg:rounded-[32px] overflow-hidden"
-      >
-        <div className="h-full bg-surface/95 dark:bg-surface-low/95 backdrop-blur-3xl border-t lg:border border-overlay rounded-t-[32px] lg:rounded-[32px] shadow-2xl flex flex-col">
-          {/* Sheet Handle */}
-          <div 
-            className="w-full py-5 flex flex-col items-center cursor-pointer lg:hidden"
-            onClick={() => setIsSheetExpanded(!isSheetExpanded)}
+      {/* ── Detail overlay ────────────────────────────────────── */}
+      <AnimatePresence>
+        {selectedProvider && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => setSelectedProvider(null)}
           >
-            <div className="w-12 h-1.5 rounded-full bg-overlay" />
-          </div>
-
-          <div className="px-6 pb-4">
-            {/* Quick Actions */}
-            <div className="flex gap-2 mb-6">
-              <button className="flex-1 bg-navy text-white p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-lg shadow-navy/20 hover:brightness-110 transition-all">
-                <Truck className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Global Rescue</span>
-              </button>
-              <button className="flex-1 bg-surface dark:bg-surface-high border border-overlay p-4 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-surface-high dark:hover:bg-surface-high/60 transition-all">
-                <Phone className="w-5 h-5 text-navy mb-0.5" />
-                <span className="text-[10px] font-bold text-muted uppercase tracking-widest italic">Direct Call</span>
-              </button>
-            </div>
-
-            {/* Search Area */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted" />
-              <input 
-                type="text" 
-                className="w-full bg-surface-low dark:bg-surface-high border border-overlay rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-on-surface placeholder:text-muted focus:outline-none focus:border-navy focus:bg-surface transition-all shadow-inner" 
-                placeholder="Search towing services..."
-                value={searchQuery} 
-                onFocus={() => setIsSheetExpanded(true)}
-                onChange={e => setSearchQuery(e.target.value)} 
-              />
-            </div>
-          </div>
-
-          {/* List Content */}
-          <div className="flex-1 overflow-y-auto px-3 pb-24 lg:pb-6">
-            {error && (
-              <div className="mx-3 p-5 bg-red-50 border border-red-100 rounded-2xl mb-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-600 mb-1">Search Error</p>
-                <p className="text-xs text-red-600 font-medium leading-relaxed">{error}</p>
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-lg bg-white rounded-t-[32px] shadow-2xl max-h-[85vh] overflow-y-auto"
+            >
+              {/* Handle */}
+              <div className="flex justify-center pt-4 pb-2">
+                <div className="w-10 h-1.5 rounded-full bg-overlay" />
               </div>
-            )}
-            
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 text-orange-600 animate-spin mb-4" />
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Locating assistance...</p>
-              </div>
-            ) : filteredPlaces.length > 0 ? (
-              <div className="space-y-2">
-                {filteredPlaces.map(place => (
-                  <motion.button 
-                    key={place.id} 
-                    onClick={() => {
-                      setSelected(place)
-                      setIsSheetExpanded(false)
-                    }}
-                    className={`w-full text-left p-5 rounded-2xl transition-all group relative border ${
-                      selected?.id === place.id 
-                        ? 'bg-orange-50/10 border-orange-500/20' 
-                        : 'bg-surface dark:bg-surface-high border-overlay hover:border-orange-500/20'
-                    }`}
+
+              <div className="px-6 pb-8">
+                {/* Close */}
+                <div className="flex justify-end mb-2">
+                  <button
+                    onClick={() => setSelectedProvider(null)}
+                    className="w-9 h-9 rounded-full bg-surface-low flex items-center justify-center text-muted hover:text-on-surface transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-bold text-on-surface text-[15px] leading-tight group-hover:text-orange-600 transition-colors">{place.name}</h3>
-                        <p className="text-[11px] text-muted mt-1 truncate max-w-[180px] font-medium">{place.address}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 shrink-0 ml-4">
-                        <span className="text-[10px] font-bold text-orange-600 italic">ETA {getETA(place.distance || 0)}</span>
-                        <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-1 rounded-md border ${
-                          place.isOpen 
-                            ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-                            : 'bg-red-50 text-red-600 border-red-100'
-                        }`}>
-                          {place.isOpen ? 'Available' : 'Busy'}
-                        </span>
-                      </div>
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {/* Provider header */}
+                <div className="flex items-start gap-4 mb-6">
+                  {selectedProvider.imageUrl ? (
+                    <img src={selectedProvider.imageUrl} alt="" className="w-20 h-20 rounded-2xl object-cover border border-overlay" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-2xl bg-surface-low border border-overlay flex items-center justify-center">
+                      <Truck className="w-8 h-8 text-muted/30" />
                     </div>
-                    
-                    <div className="flex items-center gap-4">
-                      {place.rating > 0 && (
-                        <div className="flex items-center gap-1.5 bg-surface-low dark:bg-surface-high/40 px-2 py-1 rounded-lg border border-overlay">
-                          <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                          <span className="text-[11px] font-bold text-on-surface">{formatRating(place.rating)}</span>
-                        </div>
-                      )}
-                      {place.distance && (
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-slate-200" />
-                          <span className="text-[11px] font-bold text-slate-400">{formatDistance(place.distance || 0)}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {requested === place.id && (
-                      <motion.div 
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        className="mt-4 pt-4 border-t border-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2"
-                      >
-                       <Truck className="w-3.5 h-3.5" /> ✓ Request Sent
-                      </motion.div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-display font-black text-on-surface tracking-tight mb-1">{selectedProvider.name}</h2>
+                    <p className="text-[13px] text-muted truncate">{selectedProvider.city}{selectedProvider.address ? ` · ${selectedProvider.address}` : ''}</p>
+                    {selectedProvider.category && (
+                      <span className="inline-block mt-2 text-[9px] font-black uppercase tracking-widest bg-navy/5 text-navy/70 border border-navy/10 px-2.5 py-1 rounded-lg">{selectedProvider.category}</span>
                     )}
-                  </motion.button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 px-10 text-center">
-                <Truck className="w-12 h-12 text-muted/30 mb-6" />
-                <p className="text-[11px] font-bold uppercase tracking-widest text-muted mb-2">No Towing Available</p>
-                <p className="text-xs text-muted max-w-[200px] leading-relaxed font-medium">Try another search or contact emergency help.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Detail Overlay */}
-      {selected && !isSheetExpanded && (
-        <motion.div 
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          className="absolute bottom-6 left-6 right-6 lg:left-1/2 lg:-translate-x-1/2 lg:w-[480px] z-40"
-        >
-          <div className="bg-white border border-slate-100 p-7 rounded-[32px] shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-x-0 top-0 h-1.5 bg-orange-600/10" />
-            
-            <div className="relative">
-              <div className="flex items-start justify-between mb-6">
-                <div className="pr-4">
-                  <h3 className="text-2xl font-display font-bold text-on-surface italic tracking-tight mb-1.5">{selected.name}</h3>
-                  <div className="flex items-center gap-2 text-muted">
-                    <MapPin className="w-4 h-4" />
-                    <p className="text-xs font-medium truncate max-w-[280px]">{selected.address}</p>
                   </div>
                 </div>
-                <button 
-                  onClick={() => setSelected(null)}
-                  className="w-10 h-10 rounded-full bg-surface-low dark:bg-surface-high/40 flex items-center justify-center text-muted hover:text-orange-600 hover:bg-orange-50 transition-all"
+
+                {/* Stats grid */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {selectedProvider.distance !== null && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Distance</p>
+                      <p className="text-base font-bold text-on-surface">{formatDistance(selectedProvider.distance)}</p>
+                    </div>
+                  )}
+                  {selectedProvider.rating > 0 && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Rating</p>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-base font-bold text-on-surface">{selectedProvider.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {selectedProvider.reviewCount > 0 && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Reviews</p>
+                      <p className="text-base font-bold text-on-surface">{selectedProvider.reviewCount}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Working hours */}
+                {selectedProvider.workingHours && (
+                  <div className="flex items-center gap-3 px-4 py-3 bg-[#f3f4f6] rounded-xl border border-overlay mb-6">
+                    <Clock className="w-4 h-4 text-muted shrink-0" />
+                    <p className="text-[12px] font-medium text-on-surface/80">{selectedProvider.workingHours}</p>
+                  </div>
+                )}
+
+                {/* Description */}
+                {selectedProvider.description && (
+                  <p className="text-sm text-muted leading-relaxed mb-6">{selectedProvider.description}</p>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2.5">
+                  {selectedProvider.phone && (
+                    <a
+                      href={`tel:${selectedProvider.phone}`}
+                      className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-navy to-[#0F172A] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-navy/20 hover:shadow-xl hover:-translate-y-[1px] transition-all"
+                    >
+                      <PhoneCall className="w-4 h-4" /> Call Now
+                    </a>
+                  )}
+                  <a
+                    href={selectedProvider.mapLink || `https://www.google.com/maps/dir/?api=1&destination=${selectedProvider.lat},${selectedProvider.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-surface-low border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest hover:bg-navy/5 transition-all"
+                  >
+                    <Navigation className="w-4 h-4" /> Directions
+                  </a>
+                </div>
+
+                {/* Request towing */}
+                <motion.button
+                  onClick={() => handleRequest(selectedProvider)}
+                  disabled={requested === selectedProvider.id}
+                  className={`w-full mt-3 flex items-center justify-center gap-2 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${
+                    requested === selectedProvider.id
+                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                      : 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-400 hover:-translate-y-[1px]'
+                  }`}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-surface-low dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-2">Rating</p>
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-base font-bold text-on-surface">{formatRating(selected.rating)}</span>
-                    <span className="text-[11px] text-muted font-medium">({selected.userRatingsTotal})</span>
-                  </div>
-                </div>
-                <div className="bg-surface-low dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-orange-600 mb-2">Arrival Time</p>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-orange-600" />
-                    <span className="text-base font-bold text-on-surface">{getETA(selected.distance)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <motion.button 
-                  onClick={() => handleRequest(selected)}
-                  disabled={requested === selected.id}
-                  className={`flex-[2] text-center py-5 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg ${requested === selected.id ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-navy text-white shadow-navy/20'}`} 
-                  whileHover={requested !== selected.id ? { y: -2, filter: 'brightness(1.1)' } : {}}
-                  whileTap={requested !== selected.id ? { scale: 0.98 } : {}}
-                >
-                  {requested === selected.id ? '✓ Towing Requested' : <><Truck className="w-4 h-4" /> Request Towing</>}
+                  {requested === selectedProvider.id ? (
+                    <><ShieldCheck className="w-4 h-4" /> Towing Requested</>
+                  ) : (
+                    <><Truck className="w-4 h-4" /> Request Towing</>
+                  )}
                 </motion.button>
-                <motion.a 
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selected.location.lat},${selected.location.lng}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-16 h-16 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay flex items-center justify-center text-navy hover:bg-navy/5 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Navigation className="w-6 h-6" />
-                </motion.a>
+
+                {/* Website link */}
+                {selectedProvider.website && (
+                  <a
+                    href={selectedProvider.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 w-full flex items-center justify-center gap-2 text-[11px] font-bold text-muted hover:text-navy transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" /> Visit Website
+                  </a>
+                )}
               </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

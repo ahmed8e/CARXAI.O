@@ -184,6 +184,67 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['user_settings']['Insert']>
       }
+      service_providers_raw: {
+        Row: {
+          id: number
+          Category: string | null
+          Business_name: string | null
+          Address: string | null
+          City: string | null
+          State: string | null
+          PostalCode: string | null
+          Country: string | null
+          Phone: string | null
+          Fax: string | null
+          Website_url: string | null
+          Email: string | null
+          MapLink: string | null
+          DetailsLink: string | null
+          Rating: string | null
+          Review: string | null
+          image1: string | null
+          Lat: string | null
+          Long: string | null
+          ClosingHour: string | null
+          Facebookprofile: string | null
+          Twitterprofile: string | null
+          linkedinprofile: string | null
+          instagramprofile: string | null
+          BusinessDescription: string | null
+          Working_hour: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          Category?: string | null
+          Business_name?: string | null
+          Address?: string | null
+          City?: string | null
+          State?: string | null
+          PostalCode?: string | null
+          Country?: string | null
+          Phone?: string | null
+          Fax?: string | null
+          Website_url?: string | null
+          Email?: string | null
+          MapLink?: string | null
+          DetailsLink?: string | null
+          Rating?: string | null
+          Review?: string | null
+          image1?: string | null
+          Lat?: string | null
+          Long?: string | null
+          ClosingHour?: string | null
+          Facebookprofile?: string | null
+          Twitterprofile?: string | null
+          linkedinprofile?: string | null
+          instagramprofile?: string | null
+          BusinessDescription?: string | null
+          Working_hour?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['service_providers_raw']['Insert']>
+      }
     }
   }
 }
