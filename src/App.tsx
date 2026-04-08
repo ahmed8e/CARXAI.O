@@ -36,6 +36,18 @@ import MyAccount from './pages/MyAccount'
 import Vehicles from './pages/Vehicles'
 import ChoosePlan from './pages/ChoosePlan'
 
+// Admin
+import { AdminRoute } from './components/AdminRoute'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminOverview from './pages/admin/AdminOverview'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminSubscriptions from './pages/admin/AdminSubscriptions'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminProviders from './pages/admin/AdminProviders'
+import AdminAddProvider from './pages/admin/AdminAddProvider'
+import AdminImportProviders from './pages/admin/AdminImportProviders'
+import AdminSettings from './pages/admin/AdminSettings'
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -107,6 +119,18 @@ export default function App() {
                 </AppLayout>
               </ProtectedRoute>
             } />
+
+            {/* Admin routes — role-protected */}
+            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+              <Route index element={<AdminOverview />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="providers" element={<AdminProviders />} />
+              <Route path="providers/add" element={<AdminAddProvider />} />
+              <Route path="providers/import" element={<AdminImportProviders />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
 
             {/* Catch all */}
             <Route path="*" element={<Navigate to="/" replace />} />
