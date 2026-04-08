@@ -259,7 +259,7 @@ ${diagnosticHistory}
       const decoder = new TextDecoder()
       let accumulatedJSON = ''
       
-      setStreamingMessage('Analyzing systems...')
+      setStreamingMessage(imageUrl ? 'Analyzing your photo…' : 'Analyzing systems...')
 
       while (true) {
         const { value, done } = await reader.read()
@@ -389,18 +389,49 @@ ${diagnosticHistory}
 
       try {
         const parsed = extractJSON(accumulatedJSON)
+        // Validate critical fields exist
+        if (!parsed.issueName || !parsed.urgencyLevel) {
+          throw new Error('Parsed JSON missing required fields')
+        }
+        console.log('[Carxai AI] Branch: structured result parsed successfully')
         issueData = parsed
         finalDisplayContent = parsed.likelyCause || parsed.issueName
         setIsPreparingAudio(true)
         prefetch(parsed.spokenSummary || finalDisplayContent).finally(() => setIsPreparingAudio(false))
       } catch (err) {
-        console.error('Failed to parse AI JSON:', accumulatedJSON)
-        const fallback = getEmergencyFallback(content)
-        if (fallback) {
-          issueData = fallback
-          finalDisplayContent = fallback.likelyCause
+        console.warn('[Carxai AI] Branch: JSON parse failed, raw output:', accumulatedJSON.slice(0, 200))
+
+        // 1st fallback: keyword match on text input
+        const textFallback = getEmergencyFallback(content)
+        if (textFallback) {
+          console.log('[Carxai AI] Branch: keyword emergency fallback used')
+          issueData = textFallback
+          finalDisplayContent = textFallback.likelyCause
         } else {
-          finalDisplayContent = "I've analyzed the situation, and while I'm still processing the fine details, my primary advice is to exercise extreme caution. Check your fluid levels and dash lights, then try describing the symptoms again so I can give you a pinpoint diagnosis."
+          // 2nd fallback: always-structured image / low-confidence result
+          // This fires when the image is unclear, partial, or the API returned
+          // non-JSON text (e.g. safety refusal or explanation in prose)
+          console.log('[Carxai AI] Branch: image/low-confidence structured fallback used')
+          const imageFallback: DiagnosticResult = {
+            issueName: imageUrl ? 'Image Analysis — Low Confidence' : 'Diagnosis Pending',
+            likelyCause: imageUrl
+              ? 'The uploaded photo could not be analysed with full confidence. The image may be blurry, partially obscured, or showing an unfamiliar dashboard layout.'
+              : 'The AI could not determine a specific issue from the description provided. Please provide more detail about the symptoms you are experiencing.',
+            canDrive: true,
+            driveWhy: 'Unable to determine safety status from the current input. Treat as a precaution until inspected.',
+            urgencyLevel: 'medium',
+            nextStep: imageUrl
+              ? 'Please retake a clear, close-up photo of the warning light or the affected area, then upload it again. Avoid driving if any dashboard light is flashing red.'
+              : 'Describe your symptoms in more detail — for example, when the issue occurs, any sounds, smells, or dashboard lights involved.',
+            mechanicRecommended: true,
+            towingRecommended: false,
+            spokenSummary: imageUrl
+              ? 'The photo was not clear enough for a full diagnosis. Please retake it up close and try again.'
+              : 'I need more details to give you a precise diagnosis. Please describe your symptoms further.',
+          }
+          issueData = imageFallback
+          finalDisplayContent = imageFallback.likelyCause
+          prefetch(imageFallback.spokenSummary ?? '').catch(() => {})
         }
       }
 
