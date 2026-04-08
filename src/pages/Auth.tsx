@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Eye, EyeOff, CheckCircle, Zap } from 'lucide-react'
@@ -8,18 +8,29 @@ export default function Auth() {
   const [searchParams] = useSearchParams()
   const { user, signIn, signUp, signInWithOAuth } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Where should we send the user after a successful login?
+  // AdminRoute (and ProtectedRoute) pass { state: { from: location } } when redirecting here.
+  const from = (location.state as any)?.from?.pathname ?? '/dashboard'
 
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
+      console.log('[Auth] already logged-in →', {
+        email: user.email,
+        role: user.user_metadata?.role ?? user.app_metadata?.role ?? null,
+        is_admin: (user.user_metadata?.role ?? user.app_metadata?.role) === 'admin',
+        redirect_target: from,
+      })
       if (sessionStorage.getItem('newly_signed_up') === 'true') {
         sessionStorage.removeItem('newly_signed_up')
         navigate('/choose-plan')
       } else {
-        navigate('/dashboard')
+        navigate(from, { replace: true })
       }
     }
-  }, [user, navigate])
+  }, [user, navigate, from])
   
   // Decide default mode based on localStorage or URL param
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 
@@ -68,7 +79,12 @@ export default function Auth() {
         setError(signInError.message)
       } else {
         markReturningUser()
-        navigate('/dashboard')
+        console.log('[Auth] login success →', {
+          email,
+          redirect_target: from,
+          final_redirect_destination: from,
+        })
+        navigate(from, { replace: true })
       }
     } else {
       const { data, error: signUpError } = await signUp(email, password, fullName)

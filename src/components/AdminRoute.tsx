@@ -2,7 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { Loader2, ShieldOff } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 /**
  * Checks whether a user object has admin access.
@@ -62,13 +62,15 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!freshUser) {
+    console.log('[AdminRoute] no user → redirecting to /auth, redirect_target:', location.pathname)
     return <Navigate to="/auth?mode=login" state={{ from: location }} replace />
   }
 
   if (!isAdminUser(freshUser)) {
-    // ← Fix: Navigate must be the sole rendered element to actually redirect
+    console.log('[AdminRoute] not admin → redirecting to /dashboard')
     return <Navigate to="/dashboard" replace />
   }
 
+  console.log('[AdminRoute] access granted, final_redirect_destination:', location.pathname)
   return <>{children}</>
 }
