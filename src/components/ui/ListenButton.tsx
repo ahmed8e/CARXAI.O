@@ -41,24 +41,24 @@ export default function ListenButton({ text, currentAudioRef }: ListenButtonProp
   const isDone = isIdle && !isLoading
 
   return (
-    <div className="flex items-center gap-2 mt-2.5 ml-0.5">
+    <div className="flex items-center gap-2">
       {/* Primary pill button */}
       <motion.button
         onClick={handleClick}
         disabled={isLoading}
         whileTap={!isLoading ? { scale: 0.95 } : {}}
         className={`
-          flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-bold
-          border transition-all duration-200 select-none
+          flex items-center justify-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest
+          border transition-all duration-300 select-none
           ${isPlaying
-            ? 'bg-navy/8 border-navy/20 text-navy'
+            ? 'bg-navy/5 border-navy/20 text-navy shadow-inner'
             : isError
             ? 'bg-red-50 border-red-200/60 text-red-500'
-            : 'bg-transparent border-overlay text-muted hover:border-navy/25 hover:text-navy hover:bg-navy/4'
+            : 'bg-white border-on-surface/10 text-navy shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.06)] hover:border-navy/20 hover:-translate-y-[1px]'
           }
           ${isLoading ? 'cursor-default opacity-70' : 'cursor-pointer'}
         `}
-        style={{ minWidth: 88 }}
+        style={{ minWidth: 100 }}
       >
         <AnimatePresence mode="wait" initial={false}>
           {isLoading ? (
@@ -158,9 +158,9 @@ export default function ListenButton({ text, currentAudioRef }: ListenButtonProp
             exit={{ opacity: 0, scale: 0.85 }}
             onClick={replay}
             whileTap={{ scale: 0.9 }}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold
-                       border border-overlay text-muted hover:border-navy/20 hover:text-navy
-                       transition-all uppercase tracking-wider"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[10px] font-bold
+                       bg-white border border-overlay shadow-[0_2px_10px_rgba(0,0,0,0.03)] text-navy/60 hover:border-navy/20 hover:text-navy hover:shadow-[0_4px_15px_rgba(0,0,0,0.06)] hover:-translate-y-[1px]
+                       transition-all uppercase tracking-widest"
             title="Replay from beginning"
           >
             <RotateCcw className="w-2.5 h-2.5" />

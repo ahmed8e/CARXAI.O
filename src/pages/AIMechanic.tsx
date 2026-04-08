@@ -651,9 +651,9 @@ ${diagnosticHistory}
                   }`}>
                   {msg.role === 'assistant' ? (
                     msg.issueData ? (
-                      <div className="space-y-5">
+                      <div className="space-y-0 relative">
                         {/* 1. Likely Problem */}
-                        <div>
+                        <div className="mb-5 pr-10">
                           <h3 className="text-lg font-bold text-navy tracking-tight mb-1">{msg.issueData.issueName}</h3>
                           <p className="text-on-surface/80 leading-relaxed text-[13px] font-medium">{msg.issueData.likelyCause}</p>
                         </div>
@@ -700,50 +700,54 @@ ${diagnosticHistory}
                           <p className="text-[13px] font-bold text-navy leading-snug">{msg.issueData.nextStep}</p>
                         </div>
 
-                        {/* Stage 1: Action Buttons (Premium Brand Redesign #0070E0) */}
-                        <div className="pt-8 flex flex-col gap-4.5">
-                          <motion.button
-                            whileHover={{ y: -2, boxShadow: '0 15px 50px rgba(0,112,224,0.25)' }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
-                              setReportDiagnosis(msg.issueData!);
-                              setShowReport(true);
-                            }}
-                            className="relative overflow-hidden w-full flex items-center justify-center gap-3.5 px-8 py-5 rounded-[22px] bg-[#0070E0] text-white text-[13px] font-bold uppercase tracking-[0.18em] shadow-[0_10px_40px_rgba(0,112,224,0.18)] transition-all duration-300 group"
-                          >
-                            {/* Sophisticated White Sheen Sweep */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                            
-                            <motion.div whileHover={{ scale: 1.1 }}>
-                              <FileText className="w-5.5 h-5.5 stroke-[2.5]" />
-                            </motion.div>
-                            Generate Official Report
-                          </motion.button>
+                        {/* Stage 1: Action Buttons (Premium Brand Redesign) */}
+                        <div className="mt-5 -mx-6 -mb-4.5 bg-slate-50 dark:bg-surface-low/30 border-t border-overlay px-6 py-5 rounded-b-[26px]">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-navy/40 mb-3 text-center">Service Options</p>
                           
-                          <div className="flex gap-4 w-full">
+                          <div className="flex flex-col gap-2.5">
                             <motion.button
-                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
+                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,112,224,0.15)' }}
                               whileTap={{ scale: 0.98 }}
-                              onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.issueName } })}
-                              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-4.5 rounded-[22px] bg-white border-[1.5px] border-[#E2E8F0] text-[#0E1B39] text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
+                              onClick={() => {
+                                setReportDiagnosis(msg.issueData!);
+                                setShowReport(true);
+                              }}
+                              className="relative overflow-hidden w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-[18px] bg-navy text-white text-[12px] font-bold uppercase tracking-widest shadow-md transition-all duration-300 group"
                             >
-                              <motion.div whileHover={{ scale: 1.1 }}>
-                                <Search className="w-5 h-5 stroke-[2.5]" />
-                              </motion.div>
-                              Find Mechanic
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                              <FileText className="w-4.5 h-4.5 stroke-[2.5]" />
+                              Generate Official Report
                             </motion.button>
                             
-                            <motion.button
-                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.issueName } })}
-                              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-4.5 rounded-[22px] bg-white border-[1.5px] border-[#E2E8F0] text-[#0E1B39] text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
-                            >
-                              <motion.div whileHover={{ scale: 1.1 }}>
-                                <Truck className="w-5 h-5 stroke-[2.5]" />
-                              </motion.div>
-                              Request Towing
-                            </motion.button>
+                            <div className="flex gap-2.5 w-full">
+                              <motion.button
+                                whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.issueName } })}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-[16px] bg-white border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest transition-all duration-300 hover:border-navy/20"
+                              >
+                                <Search className="w-4 h-4 stroke-[2.5] text-navy/60" />
+                                Find Mechanic
+                              </motion.button>
+                              
+                              <motion.button
+                                whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.issueName } })}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-[16px] bg-white border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest transition-all duration-300 hover:border-navy/20"
+                              >
+                                <Truck className="w-4 h-4 stroke-[2.5] text-navy/60" />
+                                Need a Tow?
+                              </motion.button>
+                            </div>
+                          </div>
+                          
+                          {/* ── Secondary Utility Actions ── */}
+                          <div className="mt-3.5 pt-3.5 border-t border-navy/5 flex justify-center">
+                            <ListenButton
+                              currentAudioRef={currentAudioRef}
+                              text={msg.issueData.spokenSummary || `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`}
+                            />
                           </div>
                         </div>
                       </div>
@@ -753,15 +757,11 @@ ${diagnosticHistory}
                   )}
                 </div>
 
-                {/* Listen button — plain AI messages & structured diagnoses */}
-                {msg.role === 'assistant' && msg.id !== '0' && (
+                {/* Listen button — plain AI messages ONLY. Structured msgs have it inside the card */}
+                {msg.role === 'assistant' && msg.id !== '0' && !msg.issueData && (
                   <ListenButton
                     currentAudioRef={currentAudioRef}
-                    text={
-                      msg.issueData
-                        ? (msg.issueData.spokenSummary || `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`)
-                        : msg.content
-                    }
+                    text={msg.content}
                   />
                 )}
 

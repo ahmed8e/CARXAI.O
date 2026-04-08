@@ -1,8 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
+
+// ── SPA GTM Tracking ─────────────────────────────────────────────────────────
+function GTMTracker() {
+  const location = useLocation()
+  
+  useEffect(() => {
+    // Push SPA navigation events to GTM dataLayer
+    if (typeof window !== 'undefined' && (window as any).dataLayer) {
+      (window as any).dataLayer.push({
+        event: 'pageview',
+        page: location.pathname + location.search
+      })
+    }
+  }, [location])
+
+  return null
+}
 
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
@@ -23,6 +41,7 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <GTMTracker />
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
