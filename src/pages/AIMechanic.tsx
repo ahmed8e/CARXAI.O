@@ -485,6 +485,14 @@ ${diagnosticHistory}
               ? { ...m, issueData: { ...m.issueData!, report_id: insertedChat.id } } 
               : m
           ))
+
+          // Also update the active reportDiagnosis state if the user opened the report modal before saving finished!
+          setReportDiagnosis(prev => {
+            if (prev && prev.issueName === issueData.issueName) {
+              return { ...prev, report_id: insertedChat.id }
+            }
+            return prev
+          })
         } else if (chatError) {
           console.error('[Carxai AI] Failed to save chat to DB:', chatError)
         }
