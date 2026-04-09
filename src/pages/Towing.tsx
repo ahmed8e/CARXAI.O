@@ -347,6 +347,12 @@ export default function Towing() {
     }
   }
 
+  /** Fire-and-forget analytics event — never blocks UI */
+  const trackEvent = (type: string, metadata?: object) => {
+    if (!user) return
+    ;(supabase as any).from('app_events').insert({ user_id: user.id, event_type: type, metadata: metadata ?? {} }).then()
+  }
+
   // ── Filter (city search) ────────────────────────────────────────
   const filteredProviders = citySearch.trim()
     ? providers.filter(p =>
@@ -436,7 +442,7 @@ export default function Towing() {
                 className="mb-5"
               >
                 <button
-                  onClick={() => setSelectedProvider(featured)}
+                  onClick={() => { setSelectedProvider(featured); trackEvent('towing_click', { name: featured.name, city: featured.city }) }}
                   className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15"
                 >
                   <div className="absolute top-3 right-3">
@@ -509,7 +515,7 @@ export default function Towing() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  onClick={() => setSelectedProvider(p)}
+                  onClick={() => { setSelectedProvider(p); trackEvent('towing_click', { name: p.name, city: p.city }) }}
                   className="w-full text-left p-4 rounded-2xl bg-white border border-overlay hover:border-navy/20 hover:shadow-md transition-all group"
                 >
                   <div className="flex gap-4">

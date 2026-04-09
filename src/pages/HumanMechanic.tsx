@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { getUserLocation, haversineDistance, formatDistance } from '../lib/utils'
 import {
@@ -211,6 +212,7 @@ function MapChooser({ provider, userCoords, onClose }: {
 // ── Main component ────────────────────────────────────────────────────
 export default function HumanMechanic() {
   const routeLocation = useLocation()
+  const { user } = useAuth()
   const [rawProviders, setRawProviders] = useState<MechanicProvider[]>([])
   const [providers, setProviders] = useState<MechanicProvider[]>([])
   const [loading, setLoading] = useState(true)
@@ -222,6 +224,12 @@ export default function HumanMechanic() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [selectedProvider, setSelectedProvider] = useState<MechanicProvider | null>(null)
   const [mapChooserProvider, setMapChooserProvider] = useState<MechanicProvider | null>(null)
+
+  /** Fire-and-forget analytics event — never blocks UI */
+  const trackEvent = (type: string, metadata?: object) => {
+    if (!user) return
+    ;(supabase as any).from('app_events').insert({ user_id: user.id, event_type: type, metadata: metadata ?? {} }).then()
+  }
 
   // ── Step 1: Geo first ────────────────────────────────────────────
   useEffect(() => {
@@ -404,7 +412,7 @@ export default function HumanMechanic() {
             {featured && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
                 <button
-                  onClick={() => setSelectedProvider(featured)}
+                  onClick={() => { setSelectedProvider(featured); trackEvent('mechanic_click', { name: featured.name, city: featured.city }) }}
                   className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15"
                 >
                   <div className="absolute top-3 right-3">
@@ -476,7 +484,7 @@ export default function HumanMechanic() {
                   transition={{ delay: i * 0.025 }}
                 >
                   <button
-                    onClick={() => setSelectedProvider(p)}
+                    onClick={() => { setSelectedProvider(p); trackEvent('mechanic_click', { name: p.name, city: p.city }) }}
                     className="w-full text-left p-4 rounded-2xl bg-white border border-overlay hover:border-navy/25 hover:shadow-md transition-all group"
                   >
                     <div className="flex items-center gap-3.5">

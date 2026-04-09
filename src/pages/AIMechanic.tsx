@@ -397,7 +397,8 @@ ${diagnosticHistory}
         issueData = parsed
         finalDisplayContent = parsed.likelyCause || parsed.issueName
         setIsPreparingAudio(true)
-        prefetch(parsed.spokenSummary || finalDisplayContent).finally(() => setIsPreparingAudio(false))
+        const speechText = `Diagnosis: ${parsed.issueName}. Summary: ${parsed.likelyCause}. Safety check: ${parsed.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${parsed.driveWhy}. Danger level: ${parsed.urgencyLevel.replace('_', ' ')}. Recommended next step: ${parsed.nextStep}`
+        prefetch(speechText).finally(() => setIsPreparingAudio(false))
       } catch (err) {
         console.warn('[Carxai AI] Branch: JSON parse failed, raw output:', accumulatedJSON.slice(0, 200))
 
@@ -523,15 +524,15 @@ ${diagnosticHistory}
   }
 
   return (
-    <div className="flex flex-col min-h-full relative bg-transparent">
+    <div className="flex flex-col absolute inset-0 bg-transparent">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-navy/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy/[0.03] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
       </div>
 
-      {/* Header — Slim & Premium — Sticky below global Navbar area */}
-      <div className="sticky top-0 z-30 flex items-center justify-between px-5 py-3 border-b border-overlay backdrop-blur-lg bg-white/60 dark:bg-surface-low/60 mt-1.5">
+      {/* Header — Slim & Premium */}
+      <div className="flex-none z-30 flex items-center justify-between px-5 py-3 border-b border-overlay/50 bg-white/95 dark:bg-surface-low/95 backdrop-blur-xl shadow-sm shadow-navy/5">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-navy shadow-lg shadow-navy/20">
             <CircuitBoard className="w-4 h-4 text-white" />
@@ -571,18 +572,18 @@ ${diagnosticHistory}
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 pt-28 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-12 space-y-6 relative z-10 scroll-smooth">
 
         {/* ── LUXURY Empty State / Diagnostic Pulsar ── */}
         {messages.length === 1 && !loading && (
-          <div className="min-h-[55vh] flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
+          <div className="h-[80%] min-h-[350px] flex flex-col items-center justify-center px-4 relative overflow-hidden">
             {/* Ambient Base — Subtle Glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white dark:via-surface-low/40 dark:to-surface-low" />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center mb-10 relative z-20"
+              className="text-center mb-8 relative z-20"
             >
               {/* The Pulsar — Multi-layered Hero */}
               <div className="relative w-24 h-24 mx-auto mb-8">
@@ -777,7 +778,7 @@ ${diagnosticHistory}
                           <div className="mt-3.5 pt-3.5 border-t border-navy/5 flex justify-center">
                             <ListenButton
                               currentAudioRef={currentAudioRef}
-                              text={msg.issueData.spokenSummary || `${msg.issueData.issueName}. ${msg.issueData.likelyCause} ${msg.issueData.nextStep}`}
+                              text={`Diagnosis: ${msg.issueData.issueName}. Summary: ${msg.issueData.likelyCause}. Safety check: ${msg.issueData.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${msg.issueData.driveWhy}. Danger level: ${msg.issueData.urgencyLevel.replace('_', ' ')}. Recommended next step: ${msg.issueData.nextStep}`}
                             />
                           </div>
                         </div>
@@ -866,7 +867,7 @@ ${diagnosticHistory}
       </AnimatePresence>
 
       {/* ══ Compact Composer ══ */}
-      <div className="relative z-10 bg-white/95 dark:bg-surface-low/95 backdrop-blur-md border-t border-overlay pb-[env(safe-area-inset-bottom)]">
+      <div className="flex-none z-30 bg-white/95 dark:bg-surface-low/95 backdrop-blur-xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-overlay pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
@@ -874,7 +875,7 @@ ${diagnosticHistory}
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
         {/* ── Refined Floating Card ── */}
-        <div className="mx-4 mt-2.5 mb-2 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-sm
+        <div className="mx-3 sm:mx-4 my-2.5 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-sm
                         transition-all duration-300
                         focus-within:border-navy/30 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] overflow-hidden">
 

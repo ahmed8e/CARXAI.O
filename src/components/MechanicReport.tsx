@@ -197,7 +197,7 @@ export default function MechanicReport({
             <div className="flex items-center gap-2">
               <ListenButton 
                 currentAudioRef={currentAudioRef}
-                text={diagnosis.spokenSummary || `${diagnosis.issueName}. ${diagnosis.likelyCause}`}
+                text={`Diagnosis: ${diagnosis.issueName}. Summary: ${diagnosis.likelyCause}. Safety check: ${diagnosis.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${diagnosis.driveWhy}. Danger level: ${diagnosis.urgencyLevel.replace('_', ' ')}. Recommended next step: ${diagnosis.nextStep}`}
               />
               <button 
                 onClick={onClose}

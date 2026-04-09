@@ -40,8 +40,8 @@ const plans: {
       '3-day free trial included',
       'Instant AI car diagnosis',
       '15 detailed diagnostic reports each month',
-      'Find trusted mechanics faster',
-      'Request towing when you need it',
+      'Step-by-step resolution guidance',
+      'Nearby provider discovery map',
       'Specialized vehicle health insights',
     ],
     cta: 'Start 3 Days Free',
@@ -56,8 +56,8 @@ const plans: {
     features: [
       'Instant AI car diagnosis',
       'Unlimited diagnostic reports',
-      'Find trusted mechanics faster',
-      'Request towing when you need it',
+      'Priority step-by-step guidance',
+      'Full provider network visibility',
       'Faster priority support',
       'Multi-vehicle management',
     ],
@@ -75,10 +75,10 @@ export default function Pricing() {
   }
 
   return (
-    <section id="pricing" className="py-24 md:py-32 px-6 bg-slate-50/30 overflow-hidden">
+    <section id="pricing" className="py-16 md:py-32 px-6 bg-slate-50/30 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-20 flex flex-col items-center">
+        <div className="text-center mb-12 md:mb-20 flex flex-col items-center">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -230,7 +230,7 @@ export default function Pricing() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-20 pt-10 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8"
+          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8"
         >
           <div className="flex items-center gap-10">
             <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">

@@ -33,11 +33,11 @@ import {
 const features = [
   { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
   { icon: Zap, title: 'Warning Light Help', desc: 'Understand dashboard alerts' },
-  { icon: Users, title: 'Human Mechanic', desc: 'Connect to local experts' },
-  { icon: Truck, title: 'Towing & Recovery', desc: 'Fast roadside support' },
-  { icon: Radar, title: 'Nearby Help Map', desc: 'Find providers on a map' },
-  { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s urgent' },
-  { icon: Camera, title: 'Photo Analysis', desc: 'AI checks visible damage' },
+  { icon: Users, title: 'Provider Discovery', desc: 'Discover trusted local options' },
+  { icon: Truck, title: 'Towing Options', desc: 'Find nearby visibility options' },
+  { icon: Radar, title: 'Nearby Help Map', desc: 'Explore providers on a map' },
+  { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s an emergency' },
+  { icon: Camera, title: 'Photo Analysis', desc: 'AI visual damage check' },
   { icon: CheckCircle2, title: 'Clear Guidance', desc: 'Step-by-step next steps' },
 ]
 
@@ -51,10 +51,10 @@ const reviews = [
 ]
 
 const steps = [
-  { num: '01', title: 'Describe problem', desc: 'Type, speak, or photo your issue in seconds.', icon: MessageSquare },
-  { num: '02', title: 'Instant AI diagnosis', desc: 'Our AI identifies the cause and urgency level.', icon: Cpu },
-  { num: '03', title: 'Find nearby help', desc: 'Locate certified mechanics and garages near you.', icon: MapPin },
-  { num: '04', title: 'Back on the road', desc: 'Get towing, a mechanic, or clear guidance fast.', icon: Navigation },
+  { num: '01', title: 'Describe the issue', desc: 'Use text, voice, or a photo to explain the problem.', icon: MessageSquare },
+  { num: '02', title: 'Get AI diagnosis', desc: 'Receive instant analysis and digital guidance.', icon: Cpu },
+  { num: '03', title: 'Understand urgency', desc: 'Know how severe it is and see clear next steps.', icon: ShieldAlert },
+  { num: '04', title: 'Explore options', desc: 'Discover nearby mechanic and towing providers if needed.', icon: MapPin },
 ]
 
 export default function Landing() {
@@ -195,8 +195,8 @@ export default function Landing() {
                 transition={{ delay: 0.1 }}
                 className="font-display font-bold text-5xl md:text-7xl leading-[1.1] mb-8 text-on-surface tracking-tight"
               >
-                Broken down? <br />
-                <span className="text-navy">Get the right help fast.</span>
+                Car trouble? <br />
+                <span className="text-navy">Find clarity fast.</span>
               </motion.h1>
 
               <motion.p 
@@ -205,7 +205,7 @@ export default function Landing() {
                 transition={{ delay: 0.2 }}
                 className="text-muted text-lg md:text-xl mb-12 max-w-xl font-medium leading-relaxed"
               >
-                AI mechanic, real mechanic, and towing in one smart platform.
+                Get instant AI diagnosis, clear step-by-step guidance, and reliable nearby provider discovery in one smart platform.
               </motion.p>
 
               {/* Service Pillar Cards */}
@@ -218,8 +218,8 @@ export default function Landing() {
                 {[
                   {
                     icon: Bot,
-                    title: 'AI Mechanic',
-                    desc: 'Instant diagnosis from a voice or photo.',
+                    title: 'AI Diagnosis',
+                    desc: 'Instant digital reports from a voice or photo.',
                     tag: 'AI-Powered',
                     accent: '#0070E0',
                     halo: 'rgba(0,112,224,0.22)',
@@ -230,9 +230,9 @@ export default function Landing() {
                   },
                   {
                     icon: Users,
-                    title: 'Real Mechanic',
-                    desc: 'Locate certified garages near you.',
-                    tag: 'Network',
+                    title: 'Clear Next Steps',
+                    desc: 'Understand the issue and explore trusted local options.',
+                    tag: 'Discovery',
                     accent: '#0891b2',
                     halo: 'rgba(8,145,178,0.22)',
                     bg: 'rgba(8,145,178,0.05)',
@@ -242,9 +242,9 @@ export default function Landing() {
                   },
                   {
                     icon: Truck,
-                    title: 'Towing',
-                    desc: 'Emergency roadside help in minutes.',
-                    tag: 'Emergency',
+                    title: 'Towing Options',
+                    desc: 'Discover nearby towing services when you need visibility.',
+                    tag: 'Visibility',
                     accent: '#ea580c',
                     halo: 'rgba(234,88,12,0.22)',
                     bg: 'rgba(234,88,12,0.05)',
@@ -352,7 +352,7 @@ export default function Landing() {
               </motion.div>
 
               <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center sm:justify-start gap-y-6 sm:gap-x-12 mt-8 py-6 border-t border-navy/5">
-                {['Diagnose fast', 'Find help nearby', 'Get back on the road'].map((point, i) => (
+                {['Diagnose with AI', 'Understand urgency', 'Discover providers'].map((point, i) => (
                   <div 
                     key={i} 
                     className={`flex items-center justify-center sm:justify-start gap-2 ${i === 2 ? 'col-span-2' : ''}`}
@@ -448,7 +448,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carxai gives you fast answers and nearby help.</p>
+            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carxai gives you immediate clarity and helps discover nearby options.</p>
           </div>
         </section>
 
@@ -605,8 +605,8 @@ export default function Landing() {
         </section>
 
         {/* Reviews Section */}
-        <section id="reviews" className="py-20 md:py-32 px-0 bg-[#f9fafc]">
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
+        <section id="reviews" className="py-16 md:py-32 px-0 bg-[#f9fafc]">
+          <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
             </div>
@@ -620,13 +620,13 @@ export default function Landing() {
         <Pricing />
 
         {/* Final CTA */}
-        <section className="relative py-20 md:py-32 px-6 text-center flex flex-col items-center">
+        <section className="relative py-16 md:py-32 px-6 text-center flex flex-col items-center">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Get Started</span>
             </div>
-            <h2 className="text-4xl md:text-7xl font-display font-bold mb-8 leading-tight tracking-tight text-on-surface">Ready to hit the road <br className="hidden md:block" /> with confidence?</h2>
-            <p className="text-muted text-xl md:text-2xl font-medium mb-14 max-w-2xl mx-auto">Get AI diagnosis, real mechanic help, and towing support in one smart place.</p>
+            <h2 className="text-4xl md:text-7xl font-display font-bold mb-8 leading-tight tracking-tight text-on-surface">Ready for clarity and <br className="hidden md:block" /> peace of mind?</h2>
+            <p className="text-muted text-xl md:text-2xl font-medium mb-14 max-w-2xl mx-auto">Get AI diagnostics, clear step-by-step guidance, and nearby provider discovery in one smart platform.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
               <button 
                 onClick={() => navigate('/auth')}
@@ -645,9 +645,9 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-16 md:py-24 px-6 bg-surface-low dark:bg-surface-low border-t border-overlay/80 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
+        <footer className="py-12 md:py-24 px-6 bg-surface-low dark:bg-surface-low border-t border-overlay/80 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-14 md:gap-24 mb-16">
+            <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-12 md:mb-16">
               {/* Brand Col */}
               <div className="flex flex-col items-start gap-5 max-w-xs">
                 <div className="flex items-center gap-3 group">
@@ -737,7 +737,12 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-overlay">
+            <div className="flex flex-col items-center text-center gap-6 pt-10 border-t border-overlay mb-6">
+              <p className="text-muted/70 text-[11px] font-medium tracking-wide max-w-3xl">
+                Carxai provides digital guidance, diagnostics, and nearby provider discovery. Repair, towing, and other offline services are handled directly by independent third-party providers.
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-overlay/50">
               <p className="text-muted/80 text-[13px] font-medium tracking-wide">
                 © 2026 Carxai. All rights reserved.
               </p>

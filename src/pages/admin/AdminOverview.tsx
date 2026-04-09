@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 import {
   Users, TrendingUp, Zap, MapPin, Wrench, FileText,
-  Star, Activity, Clock, RefreshCw, AlertCircle
+  Activity, Clock, RefreshCw, MousePointerClick, Truck
 } from 'lucide-react'
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -66,10 +66,11 @@ export default function AdminOverview() {
   const [stats, setStats] = useState({
     totalUsers: 0,
     aiChats: 0,
-    reports: 0,
     providers: 0,
     mechanics: 0,
     towing: 0,
+    mechanicClicks: 0,
+    towingClicks: 0,
   })
   const [recentChats, setRecentChats] = useState<any[]>([])
   const [signupChart, setSignupChart] = useState<any[]>([])
@@ -77,15 +78,14 @@ export default function AdminOverview() {
 
   const loadData = async () => {
     try {
-      // Parallel fetch all critical data
-      const [profilesRes, chatsRes, providersRes] = await Promise.all([
-        supabase.from('profiles').select('id, email, created_at', { count: 'exact' }),
-        supabase.from('ai_chats').select('id, user_id, issue_name, urgency_level, created_at').order('created_at', { ascending: false }).limit(8),
+      const [profilesRes, chatsRes, providersRes, eventsRes] = await Promise.all([
+        supabase.from('profiles').select('id, created_at', { count: 'exact' }),
+        supabase.from('ai_chats').select('id, issue_name, urgency_level, created_at').order('created_at', { ascending: false }).limit(8),
         supabase.from('service_providers_raw').select('id, Category, City', { count: 'exact' }),
+        supabase.from('app_events').select('event_type'),
       ])
 
       const totalUsers = profilesRes.count ?? 0
-      const aiChats = chatsRes.data?.length ?? 0
       const totalProviders = providersRes.count ?? 0
       const mechanics = (providersRes.data ?? []).filter((p: any) => {
         const cat = (p.Category ?? '').toLowerCase()
@@ -95,6 +95,10 @@ export default function AdminOverview() {
         const cat = (p.Category ?? '').toLowerCase()
         return cat.includes('remorquage') || cat.includes('towing')
       }).length
+
+      const allEvents = eventsRes.data ?? []
+      const mechanicClicks = allEvents.filter((e: any) => e.event_type === 'mechanic_click').length
+      const towingClicks = allEvents.filter((e: any) => e.event_type === 'towing_click').length
 
       // City distribution for providers
       const cityMap: Record<string, number> = {}
@@ -110,12 +114,12 @@ export default function AdminOverview() {
       // Build signup sparkline from profiles (group by month)
       const monthMap: Record<string, number> = {}
       for (const p of (profilesRes.data ?? [])) {
-        const month = new Date(p.created_at).toLocaleDateString('en', { month: 'short' })
+        const month = new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: '2-digit' })
         monthMap[month] = (monthMap[month] || 0) + 1
       }
       const chartData = Object.entries(monthMap).map(([month, signups]) => ({ month, signups }))
 
-      setStats({ totalUsers, aiChats, reports: aiChats, providers: totalProviders, mechanics, towing })
+      setStats({ totalUsers, aiChats: chatsRes.data?.length ?? 0, providers: totalProviders, mechanics, towing, mechanicClicks, towingClicks })
       setRecentChats(chatsRes.data ?? [])
       setSignupChart(chartData)
       setProviderCities(topCities)
@@ -136,8 +140,8 @@ export default function AdminOverview() {
     { label: 'AI Analyses', value: stats.aiChats, icon: Zap, color: 'text-violet-600', bgColor: 'bg-violet-50' },
     { label: 'Total Providers', value: stats.providers, icon: MapPin, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
     { label: 'Mechanics', value: stats.mechanics, icon: Wrench, color: 'text-amber-600', bgColor: 'bg-amber-50' },
-    { label: 'Towing Providers', value: stats.towing, icon: TrendingUp, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-    { label: 'Reports Generated', value: stats.reports, icon: FileText, color: 'text-rose-600', bgColor: 'bg-rose-50' },
+    { label: 'Mechanic Clicks', value: stats.mechanicClicks, icon: MousePointerClick, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+    { label: 'Towing Clicks', value: stats.towingClicks, icon: Truck, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   ]
 
   return (
@@ -179,6 +183,11 @@ export default function AdminOverview() {
           </div>
           {loading ? (
             <div className="h-44 bg-surface-low rounded-xl animate-pulse" />
+          ) : signupChart.length === 0 ? (
+            <div className="h-44 flex flex-col items-center justify-center gap-2">
+              <Users className="w-8 h-8 text-muted/20" />
+              <p className="text-xs text-muted font-medium">No signup data yet</p>
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={signupChart} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
@@ -235,7 +244,11 @@ export default function AdminOverview() {
         {loading ? (
           <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-10 bg-surface-low rounded-xl animate-pulse" />)}</div>
         ) : recentChats.length === 0 ? (
-          <div className="text-center py-10 text-muted text-sm">No AI sessions yet</div>
+          <div className="text-center py-10">
+            <Zap className="w-8 h-8 text-muted/20 mx-auto mb-2" />
+            <p className="text-sm text-muted font-medium">No AI diagnoses yet</p>
+            <p className="text-xs text-muted/60 mt-1">Sessions will appear here as users use the AI Mechanic.</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {recentChats.map((chat, i) => {
@@ -252,7 +265,7 @@ export default function AdminOverview() {
                   <Zap className="w-4 h-4 text-navy/40 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-on-surface truncate">{chat.issue_name || 'Unknown issue'}</p>
-                    <p className="text-[10px] text-muted">{new Date(chat.created_at).toLocaleDateString()}</p>
+                    <p className="text-[10px] text-muted">{new Date(chat.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                   {urgency && (
                     <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full border ${urgencyColor}`}>
