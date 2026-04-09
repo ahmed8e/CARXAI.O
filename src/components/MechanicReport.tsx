@@ -146,9 +146,14 @@ export default function MechanicReport({
         await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosis.issueName}\nView report: ${shareUrl}`)
         alert('Public report link copied to clipboard!')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error sharing:', err)
-      alert("There was an issue creating the share link. Please try again.")
+      // Provide a more descriptive error alert detailing what might have failed.
+      if (err?.code === '42P01') {
+        alert("Database structure missing. Please run the SQL migrations in Supabase to create the `shared_reports` table.")
+      } else {
+        alert(`There was an issue creating the share link. Please try again. Detailed error: ${err.message || 'Unknown Error'}`)
+      }
     } finally {
       setSharing(false)
     }
