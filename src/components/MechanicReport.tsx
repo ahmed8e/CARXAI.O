@@ -118,7 +118,7 @@ export default function MechanicReport({
     
     // 5. Add a guard clause for report_id
     if (!diagnosis.report_id) {
-      alert("Report is not ready yet. Please wait for generation to finish.")
+      alert("Report has not finished saving to your history yet. Please wait a few seconds and try again. If it remains stuck, check your connection.")
       return
     }
 
@@ -132,7 +132,7 @@ export default function MechanicReport({
     const payload = {
       share_id: reportId,
       report_id: diagnosis.report_id,
-      user_id: user.id,
+      user_id: user?.id, // Use optional chaining to prevent crash if somehow user is null
       vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
       diagnosis_data: diagnosis,
       messages: messages
@@ -505,10 +505,10 @@ export default function MechanicReport({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleShare}
                     disabled={sharing}
-                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${(!diagnosis.report_id || sharing) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${sharing ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {(sharing || !diagnosis.report_id) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
-                    {sharing ? 'Generating...' : (!diagnosis.report_id ? 'Saving...' : 'Share Report')}
+                    {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
+                    {sharing ? 'Generating...' : 'Share Report'}
                   </motion.button>
                   <motion.button 
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
