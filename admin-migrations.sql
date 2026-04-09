@@ -153,5 +153,85 @@ SELECT
 FROM public.profiles p
 ON CONFLICT (user_id) DO NOTHING;
 
+-- ── 6. SHARED_REPORTS table ─────────────────────────────────────────────
+-- Stores a snapshot of a diagnostic report to be shared via public link.
+CREATE TABLE IF NOT EXISTS public.shared_reports (
+  id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  share_id         text UNIQUE NOT NULL, -- e.g., 'CX-1A2B3C'
+  user_id          uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  vehicle_data     jsonb NOT NULL,
+  diagnosis_data   jsonb NOT NULL,
+  messages         jsonb DEFAULT '[]', -- optional conversation context
+  created_at       timestamptz DEFAULT now()
+);
+
+-- Public read access by share_id
+ALTER TABLE public.shared_reports ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'shared_reports'
+      AND policyname = 'Anyone can view shared reports'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Anyone can view shared reports" ON public.shared_reports FOR SELECT USING (true)';
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'shared_reports'
+      AND policyname = 'Users can insert own shared reports'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can insert own shared reports" ON public.shared_reports FOR INSERT WITH CHECK (auth.uid() = user_id)';
+  END IF;
+END $$;
+
+
+-- ── 7. MECHANIC_LEADS table ───────────────────────────────────────────
+-- Captures emails/phones from external mechanics viewing shared reports.
+CREATE TABLE IF NOT EXISTS public.mechanic_leads (
+  id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  report_id        uuid REFERENCES public.shared_reports(id) ON DELETE SET NULL,
+  share_id         text REFERENCES public.shared_reports(share_id) ON DELETE CASCADE,
+  contact_value    text NOT NULL,
+  contact_type     text NOT NULL, -- 'phone' or 'email'
+  source           text DEFAULT 'shared_report_modal',
+  created_at       timestamptz DEFAULT now()
+);
+
+-- Anyone can insert leads (from the public report page)
+ALTER TABLE public.mechanic_leads ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'mechanic_leads'
+      AND policyname = 'Anyone can insert mechanic leads'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Anyone can insert mechanic leads" ON public.mechanic_leads FOR INSERT WITH CHECK (true)';
+  END IF;
+END $$;
+
+-- Only admins can read leads
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'mechanic_leads'
+      AND policyname = 'Admin can read mechanic leads'
+  ) THEN
+    EXECUTE '
+      CREATE POLICY "Admin can read mechanic leads" ON public.mechanic_leads
+        FOR SELECT
+        USING (
+          (auth.jwt() -> ''user_metadata'' ->> ''role'') = ''admin''
+          OR (auth.jwt() -> ''raw_user_meta_data'' ->> ''role'') = ''admin''
+        )
+    ';
+  END IF;
+END $$;
+
 -- ── Done ──────────────────────────────────────────────────────────────
 -- After running this, visit /admin in the app — all pages should show real data.
+

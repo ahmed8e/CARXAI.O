@@ -245,6 +245,48 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['service_providers_raw']['Insert']>
       }
+      shared_reports: {
+        Row: {
+          id: string
+          share_id: string
+          user_id: string
+          vehicle_data: any
+          diagnosis_data: any
+          messages: any
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          share_id: string
+          user_id: string
+          vehicle_data: any
+          diagnosis_data: any
+          messages?: any
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['shared_reports']['Insert']>
+      }
+      mechanic_leads: {
+        Row: {
+          id: string
+          report_id: string | null
+          share_id: string | null
+          contact_value: string
+          contact_type: string
+          source: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          report_id?: string | null
+          share_id?: string | null
+          contact_value: string
+          contact_type: string
+          source?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['mechanic_leads']['Insert']>
+      }
     }
   }
 }

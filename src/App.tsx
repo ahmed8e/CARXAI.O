@@ -22,6 +22,8 @@ function GTMTracker() {
   return null
 }
 
+import SharedReport from './pages/SharedReport'
+
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import ForgotPassword from './pages/ForgotPassword'
@@ -63,6 +65,7 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/report/:shareId" element={<SharedReport />} />
 
             {/* Protected app routes */}
             <Route path="/choose-plan" element={

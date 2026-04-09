@@ -14,6 +14,16 @@ import ListenButton from './ui/ListenButton'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
+// Helper to generate a unique share ID
+const generateShareId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let result = 'CX-'
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 interface MechanicReportProps {
   isOpen: boolean
   onClose: () => void
@@ -36,7 +46,8 @@ export default function MechanicReport({
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
   const [loading, setLoading] = useState(true)
-  const [reportId] = useState(() => `CX-${Math.random().toString(36).substring(2, 9).toUpperCase()}`)
+  const [sharing, setSharing] = useState(false)
+  const [reportId] = useState(() => generateShareId())
   const [date] = useState(() => new Date().toLocaleString())
 
   useEffect(() => {
@@ -103,20 +114,43 @@ export default function MechanicReport({
   }
 
   const handleShare = async () => {
-    const shareData = {
-      title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
-      text: `Diagnostic report for ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName}.`,
-      url: window.location.hostname === 'localhost' ? 'https://carx.ai' : window.location.href
-    }
-
+    setSharing(true)
     try {
+      // Create the record in supabase
+      const { error: shareError } = await supabase
+        .from('shared_reports')
+        .insert([{
+          share_id: reportId,
+          user_id: user.id,
+          vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
+          diagnosis_data: diagnosis,
+          messages: messages // Pass conversation history for context in the backend
+        }] as any)
+
+      // Ignore uniqueness conflict if they click share multiple times on same report
+      if (shareError && shareError.code !== '23505') {
+        throw shareError
+      }
+
+      const shareUrl = `${window.location.origin}/report/${reportId}`
+
+      const shareData = {
+        title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
+        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName}.`,
+        url: shareUrl
+      }
+
       if (navigator.share) {
         await navigator.share(shareData)
       } else {
-        copySummary()
+        await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosis.issueName}\nView report: ${shareUrl}`)
+        alert('Public report link copied to clipboard!')
       }
     } catch (err) {
       console.error('Error sharing:', err)
+      alert("There was an issue creating the share link. Please try again.")
+    } finally {
+      setSharing(false)
     }
   }
 
@@ -440,9 +474,11 @@ export default function MechanicReport({
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleShare}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300"
+                    disabled={sharing}
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 disabled:opacity-50"
                   >
-                    <Share2 className="w-4 h-4" /> Share Report
+                    {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
+                    {sharing ? 'Generating...' : 'Share Report'}
                   </motion.button>
                   <motion.button 
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
