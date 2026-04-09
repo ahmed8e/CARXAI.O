@@ -467,14 +467,27 @@ ${diagnosticHistory}
       // Save to Supabase
       if (user && issueData) {
         // @ts-ignore
-        await supabase.from('ai_chats').insert({
+        const { data: insertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
           user_message: content,
           ai_response: finalDisplayContent,
           issue_name: issueData.issueName,
           likely_cause: issueData.likelyCause,
           urgency_level: issueData.urgencyLevel,
-        })
+        }).select('id').single()
+
+        if (insertedChat && insertedChat.id) {
+          issueData.report_id = insertedChat.id;
+          
+          // Update the message in state so it has the report_id for the UI
+          setMessages(prev => prev.map(m => 
+            m.id === assistantMsg.id 
+              ? { ...m, issueData: { ...m.issueData!, report_id: insertedChat.id } } 
+              : m
+          ))
+        } else if (chatError) {
+          console.error('[Carxai AI] Failed to save chat to DB:', chatError)
+        }
       }
     } catch (err) {
       console.error('AI Error:', err)

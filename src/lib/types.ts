@@ -248,6 +248,7 @@ export type Database = {
       shared_reports: {
         Row: {
           id: string
+          report_id: string
           share_id: string
           user_id: string
           vehicle_data: any
@@ -257,6 +258,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          report_id: string
           share_id: string
           user_id: string
           vehicle_data: any
@@ -302,21 +304,19 @@ export interface Message {
 }
 
 export interface DiagnosticResult {
-  issueName: string;
-  likelyCause: string;
-  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving';
-  canDrive: boolean;
-  driveWhy: string;
-  nextStep: string;
-  warning?: string;
-  followUp?: string;
-  mechanicRecommended: boolean;
-  towingRecommended: boolean;
-  missingInfo?: string;
-  spokenSummary?: string;
-  readableText?: string;
-  confidence?: string;
-  fallbackReason?: string;
+  issueName: string
+  likelyCause: string
+  canDrive: boolean
+  driveWhy: string
+  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving'
+  nextStep: string
+  mechanicRecommended?: boolean
+  towingRecommended?: boolean
+  spokenSummary?: string
+  readableText?: string
+  confidence?: 'high' | 'medium' | 'low'
+  fallbackReason?: string | null
+  report_id?: string // Links to the ai_chats DB record
 }
 
 export interface NearbyPlace {

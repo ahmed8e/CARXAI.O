@@ -114,18 +114,36 @@ export default function MechanicReport({
   }
 
   const handleShare = async () => {
+    // 5. Add a guard clause for report_id
+    if (!diagnosis.report_id) {
+      alert("Report is not ready yet. Please wait for generation to finish.")
+      return
+    }
+
     setSharing(true)
+    
+    // 8. Add debug logs
+    console.group('[Carxai Share Flow]')
+    console.log('Report Object:', diagnosis)
+    console.log('Report ID before insert:', diagnosis.report_id)
+
+    const payload = {
+      share_id: reportId,
+      report_id: diagnosis.report_id,
+      user_id: user.id,
+      vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
+      diagnosis_data: diagnosis,
+      messages: messages
+    }
+    
+    console.log('Insert Payload:', payload)
+    console.groupEnd()
+
     try {
       // Create the record in supabase
       const { error: shareError } = await supabase
         .from('shared_reports')
-        .insert([{
-          share_id: reportId,
-          user_id: user.id,
-          vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
-          diagnosis_data: diagnosis,
-          messages: messages // Pass conversation history for context in the backend
-        }] as any)
+        .insert([payload] as any)
 
       // Ignore uniqueness conflict if they click share multiple times on same report
       if (shareError && shareError.code !== '23505') {
@@ -476,11 +494,12 @@ export default function MechanicReport({
                 {/* Secondary Utility Actions */}
                 <div className="flex items-center gap-4 w-full lg:w-auto lg:border-l border-slate-200 lg:pl-8 pt-6 lg:pt-0 border-t lg:border-t-0">
                   <motion.button 
-                    whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={diagnosis.report_id ? { y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' } : {}}
+                    whileTap={diagnosis.report_id ? { scale: 0.98 } : {}}
                     onClick={handleShare}
-                    disabled={sharing}
-                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 disabled:opacity-50"
+                    disabled={sharing || !diagnosis.report_id}
+                    title={!diagnosis.report_id ? "Waiting for report to save to database..." : "Share Report"}
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
                     {sharing ? 'Generating...' : 'Share Report'}

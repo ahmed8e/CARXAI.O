@@ -158,6 +158,7 @@ ON CONFLICT (user_id) DO NOTHING;
 CREATE TABLE IF NOT EXISTS public.shared_reports (
   id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   share_id         text UNIQUE NOT NULL, -- e.g., 'CX-1A2B3C'
+  report_id        uuid REFERENCES public.ai_chats(id) ON DELETE CASCADE NOT NULL,
   user_id          uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   vehicle_data     jsonb NOT NULL,
   diagnosis_data   jsonb NOT NULL,
