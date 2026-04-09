@@ -47,6 +47,7 @@ export default function MechanicReport({
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
   const [loading, setLoading] = useState(true)
   const [sharing, setSharing] = useState(false)
+  const [pendingShare, setPendingShare] = useState(false)
   const [reportId] = useState(() => generateShareId())
   const [date] = useState(() => new Date().toLocaleString())
 
@@ -107,6 +108,12 @@ export default function MechanicReport({
     }
   }
 
+  const diagnosisRef = useRef(diagnosis)
+  
+  useEffect(() => {
+    diagnosisRef.current = diagnosis
+  }, [diagnosis])
+
   const copySummary = () => {
     const text = `Carxai Mechanic Report ${reportId}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel)}\nLikely Cause: ${diagnosis.likelyCause}\nRecommended Action: ${diagnosis.nextStep}`
     navigator.clipboard.writeText(text)
@@ -114,27 +121,46 @@ export default function MechanicReport({
   }
 
   const handleShare = async () => {
-    console.log('[Carxai Share Flow] Share Button Clicked!')
+    console.log('[Carxai Share Flow] 1. Share Button Clicked')
     
-    // 5. Add a guard clause for report_id
-    if (!diagnosis.report_id) {
-      alert("Report has not finished saving to your history yet. Please wait a few seconds and try again. If it remains stuck, check your connection.")
-      return
+    // Check if report_id exists, if not, wait for it inline to keep user gesture context alive if possible
+    let currentReportId = diagnosisRef.current.report_id
+    if (!currentReportId) {
+      console.log('[Carxai Share Flow] 2. Report ID missing. Waiting for save to complete...')
+      setPendingShare(true)
+      
+      let attempts = 0
+      while (!currentReportId && attempts < 25) { // max 5 seconds wait (25 * 200ms)
+        await new Promise(r => setTimeout(r, 200))
+        currentReportId = diagnosisRef.current.report_id
+        attempts++
+      }
+
+      if (!currentReportId) {
+        console.error('[Carxai Share Flow] 3. Timeout. Report ID never arrived.')
+        setPendingShare(false)
+        alert("Report could not be saved to your history in time. Check your connection or try closing and reopening this report.")
+        return
+      }
+      
+      console.log(`[Carxai Share Flow] 3. Report ID received after ${attempts * 200}ms:`, currentReportId)
+    } else {
+      console.log('[Carxai Share Flow] 2. Report ID already present:', currentReportId)
     }
 
+    // Now proceed with sharing
+    setPendingShare(false)
     setSharing(true)
     
-    // 8. Add debug logs
-    console.group('[Carxai Share Flow] Execution Details')
-    console.log('Report Object:', diagnosis)
-    console.log('Report ID before insert:', diagnosis.report_id)
+    console.group('[Carxai Share Flow] 4. Execution Details')
+    console.log('Report Object:', diagnosisRef.current)
 
     const payload = {
       share_id: reportId,
-      report_id: diagnosis.report_id,
-      user_id: user?.id, // Use optional chaining to prevent crash if somehow user is null
+      report_id: currentReportId,
+      user_id: user?.id,
       vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
-      diagnosis_data: diagnosis,
+      diagnosis_data: diagnosisRef.current,
       messages: messages
     }
     
@@ -142,44 +168,66 @@ export default function MechanicReport({
     console.groupEnd()
 
     try {
-      // Create the record in supabase
+      console.log('[Carxai Share Flow] 5. Requesting Supabase insert into `shared_reports`...')
       const { error: shareError } = await supabase
         .from('shared_reports')
         .insert([payload] as any)
 
-      // Ignore uniqueness conflict if they click share multiple times on same report
       if (shareError && shareError.code !== '23505') {
+        console.error('[Carxai Share Flow] 6. Supabase insert failed', shareError)
         throw shareError
       }
+      console.log('[Carxai Share Flow] 6. Supabase insert successful or duplicate ignored')
 
       const shareUrl = `${window.location.origin}/report/${reportId}`
-
       const shareData = {
-        title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
-        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName}.`,
+        title: `Carxai Mechanic Report - ${diagnosisRef.current.issueName}`,
+        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosisRef.current.issueName}.`,
         url: shareUrl
       }
 
+      console.log('[Carxai Share Flow] 7. Share URL Generated:', shareUrl)
+
+      // Fallback executor function
+      const executeClipboardFallback = async () => {
+        try {
+          console.log('[Carxai Share Flow] 8. Attempting Clipboard Fallback...')
+          await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosisRef.current.issueName}\nView report: ${shareUrl}`)
+          alert('Public report link copied to clipboard!')
+          console.log('[Carxai Share Flow] 9. Clipboard success')
+        } catch (clipErr) {
+          console.error('[Carxai Share Flow] 9. Clipboard failed as well:', clipErr)
+          alert(`Your report is ready, but we couldn't copy the link automatically. Please manually copy this url: ${shareUrl}`)
+        }
+      }
+
       if (navigator.share) {
-        await navigator.share(shareData)
+        try {
+          console.log('[Carxai Share Flow] 8. Attempting Native navigator.share...')
+          await navigator.share(shareData)
+          console.log('[Carxai Share Flow] 9. Native Share Sheet executed')
+        } catch (shareErr: any) {
+          console.error('[Carxai Share Flow] Native Share Promise failed:', shareErr)
+          // AbortError means user swiped closed the share sheet, do not fallback
+          if (shareErr?.name !== 'AbortError') {
+             await executeClipboardFallback()
+          } else {
+             console.log('[Carxai Share Flow] 9. User cancelled native share sheet')
+          }
+        }
       } else {
-        await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosis.issueName}\nView report: ${shareUrl}`)
-        alert('Public report link copied to clipboard!')
+        await executeClipboardFallback()
       }
+
     } catch (err: any) {
-      console.error('Error sharing:', err)
-      // Ignore AbortError which fires when the user closes the native share sheet
-      if (err?.name === 'AbortError') {
-        return
-      }
-      
-      // Provide a more descriptive error alert detailing what might have failed.
+      console.error('[Carxai Share Flow] Fatal Error:', err)
       if (err?.code === '42P01') {
         alert("Database structure missing. Please run the SQL migrations in Supabase to create the `shared_reports` table.")
       } else {
         alert(`There was an issue creating the share link. Please try again. Detailed error: ${err.message || 'Unknown Error'}`)
       }
     } finally {
+      console.log('[Carxai Share Flow] 10. Flow completes, cleaning up state')
       setSharing(false)
     }
   }
@@ -504,11 +552,11 @@ export default function MechanicReport({
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleShare}
-                    disabled={sharing}
-                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${sharing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={sharing || pendingShare}
+                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${(sharing || pendingShare) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
-                    {sharing ? 'Generating...' : 'Share Report'}
+                    {(sharing || pendingShare) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
+                    {sharing ? 'Generating...' : (pendingShare ? 'Preparing share...' : 'Share Report')}
                   </motion.button>
                   <motion.button 
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
