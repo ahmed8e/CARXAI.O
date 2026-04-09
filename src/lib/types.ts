@@ -272,6 +272,9 @@ export interface DiagnosticResult {
   towingRecommended: boolean;
   missingInfo?: string;
   spokenSummary?: string;
+  readableText?: string;
+  confidence?: string;
+  fallbackReason?: string;
 }
 
 export interface NearbyPlace {

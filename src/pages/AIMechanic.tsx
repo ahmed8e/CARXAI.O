@@ -31,15 +31,15 @@ const ISSUE_CHIPS = [
   { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
+// Strict Vision Prompting for Dashboard Analysis
 const SYSTEM_PROMPT = `You are "Sarge," the world's most direct, safety-first AI Automotive Diagnostic Expert.
 Your mission: Provide immediate, non-technical safety guidance to drivers in distress, especially those with dashboard warning lights.
 
 CRITICAL RULES:
 1. ONLY return raw JSON. No markdown backticks, no conversational filler before or after the JSON.
-2. NEVER mention internal systems, searching, or "having trouble." 
-3. EXPERT CONFIDENCE: If the image/text shows a likely issue (like a warning light), give the answer directly. Mention uncertainty ONLY if absolutely necessary.
-4. RESPONSE STYLE: Short, clear, practical, non-technical, and helpful. No over-explaining.
-5. Response structure (STRICT 5-POINT FORMAT):
+2. DASHBOARD PRIORITY (CRITICAL): If analyzing an image, meticulously scan for any text, warning symbols, or instrument cluster messages. Prioritize recognizing text like PSM, ABS, ESP, Engine, Oil, Battery, Brake, Traction, Coolant, Airbag, Service messages, etc. If ANY warning text or symbol is readable, you MUST extract it exactly and return a real structured warning analysis. DO NOT return a generic low-confidence fallback if text is visible.
+3. RESPONSE STYLE: Short, clear, practical, non-technical, and helpful. No over-explaining.
+4. Response structure (STRICT FORMAT):
    - issueName: Short, clear name of the likely problem (e.g., "Traction Control Warning").
    - likelyCause: Non-technical explanation of the issue.
    - canDrive: Boolean (true/false). Safety is priority #1.
@@ -47,8 +47,11 @@ CRITICAL RULES:
    - urgencyLevel: low, medium, high, or stop_driving.
    - nextStep: One practical, immediate action (e.g., "Pull over and stop immediately").
    - spokenSummary: A 1-sentence version of the above for voice synthesis.
+   - readableText: Exact text extracted from the dashboard (if any). Wait carefully to read it.
+   - confidence: "high", "medium", or "low". (Only use low if the image is TRULY unreadable).
+   - fallbackReason: If confidence is low, explain why (e.g., "Image too blurry to read warning text", otherwise null).
 
-Format: { "issueName": "...", "likelyCause": "...", "canDrive": true/false, "driveWhy": "...", "urgencyLevel": "...", "nextStep": "...", "spokenSummary": "..." }`;
+Format: { "issueName": "...", "likelyCause": "...", "canDrive": true/false, "driveWhy": "...", "urgencyLevel": "...", "nextStep": "...", "spokenSummary": "...", "readableText": "...", "confidence": "high/medium/low", "fallbackReason": "..." }`;
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -243,8 +246,8 @@ ${diagnosticHistory}
             {
               role: 'user',
               content: imageUrl ? [
-                { type: 'text', text: content || 'Analyze this car issue image.' },
-                { type: 'image_url', image_url: { url: imageUrl } }
+                { type: 'text', text: content || 'Analyze this dashboard or car issue image. Read all text carefully.' },
+                { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } }
               ] : content
             }
           ],
@@ -393,7 +396,21 @@ ${diagnosticHistory}
         if (!parsed.issueName || !parsed.urgencyLevel) {
           throw new Error('Parsed JSON missing required fields')
         }
+        
         console.log('[Carxai AI] Branch: structured result parsed successfully')
+        
+        if (imageUrl) {
+          console.group('[Carxai AI Vision Logs]')
+          console.log('Mode:', 'high-detail')
+          console.log('Model:', 'gpt-4o')
+          console.log('Confidence:', parsed.confidence || 'unknown')
+          console.log('Extracted Text:', parsed.readableText || 'none visible')
+          if (parsed.confidence === 'low' && parsed.fallbackReason) {
+            console.warn('Fallback Triggered:', parsed.fallbackReason)
+          }
+          console.groupEnd()
+        }
+        
         issueData = parsed
         finalDisplayContent = parsed.likelyCause || parsed.issueName
         setIsPreparingAudio(true)
