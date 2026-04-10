@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion'
 import { Crown, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react'
-import { POLAR_CHECKOUT_URLS } from '../lib/pricing'
+import { useNavigate } from 'react-router-dom'
 
 export default function Paywall() {
+  const navigate = useNavigate()
+
   const handleUpgrade = () => {
-    // Lead user to the default Pro Monthly checkout
-    window.location.href = POLAR_CHECKOUT_URLS.pro.monthly
+    // Lead user to the dedicated PayPal-powered pricing page
+    navigate('/choose-plan')
   }
 
   return (
@@ -56,7 +58,7 @@ export default function Paywall() {
           </button>
           
           <p className="text-[11px] font-medium text-muted mt-5 mb-1 uppercase tracking-widest">
-            Cancel anytime • Secure via Polar
+            Cancel anytime • Secure PayPal Billing
           </p>
         </div>
       </motion.div>

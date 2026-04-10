@@ -79,6 +79,37 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['ai_chats']['Insert']>
       }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          email: string | null
+          status: string
+          plan_name: string
+          billing_cycle: string | null
+          starts_at: string | null
+          ends_at: string | null
+          payment_method: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          email?: string | null
+          status?: string
+          plan_name?: string
+          billing_cycle?: string | null
+          starts_at?: string | null
+          ends_at?: string | null
+          payment_method?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['subscriptions']['Insert']>
+      }
       ai_chat_attachments: {
         Row: {
           id: string

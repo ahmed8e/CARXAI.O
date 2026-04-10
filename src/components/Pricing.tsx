@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Sparkles, ShieldCheck, Zap, Lock, Headphones, Globe } from 'lucide-react'
-import { POLAR_CHECKOUT_URLS, type PlanType, type BillingCycle as BillingCycleType } from '../lib/pricing'
+import { Check, Sparkles, ShieldCheck, Zap, Lock, Headphones, Globe, MessageSquare } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import type { PlanType, BillingCycle as BillingCycleType } from '../lib/paypal'
 
 const plans: {
   id: PlanType
@@ -34,7 +36,7 @@ const plans: {
     name: 'Pro',
     description: 'The complete car assistance experience for drivers who want faster answers and better support.',
     monthlyPrice: 12,
-    yearlyPrice: 9, // Monthly equivalent for yearly
+    yearlyPrice: 9,
     trial: '3-Day Free Trial',
     features: [
       '3-day free trial included',
@@ -44,7 +46,7 @@ const plans: {
       'Nearby provider discovery map',
       'Specialized vehicle health insights',
     ],
-    cta: 'Start 3 Days Free',
+    cta: 'Get Started',
     popular: true,
   },
   {
@@ -61,17 +63,24 @@ const plans: {
       'Faster priority support',
       'Multi-vehicle management',
     ],
-    cta: 'Choose Advanced',
+    cta: 'Get Started',
     popular: false,
   }
 ]
 
 export default function Pricing() {
   const [billingCycle, setBillingCycle] = useState<BillingCycleType>('yearly')
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
-  const handleCheckout = (planId: PlanType) => {
-    const checkoutUrl = POLAR_CHECKOUT_URLS[planId][billingCycle]
-    window.location.href = checkoutUrl
+  const handleGetStarted = (plan: typeof plans[0]) => {
+    if (!user) {
+      navigate('/auth?redirect=choose-plan')
+      return
+    }
+    
+    // User is signed in. Send them to the mechanic chat to start their free trial.
+    navigate('/dashboard/mechanic')
   }
 
   return (
@@ -106,10 +115,9 @@ export default function Pricing() {
             transition={{ delay: 0.2 }}
             className="text-slate-500 text-lg md:text-xl font-medium max-w-xl mx-auto mb-12 leading-relaxed"
           >
-            Experience the future of automotive assistance. Flexible billing, no hidden fees, cancel anytime.
+            Experience the future of automotive assistance. Start free, upgrade anytime via WhatsApp manual activation.
           </motion.p>
 
-          {/* Billing Toggle Redesign */}
           <div className="relative inline-flex items-center p-1.5 rounded-2xl bg-white border border-slate-200 shadow-sm transition-all hover:border-slate-300">
             <button 
               onClick={() => setBillingCycle('monthly')}
@@ -143,86 +151,92 @@ export default function Pricing() {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-8 items-stretch relative">
-          {plans.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -8 }}
-              className={`relative flex flex-col p-10 md:p-12 rounded-[40px] bg-white border transition-all duration-500 ${
-                plan.popular 
-                  ? 'border-[#0070E0] shadow-[0_30px_70px_rgba(0,112,224,0.12)] ring-1 ring-[#0070E0]/5 group' 
-                  : 'border-slate-100 shadow-[0_15px_60px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] hover:border-slate-200'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-5 py-2 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.25em] shadow-2xl shadow-[#0070E0]/30 flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 animate-pulse" /> Most Popular
-                </div>
-              )}
-
-              <div className="mb-10 text-left">
-                <h3 className={`text-2xl font-display font-black text-slate-900 mb-3 ${plan.popular ? 'text-[#0070E0]' : ''}`}>{plan.name}</h3>
-                <p className="text-sm text-slate-500 font-medium leading-relaxed">{plan.description}</p>
-              </div>
-
-              <div className="mb-10 flex items-baseline gap-2">
-                <span className="text-5xl font-display font-black text-slate-900 tracking-tighter">
-                  ${billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
-                </span>
-                <div className="flex flex-col">
-                   <span className="text-slate-400 font-black uppercase text-[10px] tracking-widest leading-none mb-1">/ month</span>
-                   {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
-                     <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded leading-none w-fit">
-                       Billed annually
-                     </span>
-                   )}
-                </div>
-              </div>
-
-              {plan.trial && (
-                <div className="mb-8 flex items-center gap-3">
-                  <div className="h-px flex-grow bg-slate-100" />
-                  <span className="text-[11px] font-black text-[#0070E0] uppercase tracking-[0.2em]">{plan.trial}</span>
-                  <div className="h-px flex-grow bg-slate-100" />
-                </div>
-              )}
-
-              <div className="flex-grow space-y-5 mb-12 text-left">
-                {plan.features.map((feature, idx) => (
-                  <div key={idx} className="flex items-start gap-3.5 group/feat">
-                    <div className={`mt-0.5 w-6 h-6 rounded-xl flex items-center justify-center shrink-0 border transition-all ${plan.popular ? 'bg-[#0070E0]/5 border-[#0070E0]/20 shadow-sm' : 'bg-slate-50 border-slate-100'}`}>
-                      <Check className={`w-3 h-3 ${plan.popular ? 'text-[#0070E0]' : 'text-slate-400'}`} strokeWidth={3} />
-                    </div>
-                    <span className="text-[15px] font-medium text-slate-600 transition-colors group-hover/feat:text-slate-900 leading-snug">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <motion.button
-                onClick={() => handleCheckout(plan.id)}
-                whileHover={{ y: -3, boxShadow: plan.popular ? '0_20px_40px_rgba(0,112,224,0.35)' : '0_15px_35px_rgba(0,0,0,0.1)' }}
-                whileTap={{ scale: 0.97 }}
-                className={`relative overflow-hidden w-full py-5 rounded-[24px] text-xs font-black uppercase tracking-[0.25em] transition-all group/btn ${
+        <div className="grid md:grid-cols-2 gap-8 items-stretch relative max-w-5xl mx-auto">
+          {plans.filter(p => p.id !== 'starter').map((plan, i) => {
+            return (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -8 }}
+                className={`relative flex flex-col p-10 md:p-12 rounded-[40px] bg-white border transition-all duration-500 ${
                   plan.popular 
-                    ? 'bg-[#0070E0] text-white shadow-2xl shadow-[#0070E0]/20' 
-                    : 'bg-white border-2 border-slate-100 text-slate-900 hover:border-[#0070E0] hover:text-[#0070E0]'
+                    ? 'border-[#0070E0] shadow-[0_30px_70px_rgba(0,112,224,0.12)] ring-1 ring-[#0070E0]/5 group' 
+                    : 'border-slate-100 shadow-[0_15px_60px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] hover:border-slate-200'
                 }`}
               >
-                {/* Visual indicator for interactive state */}
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                
                 {plan.popular && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-5 py-2 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.25em] shadow-2xl shadow-[#0070E0]/30 flex items-center gap-2">
+                    <Sparkles className="w-3 h-3 animate-pulse" /> Most Popular
+                  </div>
                 )}
-                {plan.cta}
-              </motion.button>
-            </motion.div>
-          ))}
+
+                <div className="mb-10 text-left">
+                  <h3 className={`text-2xl font-display font-black text-slate-900 mb-3 ${plan.popular ? 'text-[#0070E0]' : ''}`}>{plan.name}</h3>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{plan.description}</p>
+                </div>
+
+                <div className="mb-10 flex items-baseline gap-2">
+                  <span className="text-5xl font-display font-black text-slate-900 tracking-tighter">
+                    ${billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
+                  </span>
+                  <div className="flex flex-col">
+                     <span className="text-slate-400 font-black uppercase text-[10px] tracking-widest leading-none mb-1">/ month</span>
+                     {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
+                       <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded leading-none w-fit">
+                         Billed annually
+                       </span>
+                     )}
+                  </div>
+                </div>
+
+                {plan.id === 'pro' && (
+                  <div className="mb-8 flex items-center gap-3">
+                    <div className="h-px flex-grow bg-slate-100" />
+                    <span className="text-[11px] font-black text-[#0070E0] uppercase tracking-[0.2em]">3-Day Free Trial Included</span>
+                    <div className="h-px flex-grow bg-slate-100" />
+                  </div>
+                )}
+
+                <div className="flex-grow space-y-5 mb-12 text-left">
+                  {plan.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-3.5 group/feat">
+                      <div className={`mt-0.5 w-6 h-6 rounded-xl flex items-center justify-center shrink-0 border transition-all ${plan.popular ? 'bg-[#0070E0]/5 border-[#0070E0]/20 shadow-sm' : 'bg-slate-50 border-slate-100'}`}>
+                        <Check className={`w-3 h-3 ${plan.popular ? 'text-[#0070E0]' : 'text-slate-400'}`} strokeWidth={3} />
+                      </div>
+                      <span className="text-[15px] font-medium text-slate-600 transition-colors group-hover/feat:text-slate-900 leading-snug">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* WhatsApp Activation CTA */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleGetStarted(plan)}
+                  className={`w-full py-5 rounded-[24px] text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 bg-[#0070e0] text-white shadow-[0_15px_40px_rgba(0,112,224,0.3)] hover:bg-[#005bb5]`}
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  {plan.cta}
+                </motion.button>
+              </motion.div>
+            )
+          })}
         </div>
+
+        {/* Trial Nudge */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mt-12 text-center"
+        >
+          <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em]">
+            Start free, upgrade anytime via WhatsApp.
+          </p>
+        </motion.div>
 
         {/* Global Footer Trust Row */}
         <motion.div 
@@ -230,7 +244,7 @@ export default function Pricing() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8"
+          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col md:row items-center justify-between gap-8"
         >
           <div className="flex items-center gap-10">
             <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">
@@ -239,17 +253,17 @@ export default function Pricing() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">Cancel anytime</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Full control in settings</p>
+                <p className="text-[9px] font-medium leading-none mt-0.5">Full control via support</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">
               <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center bg-white shadow-sm group-hover:border-slate-200 group-hover:shadow-md transition-all">
-                <Lock className="w-5 h-5 text-[#0070E0]" strokeWidth={2.5} />
+                <Lock className="w-5 h-5 text-emerald-500" strokeWidth={2.5} />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">Secure Billing</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Encrypted transactions</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">Manual Activation</p>
+                <p className="text-[9px] font-medium leading-none mt-0.5">Verified via WhatsApp</p>
               </div>
             </div>
 
@@ -258,8 +272,8 @@ export default function Pricing() {
                 <Headphones className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">24/7 Support</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Priority human help</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">24/7 Priority</p>
+                <p className="text-[9px] font-medium leading-none mt-0.5">Personal assistance</p>
               </div>
             </div>
           </div>
@@ -267,7 +281,7 @@ export default function Pricing() {
           <div className="flex items-center gap-4 text-slate-400 border-l border-slate-100 pl-8 hidden lg:flex">
              <Globe className="w-4 h-4" />
              <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
-               Operating in 40+ Cities Worldwide
+               Global Community Support
              </p>
           </div>
         </motion.div>

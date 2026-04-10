@@ -1,7 +1,45 @@
--- ============================================================
--- Carxai Admin Dashboard — Database Migrations
--- Run this ONCE in your Supabase SQL Editor (Dashboard → SQL Editor → New query)
--- ============================================================
+-- ── 0. PROFILES Table & Trigger ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id          uuid PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
+  email       text UNIQUE NOT NULL,
+  full_name   text,
+  avatar_url  text,
+  created_at  timestamptz DEFAULT now(),
+  updated_at  timestamptz DEFAULT now()
+);
+
+-- Trigger function to handle new user signups
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, avatar_url)
+  VALUES (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to call the function on signup
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Backfill existing users from auth.users into public.profiles
+INSERT INTO public.profiles (id, email, full_name, avatar_url, created_at)
+SELECT 
+  id, 
+  email, 
+  raw_user_meta_data->>'full_name',
+  raw_user_meta_data->>'avatar_url',
+  created_at
+FROM auth.users
+ON CONFLICT (id) DO NOTHING;
+
 
 -- ── 1. Admin read policy on PROFILES ─────────────────────────────────
 -- Allow a user whose user_metadata.role = 'admin' to read all profile rows.
@@ -46,27 +84,37 @@ END $$;
 
 
 -- ── 3. SUBSCRIPTIONS table ────────────────────────────────────────────
--- Real structure ready for Polar/Stripe webhook sync.
 CREATE TABLE IF NOT EXISTS public.subscriptions (
   id                    uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id               uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   email                 text,
-  status                text NOT NULL DEFAULT 'trialing', -- trialing | active | canceled | past_due
-  plan                  text NOT NULL DEFAULT 'Pro',
-  billing_interval      text DEFAULT 'monthly',
-  trial_starts_at       timestamptz,
-  trial_ends_at         timestamptz,
-  current_period_start  timestamptz,
-  current_period_end    timestamptz,
-  polar_subscription_id text,
+  status                text NOT NULL DEFAULT 'trialing', -- pending | active | expired | cancelled | trialing
+  plan_name             text NOT NULL DEFAULT 'pro',
+  billing_cycle         text DEFAULT 'monthly',
+  starts_at             timestamptz,
+  ends_at               timestamptz,
+  payment_method        text,
+  notes                 text,
   created_at            timestamptz DEFAULT now(),
   updated_at            timestamptz DEFAULT now(),
   UNIQUE (user_id)
 );
 
+-- Note: Ensure old columns from messy historical schemas are mapped or ignored.
+DO $$
+BEGIN
+  BEGIN ALTER TABLE public.subscriptions RENAME COLUMN plan TO plan_name; EXCEPTION WHEN undefined_column THEN END;
+  BEGIN ALTER TABLE public.subscriptions RENAME COLUMN billing_interval TO billing_cycle; EXCEPTION WHEN undefined_column THEN END;
+  BEGIN ALTER TABLE public.subscriptions RENAME COLUMN current_period_start TO starts_at; EXCEPTION WHEN undefined_column THEN END;
+  BEGIN ALTER TABLE public.subscriptions RENAME COLUMN current_period_end TO ends_at; EXCEPTION WHEN undefined_column THEN END;
+END $$;
+-- Make sure new payment_method and notes columns definitely exist 
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS payment_method text;
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS notes text;
+
+
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 
--- Users can only see their own subscription
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -89,6 +137,36 @@ BEGIN
       CREATE POLICY "Admin can read all subscriptions" ON public.subscriptions
         FOR SELECT
         USING (
+          (auth.jwt() -> ''user_metadata'' ->> ''role'') = ''admin''
+          OR (auth.jwt() -> ''raw_user_meta_data'' ->> ''role'') = ''admin''
+        )
+    ';
+  END IF;
+  
+  -- Admin can update all subscriptions
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'subscriptions'
+      AND policyname = 'Admin can update subscriptions'
+  ) THEN
+    EXECUTE '
+      CREATE POLICY "Admin can update subscriptions" ON public.subscriptions
+        FOR UPDATE
+        USING (
+          (auth.jwt() -> ''user_metadata'' ->> ''role'') = ''admin''
+          OR (auth.jwt() -> ''raw_user_meta_data'' ->> ''role'') = ''admin''
+        )
+    ';
+  END IF;
+  
+  -- Admin can insert all subscriptions
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'subscriptions'
+      AND policyname = 'Admin can insert subscriptions'
+  ) THEN
+    EXECUTE '
+      CREATE POLICY "Admin can insert subscriptions" ON public.subscriptions
+        FOR INSERT
+        WITH CHECK (
           (auth.jwt() -> ''user_metadata'' ->> ''role'') = ''admin''
           OR (auth.jwt() -> ''raw_user_meta_data'' ->> ''role'') = ''admin''
         )
@@ -141,12 +219,12 @@ END $$;
 -- ── 5. Seed subscriptions from existing profiles ──────────────────────
 -- Backfills historical users so the subscriptions page isn't empty immediately.
 -- Uses metadata stored in auth.users for trial dates where available.
-INSERT INTO public.subscriptions (user_id, email, status, plan, trial_starts_at, trial_ends_at, created_at)
+INSERT INTO public.subscriptions (user_id, email, status, plan_name, starts_at, ends_at, created_at)
 SELECT
   p.id,
   p.email,
   'trialing',
-  'Pro',
+  'pro',
   p.created_at,
   p.created_at + interval '3 days',
   p.created_at

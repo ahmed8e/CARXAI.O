@@ -16,9 +16,13 @@ import {
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
+import UpgradeGate from '../components/chat/UpgradeGate'
+import { useSubscription } from '../hooks/useSubscription'
 import type { Database } from '../lib/types'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
+
+const FREE_MESSAGE_LIMIT = 2
 
 const ISSUE_CHIPS = [
   { label: 'Engine light', value: 'My check engine light is on', icon: Activity },
@@ -111,6 +115,9 @@ export default function AIMechanic() {
   const [isPreparingAudio, setIsPreparingAudio] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
+  const [usageCount, setUsageCount] = useState(0)
+  const [isGated, setIsGated] = useState(false)
+  const { isPaid, loading: subLoading } = useSubscription()
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -121,6 +128,37 @@ export default function AIMechanic() {
       fetchActiveVehicle()
     }
   }, [user])
+
+  useEffect(() => {
+    if (user && !subLoading) {
+      if (isPaid) {
+        setIsGated(false)
+      } else {
+        fetchUsageCount()
+      }
+    }
+  }, [isPaid, subLoading, user])
+
+  const fetchUsageCount = async () => {
+    if (!user || isPaid) return
+
+    try {
+      const { count, error } = await supabase
+        .from('ai_chats')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      
+      if (!error && count !== null) {
+        console.log('[Carxai] AI Mechanic usage count:', count)
+        setUsageCount(count)
+        if (count >= FREE_MESSAGE_LIMIT) {
+          setIsGated(true)
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching usage count:', err)
+    }
+  }
 
   const fetchActiveVehicle = async () => {
     setLoadingVehicle(true)
@@ -545,6 +583,9 @@ ${diagnosticHistory}
         } else if (chatError) {
           console.error('[Carxai AI] Failed to save chat to DB:', chatError)
         }
+        
+        // Final: Re-fetch usage to see if we hit the limit
+        await fetchUsageCount()
       }
     } catch (err) {
       console.error('AI Error:', err)
@@ -924,6 +965,8 @@ ${diagnosticHistory}
           );
         })}
 
+        {isGated && <UpgradeGate />}
+
         {(loading || streamingMessage) && (
           <div className="flex justify-start items-start">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-navy shadow-lg border border-white/10 relative overflow-hidden">
@@ -1052,7 +1095,7 @@ ${diagnosticHistory}
                   className="w-full bg-transparent outline-none resize-none
                              text-[15px] font-medium leading-[1.6]
                              text-on-surface placeholder:text-muted/50"
-                  disabled={loading}
+                  disabled={loading || isGated}
                 />
               )}
             </AnimatePresence>
@@ -1070,7 +1113,7 @@ ${diagnosticHistory}
                 <motion.button
                   key={i}
                   onClick={btn.onClick}
-                  disabled={loading}
+                  disabled={loading || isGated}
                   className="relative w-9 h-9 rounded-[16px] flex items-center justify-center transition-all
                              hover:bg-navy/5 active:scale-95 group"
                   whileTap={{ scale: 0.9 }}
@@ -1085,7 +1128,7 @@ ${diagnosticHistory}
               {/* Mic — Now grouped with Send */}
               <motion.button
                 onClick={toggleListening}
-                disabled={loading || isProcessing}
+                disabled={loading || isProcessing || isGated}
                 className={`w-9 h-9 rounded-[16px] flex items-center justify-center transition-all ${isListening
                     ? 'bg-red-500 text-white shadow-lg shadow-red-400/30'
                     : 'text-muted hover:bg-navy/5 hover:text-navy active:scale-90'
@@ -1100,7 +1143,7 @@ ${diagnosticHistory}
               {/* Send Button */}
               <motion.button
                 onClick={() => sendMessage(input)}
-                disabled={loading || (!input.trim() && !isListening)}
+                disabled={loading || isGated || (!input.trim() && !isListening)}
                 className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
                             transition-all duration-300 ${input.trim() && !loading
                     ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
