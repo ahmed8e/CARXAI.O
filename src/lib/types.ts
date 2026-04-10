@@ -248,22 +248,26 @@ export type Database = {
       shared_reports: {
         Row: {
           id: string
-          report_id: string
-          share_id: string
-          user_id: string
+          report_id: string | null
+          token: string
+          created_by: string
           vehicle_data: any
           diagnosis_data: any
           messages: any
+          customer_data: any
+          summary: string | null
           created_at: string
         }
         Insert: {
           id?: string
-          report_id: string
-          share_id: string
-          user_id: string
+          report_id?: string | null
+          token: string
+          created_by: string
           vehicle_data: any
           diagnosis_data: any
           messages?: any
+          customer_data?: any
+          summary?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['shared_reports']['Insert']>
@@ -272,20 +276,20 @@ export type Database = {
         Row: {
           id: string
           report_id: string | null
-          share_id: string | null
+          shared_link_id: string | null
           contact_value: string
           contact_type: string
           source: string
-          created_at: string
+          submitted_at: string
         }
         Insert: {
           id?: string
           report_id?: string | null
-          share_id?: string | null
+          shared_link_id?: string | null
           contact_value: string
           contact_type: string
           source?: string
-          created_at?: string
+          submitted_at?: string
         }
         Update: Partial<Database['public']['Tables']['mechanic_leads']['Insert']>
       }
@@ -304,17 +308,27 @@ export interface Message {
 }
 
 export interface DiagnosticResult {
-  issueName: string
-  likelyCause: string
-  canDrive: boolean
-  driveWhy: string
-  urgencyLevel: 'low' | 'medium' | 'high' | 'stop_driving'
-  nextStep: string
+  // New Dashboard Analysis Fields
+  dashboard_type?: 'warning_light' | 'text_message' | 'both' | 'unknown'
+  warning_light_name?: string | null
+  fault_message_text?: string | null
+  normalized_issue?: string
+  severity?: 'low' | 'medium' | 'high'
+  can_drive: boolean
+  confidence?: 'low' | 'medium' | 'high'
+  used_vehicle_context?: boolean
+  explanation: string
+  next_step: string
+
+  // Backward Compatibility / Legacy mapping
+  issueName?: string
+  likelyCause?: string
+  driveWhy?: string
+  urgencyLevel?: 'low' | 'medium' | 'high' | 'stop_driving'
   mechanicRecommended?: boolean
   towingRecommended?: boolean
   spokenSummary?: string
   readableText?: string
-  confidence?: 'high' | 'medium' | 'low'
   fallbackReason?: string | null
   report_id?: string // Links to the ai_chats DB record
 }

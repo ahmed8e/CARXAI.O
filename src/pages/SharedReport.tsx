@@ -11,7 +11,7 @@ import MechanicLeadModal from '../components/MechanicLeadModal'
 import ListenButton from '../components/ui/ListenButton'
 
 export default function SharedReport() {
-  const { shareId } = useParams()
+  const { shareId, token } = useParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reportData, setReportData] = useState<any>(null)
@@ -22,17 +22,21 @@ export default function SharedReport() {
 
   useEffect(() => {
     async function fetchSharedReport() {
-      if (!shareId) {
+      const activeIdentifier = token || shareId
+      if (!activeIdentifier) {
         setError('Invalid share link.')
         setLoading(false)
         return
       }
 
       try {
+        // Alignment: Check both token (new canonical) and share_id (legacy)
+        const queryField = token ? 'token' : 'share_id'
+        
         const { data, error: fetchErr } = await supabase
           .from('shared_reports')
           .select('*')
-          .eq('share_id', shareId)
+          .eq(queryField, activeIdentifier)
           .single()
 
         if (fetchErr) throw fetchErr
@@ -41,7 +45,7 @@ export default function SharedReport() {
         setReportData(data)
         
         // Show modal only once per session for this report
-        const modalShownKey = `carxai_lead_modal_shown_${shareId}`
+        const modalShownKey = `carxai_lead_modal_shown_${activeIdentifier}`
         if (!sessionStorage.getItem(modalShownKey)) {
           setTimeout(() => setShowLeadModal(true), 1500) // Delay modal slightly for premium feel
           sessionStorage.setItem(modalShownKey, 'true')
@@ -56,7 +60,7 @@ export default function SharedReport() {
     }
 
     fetchSharedReport()
-  }, [shareId])
+  }, [shareId, token])
 
   if (loading) {
     return (
@@ -213,8 +217,7 @@ export default function SharedReport() {
       <MechanicLeadModal 
         isOpen={showLeadModal}
         onClose={() => setShowLeadModal(false)}
-        reportId={reportData.id}
-        shareId={reportData.share_id}
+        sharedLinkId={reportData.id}
       />
     </div>
   )

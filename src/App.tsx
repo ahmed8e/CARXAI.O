@@ -66,6 +66,7 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/report/:shareId" element={<SharedReport />} />
+            <Route path="/shared-report/:token" element={<SharedReport />} />
 
             {/* Protected app routes */}
             <Route path="/choose-plan" element={

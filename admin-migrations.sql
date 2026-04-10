@@ -157,14 +157,36 @@ ON CONFLICT (user_id) DO NOTHING;
 -- Stores a snapshot of a diagnostic report to be shared via public link.
 CREATE TABLE IF NOT EXISTS public.shared_reports (
   id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  share_id         text UNIQUE NOT NULL, -- e.g., 'CX-1A2B3C'
-  report_id        uuid REFERENCES public.ai_chats(id) ON DELETE CASCADE NOT NULL,
-  user_id          uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  token            text UNIQUE NOT NULL, -- e.g., 'CX-1A2B3C'
+  report_id        uuid REFERENCES public.ai_chats(id) ON DELETE CASCADE, -- Nullable to decouple from history saving
+  created_by       uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   vehicle_data     jsonb NOT NULL,
   diagnosis_data   jsonb NOT NULL,
-  messages         jsonb DEFAULT '[]', -- optional conversation context
+  messages         jsonb DEFAULT '[]', -- conversation context
+  customer_data    jsonb DEFAULT '{}', -- customer name, email, etc.
+  summary          text, -- text summary of the report
   created_at       timestamptz DEFAULT now()
 );
+
+-- Ensure existing table is updated (in case columns already exist or need rename)
+-- Note: Manually running these in Supabase is recommended if Rename is needed.
+ALTER TABLE public.shared_reports ALTER COLUMN report_id DROP NOT NULL;
+DO $$ 
+BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shared_reports' AND column_name='token') THEN
+    ALTER TABLE public.shared_reports RENAME COLUMN share_id TO token;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shared_reports' AND column_name='created_by') THEN
+    ALTER TABLE public.shared_reports RENAME COLUMN user_id TO created_by;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shared_reports' AND column_name='customer_data') THEN
+    ALTER TABLE public.shared_reports ADD COLUMN customer_data jsonb DEFAULT '{}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shared_reports' AND column_name='summary') THEN
+    ALTER TABLE public.shared_reports ADD COLUMN summary text;
+  END IF;
+END $$;
+
 
 -- Public read access by share_id
 ALTER TABLE public.shared_reports ENABLE ROW LEVEL SECURITY;
@@ -194,13 +216,31 @@ END $$;
 -- Captures emails/phones from external mechanics viewing shared reports.
 CREATE TABLE IF NOT EXISTS public.mechanic_leads (
   id               uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  report_id        uuid REFERENCES public.shared_reports(id) ON DELETE SET NULL,
-  share_id         text REFERENCES public.shared_reports(share_id) ON DELETE CASCADE,
+  report_id        uuid REFERENCES public.ai_chats(id) ON DELETE SET NULL, -- Nullable to decouple from history
+  shared_link_id   uuid REFERENCES public.shared_reports(id) ON DELETE CASCADE, -- Link to the shared report snapshot
   contact_value    text NOT NULL,
   contact_type     text NOT NULL, -- 'phone' or 'email'
   source           text DEFAULT 'shared_report_modal',
-  created_at       timestamptz DEFAULT now()
+  submitted_at     timestamptz DEFAULT now() -- Canonical name for user's reports
 );
+
+-- Ensure existing table is updated
+DO $$ 
+BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='mechanic_leads' AND column_name='shared_link_id') THEN
+    ALTER TABLE public.mechanic_leads RENAME COLUMN report_id TO shared_link_id;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='mechanic_leads' AND column_name='report_id') THEN
+    ALTER TABLE public.mechanic_leads ADD COLUMN report_id uuid REFERENCES public.ai_chats(id) ON DELETE SET NULL;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='mechanic_leads' AND column_name='share_id') THEN
+     ALTER TABLE public.mechanic_leads DROP COLUMN share_id;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='mechanic_leads' AND column_name='submitted_at') THEN
+    ALTER TABLE public.mechanic_leads RENAME COLUMN created_at TO submitted_at;
+  END IF;
+END $$;
+
 
 -- Anyone can insert leads (from the public report page)
 ALTER TABLE public.mechanic_leads ENABLE ROW LEVEL SECURITY;

@@ -4,13 +4,12 @@ import { X, CheckCircle, Mail, Phone, ArrowRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 interface MechanicLeadModalProps {
-  shareId: string
-  reportId: string
+  sharedLinkId: string
   isOpen: boolean
   onClose: () => void
 }
 
-export default function MechanicLeadModal({ shareId, reportId, isOpen, onClose }: MechanicLeadModalProps) {
+export default function MechanicLeadModal({ sharedLinkId, isOpen, onClose }: MechanicLeadModalProps) {
   const [contactValue, setContactValue] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -45,18 +44,35 @@ export default function MechanicLeadModal({ shareId, reportId, isOpen, onClose }
     setSubmitting(true)
     setError('')
 
+    const payload = {
+      report_id: null, // Lead capture is independent of history
+      shared_link_id: sharedLinkId,
+      contact_value: contactValue.trim(),
+      contact_type: type,
+      source: 'shared_report_modal'
+    }
+
+    console.group('[Carxai Lead Capture] Submission Details')
+    console.log('Shared Link UUID:', sharedLinkId)
+    console.log('Payload:', payload)
+    console.groupEnd()
+
     try {
+      console.log('[Carxai Lead Capture] Proceeding with Supabase insert...')
       const { error: insertError } = await supabase
         .from('mechanic_leads')
-        .insert([{
-          report_id: reportId,
-          share_id: shareId,
-          contact_value: contactValue.trim(),
-          contact_type: type,
-          source: 'shared_report_modal'
-        }] as any)
+        .insert([payload] as any)
 
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error('[Carxai Lead Capture] Supabase insert failed', {
+          code: insertError.code,
+          message: insertError.message,
+          details: insertError.details
+        })
+        throw insertError
+      }
+
+      console.log('[Carxai Lead Capture] Submission Successful')
 
       if (typeof window !== 'undefined' && 'dataLayer' in window) {
         (window as any).dataLayer.push({ event: 'mechanic_lead_submitted', leadType: type })
@@ -68,7 +84,6 @@ export default function MechanicLeadModal({ shareId, reportId, isOpen, onClose }
       }, 2000)
 
     } catch (err: any) {
-      console.error('Lead capture error:', err)
       setError('Something went wrong. You can skip for now.')
     } finally {
       setSubmitting(false)
@@ -92,35 +107,35 @@ export default function MechanicLeadModal({ shareId, reportId, isOpen, onClose }
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="relative w-full max-w-lg bg-[#F4F7FF] rounded-[32px] overflow-hidden shadow-2xl border border-white/50"
+            className="relative w-full max-w-[440px] bg-white rounded-[40px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-slate-100"
           >
             {/* Glossy top highlight */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none" />
             
             {/* Close Button */}
             {!submitted && (
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-200/50 transition-colors text-slate-400 hover:text-slate-600 z-10"
+                className="absolute top-8 right-8 p-2 rounded-full hover:bg-slate-50 transition-colors text-slate-300 hover:text-slate-600 z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
 
-            <div className="p-8 md:p-10 relative z-10">
+            <div className="p-10 md:p-12 relative z-10">
               <AnimatePresence mode="wait">
                 {submitted ? (
                   <motion.div
                     key="success"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center text-center py-8"
+                    className="flex flex-col items-center justify-center text-center py-10"
                   >
-                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
-                      <CheckCircle className="w-8 h-8 text-emerald-600" />
+                    <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-8">
+                      <CheckCircle className="w-10 h-10 text-emerald-500" />
                     </div>
-                    <h3 className="text-2xl font-display font-bold text-slate-900 mb-2">Thanks!</h3>
-                    <p className="text-slate-600 font-medium">We'll notify you about relevant nearby opportunities.</p>
+                    <h3 className="text-2xl font-display font-bold text-slate-900 mb-2">You're in!</h3>
+                    <p className="text-slate-500 font-medium">We'll reach out when nearby opportunities match your area.</p>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -130,55 +145,61 @@ export default function MechanicLeadModal({ shareId, reportId, isOpen, onClose }
                     exit={{ opacity: 0 }}
                   >
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0E3882]/5 border border-[#0E3882]/10 mb-6">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#0E3882] animate-pulse" />
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-[#0E3882]">Mechanic Network</span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E3882]/5 border border-[#0E3882]/10 mb-8">
+                       <Zap className="w-3 h-3 text-[#0E3882]" fill="currentColor" />
+                      <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#0E3882]">Mechanic Network</span>
                     </div>
 
-                    <h2 className="text-3xl font-display font-black text-[#0E1B39] tracking-tight mb-4">
-                      Get more nearby client opportunities
+                    <h2 className="text-[32px] leading-[1.1] font-display font-black text-[#0E1B39] tracking-tight mb-5">
+                      Get more local repair opportunities
                     </h2>
                     
-                    <p className="text-sm font-medium text-slate-600 leading-relaxed mb-8">
-                      Leave your phone number or email to receive similar diagnostic cases and local customer requests in the future.
+                    <p className="text-[15px] font-medium text-slate-500 leading-relaxed mb-10">
+                      Leave your email or phone number to receive relevant nearby customer requests and similar repair cases.
                     </p>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                       <div>
-                        <div className="relative">
+                        <div className="relative group">
                           <input
                             type="text"
                             value={contactValue}
                             onChange={(e) => setContactValue(e.target.value)}
                             placeholder="Enter your email or phone number"
-                            className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0070E0] focus:border-transparent transition-all font-medium"
+                            className="w-full pl-14 pr-5 py-5 rounded-2xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#0070E0]/10 focus:border-[#0070E0] focus:bg-white transition-all font-medium text-[15px]"
                           />
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-slate-400">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 text-slate-300 group-focus-within:text-[#0070E0] transition-colors">
                             <Mail className="w-4 h-4" />
-                            <span className="text-slate-300">/</span>
+                            <div className="w-px h-3 bg-slate-200" />
                             <Phone className="w-4 h-4" />
                           </div>
                         </div>
-                        {error && <p className="text-red-500 text-xs font-semibold mt-2 ml-1">{error}</p>}
+                        {error && <p className="text-red-500 text-xs font-bold mt-3 ml-2 flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-red-500" /> {error}</p>}
                       </div>
 
-                      <div className="pt-2 flex flex-col gap-3">
+                      <div className="pt-2 flex flex-col gap-4">
                         <button
                           type="submit"
                           disabled={submitting || !contactValue.trim()}
-                          className="w-full py-4 rounded-xl bg-[#0070E0] text-white font-bold tracking-wide shadow-lg shadow-[#0070E0]/20 hover:bg-[#005bb5] transition-all disabled:opacity-50 disabled:hover:bg-[#0070E0] flex items-center justify-center gap-2 group"
+                          className="w-full py-5 rounded-2xl bg-[#0070E0] text-white font-bold tracking-wide shadow-xl shadow-[#0070E0]/20 hover:bg-[#005bb5] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-3 group"
                         >
-                          {submitting ? 'Submitting...' : 'Continue'}
-                          {!submitting && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                          {submitting ? 'Connecting...' : 'Get opportunities'}
+                          {!submitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                         </button>
 
                         <button
                           type="button"
                           onClick={onClose}
-                          className="w-full py-3 text-slate-500 hover:text-slate-800 text-sm font-semibold transition-colors"
+                          className="w-full py-2 text-slate-400 hover:text-slate-600 text-[13px] font-bold transition-colors"
                         >
                           Skip and view report
                         </button>
+                      </div>
+
+                      {/* Trust Line */}
+                      <div className="pt-4 flex items-center justify-center gap-2 border-t border-slate-100">
+                        <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">No spam. Only useful local opportunities.</p>
                       </div>
                     </form>
                   </motion.div>

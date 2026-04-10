@@ -6,8 +6,8 @@ import { supabase } from '../lib/supabase'
 import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
 import { useTTS } from '../lib/useTTS'
 import ListenButton from '../components/ui/ListenButton'
-import type { Message, DiagnosticResult } from '../lib/types'
-import { Loader2 } from 'lucide-react'
+import type { Message, DiagnosticResult, UrgencyLevel } from '../lib/types'
+import { Loader2, CheckCircle } from 'lucide-react'
 import {
   Bot, Send,
   Mic, RefreshCw, Zap,
@@ -32,26 +32,51 @@ const ISSUE_CHIPS = [
 ]
 
 // Strict Vision Prompting for Dashboard Analysis
-const SYSTEM_PROMPT = `You are "Sarge," the world's most direct, safety-first AI Automotive Diagnostic Expert.
-Your mission: Provide immediate, non-technical safety guidance to drivers in distress, especially those with dashboard warning lights.
+const SYSTEM_PROMPT = `You are an automotive dashboard fault reader.
 
-CRITICAL RULES:
-1. ONLY return raw JSON. No markdown backticks, no conversational filler before or after the JSON.
-2. DASHBOARD PRIORITY (CRITICAL): If analyzing an image, meticulously scan for any text, warning symbols, or instrument cluster messages. Prioritize recognizing text like PSM, ABS, ESP, Engine, Oil, Battery, Brake, Traction, Coolant, Airbag, Service messages, etc. If ANY warning text or symbol is readable, you MUST extract it exactly and return a real structured warning analysis. DO NOT return a generic low-confidence fallback if text is visible.
-3. RESPONSE STYLE: Short, clear, practical, non-technical, and helpful. No over-explaining.
-4. Response structure (STRICT FORMAT):
-   - issueName: Short, clear name of the likely problem (e.g., "Traction Control Warning").
-   - likelyCause: Non-technical explanation of the issue.
-   - canDrive: Boolean (true/false). Safety is priority #1.
-   - driveWhy: Direct reasoning for the "Can you keep driving" status (e.g., "Risk of engine seizure").
-   - urgencyLevel: low, medium, high, or stop_driving.
-   - nextStep: One practical, immediate action (e.g., "Pull over and stop immediately").
-   - spokenSummary: A 1-sentence version of the above for voice synthesis.
-   - readableText: Exact text extracted from the dashboard (if any). Wait carefully to read it.
-   - confidence: "high", "medium", or "low". (Only use low if the image is TRULY unreadable).
-   - fallbackReason: If confidence is low, explain why (e.g., "Image too blurry to read warning text", otherwise null).
+Your task:
+Analyze a car dashboard image and detect:
+1. warning lights / dashboard symbols
+2. dashboard fault text messages
+3. both together if present
 
-Format: { "issueName": "...", "likelyCause": "...", "canDrive": true/false, "driveWhy": "...", "urgencyLevel": "...", "nextStep": "...", "spokenSummary": "...", "readableText": "...", "confidence": "high/medium/low", "fallbackReason": "..." }`;
+Important:
+- Focus only on dashboard warnings, symbols, and fault messages.
+- Do not analyze the whole car.
+- If a text fault message is visible, read it and use it as strong evidence.
+- If both icon and message are visible, combine them.
+- Return only valid JSON.
+- Do not return markdown or freeform paragraphs.
+
+JSON Output Schema:
+{
+  "dashboard_type": "warning_light" | "text_message" | "both" | "unknown",
+  "warning_light_name": string | null,
+  "fault_message_text": string | null,
+  "normalized_issue": string,
+  "severity": "low" | "medium" | "high",
+  "can_drive": boolean,
+  "confidence": "low" | "medium" | "high",
+  "explanation": string,
+  "next_step": string
+}
+
+Rules:
+- If a warning symbol is clearly visible and recognizable, do not return generic low confidence.
+- If a dashboard text fault message is readable, extract it accurately.
+- If both are present, combine them into one final issue.
+- Only return low confidence if the image is truly too blurry, too dark, or the message is unreadable.
+- Orange Airbag / SRS Icon Rule:
+  - warning_light_name: "Airbag / SRS warning light"
+  - normalized_issue: "Airbag system fault"
+  - severity: "medium"
+  - can_drive: true
+  - explanation: "The airbag or SRS system may have a fault and may not function correctly in a crash."
+  - next_step: "Drive cautiously and have the SRS system scanned soon."
+- Severity Rules:
+  - HIGH: red oil pressure, red coolant temp, brake failure, charging/overheating warnings.
+  - MEDIUM: airbag/SRS, ABS, TPMS, orange check engine, service faults.
+  - LOW: washer fluid, maintenance reminder, non-critical bulb warnings.`;
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -210,17 +235,14 @@ export default function AIMechanic() {
     try {
       const symptomContext = chipLabel ? `USER SELECTED SYMPTOM: ${chipLabel}` : '';
       
-      const vehicleContext = activeVehicle ? `
-VEHICLE CONTEXT:
-- Brand: ${activeVehicle.make}
-- Model: ${activeVehicle.model}
-- Year: ${activeVehicle.year}
-- Fuel Type: ${activeVehicle.fuel_type || 'Unknown'}
-- Engine: ${activeVehicle.engine_type || 'Unknown'}
-- Gearbox: ${activeVehicle.gearbox || 'Unknown'}
-- Mileage: ${activeVehicle.mileage || 'Unknown'} km
-- VIN: ${activeVehicle.vin || 'Not provided'}` 
-: 'VEHICLE CONTEXT: Not available. Provide a general diagnosis.'
+      const vehicleContext = activeVehicle ? {
+        make: activeVehicle.make,
+        model: activeVehicle.model,
+        year: activeVehicle.year,
+        fuel_type: activeVehicle.fuel_type || 'Unknown',
+        engine_type: activeVehicle.engine_type || 'Unknown',
+        gearbox: activeVehicle.gearbox || 'Unknown'
+      } : null;
 
       const historyContext = diagnosticHistory ? `
 DIAGNOSTIC HISTORY (Last 5 events):
@@ -228,87 +250,74 @@ ${diagnosticHistory}
 (Note: Use this history to spot recurring patterns or unresolved issues.)` 
 : 'DIAGNOSTIC HISTORY: Initial session. No previous records.'
 
-      // API Logic moved to server-side proxy (/api/chat) for security and CORS
+      // Use a helper for the API call to support retries
+      const performAnalysis = async (isRetry = false) => {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            stream: true,
+            messages: [
+              { role: 'system', content: SYSTEM_PROMPT },
+              { 
+                role: 'system', 
+                content: `VEHICLE CONTEXT: ${vehicleContext ? JSON.stringify(vehicleContext) : 'None provided'}\n\n${symptomContext}\n\n${historyContext}${isRetry ? '\n\nIMPORTANT: Your previous response was invalid JSON. Please return ONLY valid JSON matching the requested schema.' : ''}` 
+              },
+              ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
+              {
+                role: 'user',
+                content: imageUrl ? [
+                  { type: 'text', text: content || 'Analyze this dashboard or car issue image. Read all text carefully.' },
+                  { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } }
+                ] : content
+              }
+            ],
+            response_format: { type: "json_object" },
+            max_tokens: 800,
+          }),
+        })
 
-      // Use our serverless proxy to avoid CORS issues and protect the API key
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          stream: true,
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'system', content: `${symptomContext}\n\n${vehicleContext}\n\n${historyContext}` },
-            ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
-            {
-              role: 'user',
-              content: imageUrl ? [
-                { type: 'text', text: content || 'Analyze this dashboard or car issue image. Read all text carefully.' },
-                { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } }
-              ] : content
-            }
-          ],
-          response_format: { type: "json_object" },
-          max_tokens: 800,
-        }),
-      })
-
-      if (!response.body) throw new Error('No response body')
-      
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let accumulatedJSON = ''
-      
-      setStreamingMessage(imageUrl ? 'Analyzing your photo…' : 'Analyzing systems...')
-
-      while (true) {
-        const { value, done } = await reader.read()
-        if (done) break
-
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
+        if (!response.body) throw new Error('No response body')
         
-        for (const line of lines) {
-          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-            try {
-              const json = JSON.parse(line.replace('data: ', ''))
-              const delta = json.choices[0]?.delta?.content || ''
-              accumulatedJSON += delta
-              
-              // Perceived speed: Show the user something is happening
-              // Since it's JSON, we can't easily show partial text without regex
-              // but we can update a generic status or try to extract likelyCause
-              if (accumulatedJSON.includes('"likelyCause": "')) {
-                const parts = accumulatedJSON.split('"likelyCause": "')
-                if (parts.length > 1) {
-                  const likelyCausePartial = parts[1].split('"')[0]
-                  if (likelyCausePartial) {
-                    setStreamingMessage(likelyCausePartial)
-                  }
-                }
-              }
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        let chunkedJSON = ''
+        
+        setStreamingMessage(imageUrl ? 'Analyzing your photo…' : 'Analyzing systems...')
 
-              // Extract spokenSummary as it appears
-              if (accumulatedJSON.includes('"spokenSummary": "')) {
-                const parts = accumulatedJSON.split('"spokenSummary": "')
-                if (parts.length > 1) {
-                  const spokenSummaryPartial = parts[1].split('"')[0]
-                  if (spokenSummaryPartial.length > 10 && !isPreparingAudio) {
-                    // Start pre-fetching the summary as soon as we have a decent chunk
-                    setIsPreparingAudio(true)
-                    prefetch(spokenSummaryPartial).finally(() => setIsPreparingAudio(false))
+        while (true) {
+          const { value, done } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value)
+          const lines = chunk.split('\n')
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+              try {
+                const json = JSON.parse(line.replace('data: ', ''))
+                const delta = json.choices[0]?.delta?.content || ''
+                chunkedJSON += delta
+                
+                // Partial streaming feedback
+                if (chunkedJSON.includes('"normalized_issue": "')) {
+                  const parts = chunkedJSON.split('"normalized_issue": "')
+                  if (parts.length > 1) {
+                    const partialText = parts[1].split('"')[0]
+                    if (partialText) setStreamingMessage(partialText)
                   }
                 }
-              }
-            } catch (e) {
-              // Ignore partial JSON parse errors
+              } catch (e) { }
             }
           }
         }
+        return chunkedJSON;
       }
+
+      let accumulatedJSON = await performAnalysis();
 
       let issueData: DiagnosticResult | undefined
       let finalDisplayContent = ''
@@ -391,30 +400,43 @@ ${diagnosticHistory}
       }
 
       try {
-        const parsed = extractJSON(accumulatedJSON)
-        // Validate critical fields exist
-        if (!parsed.issueName || !parsed.urgencyLevel) {
+        let parsed: any;
+        try {
+          parsed = extractJSON(accumulatedJSON)
+        } catch (e) {
+          console.warn('[Carxai AI] First parse failed, retrying once...', e)
+          accumulatedJSON = await performAnalysis(true)
+          parsed = extractJSON(accumulatedJSON)
+        }
+
+        // Validate critical fields based on new schema
+        if (!parsed.normalized_issue || !parsed.severity) {
           throw new Error('Parsed JSON missing required fields')
         }
         
-        console.log('[Carxai AI] Branch: structured result parsed successfully')
+        console.log('[Carxai AI] Branch: structured dashboard result parsed successfully')
         
         if (imageUrl) {
-          console.group('[Carxai AI Vision Logs]')
-          console.log('Mode:', 'high-detail')
-          console.log('Model:', 'gpt-4o')
-          console.log('Confidence:', parsed.confidence || 'unknown')
-          console.log('Extracted Text:', parsed.readableText || 'none visible')
-          if (parsed.confidence === 'low' && parsed.fallbackReason) {
-            console.warn('Fallback Triggered:', parsed.fallbackReason)
-          }
+          console.group('[Carxai Dashboard AI Logs]')
+          console.log('Type:', parsed.dashboard_type)
+          console.log('Icon:', parsed.warning_light_name)
+          console.log('Msg:', parsed.fault_message_text)
+          console.log('Confidence:', parsed.confidence)
           console.groupEnd()
         }
         
-        issueData = parsed
-        finalDisplayContent = parsed.likelyCause || parsed.issueName
+        // Map new schema to IssueData maintaining compatibility for existing logic
+        issueData = {
+          ...parsed,
+          issueName: parsed.normalized_issue,
+          likelyCause: parsed.explanation,
+          urgencyLevel: parsed.severity as UrgencyLevel,
+          driveWhy: parsed.explanation, // Using explanation as placeholder for driveWhy
+        }
+        
+        finalDisplayContent = parsed.explanation
         setIsPreparingAudio(true)
-        const speechText = `Diagnosis: ${parsed.issueName}. Summary: ${parsed.likelyCause}. Safety check: ${parsed.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${parsed.driveWhy}. Danger level: ${parsed.urgencyLevel.replace('_', ' ')}. Recommended next step: ${parsed.nextStep}`
+        const speechText = `Diagnosis: ${parsed.normalized_issue}. Severity: ${parsed.severity}. Safety check: ${parsed.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${parsed.explanation}. Recommended next step: ${parsed.next_step}`
         prefetch(speechText).finally(() => setIsPreparingAudio(false))
       } catch (err) {
         console.warn('[Carxai AI] Branch: JSON parse failed, raw output:', accumulatedJSON.slice(0, 200))
@@ -431,25 +453,22 @@ ${diagnosticHistory}
           // non-JSON text (e.g. safety refusal or explanation in prose)
           console.log('[Carxai AI] Branch: image/low-confidence structured fallback used')
           const imageFallback: DiagnosticResult = {
-            issueName: imageUrl ? 'Image Analysis — Low Confidence' : 'Diagnosis Pending',
-            likelyCause: imageUrl
-              ? 'The uploaded photo could not be analysed with full confidence. The image may be blurry, partially obscured, or showing an unfamiliar dashboard layout.'
-              : 'The AI could not determine a specific issue from the description provided. Please provide more detail about the symptoms you are experiencing.',
-            canDrive: true,
-            driveWhy: 'Unable to determine safety status from the current input. Treat as a precaution until inspected.',
-            urgencyLevel: 'medium',
-            nextStep: imageUrl
-              ? 'Please retake a clear, close-up photo of the warning light or the affected area, then upload it again. Avoid driving if any dashboard light is flashing red.'
-              : 'Describe your symptoms in more detail — for example, when the issue occurs, any sounds, smells, or dashboard lights involved.',
+            issueName: imageUrl ? 'Unreadable Dashboard Photo' : 'Diagnosis Pending',
+            normalized_issue: imageUrl ? 'Unreadable Dashboard Photo' : 'Diagnosis Pending',
+            explanation: imageUrl
+              ? 'We couldn’t confidently read this dashboard photo. The image may be too blurry, too dark, or the warning light is partially obscured.'
+              : 'I need more details to provide a precise diagnosis. Please describe your symptoms or provide a clearer photo.',
+            can_drive: true,
+            severity: 'medium',
+            next_step: imageUrl
+              ? 'Please upload a clearer, close-up photo of the dashboard or describe the warning in text.'
+              : 'Describe your symptoms in more detail — for example, when the issue occurs and any dashboard lights involved.',
             mechanicRecommended: true,
             towingRecommended: false,
-            spokenSummary: imageUrl
-              ? 'The photo was not clear enough for a full diagnosis. Please retake it up close and try again.'
-              : 'I need more details to give you a precise diagnosis. Please describe your symptoms further.',
           }
           issueData = imageFallback
-          finalDisplayContent = imageFallback.likelyCause
-          prefetch(imageFallback.spokenSummary ?? '').catch(() => {})
+          finalDisplayContent = imageFallback.explanation
+          prefetch(imageUrl ? 'We couldn’t confidently read this dashboard photo. Please upload a clearer image.' : 'I need more details to give you a precise diagnosis.').catch(() => {})
         }
       }
 
@@ -722,101 +741,134 @@ ${diagnosticHistory}
                   {msg.role === 'assistant' ? (
                     msg.issueData ? (
                       <div className="space-y-0 relative">
-                        {/* 1. Likely Problem */}
-                        <div className="mb-5 pr-10">
-                          <h3 className="text-lg font-bold text-navy tracking-tight mb-1">{msg.issueData.issueName}</h3>
-                          <p className="text-on-surface/80 leading-relaxed text-[13px] font-medium">{msg.issueData.likelyCause}</p>
+                        {/* 1. Header & Priority */}
+                        <div className="mb-6 flex items-start justify-between gap-4">
+                          <div className="pr-2">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40 block mb-1">Detected Fault</span>
+                            <h3 className="text-[22px] leading-tight font-display font-black text-[#0E1B39] tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                          </div>
+                          <div className={`px-3 py-1.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest ${getUrgencyColor(msg.issueData.severity || msg.issueData.urgencyLevel)}`}>
+                            {getUrgencyBadge(msg.issueData.severity || msg.issueData.urgencyLevel)}
+                          </div>
                         </div>
 
-                        {/* 2 & 3. Driving Safety + Why */}
-                        <div className="pt-4 border-t border-navy/5">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${msg.issueData.canDrive ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
-                              {msg.issueData.canDrive ? (
-                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        {/* 2. Dashboard Symbols & Text (Contextual) */}
+                        {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
+                          <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col gap-3">
+                            {msg.issueData.warning_light_name && (
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
+                                  <Aperture className="w-4 h-4 text-navy/60" />
+                                </div>
+                                <div>
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
+                                  <p className="text-[13px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
+                                </div>
+                              </div>
+                            )}
+                            {msg.issueData.fault_message_text && (
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
+                                  <FileText className="w-4 h-4 text-navy/60" />
+                                </div>
+                                <div>
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Message</p>
+                                  <p className="text-[13px] font-bold text-navy leading-tight line-clamp-2">“{msg.issueData.fault_message_text}”</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* 3. Driving Status */}
+                        <div className="mb-6 pt-5 border-t border-slate-100">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Car className="w-3.5 h-3.5 text-navy/30" />
+                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/40">Can you keep driving?</p>
+                          </div>
+                          <div className={`flex items-center gap-4 p-4 rounded-2xl border ${msg.issueData.can_drive ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${msg.issueData.can_drive ? 'bg-white text-emerald-500' : 'bg-white text-rose-500'}`}>
+                              {msg.issueData.can_drive ? (
+                                <CheckCircle className="w-6 h-6" />
                               ) : (
-                                <AlertTriangle className={`w-3 h-3 ${msg.issueData.canDrive ? 'text-emerald-500' : 'text-rose-500'}`} />
+                                <AlertTriangle className="w-6 h-6" />
                               )}
                             </div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Can you keep driving?</p>
-                          </div>
-                          <div className="flex flex-col gap-1.5 pl-7">
-                            <p className={`text-sm font-bold ${msg.issueData.canDrive ? 'text-emerald-600' : 'text-rose-600'}`}>
-                              {msg.issueData.canDrive ? 'Yes, but be careful' : 'No, stop as soon as safe'}
-                            </p>
-                            <p className="text-[12px] text-on-surface/60 italic leading-tight">{msg.issueData.driveWhy}</p>
+                            <div>
+                              <p className={`text-[15px] font-black leading-none mb-1 ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                {msg.issueData.can_drive ? 'YES, CAUTIOUSLY' : 'NO, STOP IMMEDIATELY'}
+                              </p>
+                              <p className="text-[12px] font-medium text-slate-500 leading-tight">Safety is priority #1.</p>
+                            </div>
                           </div>
                         </div>
 
-                        {/* 4. Danger Level */}
-                        <div className="pt-4 border-t border-navy/5">
-                          <div className="flex items-center gap-2 mb-2">
+                        {/* 4. Explanation */}
+                        <div className="mb-6 pt-5 border-t border-slate-100">
+                           <div className="flex items-center gap-2 mb-2.5">
                             <Activity className="w-3.5 h-3.5 text-navy/30" />
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-navy/60">Danger Level</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/40">AI Analysis</p>
                           </div>
-                          <div className="pl-7">
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border ${getUrgencyColor(msg.issueData.urgencyLevel)}`}>
-                              {getUrgencyBadge(msg.issueData.urgencyLevel)}
-                            </div>
-                          </div>
+                          <p className="text-[14px] font-medium text-slate-600 leading-relaxed pl-5.5 relative">
+                            <span className="absolute left-1.5 top-2 w-1.5 h-1.5 rounded-full bg-navy/20" />
+                            {msg.issueData.explanation || msg.issueData.likelyCause}
+                          </p>
                         </div>
 
                         {/* 5. Next Step */}
-                        <div className="pt-4 border-t border-navy/5 bg-navy/[0.02] -mx-6 -mb-4.5 px-6 pb-4.5 rounded-b-[26px]">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <Wrench className="w-3.5 h-3.5 text-navy/40" />
-                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-navy/40">Next Step</p>
+                        <div className="pt-6 border-t border-slate-100 bg-slate-50 -mx-6 -mb-4.5 px-6 pb-6 rounded-b-[26px]">
+                          <div className="flex items-center gap-2 mb-2.5">
+                            <Wrench className="w-4 h-4 text-navy/40" />
+                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/50">Recommended Next Step</p>
                           </div>
-                          <p className="text-[13px] font-bold text-navy leading-snug">{msg.issueData.nextStep}</p>
+                          <p className="text-[15px] font-black text-navy leading-snug pl-0">
+                            {msg.issueData.next_step}
+                          </p>
                         </div>
 
-                        {/* Stage 1: Action Buttons (Premium Brand Redesign) */}
-                        <div className="mt-5 -mx-6 -mb-4.5 bg-slate-50 dark:bg-surface-low/30 border-t border-overlay px-6 py-5 rounded-b-[26px]">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-navy/40 mb-3 text-center">Service Options</p>
-                          
-                          <div className="flex flex-col gap-2.5">
+                        {/* Action Buttons */}
+                        <div className="mt-5 -mx-6 -mb-4.5 bg-white border-t border-slate-100 px-6 py-6 rounded-b-[26px]">
+                          <div className="flex flex-col gap-3">
                             <motion.button
-                              whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,112,224,0.15)' }}
-                              whileTap={{ scale: 0.98 }}
+                              whileHover={{ y: -1, scale: 1.01 }}
+                              whileTap={{ scale: 0.99 }}
                               onClick={() => {
                                 setReportDiagnosis(msg.issueData!);
                                 setShowReport(true);
                               }}
-                              className="relative overflow-hidden w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-[18px] bg-navy text-white text-[12px] font-bold uppercase tracking-widest shadow-md transition-all duration-300 group"
+                              className="w-full flex items-center justify-center gap-3 px-6 py-4.5 rounded-[20px] bg-navy text-white text-[12px] font-black uppercase tracking-widest shadow-xl shadow-navy/20 transition-all group"
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                              <FileText className="w-4.5 h-4.5 stroke-[2.5]" />
+                              <FileText className="w-4.5 h-4.5" />
                               Generate Official Report
                             </motion.button>
                             
-                            <div className="flex gap-2.5 w-full">
+                            <div className="flex gap-3 w-full">
                               <motion.button
-                                whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.issueName } })}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-[16px] bg-white border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest transition-all duration-300 hover:border-navy/20"
+                                whileHover={{ y: -1, scale: 1.01 }}
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-4 rounded-[18px] bg-white border-2 border-slate-100 text-navy text-[11px] font-bold uppercase tracking-widest transition-all hover:border-navy"
                               >
-                                <Search className="w-4 h-4 stroke-[2.5] text-navy/60" />
+                                <Search className="w-4 h-4" />
                                 Find Mechanic
                               </motion.button>
                               
                               <motion.button
-                                whileHover={{ y: -1, boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.issueName } })}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-[16px] bg-white border border-overlay text-navy text-[11px] font-bold uppercase tracking-widest transition-all duration-300 hover:border-navy/20"
+                                whileHover={{ y: -1, scale: 1.01 }}
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-4 rounded-[18px] bg-white border-2 border-slate-100 text-navy text-[11px] font-bold uppercase tracking-widest transition-all hover:border-navy"
                               >
-                                <Truck className="w-4 h-4 stroke-[2.5] text-navy/60" />
-                                Need a Tow?
+                                <Truck className="w-4 h-4" />
+                                Towing
                               </motion.button>
                             </div>
                           </div>
                           
-                          {/* ── Secondary Utility Actions ── */}
-                          <div className="mt-3.5 pt-3.5 border-t border-navy/5 flex justify-center">
+                          <div className="mt-5 pt-4 border-t border-slate-50 flex justify-center">
                             <ListenButton
                               currentAudioRef={currentAudioRef}
-                              text={`Diagnosis: ${msg.issueData.issueName}. Summary: ${msg.issueData.likelyCause}. Safety check: ${msg.issueData.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${msg.issueData.driveWhy}. Danger level: ${msg.issueData.urgencyLevel.replace('_', ' ')}. Recommended next step: ${msg.issueData.nextStep}`}
+                              text={`Diagnosis: ${msg.issueData.normalized_issue}. Severity: ${msg.issueData.severity}. Safety check: ${msg.issueData.can_drive ? 'You can keep driving cautiously.' : 'No, stop as soon as it is safe.'} ${msg.issueData.explanation}. Next step: ${msg.issueData.next_step}`}
                             />
                           </div>
                         </div>
