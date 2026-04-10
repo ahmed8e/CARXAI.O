@@ -127,27 +127,21 @@ export default function AIMechanic() {
     try {
       if (!user?.id) return
 
-      const { data } = await supabase
+      const { data: rawVehicles } = await supabase
         .from('vehicles')
         .select('*')
         .eq('user_id', user.id)
-        .eq('is_default', true)
-        .maybeSingle()
-
-      if (data) {
-        setActiveVehicle(data as Vehicle)
+      
+      const vehicles = rawVehicles as any[] | null;
+      
+      if (vehicles && vehicles.length > 0) {
+        // Prefer default vehicle, otherwise take latest
+        const defaultVehicle = vehicles.find(v => v.is_default) || vehicles[0];
+        console.log('[Carxai AI] Active vehicle loaded:', defaultVehicle.make, defaultVehicle.model);
+        setActiveVehicle(defaultVehicle as Vehicle)
       } else {
-        // Take the latest if no default
-        const { data: latest } = await supabase
-          .from('vehicles')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-
-        if (latest && latest.length > 0) {
-          setActiveVehicle(latest[0] as Vehicle)
-        }
+        console.log('[Carxai AI] No active vehicle found for user.');
+        setActiveVehicle(null);
       }
 
       // Fetch last 5 diagnostic sessions for context
@@ -244,6 +238,8 @@ export default function AIMechanic() {
         gearbox: activeVehicle.gearbox || 'Unknown'
       } : null;
 
+      console.log('[Carxai AI] Vehicle context for analysis:', vehicleContext);
+
       const historyContext = diagnosticHistory ? `
 DIAGNOSTIC HISTORY (Last 5 events):
 ${diagnosticHistory}
@@ -252,6 +248,7 @@ ${diagnosticHistory}
 
       // Use a helper for the API call to support retries
       const performAnalysis = async (isRetry = false) => {
+        console.log(`[Carxai AI] Starting analysis (isRetry: ${isRetry})`);
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
@@ -344,10 +341,11 @@ ${diagnosticHistory}
         if (lowerInput.includes('flat tire') || lowerInput.includes('puncture')) return {
           issueName: 'Flat Tire Detected',
           likelyCause: 'A puncture from road debris or a faulty valve stem.',
-          canDrive: false,
+          explanation: 'Driving on a flat tire will permanently damage your rim and can cause loss of vehicle control.',
+          can_drive: false,
           driveWhy: 'Driving on a flat tire will permanently damage your rim and can cause loss of vehicle control.',
           urgencyLevel: 'high',
-          nextStep: 'Stop immediately in a safe location and change to a spare or call for professional towing.',
+          next_step: 'Stop immediately in a safe location and change to a spare or call for professional towing.',
           mechanicRecommended: true,
           towingRecommended: true,
           spokenSummary: 'You have a flat tire. Stop driving immediately to stay safe and protect your rims.'
@@ -355,10 +353,11 @@ ${diagnosticHistory}
         if (lowerInput.includes('battery') || lowerInput.includes('won\'t start')) return {
           issueName: 'Potential Battery Failure',
           likelyCause: 'Corroded terminals, battery age, or an alternator issue.',
-          canDrive: false,
+          explanation: 'The engine lacks sufficient power to turn over or may stall unexpectedly.',
+          can_drive: false,
           driveWhy: 'The engine lacks sufficient power to turn over or may stall unexpectedly.',
           urgencyLevel: 'medium',
-          nextStep: 'Check battery terminals for corrosion and attempt a jump-start using high-quality cables.',
+          next_step: 'Check battery terminals for corrosion and attempt a jump-start using high-quality cables.',
           mechanicRecommended: true,
           towingRecommended: false,
           spokenSummary: 'Your battery is likely the culprit. Try a jump-start or check the connections.'
@@ -366,10 +365,11 @@ ${diagnosticHistory}
         if (lowerInput.includes('engine light') || lowerInput.includes('check engine')) return {
           issueName: 'Check Engine Indicator',
           likelyCause: 'Varies from a loose gas cap to a critical sensor malfunction.',
-          canDrive: true,
+          explanation: 'The vehicle is likely safe for a short trip to a shop unless the light is flashing.',
+          can_drive: true,
           driveWhy: 'The vehicle is likely safe for a short trip to a shop unless the light is flashing.',
           urgencyLevel: 'medium',
-          nextStep: 'Ensure your gas cap is tight and get an OBD-II scan at a local garage soon.',
+          next_step: 'Ensure your gas cap is tight and get an OBD-II scan at a local garage soon.',
           mechanicRecommended: true,
           towingRecommended: false,
           spokenSummary: 'The check engine light is on. It\'s usually safe for a short drive, but don\'t ignore it.'
@@ -377,10 +377,11 @@ ${diagnosticHistory}
         if (lowerInput.includes('overheating') || lowerInput.includes('smoke') || lowerInput.includes('steam')) return {
           issueName: 'Engine Overheating Alert',
           likelyCause: 'Low coolant, a burst hose, or a failing water pump.',
-          canDrive: false,
+          explanation: 'Excessive heat will melt engine components, leading to total engine destruction.',
+          can_drive: false,
           driveWhy: 'Excessive heat will melt engine components, leading to total engine destruction.',
           urgencyLevel: 'stop_driving',
-          nextStep: 'Pull over and shut off the engine IMMEDIATELY. Do not open the hood if steam is present.',
+          next_step: 'Pull over and shut off the engine IMMEDIATELY. Do not open the hood if steam is present.',
           mechanicRecommended: true,
           towingRecommended: true,
           spokenSummary: 'Your engine is overheating. Pull over and stop immediately to prevent a total rebuild.'
@@ -388,10 +389,11 @@ ${diagnosticHistory}
         if (lowerInput.includes('noise') || lowerInput.includes('grinding') || lowerInput.includes('squeak')) return {
           issueName: 'Mechanical Noise Issue',
           likelyCause: 'Likely worn brake pads, a failing wheel bearing, or a loose belt.',
-          canDrive: true,
+          explanation: 'Most noises are early warning signs, but safe for a cautious drive to a mechanic.',
+          can_drive: true,
           driveWhy: 'Most noises are early warning signs, but safe for a cautious drive to a mechanic.',
           urgencyLevel: 'medium',
-          nextStep: 'Listen for when the noise changes (turning, braking) and book a diagnostic check.',
+          next_step: 'Listen for when the noise changes (turning, braking) and book a diagnostic check.',
           mechanicRecommended: true,
           towingRecommended: false,
           spokenSummary: 'That strange noise sounds like a mechanical component wearing out. Get it looked at soon.'
@@ -401,24 +403,36 @@ ${diagnosticHistory}
 
       try {
         let parsed: any;
+
         try {
           parsed = extractJSON(accumulatedJSON)
+          console.log('[Carxai AI] Initial parse result:', parsed);
         } catch (e) {
           console.warn('[Carxai AI] First parse failed, retrying once...', e)
           accumulatedJSON = await performAnalysis(true)
-          parsed = extractJSON(accumulatedJSON)
+          try {
+            parsed = extractJSON(accumulatedJSON)
+            console.log('[Carxai AI] Retry parse result:', parsed);
+          } catch (e2) {
+            console.error('[Carxai AI] Retry parse also failed.', e2);
+          }
         }
 
-        // Validate critical fields based on new schema
-        if (!parsed.normalized_issue || !parsed.severity) {
-          throw new Error('Parsed JSON missing required fields')
+        // Loosened validation: prioritize ANY valid dashboard detection
+        const hasValidIssue = parsed && (parsed.normalized_issue || parsed.warning_light_name || parsed.fault_message_text);
+        
+        if (!hasValidIssue) {
+          console.warn('[Carxai AI] Result priority check failed. No valid issue found in parsed object.');
+          throw new Error('Parsed JSON missing core diagnostic fields');
         }
         
-        console.log('[Carxai AI] Branch: structured dashboard result parsed successfully')
+        console.log('[Carxai AI] Branch: Valid result identified. Priority rules MET.');
         
         if (imageUrl) {
           console.group('[Carxai Dashboard AI Logs]')
+          console.log('Final Result Choice: SUCCESS - VALID DETECTION')
           console.log('Type:', parsed.dashboard_type)
+          console.log('Issue:', parsed.normalized_issue)
           console.log('Icon:', parsed.warning_light_name)
           console.log('Msg:', parsed.fault_message_text)
           console.log('Confidence:', parsed.confidence)
@@ -426,27 +440,40 @@ ${diagnosticHistory}
         }
         
         // Map new schema to IssueData maintaining compatibility for existing logic
+        // Rule: If high severity AND cannot drive, map to stop_driving for UI coloring
+        const mappedUrgency = (parsed.severity === 'high' && parsed.can_drive === false) 
+          ? 'stop_driving' 
+          : (parsed.severity || 'medium');
+
         issueData = {
           ...parsed,
-          issueName: parsed.normalized_issue,
-          likelyCause: parsed.explanation,
-          urgencyLevel: parsed.severity as UrgencyLevel,
-          driveWhy: parsed.explanation, // Using explanation as placeholder for driveWhy
+          issueName: parsed.normalized_issue || parsed.warning_light_name || 'Dashboard Alert',
+          likelyCause: parsed.explanation || (imageUrl ? 'A system fault was detected on your dashboard.' : 'Issue detected from description.'),
+          urgencyLevel: mappedUrgency as UrgencyLevel,
+          driveWhy: parsed.explanation || 'Safety status based on detected dashboard signal.',
+          severity: parsed.severity || 'medium',
+          can_drive: typeof parsed.can_drive === 'boolean' ? parsed.can_drive : true,
+          next_step: parsed.next_step || 'Consult a mechanic for a full diagnostic scan.'
         }
         
-        finalDisplayContent = parsed.explanation
-        setIsPreparingAudio(true)
-        const speechText = `Diagnosis: ${parsed.normalized_issue}. Severity: ${parsed.severity}. Safety check: ${parsed.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${parsed.explanation}. Recommended next step: ${parsed.next_step}`
-        prefetch(speechText).finally(() => setIsPreparingAudio(false))
+        if (issueData) {
+          console.log('[Carxai AI] Final mapped issueData for UI:', issueData);
+          
+          finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
+          setIsPreparingAudio(true)
+          const speechText = `Diagnosis: ${issueData.issueName}. Severity: ${issueData.severity}. Safety check: ${issueData.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${issueData.explanation}. Recommended next step: ${issueData.next_step}`
+          prefetch(speechText).finally(() => setIsPreparingAudio(false))
+        }
       } catch (err) {
-        console.warn('[Carxai AI] Branch: JSON parse failed, raw output:', accumulatedJSON.slice(0, 200))
+        console.error('[Carxai AI] Final Logic Catch Triggered:', (err as any)?.message || err);
+        console.log('[Carxai AI] Raw accumulatedJSON at time of failure:', accumulatedJSON);
 
         // 1st fallback: keyword match on text input
         const textFallback = getEmergencyFallback(content)
         if (textFallback) {
           console.log('[Carxai AI] Branch: keyword emergency fallback used')
           issueData = textFallback
-          finalDisplayContent = textFallback.likelyCause
+          finalDisplayContent = textFallback.likelyCause || ''
         } else {
           // 2nd fallback: always-structured image / low-confidence result
           // This fires when the image is unclear, partial, or the API returned
@@ -467,7 +494,7 @@ ${diagnosticHistory}
             towingRecommended: false,
           }
           issueData = imageFallback
-          finalDisplayContent = imageFallback.explanation
+          finalDisplayContent = imageFallback.explanation || ''
           prefetch(imageUrl ? 'We couldn’t confidently read this dashboard photo. Please upload a clearer image.' : 'I need more details to give you a precise diagnosis.').catch(() => {})
         }
       }
@@ -486,7 +513,7 @@ ${diagnosticHistory}
       // Save to Supabase
       if (user && issueData) {
         // @ts-ignore
-        const { data: insertedChat, error: chatError } = await supabase.from('ai_chats').insert({
+        const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
           user_message: content,
           ai_response: finalDisplayContent,
@@ -495,20 +522,23 @@ ${diagnosticHistory}
           urgency_level: issueData.urgencyLevel,
         }).select('id').single()
 
+        const insertedChat = rawInsertedChat as { id: string } | null;
+
         if (insertedChat && insertedChat.id) {
-          issueData.report_id = insertedChat.id;
+          const chatId = insertedChat.id;
+          issueData.report_id = chatId;
           
           // Update the message in state so it has the report_id for the UI
           setMessages(prev => prev.map(m => 
             m.id === assistantMsg.id 
-              ? { ...m, issueData: { ...m.issueData!, report_id: insertedChat.id } } 
+              ? { ...m, issueData: { ...m.issueData!, report_id: chatId } } 
               : m
           ))
 
           // Also update the active reportDiagnosis state if the user opened the report modal before saving finished!
           setReportDiagnosis(prev => {
             if (prev && prev.issueName === issueData.issueName) {
-              return { ...prev, report_id: insertedChat.id }
+              return { ...prev, report_id: chatId }
             }
             return prev
           })
@@ -521,9 +551,10 @@ ${diagnosticHistory}
       const errorResult: DiagnosticResult = {
         issueName: 'Diagnosis Unavailable',
         likelyCause: 'I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.',
+        explanation: 'I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.',
         urgencyLevel: 'medium',
-        nextStep: 'Please check your internet connection and try submitting your request again in a few moments.',
-        canDrive: true,
+        next_step: 'Please check your internet connection and try submitting your request again in a few moments.',
+        can_drive: true,
         driveWhy: 'Connection to diagnostic server interrupted.',
         mechanicRecommended: false,
         towingRecommended: false,
@@ -532,7 +563,7 @@ ${diagnosticHistory}
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: errorResult.likelyCause,
+        content: errorResult.likelyCause || '',
         timestamp: new Date(),
         issueData: errorResult,
       }])
@@ -747,8 +778,8 @@ ${diagnosticHistory}
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40 block mb-1">Detected Fault</span>
                             <h3 className="text-[22px] leading-tight font-display font-black text-[#0E1B39] tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
                           </div>
-                          <div className={`px-3 py-1.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest ${getUrgencyColor(msg.issueData.severity || msg.issueData.urgencyLevel)}`}>
-                            {getUrgencyBadge(msg.issueData.severity || msg.issueData.urgencyLevel)}
+                          <div className={`px-3 py-1.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
+                            {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
                           </div>
                         </div>
 
