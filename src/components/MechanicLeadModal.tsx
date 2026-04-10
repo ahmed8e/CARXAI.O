@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, CheckCircle, Mail, Phone, ArrowRight } from 'lucide-react'
+import { X, CheckCircle, Mail, Phone, ArrowRight, Zap } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 interface MechanicLeadModalProps {
