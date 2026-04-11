@@ -1,9 +1,14 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Zap, ShieldCheck, CreditCard } from 'lucide-react'
 import Pricing from '../components/Pricing'
+import { useSubscription } from '../hooks/useSubscription'
 
 export default function ChoosePlan() {
+  const location = useLocation()
+  const { subscription } = useSubscription()
+  const intent = location.state?.intent || 'onboarding'
+
   return (
     <div className="min-h-screen bg-white">
       {/* Premium Minimal Header */}
@@ -65,7 +70,7 @@ export default function ChoosePlan() {
       </div>
 
       {/* Reuse Pricing Component */}
-      <Pricing />
+      <Pricing mode={intent as any} currentSubscription={subscription} />
 
       {/* Exit/Dashboard Link for Skip (Optional but sometimes useful for UX) */}
       <div className="pb-24 pt-12 text-center border-t border-slate-50">

@@ -1,7 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
 import { Loader2 } from 'lucide-react'
 
 /**
@@ -25,32 +23,11 @@ export function isAdminUser(user: any): boolean {
 }
 
 export function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+  const { user, loading, isAdmin, isRoleVerified } = useAuth()
   const location = useLocation()
-  const [refreshed, setRefreshed] = useState(false)
-  const [freshUser, setFreshUser] = useState<any>(null)
 
-  /**
-   * Force a session refresh so that Supabase re-reads raw_user_meta_data
-   * from the server. Without this, metadata updates made via SQL won't be
-   * visible until the user signs out and back in.
-   */
-  useEffect(() => {
-    if (!user) { setRefreshed(true); return }
-
-    supabase.auth.refreshSession().then(({ data }) => {
-      const u = data?.user ?? user
-      setFreshUser(u)
-      setRefreshed(true)
-    }).catch(() => {
-      // refresh failed — fall back to cached user
-      setFreshUser(user)
-      setRefreshed(true)
-    })
-  }, [user])
-
-  // Show spinner while auth is loading or session is being refreshed
-  if (loading || !refreshed) {
+  // Show spinner while auth is loading or role is being verified
+  if (loading || !isRoleVerified) {
     return (
       <div className="min-h-screen bg-surface-low flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -61,12 +38,12 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (!freshUser) {
+  if (!user) {
     console.log('[AdminRoute] no user → redirecting to /auth, redirect_target:', location.pathname)
     return <Navigate to="/auth?mode=login" state={{ from: location }} replace />
   }
 
-  if (!isAdminUser(freshUser)) {
+  if (!isAdmin) {
     console.log('[AdminRoute] not admin → redirecting to /dashboard')
     return <Navigate to="/dashboard" replace />
   }

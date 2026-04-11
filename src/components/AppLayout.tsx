@@ -66,7 +66,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="px-5 pt-[calc(1.25rem_+_env(safe-area-inset-top))] pb-4 border-b border-overlay">
           <div className="flex items-center justify-between">
             <Link
-              to="/"
+              to="/dashboard"
               className="flex items-center gap-3.5 group"
               onClick={() => setSidebarOpen(false)}
             >

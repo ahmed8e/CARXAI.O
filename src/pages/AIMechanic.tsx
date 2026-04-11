@@ -85,14 +85,7 @@ Rules:
 export default function AIMechanic() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '0',
-      role: 'assistant',
-      content: 'Describe your issue or tap a common problem to start.',
-      timestamp: new Date(),
-    }
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
@@ -115,13 +108,35 @@ export default function AIMechanic() {
   const [isPreparingAudio, setIsPreparingAudio] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
-  const [usageCount, setUsageCount] = useState(0)
   const [isGated, setIsGated] = useState(false)
+  const [attachedImage, setAttachedImage] = useState<string | null>(null)
+  const [isImageProcessing, setIsImageProcessing] = useState(false)
   const { isPaid, loading: subLoading } = useSubscription()
 
+  // Effect 1: Basic scroll to bottom during typing/user-send
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (loading || (messages.length > 0 && messages[messages.length - 1].role === 'user')) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [messages, loading])
+
+  // Effect 2: Center AI response after generation completes
+  useEffect(() => {
+    if (!loading && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === 'assistant') {
+        // Find the actual DOM element for the last bubble
+        // Using a short timeout to ensure the card is fully rendered and the layout shifted
+        setTimeout(() => {
+          const bubbles = document.querySelectorAll('.assistant-card-bubble');
+          const lastBubble = bubbles[bubbles.length - 1];
+          if (lastBubble) {
+            lastBubble.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 150);
+      }
+    }
+  }, [loading, messages.length])
 
   useEffect(() => {
     if (user) {
@@ -150,7 +165,6 @@ export default function AIMechanic() {
       
       if (!error && count !== null) {
         console.log('[Carxai] AI Mechanic usage count:', count)
-        setUsageCount(count)
         if (count >= FREE_MESSAGE_LIMIT) {
           setIsGated(true)
         }
@@ -221,7 +235,8 @@ export default function AIMechanic() {
           transcript += event.results[i][0].transcript
         }
         if (event.results[event.results.length - 1].isFinal) {
-          setInput(prev => prev ? `${prev} ${transcript}` : transcript)
+          // If we are in "audio mode", we clear any typed text or just replace it
+          setInput(transcript)
         }
       }
 
@@ -257,12 +272,15 @@ export default function AIMechanic() {
   }
 
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
-    if (!content.trim() && !imageUrl) return
+    const finalImageUrl = imageUrl || attachedImage || undefined
+    if (!content.trim() && !finalImageUrl) return
+    
     stop() // Interrupt any playing audio
     setLoading(true)
     setInput('')
+    setAttachedImage(null) // Clear attachment after send
 
-    addMessage({ role: 'user', content, imageUrl })
+    addMessage({ role: 'user', content, imageUrl: finalImageUrl })
 
     try {
       const symptomContext = chipLabel ? `USER SELECTED SYMPTOM: ${chipLabel}` : '';
@@ -615,10 +633,12 @@ ${diagnosticHistory}
   }
 
   const handleFileUpload = async (file: File) => {
+    setIsImageProcessing(true)
     const reader = new FileReader()
     reader.onloadend = () => {
       const base64 = reader.result as string
-      sendMessage('I\'ve uploaded a photo of my car issue. Please analyze it.', base64)
+      setAttachedImage(base64)
+      setIsImageProcessing(false)
     }
     reader.readAsDataURL(file)
   }
@@ -628,10 +648,18 @@ ${diagnosticHistory}
       recognitionRef.current?.stop()
       setIsListening(false)
       setIsProcessing(true)
-      // Small timeout to simulate processing/finishing
-      setTimeout(() => setIsProcessing(false), 1000)
+      
+      // If we have content (either recorded or already there with a photo), send it
+      setTimeout(() => {
+        if (input.trim() || attachedImage) {
+          sendMessage(input)
+        }
+        setIsProcessing(false)
+      }, 500)
     } else {
       try {
+        // Clear input when starting fresh voice command to satisfy "no text + audio"
+        setInput('')
         recognitionRef.current?.start()
         setIsListening(true)
       } catch (err) {
@@ -653,114 +681,56 @@ ${diagnosticHistory}
   }
 
   return (
-    <div className="flex flex-col absolute inset-0 bg-transparent">
+    <div className="flex flex-col absolute inset-0 bg-[#fafbfd]">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-navy/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy/[0.03] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
       </div>
 
-      {/* Header — Slim & Premium */}
-      <div className="flex-none z-30 flex items-center justify-between px-5 py-3 border-b border-overlay/50 bg-white/95 dark:bg-surface-low/95 backdrop-blur-xl shadow-sm shadow-navy/5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-navy shadow-lg shadow-navy/20">
-            <CircuitBoard className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h1 className="font-display font-black text-sm text-on-surface italic tracking-tight leading-none mb-0.5">AI Mechanic</h1>
-            <div className="flex items-center gap-1">
-              <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Active</span>
-            </div>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          {loadingVehicle ? (
-            <div className="w-8 h-6 flex items-center justify-center">
-              <Loader2 className="w-3 h-3 animate-spin text-muted" />
-            </div>
-          ) : activeVehicle ? (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={() => navigate('/dashboard/vehicles')}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy/5 border border-navy/10 hover:bg-navy/10 transition-colors"
-            >
-              <Car className="w-2.5 h-2.5 text-navy opacity-70" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-navy truncate max-w-[100px]">
-                {activeVehicle.make}
-              </span>
-            </motion.button>
-          ) : null}
-
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-navy to-navy/70 flex items-center justify-center shadow-lg ring-2 ring-white">
-            <span className="text-[10px] font-black text-white uppercase">{user?.email?.[0] ?? '?'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-12 space-y-6 relative z-10 scroll-smooth">
-
-        {/* ── LUXURY Empty State / Diagnostic Pulsar ── */}
-        {messages.length === 1 && !loading && (
-          <div className="h-[80%] min-h-[350px] flex flex-col items-center justify-center px-4 relative overflow-hidden">
-            {/* Ambient Base — Subtle Glow */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white dark:via-surface-low/40 dark:to-surface-low" />
-
+        {messages.length === 0 && !loading && (
+          <div className="flex-1 flex flex-col items-center justify-start pt-16 md:pt-24 pb-0 px-4 w-full relative overflow-hidden">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center mb-8 relative z-20"
+              className="text-center mb-8 w-full"
             >
-              {/* The Pulsar — Multi-layered Hero */}
-              <div className="relative w-24 h-24 mx-auto mb-8">
-                {/* Subtle outer glow */}
+              {/* The Pulsar — Multi-layered Hero — Minimalist */}
+              <div className="relative w-16 h-16 mx-auto mb-4">
                 <motion.div
                   className="absolute inset-[-4px] rounded-full bg-navy/[0.02] blur-xl"
-                  animate={{ opacity: [0.2, 0.4, 0.2] }}
+                  animate={{ opacity: [0.1, 0.3, 0.1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
-
-                {/* Core Orb — Glassmorphism */}
-                <div className="absolute inset-0 rounded-[28px] bg-navy flex items-center justify-center shadow-[0_20px_50px_rgba(0,18,51,0.25)] border border-white/20 z-10 overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-navy flex items-center justify-center shadow-2xl border border-white/20 z-10 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                  <Bot className="w-10 h-10 text-white relative z-20" />
-                  {/* Internal Glow Pulse */}
+                  <Bot className="w-7 h-7 text-white relative z-20" />
                   <motion.div
-                    className="absolute inset-0 bg-blue-400/20 blur-xl"
-                    animate={{ opacity: [0, 0.5, 0] }}
+                    className="absolute inset-0 bg-blue-400/10 blur-xl"
+                    animate={{ opacity: [0, 0.4, 0] }}
                     transition={{ duration: 3, repeat: Infinity }}
                   />
                 </div>
               </div>
-
-              <h2 className="text-2xl font-display font-bold text-on-surface tracking-tight mb-3 leading-none">Diagnostic Center</h2>
-              <p className="text-muted font-medium max-w-[240px] mx-auto text-[13px] leading-relaxed tracking-tight">Active session — describe your symptom to begin AI assessment.</p>
             </motion.div>
 
-            {/* Quick Start Grid — Luxury Cockpit Style */}
-            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-12 relative z-20">
+            {/* Quick Start Grid — Natural Flow */}
+            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-6 z-20">
               {ISSUE_CHIPS.map((chip, idx) => (
                 <motion.button
                   key={chip.value}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + idx * 0.05, type: 'spring', damping: 20 }}
+                  transition={{ delay: 0.1 + idx * 0.05 }}
                   onClick={() => sendMessage(chip.value, undefined, chip.label)}
-                  className="group relative flex items-center gap-3.5 p-4 rounded-[24px] bg-white/70 dark:bg-surface-high/70 backdrop-blur-md border border-white/60 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:border-navy/20 dark:hover:border-navy/40 transition-all active:scale-[0.97] overflow-hidden"
+                  className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-[#fafbfd] border border-slate-100 shadow-[0_2px_10px_rgba(0,18,51,0.02)] hover:shadow-[0_8px_20px_rgba(0,18,51,0.05)] hover:border-navy/20 transition-all active:scale-[0.98] overflow-hidden"
                 >
-                  {/* Subtle Inner Highlight */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  {/* Icon Orb */}
-                  <div className="w-10 h-10 rounded-2xl bg-surface-low dark:bg-surface-low/50 flex items-center justify-center border border-overlay shadow-inner group-hover:bg-navy group-hover:scale-110 transition-all duration-300 relative z-10 overflow-hidden">
-                    <chip.icon className="w-5 h-5 text-muted group-hover:text-white transition-colors" />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100" />
+                  <div className="w-7 h-7 rounded-xl bg-white flex items-center justify-center border border-slate-100 shadow-sm group-hover:bg-navy group-hover:scale-110 transition-all duration-300 relative z-10 shrink-0">
+                    <chip.icon className="w-3.5 h-3.5 text-navy/40 group-hover:text-white transition-colors" />
                   </div>
-
-                  <span className="text-[11px] font-bold uppercase tracking-wide leading-none text-on-surface/80 group-hover:text-navy group-hover:translate-x-0.5 transition-all relative z-10">{chip.label}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide leading-tight text-on-surface group-hover:text-navy transition-all relative z-10 text-left">{chip.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -771,9 +741,9 @@ ${diagnosticHistory}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setShowVehicleModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50/80 dark:bg-transparent border border-overlay hover:border-navy/30 text-muted hover:text-navy text-[9px] font-black uppercase tracking-[0.2em] transition-all relative z-20 backdrop-blur-sm"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-100 hover:border-navy/30 text-muted hover:text-navy text-[8px] font-black uppercase tracking-[0.2em] transition-all z-20"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <div className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
                 Configure vehicle context
               </motion.button>
             )}
@@ -806,9 +776,9 @@ ${diagnosticHistory}
                 )}
 
                 {/* Message Bubble — LUXE */}
-                <div className={`px-6 py-4.5 rounded-[26px] text-sm leading-relaxed shadow-sm transition-all ${msg.role === 'user'
+                <div className={`px-6 py-4.5 rounded-[26px] text-sm leading-relaxed shadow-sm transition-all assistant-card-bubble ${msg.role === 'user'
                     ? 'bg-navy text-white rounded-tr-none shadow-navy/20'
-                    : 'bg-white dark:bg-surface-high border border-overlay text-on-surface rounded-tl-none shadow-[0_2px_15px_rgba(0,0,0,0.02)]'
+                    : 'bg-[#fafbfd] border border-slate-100 text-slate-800 rounded-tl-none shadow-[0_2px_15px_rgba(0,18,51,0.03)]'
                   }`}>
                   {msg.role === 'assistant' ? (
                     msg.issueData ? (
@@ -888,7 +858,7 @@ ${diagnosticHistory}
                         </div>
 
                         {/* 5. Next Step */}
-                        <div className="pt-6 border-t border-slate-100 bg-slate-50 -mx-6 -mb-4.5 px-6 pb-6 rounded-b-[26px]">
+                        <div className="pt-6 border-t border-slate-100 bg-[#fafbfd] -mx-6 -mb-4.5 px-6 pb-6 rounded-b-[26px]">
                           <div className="flex items-center gap-2 mb-2.5">
                             <Wrench className="w-4 h-4 text-navy/40" />
                             <p className="text-[10px] font-black uppercase tracking-widest text-navy/50">Recommended Next Step</p>
@@ -899,7 +869,7 @@ ${diagnosticHistory}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="mt-5 -mx-6 -mb-4.5 bg-white border-t border-slate-100 px-6 py-6 rounded-b-[26px]">
+                        <div className="mt-5 -mx-6 -mb-4.5 bg-[#fafbfd] border-t border-slate-100 px-6 py-6 rounded-b-[26px]">
                           <div className="flex flex-col gap-3">
                             <motion.button
                               whileHover={{ y: -1, scale: 1.01 }}
@@ -974,7 +944,7 @@ ${diagnosticHistory}
               <Bot className="w-4 h-4 text-white relative z-10" />
             </div>
             <div className="space-y-2 max-w-[85%] lg:max-w-lg">
-              <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-white dark:bg-surface-high border border-overlay text-on-surface shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
+              <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-[#fafbfd] border border-slate-100 text-slate-800 shadow-[0_2px_15px_rgba(0,18,51,0.03)] assistant-card-bubble">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-1">
                     <Loader2 className="w-3 h-3 text-navy animate-spin" />
@@ -1001,7 +971,7 @@ ${diagnosticHistory}
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
 
       {/* Premium Voice Activity Indicator */}
@@ -1030,138 +1000,181 @@ ${diagnosticHistory}
         )}
       </AnimatePresence>
 
-      {/* ══ Compact Composer ══ */}
-      <div className="flex-none z-30 bg-white/95 dark:bg-surface-low/95 backdrop-blur-xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-overlay pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+      {/* ══ Premium ChatGPT-style Composer ══ */}
+      <div className="flex-none z-30 bg-[#fafbfd]/80 backdrop-blur-2xl border-t border-white/[0.08] pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
-        {/* ── Refined Floating Card ── */}
-        <div className="mx-3 sm:mx-4 my-2.5 rounded-[32px] border border-overlay bg-white dark:bg-surface-high shadow-sm
-                        transition-all duration-300
-                        focus-within:border-navy/30 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] overflow-hidden">
+        <div className="max-w-3xl mx-auto px-4">
+          {/* ══ Attachment Preview ══ */}
+          <AnimatePresence mode="wait">
+            {isImageProcessing ? (
+              <motion.div
+                key="loading-image"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="mb-3 flex justify-start"
+              >
+                <div className="w-20 h-20 rounded-2xl bg-slate-100 border-2 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer" />
+                  <Loader2 className="w-5 h-5 text-slate-300 animate-spin" />
+                </div>
+              </motion.div>
+            ) : attachedImage ? (
+              <motion.div
+                key="attachment"
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="mb-3 flex justify-start"
+              >
+                <div className="relative group">
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white shadow-xl">
+                    <img src={attachedImage} alt="Attachment" className="w-full h-full object-cover" />
+                  </div>
+                  <button
+                    onClick={() => setAttachedImage(null)}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-slate-900/80 text-white flex items-center justify-center backdrop-blur-md border border-white/20 shadow-lg active:scale-90 transition-transform"
+                  >
+                    <RefreshCw className="w-3 h-3 rotate-45" />
+                  </button>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
 
-          {/* Pro Nudge Removed — Full Experience Unlocked */}
-
-          {/* ── Top: text input ── */}
-          <div className="px-6 pt-3.5 pb-0.5">
-            <AnimatePresence mode="wait">
-              {isListening ? (
-                <motion.div
-                  key="waveform"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-1.5 h-[40px]"
-                >
-                  {Array.from({ length: 24 }).map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-[2.5px] rounded-full bg-navy"
-                      animate={{ scaleY: [0.3, 1, 0.3] }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 0.9,
-                        delay: i * 0.04,
-                        ease: 'easeInOut',
-                      }}
-                      style={{ height: 20, transformOrigin: 'center' }}
-                    />
-                  ))}
-                  <span className="ml-3 text-[12px] font-black text-navy uppercase tracking-widest italic opacity-80">Listening…</span>
-                </motion.div>
-              ) : (
-                <motion.textarea
-                  key="textarea"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  value={input}
-                  onChange={e => {
-                    setInput(e.target.value)
-                    e.target.style.height = 'auto'
-                    e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px'
-                  }}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      sendMessage(input)
-                    }
-                  }}
-                  placeholder="Describe your car issue…"
-                  rows={1}
-                  style={{ minHeight: 40, maxHeight: 150 }}
-                  className="w-full bg-transparent outline-none resize-none
-                             text-[15px] font-medium leading-[1.6]
-                             text-on-surface placeholder:text-muted/50"
-                  disabled={loading || isGated}
-                />
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* ── Bottom: action bar ── */}
-          <div className="flex items-center gap-1.5 px-4 pb-3">
-            <div className="flex items-center gap-1 flex-1">
-              {/* Media Buttons (Left) */}
-              {/* Media Buttons (Left) — Always Unlocked */}
-              {[
-                { icon: ImagePlus, onClick: () => fileInputRef.current?.click(), title: 'Photo' },
-                { icon: Aperture, onClick: () => cameraInputRef.current?.click(), title: 'Camera' },
-              ].map((btn, i) => (
-                <motion.button
-                  key={i}
-                  onClick={btn.onClick}
-                  disabled={loading || isGated}
-                  className="relative w-9 h-9 rounded-[16px] flex items-center justify-center transition-all
-                             hover:bg-navy/5 active:scale-95 group"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <btn.icon className="w-[18px] h-[18px] text-muted group-hover:text-navy" />
-                </motion.button>
-              ))}
+          <div className="relative flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-[32px] p-2 pr-3 focus-within:border-blue-500/10 focus-within:bg-white focus-within:shadow-[0_12px_40px_rgba(0,18,51,0.08)] transition-all duration-300">
+            {/* Left: Camera */}
+            <div className="flex items-center self-center pl-1">
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                disabled={loading || isGated || isImageProcessing}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
+              >
+                <Aperture className="w-[22px] h-[22px]" />
+              </button>
             </div>
 
-            {/* Primary Actions (Right) */}
-            <div className="flex items-center gap-2">
-              {/* Mic — Now grouped with Send */}
-              <motion.button
-                onClick={toggleListening}
-                disabled={loading || isProcessing || isGated}
-                className={`w-9 h-9 rounded-[16px] flex items-center justify-center transition-all ${isListening
-                    ? 'bg-red-500 text-white shadow-lg shadow-red-400/30'
-                    : 'text-muted hover:bg-navy/5 hover:text-navy active:scale-90'
-                  }`}
-                whileTap={{ scale: 0.9 }}
-              >
-                {isProcessing
-                  ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
-                  : <Mic className={`w-[18px] h-[18px] ${isListening ? 'text-white' : ''}`} />}
-              </motion.button>
+            {/* Center: Textarea / Waveform */}
+            <div className="flex-1 min-h-[44px] flex items-center py-2 px-1">
+              <AnimatePresence mode="wait">
+                {isListening ? (
+                  <motion.div
+                    key="waveform"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-1.5 h-[32px] px-2"
+                  >
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-[3px] rounded-full bg-blue-600"
+                        animate={{ scaleY: [0.3, 1, 0.3] }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 0.8,
+                          delay: i * 0.05,
+                          ease: 'easeInOut',
+                        }}
+                        style={{ height: 16, transformOrigin: 'center' }}
+                      />
+                    ))}
+                    <span className="ml-3 text-[10px] font-black text-blue-600 uppercase tracking-widest italic animate-pulse">Listening...</span>
+                  </motion.div>
+                ) : (
+                  <motion.textarea
+                    key="textarea"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    value={input}
+                    onChange={e => {
+                      setInput(e.target.value)
+                      e.target.style.height = 'auto'
+                      e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        sendMessage(input)
+                      }
+                    }}
+                    placeholder="Ask anything about your car..."
+                    rows={1}
+                    style={{ minHeight: 24, maxHeight: 200 }}
+                    className="w-full bg-transparent outline-none resize-none
+                               text-[16px] font-bold leading-[1.4]
+                               text-slate-900 placeholder:text-slate-400"
+                    disabled={loading || isGated}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
 
-              {/* Send Button */}
-              <motion.button
-                onClick={() => sendMessage(input)}
-                disabled={loading || isGated || (!input.trim() && !isListening)}
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0
-                            transition-all duration-300 ${input.trim() && !loading
-                    ? 'bg-navy text-white shadow-xl shadow-navy/20 active:scale-95'
-                    : 'bg-surface-low text-muted/30 cursor-not-allowed'
-                  }`}
-                whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
-                whileTap={{ scale: 0.95 }}
-              >
-                {loading
-                  ? <Loader2 className="w-5 h-5 animate-spin" />
-                  : <Send className="w-5 h-5 translate-x-[1px] translate-y-[-0.5px]" />}
-              </motion.button>
+            {/* Right: Actions */}
+            <div className="flex items-center gap-1.5 self-center">
+              {/* Always show gallery/upload if not sending audio */}
+              {!isListening && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={loading || isGated || isImageProcessing}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
+                >
+                  <ImagePlus className="w-[20px] h-[20px]" />
+                </button>
+              )}
+
+              <AnimatePresence mode="popLayout">
+                {(!input.trim() && !attachedImage && !isListening) ? (
+                  <motion.button
+                    key="mic"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={toggleListening}
+                    disabled={loading || isProcessing || isGated}
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90"
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {isProcessing
+                      ? <RefreshCw className="w-5 h-5 animate-spin" />
+                      : <Mic className="w-5 h-5" />}
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    key="send"
+                    initial={{ opacity: 0, scale: 0.8, x: 10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, x: 10 }}
+                    onClick={() => isListening ? toggleListening() : sendMessage(input)}
+                    disabled={loading || isGated || (!input.trim() && !attachedImage && !isListening)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isListening 
+                      ? 'bg-red-500 text-white shadow-xl shadow-red-500/20' 
+                      : (input.trim() || attachedImage) && !loading
+                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isListening ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      <Send className="w-5 h-5 translate-x-[1px]" />
+                    )}
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
-
       </div>
-
 
       {/* Vehicle Add Modal — opened from header or onboarding card */}
       <VehicleAddModal
@@ -1179,7 +1192,7 @@ ${diagnosticHistory}
           isOpen={showReport}
           onClose={() => setShowReport(false)}
           user={user}
-          diagnosis={reportDiagnosis}
+          diagnosis={reportDiagnosis!}
           messages={messages}
           activeVehicle={activeVehicle}
           currentAudioRef={currentAudioRef}

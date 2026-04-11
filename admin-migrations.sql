@@ -41,6 +41,23 @@ FROM auth.users
 ON CONFLICT (id) DO NOTHING;
 
 
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to manage their own profile
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'profiles'
+      AND policyname = 'Users can manage own profile'
+  ) THEN
+    CREATE POLICY "Users can manage own profile" ON public.profiles
+      FOR ALL
+      USING (auth.uid() = id)
+      WITH CHECK (auth.uid() = id);
+  END IF;
+END $$;
+
 -- ── 1. Admin read policy on PROFILES ─────────────────────────────────
 -- Allow a user whose user_metadata.role = 'admin' to read all profile rows.
 -- The standard RLS only allows self-reads; this adds the admin bypass.
@@ -63,7 +80,33 @@ BEGIN
 END $$;
 
 
--- ── 2. Admin read policy on AI_CHATS ──────────────────────────────────
+-- ── 2. AI_CHATS table ───────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.ai_chats (
+  id              uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id         uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  vehicle_id      uuid,
+  user_message    text,
+  ai_response     text,
+  issue_name      text,
+  likely_cause    text,
+  urgency_level   text,
+  created_at      timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.ai_chats ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'ai_chats'
+      AND policyname = 'Users can view own ai_chats'
+  ) THEN
+    CREATE POLICY "Users can view own ai_chats" ON public.ai_chats
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
+
 DO $$
 BEGIN
   IF NOT EXISTS (

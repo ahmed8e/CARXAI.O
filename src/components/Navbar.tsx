@@ -29,7 +29,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
 
   return (
     <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-2.5 ${transparent ? 'bg-surface/20 dark:bg-black/40' : 'bg-surface/90 dark:bg-surface-low/90'} backdrop-blur-2xl border border-overlay rounded-full shadow-lg transition-all duration-300`}>
-      <Link to="/" className="flex items-center gap-2 group shrink-0">
+      <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 group shrink-0">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
           <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
         </div>

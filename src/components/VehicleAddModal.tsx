@@ -159,21 +159,21 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-2xl bg-surface dark:bg-surface-low rounded-[40px] shadow-2xl overflow-hidden my-auto border border-overlay"
+          className="relative w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden my-auto border border-slate-200"
         >
           {/* Header */}
           <div className="p-8 pb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-display font-black text-on-surface italic tracking-tight">
+              <h2 className="text-3xl font-display font-black text-slate-900 italic tracking-tight">
                 {editingVehicle ? 'Edit Vehicle' : 'Add Your Vehicle'}
               </h2>
-              <p className="text-muted/80 font-medium text-sm mt-1">{stepLabel}</p>
+              <p className="text-slate-500 font-medium text-sm mt-1">{stepLabel}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-surface-high/40 rounded-full transition-colors"
+              className="p-2 hover:bg-slate-50 rounded-full transition-colors"
             >
-              <X className="w-6 h-6 text-muted/70" />
+              <X className="w-6 h-6 text-slate-400" />
             </button>
           </div>
 
@@ -183,7 +183,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
               <div
                 key={step}
                 className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                  idx <= currentIdx ? 'bg-navy' : 'bg-slate-100'
+                  idx <= currentIdx ? 'bg-blue-600' : 'bg-slate-100'
                 }`}
               />
             ))}
@@ -202,11 +202,11 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
             {currentStep === 'BRAND' && (
               <div className="space-y-6">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted/70" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search brands..."
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-white outline-none transition-all font-bold"
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     autoFocus
@@ -221,7 +221,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                         setCurrentStep('MODEL')
                         setSearchTerm('')
                       }}
-                      className="px-4 py-4 rounded-xl bg-surface-low dark:bg-surface-high/40 border border-overlay hover:border-navy hover:bg-white transition-all text-left font-bold text-on-surface/80 flex items-center justify-between group"
+                      className="px-4 py-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-slate-700 flex items-center justify-between group"
                     >
                       {brand}
                       <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -233,7 +233,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                       setCurrentStep('MODEL')
                       setSearchTerm('')
                     }}
-                    className="px-4 py-4 rounded-xl bg-navy/5 border border-navy/20 hover:border-navy hover:bg-white transition-all text-left font-bold text-navy"
+                    className="px-4 py-4 rounded-xl bg-blue-50 border border-blue-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-blue-600"
                   >
                     Enter "{searchTerm || 'Other'}" manually
                   </button>
@@ -247,18 +247,18 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                 <div className="flex items-center gap-4 mb-4">
                   <button
                     onClick={() => setCurrentStep('BRAND')}
-                    className="px-3 py-1 rounded-full bg-surface-high/40 text-[10px] font-black uppercase tracking-widest text-muted/70"
+                    className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500"
                   >
                     ← Back to Brand
                   </button>
-                  <span className="text-sm font-bold text-muted/70">{formData.make}</span>
+                  <span className="text-sm font-bold text-slate-500">{formData.make}</span>
                 </div>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted/70" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder={`Search ${formData.make} models...`}
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-white outline-none transition-all font-bold"
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     autoFocus
@@ -273,7 +273,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                         setCurrentStep('YEAR')
                         setSearchTerm('')
                       }}
-                      className="px-4 py-4 rounded-xl bg-surface-low dark:bg-surface-high/40 border border-overlay hover:border-navy hover:bg-white transition-all text-left font-bold text-on-surface/80 flex items-center justify-between group"
+                      className="px-4 py-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-slate-700 flex items-center justify-between group"
                     >
                       {model}
                       <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -285,7 +285,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                       setCurrentStep('YEAR')
                       setSearchTerm('')
                     }}
-                    className="px-4 py-4 rounded-xl bg-navy/5 border border-navy/20 hover:border-navy hover:bg-white transition-all text-left font-bold text-navy"
+                    className="px-4 py-4 rounded-xl bg-blue-50 border border-blue-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-blue-600"
                   >
                     Enter "{searchTerm || 'Other'}" manually
                   </button>
@@ -299,11 +299,11 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                 <div className="flex items-center gap-4 mb-4">
                   <button
                     onClick={() => setCurrentStep('MODEL')}
-                    className="px-3 py-1 rounded-full bg-surface-high/40 text-[10px] font-black uppercase tracking-widest text-muted/70"
+                    className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500"
                   >
                     ← Back to Model
                   </button>
-                  <span className="text-sm font-bold text-muted/70">
+                  <span className="text-sm font-bold text-slate-500">
                     {formData.make} {formData.model}
                   </span>
                 </div>
@@ -315,7 +315,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                         setFormData({ ...formData, year })
                         setCurrentStep('REVIEW')
                       }}
-                      className="px-4 py-4 rounded-xl bg-surface-low dark:bg-surface-high/40 border border-overlay hover:border-navy hover:bg-white transition-all text-center font-bold text-on-surface/80"
+                      className="px-4 py-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-500/30 hover:bg-white transition-all text-center font-bold text-slate-700"
                     >
                       {year}
                     </button>
@@ -328,37 +328,36 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
             {currentStep === 'REVIEW' && (
               <div className="space-y-5">
                 {/* Summary card */}
-                <div className="p-5 rounded-3xl bg-navy/5 border border-navy/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-navy/10">
-                      <Car className="w-5 h-5 text-navy" />
+                <div className="p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-blue-100">
+                      <Car className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <h4 className="text-base font-display font-black italic text-on-surface/90 leading-none">
+                      <h4 className="text-base font-display font-black italic text-slate-900 leading-none">
                         {formData.year} {formData.make}
                       </h4>
-                      <p className="text-[11px] font-bold text-navy/60 uppercase tracking-widest mt-1">
+                      <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest mt-1">
                         {formData.model || '—'}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setCurrentStep('BRAND')}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-high/40 hover:bg-surface-high/60 border border-overlay transition-colors shadow-sm text-[10px] font-black uppercase tracking-widest text-muted/70 hover:text-on-surface/80"
-                    title="Change vehicle"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-700"
                   >
-                    <RotateCcw className="w-3 h-3" /> Change
+                    <RotateCcw className="w-3.5 h-3.5" /> Change
                   </button>
                 </div>
 
                 {/* Detail fields */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted/70 mb-1.5 ml-0.5">
-                      <Fuel className="w-3 h-3" /> Fuel Type
+                    <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
+                      <Fuel className="w-3.5 h-3.5" /> Fuel Type
                     </label>
                     <select
-                      className="w-full px-3.5 py-3 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-white outline-none transition-all font-bold text-on-surface/90 appearance-none text-sm"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 appearance-none text-sm"
                       value={formData.fuel_type}
                       onChange={e => setFormData({ ...formData, fuel_type: e.target.value })}
                     >
@@ -366,11 +365,11 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     </select>
                   </div>
                   <div>
-                    <label className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted/70 mb-1.5 ml-0.5">
-                      <Settings className="w-3 h-3" /> Gearbox
+                    <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
+                      <Settings className="w-3.5 h-3.5" /> Gearbox
                     </label>
                     <select
-                      className="w-full px-3.5 py-3 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-white outline-none transition-all font-bold text-on-surface/90 appearance-none text-sm"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 appearance-none text-sm"
                       value={formData.gearbox}
                       onChange={e => setFormData({ ...formData, gearbox: e.target.value })}
                     >
@@ -378,37 +377,36 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     </select>
                   </div>
                   <div>
-                    <label className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted/70 mb-1.5 ml-0.5">
-                      <Gauge className="w-3 h-3" /> Mileage (km)
+                    <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
+                      <Gauge className="w-3.5 h-3.5" /> Mileage (km)
                     </label>
                     <input
                       type="number"
-                      className="w-full px-3.5 py-3 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-white outline-none transition-all font-bold text-on-surface/90 text-sm"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 text-sm"
                       value={formData.mileage}
                       onChange={e => setFormData({ ...formData, mileage: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div>
-                    <label className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-muted/70 mb-1.5 ml-0.5">
-                      <Hash className="w-3 h-3" /> Plate Number
+                    <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
+                      <Hash className="w-3.5 h-3.5" /> Plate Number
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3.5 py-3 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-surface-high/20 outline-none transition-all font-bold text-on-surface/90 uppercase text-sm"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase text-sm"
                       value={formData.plate_number}
                       onChange={e => setFormData({ ...formData, plate_number: e.target.value })}
                       placeholder="e.g. AB-123-CD"
                     />
                   </div>
-                  {/* VIN — full width with helper note */}
                   <div className="col-span-2">
-                    <div className="flex items-center justify-between mb-1.5 ml-0.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted/70">VIN</label>
-                      <span className="text-[10px] font-medium text-muted/70 italic">optional · improves AI accuracy</span>
+                    <div className="flex items-center justify-between mb-2 ml-1">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">VIN</label>
+                      <span className="text-[10px] font-bold text-blue-600/60 italic uppercase tracking-wider">optional · improves accuracy</span>
                     </div>
                     <input
                       type="text"
-                      className="w-full px-3.5 py-3 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay focus:border-navy focus:bg-surface-high/20 outline-none transition-all font-bold text-on-surface/90 uppercase text-sm"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase text-sm"
                       value={formData.vin}
                       onChange={e => setFormData({ ...formData, vin: e.target.value })}
                       placeholder="17-digit VIN number"
@@ -416,36 +414,34 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   </div>
                 </div>
 
-                {/* Set as default — cleaner mobile label */}
                 <label
                   htmlFor="is_default_modal"
-                    className="flex items-start gap-3 p-4 rounded-2xl bg-surface-low dark:bg-surface-high/40 border border-overlay cursor-pointer hover:bg-surface-high/40 transition-colors"
+                    className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors"
                 >
                   <input
                     type="checkbox"
                     id="is_default_modal"
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-navy focus:ring-navy cursor-pointer flex-shrink-0"
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"
                     checked={formData.is_default}
                     onChange={e => setFormData({ ...formData, is_default: e.target.checked })}
                   />
                   <div>
-                    <p className="text-sm font-bold text-on-surface/80 leading-tight">Use as active vehicle</p>
-                    <p className="text-[11px] text-muted/70 font-medium mt-0.5">AI Mechanic will use this car for diagnosis</p>
+                    <p className="text-sm font-bold text-slate-700 leading-tight">Use as active vehicle</p>
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">AI Mechanic will use this car for diagnosis</p>
                   </div>
                 </label>
 
-                {/* Actions */}
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <button
                     onClick={onClose}
-                    className="flex-1 py-3.5 rounded-2xl border border-overlay bg-surface-high/20 text-muted font-bold text-sm hover:bg-surface-high/40 transition-all"
+                    className="flex-1 py-4 rounded-3xl border border-slate-200 bg-white text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="flex-[2] py-3.5 rounded-2xl bg-navy text-white font-bold text-sm shadow-xl shadow-navy/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 disabled:opacity-50"
+                    className="flex-[2] py-4 rounded-3xl bg-blue-600 text-white font-bold text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50"
                   >
                     {isSaving
                       ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -458,13 +454,6 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
           </div>
         </motion.div>
       </div>
-
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-      `}</style>
     </AnimatePresence>
   )
 }

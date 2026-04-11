@@ -61,36 +61,35 @@ export default function AdminSubscriptions() {
     setLoading(true)
     setError(null)
     try {
-      // First get profiles
-      const { data: profiles, error: profErr } = await supabase
-        .from('profiles')
-        .select('*')
+      // Use the explicit relation hint to join profiles
+      // Query: subscriptions?select=*,profile:profiles!fk_subscriptions_user_profile(...)
+      const { data: rawData, error: subErr } = await supabase
+        .from('subscriptions')
+        .select(`
+          *,
+          profile:profiles!fk_subscriptions_user_profile (
+            id,
+            email,
+            full_name,
+            created_at
+          )
+        `)
         .order('created_at', { ascending: false })
 
-      if (profErr) throw profErr
+      if (subErr) throw subErr
 
-      // Then get subscriptions
-      const { data: subs, error: subErr } = await supabase
-        .from('subscriptions')
-        .select('*')
-
-      if (subErr) {
-        // If subscriptions fails, log and show without subs
-        console.warn('Subscriptions table error, maybe columns not updated yet?', subErr)
-        setUsers(profiles.map(p => ({ ...p, subscription: null })))
-        return
-      }
-
-      const subsMap = new Map(subs.map(s => [s.user_id, s]))
-      
-      const merged = profiles.map(p => ({
-        ...p,
-        subscription: subsMap.get(p.id) || null
+      // If there are zero rows, load will still set an empty array
+      const merged: UserWithSub[] = (rawData ?? []).map((s: any) => ({
+        ...(s.profile || { id: s.user_id, email: s.email || '—', full_name: '—', created_at: s.created_at }),
+        subscription: s
       }))
 
       setUsers(merged)
     } catch (e: any) {
-      setError(e.message || 'Failed to load data. Run migrations.')
+      console.error('[AdminSubscriptions] Load failed:', e)
+      setError(e.message || 'Failed to load subscriptions. Check migrations.')
+      // Default to empty array on total failure so UX stays intact
+      setUsers([])
     } finally {
       setLoading(false)
     }
@@ -100,17 +99,30 @@ export default function AdminSubscriptions() {
     load()
   }, [])
 
+  const calculateEndDate = (startDate: string, cycle: string) => {
+    const start = new Date(startDate)
+    if (cycle === 'monthly') {
+      start.setMonth(start.getMonth() + 1)
+    } else if (cycle === 'yearly') {
+      start.setFullYear(start.getFullYear() + 1)
+    }
+    return start.toISOString()
+  }
+
   const handleEdit = (user: UserWithSub) => {
     setEditingUser(user)
     if (user.subscription) {
       setFormData(user.subscription)
     } else {
+      const startsAt = new Date().toISOString()
+      const billingCycle = 'monthly'
       setFormData({
         user_id: user.id,
         plan_name: 'pro',
-        billing_cycle: 'monthly',
+        billing_cycle: billingCycle,
         status: 'active',
-        starts_at: new Date().toISOString(),
+        starts_at: startsAt,
+        ends_at: calculateEndDate(startsAt, billingCycle),
         payment_method: 'whatsapp_manual',
         notes: ''
       })
@@ -139,14 +151,14 @@ export default function AdminSubscriptions() {
     try {
       if (editingUser.subscription?.id) {
         // Update existing
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('subscriptions')
           .update(payload)
           .eq('id', editingUser.subscription.id)
         if (error) throw error
       } else {
         // Create new
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('subscriptions')
           .insert(payload)
         if (error) throw error
@@ -239,7 +251,7 @@ export default function AdminSubscriptions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-overlay">
-                {filtered.map((user, i) => (
+                {filtered.map((user) => (
                   <motion.tr
                     key={user.id}
                     initial={{ opacity: 0 }}
@@ -332,11 +344,18 @@ export default function AdminSubscriptions() {
                     <label className="text-[10px] font-black uppercase text-muted tracking-widest text-navy">Cycle</label>
                     <select 
                       value={formData.billing_cycle || ''} 
-                      onChange={e => setFormData({ ...formData, billing_cycle: e.target.value })}
+                      onChange={e => {
+                        const newCycle = e.target.value
+                        setFormData({ 
+                          ...formData, 
+                          billing_cycle: newCycle,
+                          ends_at: calculateEndDate(formData.starts_at || new Date().toISOString(), newCycle)
+                        })
+                      }}
                       className="w-full text-sm font-medium border border-overlay rounded-xl p-2.5 bg-white"
                     >
-                      <option value="monthly">Monthly</option>
-                      <option value="yearly">Yearly</option>
+                      <option value="monthly">Monthly (+30d)</option>
+                      <option value="yearly">Yearly (+365d)</option>
                     </select>
                   </div>
                   
@@ -375,7 +394,14 @@ export default function AdminSubscriptions() {
                     <input 
                       type="date"
                       value={formData.starts_at ? new Date(formData.starts_at).toISOString().split('T')[0] : ''} 
-                      onChange={e => setFormData({ ...formData, starts_at: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                      onChange={e => {
+                        const newStart = e.target.value ? new Date(e.target.value).toISOString() : null
+                        setFormData({ 
+                          ...formData, 
+                          starts_at: newStart,
+                          ends_at: newStart ? calculateEndDate(newStart, formData.billing_cycle || 'monthly') : null
+                        })
+                      }}
                       className="w-full text-sm font-medium border border-overlay rounded-xl p-2.5 bg-white text-on-surface"
                     />
                   </div>

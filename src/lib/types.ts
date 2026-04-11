@@ -378,4 +378,18 @@ export interface NearbyPlace {
   placeId: string
 }
 
-export type UrgencyLevel = 'low' | 'medium' | 'high' | 'stop_driving'
+export interface TowingProvider {
+  id: number
+  name: string
+  phone: string
+  city: string
+  address: string
+  rating: number
+  reviewCount: number
+  lat: number | null
+  lng: number | null
+  imageUrl: string | null
+  category: string
+  description: string | null
+  distance: number | null
+}

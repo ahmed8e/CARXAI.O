@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import type { Database } from '../lib/types'
 
 interface AuthContextType {
   user: User | null
@@ -16,6 +15,8 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: Error | null }>
   updateProfile: (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string }) => Promise<{ error: Error | null }>
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
+  isAdmin: boolean
+  isRoleVerified: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -24,18 +25,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isRoleVerified, setIsRoleVerified] = useState(false)
+
+  const checkAdminStatus = async (user: User | null) => {
+    if (!user) {
+      setIsAdmin(false)
+      setIsRoleVerified(true)
+      return
+    }
+
+    // First check local metadata
+    const role = user.user_metadata?.role ?? user.app_metadata?.role ?? null
+    if (role === 'admin') {
+      setIsAdmin(true)
+      setIsRoleVerified(true)
+      return
+    }
+
+    // Role might be updated in DB but not in current session — refresh once
+    try {
+      console.log('[AuthContext] Verifying role via session refresh...')
+      const { data, error } = await supabase.auth.refreshSession()
+      if (error) throw error
+      const refreshedUser = data?.user ?? user
+      const finalRole = refreshedUser.user_metadata?.role ?? refreshedUser.app_metadata?.role ?? null
+      setIsAdmin(finalRole === 'admin')
+    } catch {
+      setIsAdmin(false)
+    } finally {
+      setIsRoleVerified(true)
+    }
+  }
 
   useEffect(() => {
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      const u = session?.user ?? null
+      setUser(u)
+      checkAdminStatus(u).then(() => setLoading(false))
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      const u = session?.user ?? null
+      setUser(u)
+      
+      // Re-verify on sign-in or session update
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+        setIsRoleVerified(false)
+        checkAdminStatus(u).then(() => setLoading(false))
+      } else if (event === 'SIGNED_OUT') {
+        setIsAdmin(false)
+        setIsRoleVerified(true)
+        setLoading(false)
+      } else {
+        setLoading(false)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -48,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('supabase.auth.remember')
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) console.error('Sign-in error:', error)
     return { error }
   }
 
@@ -157,7 +205,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, signOutAll, signInWithOAuth, resetPassword, updateProfile, updatePassword }}>
+    <AuthContext.Provider value={{
+      user, session, loading, isAdmin, isRoleVerified,
+      signIn, signUp, signOut, signOutAll, signInWithOAuth,
+      resetPassword, updateProfile, updatePassword
+    }}>
       {children}
     </AuthContext.Provider>
   )

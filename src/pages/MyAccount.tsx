@@ -7,10 +7,11 @@ import {
   CheckCircle2, Globe, 
   HelpCircle, Camera,
   History, X, Loader2, Navigation, Wrench, ChevronRight,
-  CreditCard, Info
+  CreditCard, Info, Zap
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
+import { useSubscription } from '../hooks/useSubscription'
 
 type Section = 'profile' | 'security' | 'preferences' | 'billing' | 'activity' | 'support'
 
@@ -101,6 +102,7 @@ function ContentSheet({ title, icon: Icon, children, onClose }: { title: string,
 
 export default function MyAccount() {
   const { user, signOut, updatePassword } = useAuth()
+  const { subscription, loading: loadingSub } = useSubscription()
   const navigate = useNavigate()
   
   // App States
@@ -411,10 +413,7 @@ export default function MyAccount() {
             <div className="text-center md:text-left space-y-4">
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                  <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">{userName}</h2>
-                  <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-black uppercase tracking-widest">
-                    <CheckCircle2 className="w-3 h-3" /> Verified Profile
-                  </div>
+                   <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">{userName}</h2>
                 </div>
                 <p className="text-slate-500 font-medium text-base flex items-center justify-center md:justify-start gap-2">
                   <Mail className="w-4 h-4 text-slate-300" /> {user?.email}
@@ -424,10 +423,6 @@ export default function MyAccount() {
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1">
                  <div className="px-4 py-2 rounded-xl bg-white border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-widest shadow-sm">
                    Join Date <span className="text-slate-900 ml-1">{new Date(user?.created_at || Date.now()).getFullYear()}</span>
-                 </div>
-                 <div className="px-4 py-2 rounded-xl bg-white border-2 border-blue-100 text-[10px] font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2 shadow-sm shadow-blue-500/5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                   Membership <span className="italic font-display font-black tracking-tight">Unlimited Access</span>
                  </div>
               </div>
             </div>
@@ -455,7 +450,7 @@ export default function MyAccount() {
                   icon={CreditCard} 
                   title="Billing & Subscription" 
                   subtitle="Manage your premium access" 
-                  isLocked
+                  onClick={() => setActiveSection('billing')}
                 />
               </div>
             </div>
@@ -555,30 +550,94 @@ export default function MyAccount() {
                  </div>
               </ContentSheet>
             )}
+            {activeSection === 'billing' && (
+              <ContentSheet title="Subscription Details" icon={Zap} onClose={() => setActiveSection('profile')}>
+                <div className="space-y-8">
+                  {/* Premium Plan Header */}
+                  <div className="p-8 rounded-[40px] bg-slate-50 border border-slate-100 flex flex-col items-center text-center gap-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
+                      <Zap className="w-32 h-32 -mr-10 -mt-10" />
+                    </div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] relative z-10">Current Plan</p>
+                    <h3 className="text-5xl font-display font-black text-slate-900 tracking-tighter uppercase italic relative z-10">
+                      {loadingSub ? '...' : (subscription?.planType || 'Free')}
+                    </h3>
+                    
+                    <div className="relative z-10">
+                      {!loadingSub && subscription?.status === 'active' ? (
+                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-widest">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Active Subscription
+                        </div>
+                      ) : !loadingSub && subscription?.status === 'trialing' ? (
+                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-black uppercase tracking-widest">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                          Trial Period
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 text-[10px] font-black uppercase tracking-widest">
+                          {subscription?.status === 'expired' ? 'Expired' : 'Standard Access'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-2 gap-6 px-4">
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</p>
+                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? 'Checking...' : (subscription?.status || 'None')}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Billing Cycle</p>
+                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.billingCycle || 'One-time')}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Started On</p>
+                      <p className="text-base font-bold text-slate-900">
+                        {loadingSub ? '...' : (subscription?.startDate ? new Date(subscription.startDate).toLocaleDateString() : 'N/A')}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        {subscription?.status === 'cancelled' ? 'Ends On' : 'Renewal Date'}
+                      </p>
+                      <p className="text-base font-bold text-slate-900 font-display">
+                        {loadingSub ? '...' : (subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString() : 'Never')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-4">
+                    <button 
+                      onClick={() => navigate('/choose-plan', { state: { intent: 'upgrade' } })}
+                      className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Zap className="w-4 h-4" fill="currentColor" />
+                      Upgrade Plan
+                    </button>
+                    <p className="text-center mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Managed via CarxAI Support
+                    </p>
+                  </div>
+                </div>
+              </ContentSheet>
+            )}
           </AnimatePresence>
         </div>
 
         {/* MODALS */}
       <AnimatePresence>
         {isEditingProfile && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsEditingProfile(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10">
-               <div className="p-6 md:p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10 backdrop-blur-xl">
-                  <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-white">Edit Profile</h2>
-                  <div className="flex items-center gap-2 md:gap-4">
-                    <button 
-                      form="profile-form"
-                      type="submit"
-                      disabled={formLoading}
-                      className="px-5 py-2.5 rounded-xl bg-[#0070E0] text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-[#0070E0]/30 hover:brightness-110 transition-all disabled:opacity-50"
-                    >
-                      {formLoading ? 'Saving...' : 'Save Profile'}
-                    </button>
-                    <button type="button" onClick={() => setIsEditingProfile(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
-                  </div>
+          <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsEditingProfile(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }} className="relative bg-white w-full max-w-xl rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden border-t sm:border border-slate-200">
+               <div className="p-8 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-20">
+                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">Edit Profile</h2>
+                  <button onClick={() => setIsEditingProfile(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
                </div>
-               <form id="profile-form" onSubmit={handleUpdateProfile} className="p-6 md:p-8 space-y-6">
+               <form id="profile-form" onSubmit={handleUpdateProfile} className="p-8 space-y-6">
                   <div className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
@@ -587,7 +646,7 @@ export default function MyAccount() {
                         type="text" 
                         value={profileData.fullName} 
                         onChange={e => setProfileData(prev => ({ ...prev, fullName: e.target.value }))}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0070E0]/10 focus:border-[#0070E0]/30 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                       />
                     </div>
                     <div>
@@ -596,7 +655,7 @@ export default function MyAccount() {
                         type="tel" 
                         value={profileData.phoneNumber} 
                         onChange={e => setProfileData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0070E0]/10 focus:border-[#0070E0]/30 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                       />
                     </div>
                     <div>
@@ -604,7 +663,7 @@ export default function MyAccount() {
                       <select 
                         value={profileData.preferredLanguage} 
                         onChange={e => setProfileData(prev => ({ ...prev, preferredLanguage: e.target.value }))}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0070E0]/10 focus:border-[#0070E0]/30 transition-all appearance-none"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none"
                       >
                          <option>English (US)</option>
                          <option>French</option>
@@ -619,24 +678,34 @@ export default function MyAccount() {
                     </div>
                   )}
 
+                  <button 
+                    disabled={formLoading}
+                    type="submit" 
+                    className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
+                  >
+                    {formLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+                    {formLoading ? 'Saving...' : 'Save Changes'}
+                  </button>
                </form>
             </motion.div>
           </div>
         )}
 
         {isUpdatingPass && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsUpdatingPass(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10">
-               <div className="p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10 backdrop-blur-xl">
-                  <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-white">Update Password</h2>
-                  <button onClick={() => setIsUpdatingPass(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
+          <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsUpdatingPass(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }} className="relative bg-white w-full max-w-xl rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden border-t sm:border border-slate-200">
+               <div className="p-8 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-20">
+                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">Security</h2>
+                  <button onClick={() => setIsUpdatingPass(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
                </div>
                <form onSubmit={handleUpdatePassword} className="p-8 space-y-6">
                   <div className="space-y-4">
-                    <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-start gap-3">
-                       <Shield className="w-5 h-5 text-[#0070E0] mt-0.5" />
-                       <p className="text-xs text-blue-500 font-medium leading-relaxed">For your security, we recommend a password that is at least 6 characters long and includes numbers.</p>
+                    <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-start gap-4">
+                       <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm border border-blue-100 flex-shrink-0">
+                          <Shield className="w-4 h-4 text-blue-600" />
+                       </div>
+                       <p className="text-xs text-blue-600 font-bold leading-relaxed">For your security, use a password at least 6 characters long with numbers.</p>
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">New Password</label>
@@ -645,7 +714,7 @@ export default function MyAccount() {
                         type="password" 
                         value={passFields.newPassword} 
                         onChange={e => setPassFields(prev => ({ ...prev, newPassword: e.target.value }))}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0070E0]/10 focus:border-[#0070E0]/30 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                       />
                     </div>
                     <div>
@@ -655,7 +724,7 @@ export default function MyAccount() {
                         type="password" 
                         value={passFields.confirmPassword} 
                         onChange={e => setPassFields(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0070E0]/10 focus:border-[#0070E0]/30 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
                       />
                     </div>
                   </div>
@@ -669,10 +738,10 @@ export default function MyAccount() {
                   <button 
                     disabled={formLoading}
                     type="submit" 
-                    className="w-full py-5 rounded-2xl bg-[#0070E0] text-white font-black uppercase tracking-widest shadow-xl shadow-[#0070E0]/20 hover:brightness-110 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
                   >
                     {formLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-                    {formLoading ? 'Updating...' : 'Update Password'}
+                    {formLoading ? 'Updating' : 'Update Password'}
                   </button>
                </form>
             </motion.div>

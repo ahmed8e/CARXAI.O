@@ -3,7 +3,13 @@ import { motion } from 'framer-motion'
 import { Check, Sparkles, ShieldCheck, Zap, Lock, Headphones, Globe, MessageSquare } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import type { PlanType, BillingCycle as BillingCycleType } from '../lib/paypal'
+import type { PlanType } from '../hooks/useSubscription'
+type BillingCycleType = 'monthly' | 'yearly'
+
+interface PricingProps {
+  mode?: 'onboarding' | 'upgrade'
+  currentSubscription?: any
+}
 
 const plans: {
   id: PlanType
@@ -68,7 +74,7 @@ const plans: {
   }
 ]
 
-export default function Pricing() {
+export default function Pricing({ mode = 'onboarding', currentSubscription }: PricingProps) {
   const [billingCycle, setBillingCycle] = useState<BillingCycleType>('yearly')
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -79,8 +85,28 @@ export default function Pricing() {
       return
     }
     
-    // User is signed in. Send them to the mechanic chat to start their free trial.
-    navigate('/dashboard/mechanic')
+    // Build WhatsApp Message
+    const isUpgrade = mode === 'upgrade' || (currentSubscription && currentSubscription.planType !== 'Free')
+    const phone = "33756816551" // Admin WhatsApp
+    
+    let text = ""
+    if (isUpgrade && currentSubscription) {
+      text = `Hello, I would like to upgrade my CarxAI account.
+Current Plan: ${currentSubscription.planType || 'Free'}
+Requested Plan: ${plan.name}
+Billing Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}
+Email: ${user.email}
+User ID: ${user.id}`
+    } else {
+      text = `Hello, I would like to activate a paid CarxAI plan for my account.
+Selected Plan: ${plan.name}
+Billing Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}
+Email: ${user.email}
+User ID: ${user.id}`
+    }
+
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+    window.open(whatsappUrl, '_blank')
   }
 
   return (

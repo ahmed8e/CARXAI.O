@@ -3,13 +3,14 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export type SubscriptionStatus = 'active' | 'pending' | 'expired' | 'cancelled' | 'trialing' | 'none'
-export type PlanType = 'pro' | 'advanced' | 'free'
+export type PlanType = 'pro' | 'advanced' | 'free' | 'starter'
 
 interface Subscription {
   id: string
   status: SubscriptionStatus
   planType: PlanType
   billingCycle: 'monthly' | 'yearly' | 'none'
+  startDate: string | null
   endDate: string | null
 }
 
@@ -37,12 +38,14 @@ export function useSubscription() {
       }
 
       if (data) {
+        const subData = data as any
         setSubscription({
-          id: data.id,
-          status: data.status as SubscriptionStatus,
-          planType: (data.plan_name?.toLowerCase() || 'free') as PlanType,
-          billingCycle: (data.billing_cycle || 'none') as 'monthly' | 'yearly' | 'none',
-          endDate: data.ends_at
+          id: subData.id,
+          status: subData.status as SubscriptionStatus,
+          planType: (subData.plan_name?.toLowerCase() || 'free') as PlanType,
+          billingCycle: (subData.billing_cycle || 'none') as 'monthly' | 'yearly' | 'none',
+          startDate: subData.starts_at,
+          endDate: subData.ends_at
         })
       } else {
         setSubscription({
@@ -50,6 +53,7 @@ export function useSubscription() {
           status: 'none',
           planType: 'free',
           billingCycle: 'none',
+          startDate: null,
           endDate: null
         })
       }

@@ -109,7 +109,7 @@ export default function MechanicReport({
 
 
   const copySummary = () => {
-    const text = `Carxai Mechanic Report ${token}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel)}\nLikely Cause: ${diagnosis.likelyCause}\nRecommended Action: ${diagnosis.nextStep}`
+    const text = `Carxai Mechanic Report ${token}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\nLikely Cause: ${diagnosis.likelyCause || 'Ongoing analysis'}\nRecommended Action: ${diagnosis.next_step}`
     navigator.clipboard.writeText(text)
     alert('Report summary copied to clipboard!')
   }
@@ -136,7 +136,7 @@ export default function MechanicReport({
         email: user?.email,
         name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'Customer'
       },
-      summary: `Diagnostic report for ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName}. Likely cause: ${diagnosis.likelyCause}. Recommended action: ${diagnosis.nextStep}`
+      summary: `Diagnostic report for ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName || 'Issue detected'}. Likely cause: ${diagnosis.likelyCause || 'Seeking clarification'}. Recommended action: ${diagnosis.next_step}`
     }
 
     // Only add report_id if it exists to link to history, but the system doesn't require it
@@ -161,8 +161,8 @@ export default function MechanicReport({
 
       const shareUrl = `${window.location.origin}/shared-report/${token}`
       const shareData = {
-        title: `Carxai Mechanic Report - ${diagnosis.issueName}`,
-        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName}.`,
+        title: `Carxai Mechanic Report - ${diagnosis.issueName || 'Diagnostic Assessment'}`,
+        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName || 'Issue detected'}.`,
         url: shareUrl
       }
 
@@ -172,7 +172,7 @@ export default function MechanicReport({
       const executeClipboardFallback = async () => {
         try {
           console.log('[Carxai Share Flow] 7. Attempting Clipboard Fallback...')
-          await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosis.issueName}\nView report: ${shareUrl}`)
+          await navigator.clipboard.writeText(`Carxai Mechanic Report\n\nIssue: ${diagnosis.issueName || 'Diagnostic Assessment'}\nView report: ${shareUrl}`)
           alert('Public report link copied to clipboard!')
           console.log('[Carxai Share Flow] 8. Clipboard success')
         } catch (clipErr) {
@@ -289,7 +289,7 @@ export default function MechanicReport({
             <div className="flex items-center gap-2">
               <ListenButton 
                 currentAudioRef={currentAudioRef}
-                text={`Diagnosis: ${diagnosis.issueName}. Summary: ${diagnosis.likelyCause}. Safety check: ${diagnosis.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${diagnosis.driveWhy}. Danger level: ${diagnosis.urgencyLevel.replace('_', ' ')}. Recommended next step: ${diagnosis.nextStep}`}
+                text={`Diagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}. Summary: ${diagnosis.likelyCause || 'Ongoing analysis'}. Safety check: ${diagnosis.can_drive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${diagnosis.driveWhy || ''}. Danger level: ${(diagnosis.urgencyLevel || 'low').replace('_', ' ')}. Recommended next step: ${diagnosis.next_step}`}
               />
               <button 
                 onClick={onClose}
@@ -410,7 +410,7 @@ export default function MechanicReport({
                             <div>
                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Professional Diagnosis</p>
                               <h4 className="text-3xl font-display font-black tracking-tight italic mb-2 text-[#0E1B39]">
-                                {diagnosis.issueName}
+                                {diagnosis.issueName || 'Diagnostic Assessment'}
                               </h4>
                               {diagnosis.urgencyLevel && (
                                 <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
@@ -419,7 +419,7 @@ export default function MechanicReport({
                                     : 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                 }`}>
                                   <div className="w-1 h-1 rounded-full bg-current animate-pulse" />
-                                  {getUrgencyBadge(diagnosis.urgencyLevel)}
+                                  {getUrgencyBadge(diagnosis.urgencyLevel || 'low')}
                                 </div>
                               )}
                             </div>
@@ -427,7 +427,7 @@ export default function MechanicReport({
                             <div>
                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Likely Root Cause</p>
                               <p className="text-lg text-[#0E1B39]/90 leading-relaxed font-medium">
-                                {diagnosis.likelyCause}
+                                {diagnosis.likelyCause || 'Ongoing professional analysis...'}
                               </p>
                             </div>
                           </div>
@@ -436,18 +436,18 @@ export default function MechanicReport({
                             <div className="p-7 rounded-3xl bg-white shadow-sm border border-[#0070E0]/20">
                               <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-3">Action Required Now</p>
                               <p className="text-base font-bold text-slate-900 leading-snug">
-                                {diagnosis.nextStep}
+                                {diagnosis.next_step}
                               </p>
                             </div>
 
                             <div className="flex flex-wrap gap-3">
                               <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${
-                                diagnosis.canDrive 
+                                diagnosis.can_drive 
                                   ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
                                   : 'bg-red-50 text-red-600 border-red-100'
                               }`}>
-                                {diagnosis.canDrive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-                                {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
+                                {diagnosis.can_drive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                                {diagnosis.can_drive ? 'Safe to Drive' : 'Do Not Drive'}
                               </div>
 
                               {diagnosis.towingRecommended && (

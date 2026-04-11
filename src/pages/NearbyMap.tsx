@@ -84,7 +84,7 @@ export default function NearbyMap() {
               isOpen: p.opening_hours?.isOpen() ?? false,
               location: { lat: p.geometry!.location!.lat(), lng: p.geometry!.location!.lng() },
               types: p.types ?? [], placeId: p.place_id!,
-              distance: google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(location), p.geometry!.location!),
+              distance: (google.maps as any).geometry.spherical.computeDistanceBetween(new google.maps.LatLng(location), p.geometry!.location!),
             }))
             
             setPlaces(mapped)
