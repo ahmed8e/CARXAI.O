@@ -48,13 +48,13 @@ export default function ListenButton({ text, currentAudioRef }: ListenButtonProp
         disabled={isLoading}
         whileTap={!isLoading ? { scale: 0.95 } : {}}
         className={`
-          flex items-center justify-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest
-          border transition-all duration-300 select-none
+          flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.1em]
+          border transition-all duration-500 select-none
           ${isPlaying
             ? 'bg-navy/5 border-navy/20 text-navy shadow-inner'
             : isError
             ? 'bg-red-50 border-red-200/60 text-red-500'
-            : 'bg-white border-on-surface/10 text-navy shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.06)] hover:border-navy/20 hover:-translate-y-[1px]'
+            : 'bg-blue-50/30 border-navy/5 text-navy shadow-[0_4px_12px_rgba(0,112,224,0.04)] hover:shadow-[0_8px_20px_rgba(0,112,224,0.08)] hover:border-navy/10 hover:bg-white hover:-translate-y-[1px]'
           }
           ${isLoading ? 'cursor-default opacity-70' : 'cursor-pointer'}
         `}

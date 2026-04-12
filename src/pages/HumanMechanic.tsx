@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { getUserLocation, haversineDistance, formatDistance } from '../lib/utils'
+import { getUserLocation, haversineDistance, formatDistance, isIOS, getMapLinks } from '../lib/utils'
 import {
   Users, MapPin, Star, Navigation, Search,
   AlertTriangle, PhoneCall, Wrench, X,
@@ -52,25 +52,6 @@ const TRUST_MESSAGES = [
 ]
 function trustFallback(id: number): string {
   return TRUST_MESSAGES[id % TRUST_MESSAGES.length]
-}
-
-// ── Detect iOS ────────────────────────────────────────────────────────
-function isIOS(): boolean {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-}
-
-// ── Map link builder ──────────────────────────────────────────────────
-function getMapLinks(lat: number, lng: number, label: string, uLat?: number, uLng?: number) {
-  const enc = encodeURIComponent(label)
-  return {
-    googleMaps: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
-    googleMapsApp: `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving`,
-    waze: `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
-    wazeApp: `waze://?ll=${lat},${lng}&navigate=yes`,
-    appleMaps: `maps://?q=${enc}&ll=${lat},${lng}${uLat != null ? `&saddr=${uLat},${uLng}` : ''}`,
-    appleMapsWeb: `https://maps.apple.com/?q=${enc}&ll=${lat},${lng}`,
-  }
 }
 
 // ── Provider type ─────────────────────────────────────────────────────
@@ -170,9 +151,9 @@ function MapChooser({ provider, onClose }: {
   const links = getMapLinks(provider.lat, provider.lng, provider.name)
   
   const options = [
-    { label: 'Google Maps', scheme: links.googleMapsApp, web: links.googleMaps, color: 'bg-blue-600' },
-    { label: 'Waze', scheme: links.wazeApp, web: links.waze, color: 'bg-[#00D4B5]' },
-    ...(ios ? [{ label: 'Apple Maps', scheme: links.appleMaps, web: links.appleMapsWeb, color: 'bg-slate-900' }] : []),
+    { label: 'Google Maps', scheme: links.googleMapsApp, web: links.googleMaps, color: 'bg-blue-600', icon: Navigation },
+    { label: 'Waze', scheme: links.wazeApp, web: links.waze, color: 'bg-[#00D4B5]', icon: Navigation },
+    ...(ios ? [{ label: 'Apple Maps', scheme: links.appleMaps, web: links.appleMapsWeb, color: 'bg-slate-900', icon: Navigation }] : []),
   ]
 
   const handleOpen = (scheme: string, web: string) => {
@@ -189,58 +170,71 @@ function MapChooser({ provider, onClose }: {
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-[#0E1B39]/40 backdrop-blur-md p-0 sm:p-6"
       onClick={onClose}
     >
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full max-w-sm bg-white rounded-[32px] overflow-hidden shadow-2xl p-2 mb-safe"
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="w-full max-w-sm bg-white rounded-t-[40px] sm:rounded-[40px] overflow-hidden shadow-[0_-20px_50px_-15px_rgba(0,0,0,0.15)] mb-0 sm:mb-safe"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 opacity-50" />
-          <h3 className="text-xl font-display font-black text-on-surface text-center mb-2">Navigation</h3>
-          <p className="text-[13px] text-muted text-center mb-8">Choose your preferred map app</p>
+        <div className="p-8 pt-6 relative">
+          <button onClick={onClose} className="absolute right-6 top-6 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-[#0E1B39] transition-all">
+            <X className="w-4.5 h-4.5" />
+          </button>
+
+          <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
           
-          <div className="space-y-3">
+          <div className="text-center mb-10">
+            <h3 className="text-2xl font-display font-black text-[#0E1B39] tracking-tight mb-2 uppercase italic leading-none">Navigation</h3>
+            <p className="text-[13px] text-slate-400 font-bold uppercase tracking-widest">Select map application</p>
+          </div>
+          
+          <div className="space-y-3.5">
             {options.map(opt => (
               <button
                 key={opt.label}
                 onClick={() => handleOpen(opt.scheme, opt.web)}
-                className="w-full flex items-center justify-between p-5 rounded-2xl bg-gray-50 border border-overlay text-on-surface group transition-all active:scale-[0.98]"
+                className="w-full flex items-center justify-between p-5 rounded-[24px] bg-white border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:border-navy/20 hover:shadow-xl hover:shadow-navy/5"
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl ${opt.color} flex items-center justify-center text-white shadow-lg`}>
-                    <Navigation className="w-5 h-5" />
+                  <div className={`w-12 h-12 rounded-2xl ${opt.color} flex items-center justify-center text-white shadow-xl shadow-black/10 transition-transform group-hover:scale-105`}>
+                    <opt.icon className="w-5.5 h-5.5" />
                   </div>
-                  <span className="font-bold text-[15px]">{opt.label}</span>
+                  <span className="font-bold text-[16px] tracking-tight">{opt.label}</span>
                 </div>
-                <ChevronRight className="w-5 h-5 opacity-40" />
+                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                  <ChevronRight className="w-4.5 h-4.5 text-navy" />
+                </div>
               </button>
             ))}
 
-            <button
-              onClick={() => {
-                const addr = `${provider.address || ''} ${provider.city}`.trim();
-                navigator.clipboard.writeText(addr);
-                onClose();
-              }}
-              className="w-full flex items-center justify-between p-5 rounded-2xl bg-gray-50 border border-overlay text-on-surface group transition-all active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-on-surface/60">
-                  <Copy className="w-5 h-5" />
+            <div className="pt-6 mt-6 border-t border-slate-50">
+              <button
+                onClick={() => {
+                  const addr = `${provider.address || ''} ${provider.city || ''}`.trim();
+                  navigator.clipboard.writeText(addr);
+                  onClose();
+                }}
+                className="w-full flex items-center justify-between p-5 rounded-[24px] bg-slate-50 border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:bg-white hover:border-navy/20"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-navy group-hover:text-white transition-all">
+                    <Copy className="w-5.5 h-5.5" />
+                  </div>
+                  <span className="font-bold text-[16px] tracking-tight">Copy Address</span>
                 </div>
-                <span className="font-bold text-[15px]">Copy Address</span>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-40" />
-            </button>
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-40 group-hover:opacity-100">
+                  <ChevronRight className="w-4.5 h-4.5 text-navy" />
+                </div>
+              </button>
+            </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-full mt-6 py-4 text-sm font-bold text-muted uppercase tracking-widest hover:text-on-surface transition-colors"
+            className="w-full mt-10 py-5 rounded-[22px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-navy hover:bg-white hover:border-navy/20 transition-all"
           >
             Cancel
           </button>
@@ -259,52 +253,69 @@ function ContactChooser({ provider, onClose }: {
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-[#0E1B39]/40 backdrop-blur-md p-0 sm:p-6"
       onClick={onClose}
     >
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full max-w-sm bg-white rounded-[32px] overflow-hidden shadow-2xl p-2 mb-safe"
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="w-full max-w-sm bg-white rounded-t-[40px] sm:rounded-[40px] overflow-hidden shadow-[0_-20px_50px_-15px_rgba(0,0,0,0.15)] mb-0 sm:mb-safe"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 opacity-50" />
-          <h3 className="text-xl font-display font-black text-on-surface text-center mb-2">Contact Provider</h3>
-          <p className="text-[13px] text-muted text-center mb-8">How would you like to get in touch?</p>
+        <div className="p-8 pt-6 relative">
+          <button onClick={onClose} className="absolute right-6 top-6 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-[#0E1B39] transition-all">
+            <X className="w-4.5 h-4.5" />
+          </button>
+
+          <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
           
-          <div className="space-y-3">
+          <div className="text-center mb-10">
+            <h3 className="text-2xl font-display font-black text-[#0E1B39] tracking-tight mb-2 uppercase italic leading-none">Contact choice</h3>
+            <p className="text-[13px] text-slate-400 font-bold uppercase tracking-widest">Connect with the provider</p>
+          </div>
+          
+          <div className="space-y-4">
             <a
               href={`tel:${provider.phone}`}
-              className="w-full flex items-center justify-between p-5 rounded-2xl bg-[#0070e0]/5 border border-[#0070e0]/10 text-[#0070e0] group transition-all active:scale-[0.98]"
+              className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-navy/20 hover:shadow-xl hover:shadow-navy/5"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[#0070e0] flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                  <PhoneCall className="w-5 h-5" />
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-navy flex items-center justify-center text-white shadow-xl shadow-navy/20 transition-transform group-hover:scale-105">
+                  <PhoneCall className="w-6 h-6" />
                 </div>
-                <span className="font-bold text-[15px]">Call Now</span>
+                <div className="text-left">
+                  <span className="block font-black text-[16px] uppercase tracking-widest leading-none mb-1.5 text-navy group-hover:text-[#0070e0] transition-colors">Call Now</span>
+                  <span className="text-[13px] text-slate-400 font-medium tracking-tight whitespace-nowrap">{provider.phone}</span>
+                </div>
               </div>
-              <ChevronRight className="w-5 h-5 opacity-40" />
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5.5 h-5.5 text-navy" />
+              </div>
             </a>
 
             <a
               href={`https://wa.me/${provider.phone?.replace(/\D/g, '')}`}
               target="_blank" rel="noreferrer"
-              className="w-full flex items-center justify-between p-5 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 group transition-all active:scale-[0.98]"
+              className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/5"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                  <MessageCircle className="w-5 h-5" />
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-[#25D366] flex items-center justify-center text-white shadow-xl shadow-[#25D366]/20 transition-transform group-hover:scale-105">
+                  <MessageCircle className="w-6 h-6" />
                 </div>
-                <span className="font-bold text-[15px]">WhatsApp Business</span>
+                <div className="text-left">
+                  <span className="block font-black text-[16px] uppercase tracking-widest leading-none mb-1.5 text-[#25D366]">WhatsApp</span>
+                  <span className="text-[13px] text-slate-400 font-medium tracking-tight whitespace-nowrap">Rapid messaging</span>
+                </div>
               </div>
-              <ChevronRight className="w-5 h-5 opacity-40" />
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5.5 h-5.5 text-navy" />
+              </div>
             </a>
           </div>
 
           <button
             onClick={onClose}
-            className="w-full mt-6 py-4 text-sm font-bold text-muted uppercase tracking-widest hover:text-on-surface transition-colors"
+            className="w-full mt-10 py-5 rounded-[22px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-navy hover:bg-white hover:border-navy/20 transition-all"
           >
             Cancel
           </button>

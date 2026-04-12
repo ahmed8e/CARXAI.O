@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, Link } from 'react-router-dom'
+import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -35,6 +35,8 @@ interface AppLayoutProps { children: React.ReactNode }
 export default function AppLayout({ children }: AppLayoutProps) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const isAIMechanic = location.pathname === '/dashboard/ai-mechanic'
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleSignOut = async () => {
@@ -241,7 +243,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden pt-[calc(5.5rem_+_env(safe-area-inset-top))] relative">
+      <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))]'}`}>
         <main className="flex-1 overflow-y-auto relative">
           {isExpired ? <Paywall /> : children}
         </main>

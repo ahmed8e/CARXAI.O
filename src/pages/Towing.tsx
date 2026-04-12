@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Truck, Star, PhoneCall, MessageCircle, 
-  ChevronRight, Navigation, Search, Copy
+  ChevronRight, Navigation, Search, Copy, X
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { getUserLocation, formatDistance, isIOS, getMapLinks } from '../lib/utils'
@@ -106,7 +106,11 @@ function MapChooser({ provider, onClose }: {
         className="w-full max-w-sm bg-white rounded-t-[40px] sm:rounded-[40px] overflow-hidden shadow-[0_-20px_50px_-15px_rgba(0,0,0,0.15)] mb-0 sm:mb-safe"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-8 pt-6">
+        <div className="p-8 pt-6 relative">
+          <button onClick={onClose} className="absolute right-6 top-6 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-[#0E1B39] transition-all">
+            <X className="w-4.5 h-4.5" />
+          </button>
+
           <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
           
           <div className="text-center mb-10">
@@ -119,37 +123,37 @@ function MapChooser({ provider, onClose }: {
               <button
                 key={opt.label}
                 onClick={() => handleOpen(opt.scheme, opt.web)}
-                className="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:border-[#0070e0]/30 hover:shadow-xl hover:shadow-[#0E1B39]/5"
+                className="w-full flex items-center justify-between p-5 rounded-[24px] bg-white border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:border-navy/20 hover:shadow-xl hover:shadow-navy/5"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-2xl ${opt.color} flex items-center justify-center text-white shadow-xl shadow-black/10 transition-transform group-hover:scale-105`}>
-                    <opt.icon className="w-5 h-5" />
+                    <opt.icon className="w-5.5 h-5.5" />
                   </div>
                   <span className="font-bold text-[16px] tracking-tight">{opt.label}</span>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                  <ChevronRight className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                  <ChevronRight className="w-4.5 h-4.5 text-navy" />
                 </div>
               </button>
             ))}
 
-            <div className="pt-4 mt-4 border-t border-slate-50">
+            <div className="pt-6 mt-6 border-t border-slate-50">
               <button
                 onClick={() => {
                   const addr = `${provider.address || ''} ${provider.city || ''}`.trim();
                   navigator.clipboard.writeText(addr);
                   onClose();
                 }}
-                className="w-full flex items-center justify-between p-5 rounded-2xl bg-white border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:bg-slate-50"
+                className="w-full flex items-center justify-between p-5 rounded-[24px] bg-slate-50 border border-slate-100 text-[#0E1B39] group transition-all active:scale-[0.98] hover:bg-white hover:border-navy/20"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-[#0E1B39] group-hover:text-white transition-all">
-                    <Copy className="w-5 h-5" />
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-navy group-hover:text-white transition-all">
+                    <Copy className="w-5.5 h-5.5" />
                   </div>
                   <span className="font-bold text-[16px] tracking-tight">Copy Address</span>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center opacity-40">
-                  <ChevronRight className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-40 group-hover:opacity-100">
+                  <ChevronRight className="w-4.5 h-4.5 text-navy" />
                 </div>
               </button>
             </div>
@@ -157,7 +161,7 @@ function MapChooser({ provider, onClose }: {
 
           <button
             onClick={onClose}
-            className="w-full mt-10 py-5 text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] hover:text-[#0E1B39] transition-colors"
+            className="w-full mt-10 py-5 rounded-[22px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-navy hover:bg-white hover:border-navy/20 transition-all"
           >
             Cancel
           </button>
@@ -184,7 +188,11 @@ function ContactChooser({ provider, onClose }: {
         className="w-full max-w-sm bg-white rounded-t-[40px] sm:rounded-[40px] overflow-hidden shadow-[0_-20px_50px_-15px_rgba(0,0,0,0.15)] mb-0 sm:mb-safe"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-8 pt-6">
+        <div className="p-8 pt-6 relative">
+          <button onClick={onClose} className="absolute right-6 top-6 w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-[#0E1B39] transition-all">
+            <X className="w-4.5 h-4.5" />
+          </button>
+
           <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
           
           <div className="text-center mb-10">
@@ -195,45 +203,45 @@ function ContactChooser({ provider, onClose }: {
           <div className="space-y-4">
             <a
               href={`tel:${provider.phone}`}
-              className="w-full flex items-center justify-between p-5 rounded-[24px] bg-[#0E1B39] text-white group transition-all active:scale-[0.98] shadow-2xl shadow-[#0E1B39]/20"
+              className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-navy/20 hover:shadow-xl hover:shadow-navy/5"
             >
               <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-white shadow-inner">
+                <div className="w-14 h-14 rounded-2xl bg-navy flex items-center justify-center text-white shadow-xl shadow-navy/20 transition-transform group-hover:scale-105">
                   <PhoneCall className="w-6 h-6" />
                 </div>
                 <div className="text-left">
-                  <span className="block font-black text-[15px] uppercase tracking-widest leading-none mb-1.5">Call Now</span>
-                  <span className="text-[13px] opacity-60 font-medium tracking-tight whitespace-nowrap">{provider.phone}</span>
+                  <span className="block font-black text-[16px] uppercase tracking-widest leading-none mb-1.5 text-navy group-hover:text-[#0070e0] transition-colors">Call Now</span>
+                  <span className="text-[13px] text-slate-400 font-medium tracking-tight whitespace-nowrap">{provider.phone}</span>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/15 transition-all">
-                <ChevronRight className="w-5 h-5 opacity-40 group-hover:opacity-100" />
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5.5 h-5.5 text-navy" />
               </div>
             </a>
 
             <a
               href={`https://wa.me/${provider.phone?.replace(/\D/g, '')}`}
               target="_blank" rel="noreferrer"
-              className="w-full flex items-center justify-between p-5 rounded-[24px] bg-[#25D366] text-white group transition-all active:scale-[0.98] shadow-2xl shadow-[#25D366]/20"
+              className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/5"
             >
               <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-white shadow-inner">
+                <div className="w-14 h-14 rounded-2xl bg-[#25D366] flex items-center justify-center text-white shadow-xl shadow-[#25D366]/20 transition-transform group-hover:scale-105">
                   <MessageCircle className="w-6 h-6" />
                 </div>
                 <div className="text-left">
-                  <span className="block font-black text-[15px] uppercase tracking-widest leading-none mb-1.5">WhatsApp</span>
-                  <span className="text-[13px] opacity-60 font-medium tracking-tight whitespace-nowrap">Rapid messaging</span>
+                  <span className="block font-black text-[16px] uppercase tracking-widest leading-none mb-1.5 text-[#25D366]">WhatsApp</span>
+                  <span className="text-[13px] text-slate-400 font-medium tracking-tight whitespace-nowrap">Rapid messaging</span>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/15 transition-all">
-                <ChevronRight className="w-5 h-5 opacity-40 group-hover:opacity-100" />
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5.5 h-5.5 text-navy" />
               </div>
             </a>
           </div>
 
           <button
             onClick={onClose}
-            className="w-full mt-10 py-5 text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] hover:text-[#0E1B39] transition-colors"
+            className="w-full mt-10 py-5 rounded-[22px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-navy hover:bg-white hover:border-navy/20 transition-all"
           >
             Cancel
           </button>
@@ -315,36 +323,47 @@ export default function Towing() {
   const rest = filtered.slice(1)
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
-      {/* Header Section */}
-      <div className="bg-white border-b border-overlay pt-12 pb-8 px-6 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-navy flex items-center justify-center shadow-lg shadow-navy/20">
-              <Truck className="w-6 h-6 text-white" />
+    <div className="min-h-full bg-[#f8f9fb]">
+      {/* ── Sticky header ───────────────────────────────────────── */}
+      <div className="sticky top-0 z-20 bg-white/85 backdrop-blur-xl border-b border-overlay">
+        <div className="max-w-2xl mx-auto px-5 py-4">
+          {/* Title row */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center shadow-lg shadow-navy/20">
+              <Truck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-display font-black text-on-surface tracking-tight uppercase italic leading-none">Find Towing</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted mt-1">CarxAI Recovery Network</p>
+              <h1 className="text-lg font-display font-black text-on-surface tracking-tight">Find Towing</h1>
+              <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
+                {loading ? 'Getting your location…' : 'CarxAI Recovery Network'}
+              </p>
             </div>
           </div>
 
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-              <Search className="w-4 h-4 text-muted group-focus-within:text-navy transition-colors" />
-            </div>
+          {/* Search */}
+          <div className="relative mb-3">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             <input
               type="text"
-              placeholder="Filter by city..."
               value={citySearch}
-              onChange={(e) => setCitySearch(e.target.value)}
-              className="w-full bg-surface-low border border-overlay rounded-2xl py-4 pl-12 pr-6 text-sm font-medium focus:ring-2 focus:ring-navy/5 focus:border-navy outline-none transition-all placeholder:text-muted/50"
+              onChange={e => setCitySearch(e.target.value)}
+              placeholder="Search by city..."
+              className="w-full bg-[#f3f4f6] border border-overlay rounded-2xl py-3.5 pl-11 pr-4 text-sm font-medium text-on-surface placeholder:text-muted/60 focus:outline-none focus:border-navy/40 focus:bg-white transition-all"
             />
           </div>
+
+          {/* Location status — synchronized with Mechanic page */}
+          {loading && (
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl">
+              <Navigation className="w-3.5 h-3.5 text-blue-500 shrink-0 animate-pulse" />
+              <p className="text-[11px] font-bold text-blue-600">Detecting your location…</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto p-6 space-y-8">
+      {/* ── Content ───────────────────────────────────────────────── */}
+      <div className="max-w-2xl mx-auto px-5 py-6 pb-32">
         {loading ? (
           <div className="space-y-4">
             <div className="h-64 bg-white rounded-[32px] border border-overlay animate-pulse" />
@@ -360,93 +379,116 @@ export default function Towing() {
           </div>
         ) : (
           <>
-            {/* Featured Provider */}
+            {/* ── Featured card ────────────────────────────────── */}
             {featured && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-[32px] border-2 border-navy/10 overflow-hidden shadow-xl shadow-navy/5 group cursor-pointer outline-none"
+              <motion.div 
+                initial={{ opacity: 0, y: 12 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="mb-5 cursor-pointer outline-none"
                 onClick={() => setSelectedProvider(featured)}
                 onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedProvider(featured) }}
                 role="button"
                 tabIndex={0}
               >
-                <div className="p-8">
-                  <div className="flex items-start justify-between mb-8">
-                    <div className="flex items-center gap-5">
-                      <ProviderImage src={featured.imageUrl} size="lg" />
-                      <div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-navy bg-navy/5 px-2.5 py-1 rounded-lg">
-                            <Star className="w-3 h-3 fill-navy" /> Nearest Help
+                <div className="w-full text-left relative overflow-hidden bg-gradient-to-br from-navy to-[#0F172A] text-white p-6 rounded-[28px] shadow-xl shadow-navy/15 group">
+                  {/* Featured Header Row */}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white">
+                      <Star className="w-3 h-3" /> Nearest help
+                    </span>
+                    <div className="h-px flex-1 bg-white/10 ml-4 max-w-[40px]" />
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <ProviderImage src={featured.imageUrl} size="lg" />
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <h3 className="text-[18px] font-bold truncate leading-tight mb-1">{featured.name}</h3>
+                      <p className="text-[13px] text-white/60 truncate mb-3 leading-none">{featured.city}{featured.address ? ` · ${featured.address}` : ''}</p>
+                      
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {featured.distance !== null && (
+                          <span className="flex items-center gap-1 text-[12px] font-bold text-sky-300">
+                            <Navigation className="w-3 h-3" /> {formatDistance(featured.distance)}
                           </span>
-                        </div>
-                        <h2 className="text-2xl font-display font-black text-on-surface tracking-tight leading-none">{featured.name}</h2>
+                        )}
+                        {featured.rating > 0 && (
+                          <span className="flex items-center gap-1 text-[12px] font-bold text-yellow-300">
+                            <Star className="w-3 h-3 fill-yellow-300" /> {(Number(featured.rating) || 0).toFixed(1)}
+                            {featured.reviewCount > 0 && <span className="text-white/40 font-medium">({featured.reviewCount})</span>}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    <div className="bg-surface-low p-4 rounded-2xl border border-overlay">
-                      <p className="text-[9px] font-black uppercase tracking-[0.1em] text-muted mb-1">Response Distance</p>
-                      <p className="text-base font-bold text-on-surface italic">{featured.distance ? formatDistance(featured.distance) : 'Unknown'}</p>
-                    </div>
-                    <div className="bg-surface-low p-4 rounded-2xl border border-overlay">
-                      <p className="text-[9px] font-black uppercase tracking-[0.1em] text-muted mb-1">Service City</p>
-                      <p className="text-base font-bold text-on-surface italic">{featured.city}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 mt-6">
                     <button
                       onClick={e => { e.stopPropagation(); setContactChooserProvider(featured) }}
-                      className="flex-1 flex items-center justify-center gap-3 py-4.5 rounded-2xl bg-navy text-white text-[11px] font-black uppercase tracking-[0.1em] shadow-xl shadow-navy/20 active:scale-[0.98] transition-all group"
+                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#0070e0] text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-[#0070e0]/90 active:scale-[0.98] transition-all"
                     >
-                      <PhoneCall className="w-4 h-4 group-hover:scale-110 transition-transform" /> Call Now
+                      <PhoneCall className="w-4 h-4" /> Call Now
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); setMapChooserProvider(featured) }}
-                      className="flex-1 flex items-center justify-center gap-3 py-4.5 rounded-2xl bg-white border border-overlay text-navy text-[11px] font-black uppercase tracking-[0.1em] hover:bg-surface-low hover:border-navy/20 active:scale-[0.98] transition-all group"
+                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white text-[11px] font-black uppercase tracking-widest hover:bg-white/20 active:scale-[0.98] transition-all"
                     >
-                      <Navigation className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" /> Directions
+                      <Navigation className="w-4 h-4" /> Directions
                     </button>
                   </div>
                 </div>
               </motion.div>
             )}
 
-            {/* List of others */}
-            <div className="space-y-4">
+            {/* ── Count row ────────────────────────────────────── */}
+            <div className="flex items-center justify-between mt-4 mb-6 px-1">
+              <p className="text-[11px] font-black text-muted uppercase tracking-widest">
+                {filtered.length} provider{filtered.length !== 1 ? 's' : ''} found
+              </p>
+              {featured?.distance !== null && (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy/5 border border-navy/10 text-[9px] font-black text-navy/50 uppercase tracking-widest">
+                  <Navigation className="w-2.5 h-2.5" /> Ordered by distance
+                </div>
+              )}
+            </div>
+            {/* ── Provider list ───────────────────────────────── */}
+            <div className="space-y-2.5">
               {rest.map((p, idx) => (
-                <motion.button
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+                <motion.div
                   key={p.id}
-                  onClick={() => setSelectedProvider(p)}
-                  className="w-full bg-white rounded-3xl border border-overlay p-4 hover:border-navy/20 hover:shadow-lg transition-all text-left group"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.025 }}
                 >
-                  <div className="flex items-center gap-4">
-                    <ProviderImage src={p.imageUrl} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-[15px] font-bold text-on-surface truncate group-hover:text-navy transition-colors mb-0.5">{p.name}</h3>
-                      <p className="text-[12px] text-muted truncate leading-none mb-2">{p.city}</p>
-                      <div className="flex items-center gap-3">
-                        {p.distance !== null && (
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-navy/70">
-                            <Navigation className="w-3 h-3" /> {formatDistance(p.distance)}
-                          </span>
-                        )}
-                        {(p.rating || 0) > 0 && (
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-on-surface/60">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {(Number(p.rating) || 0).toFixed(1)}
-                          </span>
-                        )}
+                  <button
+                    onClick={() => setSelectedProvider(p)}
+                    className="w-full text-left p-4 rounded-2xl bg-white border border-overlay hover:border-[#0070e0]/30 hover:shadow-xl hover:shadow-navy/5 transition-all duration-300 group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <ProviderImage src={p.imageUrl} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-[15px] font-bold text-on-surface truncate leading-tight group-hover:text-navy transition-colors mb-0.5">{p.name}</h3>
+                        <p className="text-[12px] text-muted truncate leading-none mb-2">{p.city}</p>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          {p.distance !== null && (
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-navy/70 bg-navy/[0.03] px-1.5 py-0.5 rounded-md">
+                              <Navigation className="w-2.5 h-2.5" /> {formatDistance(p.distance)}
+                            </span>
+                          )}
+                          {(p.rating || 0) > 0 && (
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-on-surface/60">
+                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {(Number(p.rating) || 0).toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Affordance */}
+                      <div className="w-10 h-10 rounded-full bg-[#0070e0]/5 flex items-center justify-center text-[#0070e0] group-hover:bg-[#0070e0] group-hover:text-white transition-all duration-300 shrink-0">
+                        <ChevronRight className="w-5 h-5" />
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-navy group-hover:translate-x-1 transition-all" />
-                  </div>
-                </motion.button>
+                  </button>
+                </motion.div>
               ))}
             </div>
           </>
@@ -463,39 +505,81 @@ export default function Towing() {
           >
             <motion.div
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
-              className="w-full max-w-lg bg-surface rounded-t-[40px] shadow-2xl overflow-hidden p-6 pb-12"
+              className="w-full max-w-lg bg-white rounded-t-[32px] shadow-2xl max-h-[85vh] overflow-y-auto"
             >
-              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-8 opacity-50" />
-              
-              <div className="flex items-start gap-6 mb-8">
-                <ProviderImage src={selectedProvider.imageUrl} size="lg" />
-                <div className="flex-1">
-                  <h2 className="text-2xl font-display font-black text-on-surface tracking-tight mb-2 uppercase italic">{selectedProvider.name}</h2>
-                  <p className="text-[13px] text-muted font-bold uppercase tracking-widest">{selectedProvider.city}</p>
+              <div className="flex justify-center pt-4 pb-2">
+                <div className="w-10 h-1.5 rounded-full bg-overlay" />
+              </div>
+              <div className="px-6 pb-8">
+                <div className="flex justify-end mb-2">
+                  <button onClick={() => setSelectedProvider(null)} className="w-9 h-9 rounded-full bg-surface-low flex items-center justify-center text-muted">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
 
-              <div className="bg-white border border-overlay rounded-3xl p-6 mb-8">
-                <p className="text-[13px] text-muted leading-relaxed italic">
-                  {selectedProvider.description || trustFallback(String(selectedProvider.id))}
-                </p>
-              </div>
+                {/* Provider header */}
+                <div className="flex items-start gap-5 mb-8">
+                  <ProviderImage src={selectedProvider.imageUrl} size="lg" />
+                  <div className="flex-1 min-w-0 pt-1">
+                    <h2 className="text-2xl font-display font-black text-on-surface tracking-tight leading-none mb-2">{selectedProvider.name}</h2>
+                    <p className="text-[14px] text-muted font-medium leading-relaxed">{selectedProvider.city}{selectedProvider.address ? ` · ${selectedProvider.address}` : ''}</p>
+                    <span className="inline-flex mt-3 text-[10px] font-black uppercase tracking-widest bg-navy/5 text-navy/60 border border-navy/10 px-3 py-1.5 rounded-xl">Towing & Recovery</span>
+                  </div>
+                </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setContactChooserProvider(selectedProvider)}
-                  className="flex-1 flex items-center justify-center gap-3 py-5 rounded-[22px] bg-navy text-white text-[11px] font-black uppercase tracking-[0.1em] shadow-2xl shadow-navy/20 active:scale-[0.98] transition-all"
-                >
-                  <PhoneCall className="w-5 h-5" /> Call Now
-                </button>
-                <button
-                  onClick={() => setMapChooserProvider(selectedProvider)}
-                  className="flex-1 flex items-center justify-center gap-3 py-5 rounded-[22px] bg-white border border-overlay text-navy text-[11px] font-black uppercase tracking-[0.1em] active:scale-[0.98] transition-all"
-                >
-                  <Navigation className="w-5 h-5" /> Directions
-                </button>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-3 mb-8">
+                  {selectedProvider.distance !== null && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Distance</p>
+                      <p className="text-[15px] font-bold text-on-surface">{formatDistance(selectedProvider.distance)}</p>
+                    </div>
+                  )}
+                  {selectedProvider.rating > 0 && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Rating</p>
+                      <div className="flex items-center justify-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-[15px] font-bold text-on-surface">{selectedProvider.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {selectedProvider.reviewCount > 0 && (
+                    <div className="bg-[#f3f4f6] border border-overlay p-3.5 rounded-2xl text-center">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Reviews</p>
+                      <p className="text-[15px] font-bold text-on-surface">{selectedProvider.reviewCount}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Description card */}
+                <div className="mb-8 p-5 bg-[#f8f9fa] border border-overlay rounded-3xl">
+                  <p className="text-[13px] font-medium text-on-surface/70 leading-relaxed italic">
+                    {selectedProvider.description || trustFallback(String(selectedProvider.id))}
+                  </p>
+                </div>
+
+                {/* CTA buttons */}
+                <div className="space-y-3.5">
+                  {selectedProvider.phone && (
+                    <>
+                      <button
+                        onClick={() => setContactChooserProvider(selectedProvider)}
+                        className="w-full flex items-center justify-center gap-3 py-5 rounded-[22px] bg-gradient-to-b from-[#0070e0] to-[#005bb5] text-white text-[13px] font-black uppercase tracking-[0.05em] shadow-[0_20px_40px_-15px_rgba(0,112,224,0.3)] border border-white/10 hover:brightness-110 active:scale-[0.97] transition-all"
+                      >
+                        <PhoneCall className="w-5 h-5 shadow-sm" /> Call Now
+                      </button>
+                      <button
+                        onClick={() => setMapChooserProvider(selectedProvider)}
+                        className="w-full flex items-center justify-center gap-3 py-5 rounded-[22px] bg-white border border-overlay text-navy text-[13px] font-black uppercase tracking-[0.05em] active:scale-[0.97] transition-all"
+                      >
+                        <Navigation className="w-5 h-5" /> Directions
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </motion.div>
           </motion.div>

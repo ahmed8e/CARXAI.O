@@ -6,13 +6,12 @@ import { supabase } from '../lib/supabase'
 import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
 import { useTTS } from '../lib/useTTS'
 import ListenButton from '../components/ui/ListenButton'
-import type { Message, DiagnosticResult, UrgencyLevel } from '../lib/types'
-import { Loader2, CheckCircle } from 'lucide-react'
-import {
-  Bot, Send,
-  Mic, RefreshCw, Zap,
-  CircuitBoard, Activity, Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Aperture,
-  Car, AudioLines, AlertTriangle, Wrench, Search, Truck, FileText
+import type { Message, DiagnosticResult } from '../lib/types'
+import { 
+  Loader2, CheckCircle, Bot, Zap, Activity,
+  AlertTriangle, Wrench, Aperture, FileText,
+  MapPin, AudioLines, Send, Mic, RefreshCw,
+  Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -39,20 +38,45 @@ const ISSUE_CHIPS = [
 const SYSTEM_PROMPT = `You are an automotive dashboard fault reader.
 
 Your task:
-Analyze a car dashboard image and detect:
-1. warning lights / dashboard symbols
-2. dashboard fault text messages
-3. both together if present
+Analyze dashboard-related evidence from:
+1. dashboard image/photo
+2. user-written message
+3. optional audio transcript
+
+You must detect:
+- dashboard warning lights / symbols
+- dashboard fault text messages
+- both together if present
+- and combine them with the user's extra explanation when useful
 
 Important:
-- Focus only on dashboard warnings, symbols, and fault messages.
-- Do not analyze the whole car.
-- If a text fault message is visible, read it and use it as strong evidence.
-- If both icon and message are visible, combine them.
-- Return only valid JSON.
-- Do not return markdown or freeform paragraphs.
+- Focus only on dashboard warnings, dashboard symbols, and dashboard fault messages
+- Do not analyze the whole car unless the user's message adds dashboard-specific context
+- If a text fault message is visible in the image, treat it as strong evidence
+- If both icon and message are visible, combine them
+- If the user message or audio transcript adds useful clarification, use it as supporting context
+- User text/audio should improve the interpretation, but should not override clear dashboard evidence from the image
+- If the user sends photo + text, combine both
+- If the user sends photo + audio transcript, combine both
+- If the user sends text only, infer carefully and lower confidence if no dashboard evidence is visible
+- Return only valid JSON
+- Do not return markdown
+- Do not return freeform paragraphs
 
-JSON Output Schema:
+Input interpretation rules:
+- Image = primary evidence when available
+- User message = supporting context
+- Audio transcript = supporting context
+- If dashboard image clearly shows a known warning light, do not return generic low confidence
+- If dashboard text fault message is readable, extract it accurately
+- If both are present, combine them into one final issue
+- Only return low confidence if:
+  - the image is too blurry
+  - too dark
+  - warning/message is unreadable
+  - or the user only gave vague text/audio without visible dashboard evidence
+
+Return this exact schema:
 {
   "dashboard_type": "warning_light" | "text_message" | "both" | "unknown",
   "warning_light_name": string | null,
@@ -65,22 +89,21 @@ JSON Output Schema:
   "next_step": string
 }
 
-Rules:
-- If a warning symbol is clearly visible and recognizable, do not return generic low confidence.
-- If a dashboard text fault message is readable, extract it accurately.
-- If both are present, combine them into one final issue.
-- Only return low confidence if the image is truly too blurry, too dark, or the message is unreadable.
-- Orange Airbag / SRS Icon Rule:
-  - warning_light_name: "Airbag / SRS warning light"
-  - normalized_issue: "Airbag system fault"
-  - severity: "medium"
-  - can_drive: true
-  - explanation: "The airbag or SRS system may have a fault and may not function correctly in a crash."
-  - next_step: "Drive cautiously and have the SRS system scanned soon."
-- Severity Rules:
-  - HIGH: red oil pressure, red coolant temp, brake failure, charging/overheating warnings.
-  - MEDIUM: airbag/SRS, ABS, TPMS, orange check engine, service faults.
-  - LOW: washer fluid, maintenance reminder, non-critical bulb warnings.`;
+Additional reasoning rules:
+- If image evidence and user text/audio agree, increase confidence
+- If image evidence is clear and user text/audio is vague, prioritize the image
+- If user text/audio mentions symptoms that match the visible dashboard warning, use that to improve explanation and next_step
+- If user text/audio conflicts with a clearly visible dashboard warning, prioritize the visible dashboard evidence
+- If only user text/audio is available and no readable dashboard evidence exists, use cautious interpretation and lower confidence
+
+Severity rules:
+- high = likely unsafe to continue driving, urgent stop/check needed
+- medium = caution, may drive short distance depending on issue
+- low = informational or lower urgency warning
+
+can_drive rules:
+- true only if likely safe for cautious/limited driving
+- false if warning suggests immediate stop or unsafe driving`;
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -505,7 +528,7 @@ ${diagnosticHistory}
           ...parsed,
           issueName: parsed.normalized_issue || parsed.warning_light_name || 'Dashboard Alert',
           likelyCause: parsed.explanation || (imageUrl ? 'A system fault was detected on your dashboard.' : 'Issue detected from description.'),
-          urgencyLevel: mappedUrgency as UrgencyLevel,
+          urgencyLevel: mappedUrgency as 'low' | 'medium' | 'high' | 'stop_driving',
           driveWhy: parsed.explanation || 'Safety status based on detected dashboard signal.',
           severity: parsed.severity || 'medium',
           can_drive: typeof parsed.can_drive === 'boolean' ? parsed.can_drive : true,
@@ -681,297 +704,299 @@ ${diagnosticHistory}
   }
 
   return (
-    <div className="flex flex-col absolute inset-0 bg-[#fafbfd]">
-      {/* Background decoration */}
+    <div className="h-full relative overflow-hidden">
+      {/* ── Layer 0: Global Background Decoration ──────────────────── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-navy/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy/[0.03] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-navy/[0.04] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-navy/[0.02] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
       </div>
 
+      {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
+      <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6">
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-12 space-y-6 relative z-10 scroll-smooth">
-        {messages.length === 0 && !loading && (
-          <div className="flex-1 flex flex-col items-center justify-start pt-16 md:pt-24 pb-0 px-4 w-full relative overflow-hidden">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center mb-8 w-full"
-            >
-              {/* The Pulsar — Multi-layered Hero — Minimalist */}
-              <div className="relative w-16 h-16 mx-auto mb-4">
-                <motion.div
-                  className="absolute inset-[-4px] rounded-full bg-navy/[0.02] blur-xl"
-                  animate={{ opacity: [0.1, 0.3, 0.1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <div className="absolute inset-0 rounded-2xl bg-navy flex items-center justify-center shadow-2xl border border-white/20 z-10 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                  <Bot className="w-7 h-7 text-white relative z-20" />
-                  <motion.div
-                    className="absolute inset-0 bg-blue-400/10 blur-xl"
-                    animate={{ opacity: [0, 0.4, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Quick Start Grid — Natural Flow */}
-            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-6 z-20">
-              {ISSUE_CHIPS.map((chip, idx) => (
-                <motion.button
-                  key={chip.value}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + idx * 0.05 }}
-                  onClick={() => sendMessage(chip.value, undefined, chip.label)}
-                  className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-[#fafbfd] border border-slate-100 shadow-[0_2px_10px_rgba(0,18,51,0.02)] hover:shadow-[0_8px_20px_rgba(0,18,51,0.05)] hover:border-navy/20 transition-all active:scale-[0.98] overflow-hidden"
-                >
-                  <div className="w-7 h-7 rounded-xl bg-white flex items-center justify-center border border-slate-100 shadow-sm group-hover:bg-navy group-hover:scale-110 transition-all duration-300 relative z-10 shrink-0">
-                    <chip.icon className="w-3.5 h-3.5 text-navy/40 group-hover:text-white transition-colors" />
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide leading-tight text-on-surface group-hover:text-navy transition-all relative z-10 text-left">{chip.label}</span>
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Add Vehicle Context — Ultra Minimal Nudge */}
-            {!loadingVehicle && !activeVehicle && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={() => setShowVehicleModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-100 hover:border-navy/30 text-muted hover:text-navy text-[8px] font-black uppercase tracking-[0.2em] transition-all z-20"
+        <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-48 relative z-10">
+          {/* Welcome State when empty */}
+          {messages.length === 0 && !loading && (
+            <div className="flex flex-col items-center justify-center pt-20 pb-12">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center mb-12 w-full px-6"
               >
-                <div className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
-                Configure vehicle context
-              </motion.button>
-            )}
-          </div>
-        )}
-
-        {messages.map((msg, idx) => {
-          // Skip the initial greeting bubble if we are showing the centered empty state
-          if (messages.length === 1 && idx === 0) return null;
-
-          return (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
-            >
-              {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center flex-shrink-0 mr-3 mt-1 shadow-lg border border-white/10 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                  <Bot className="w-4 h-4 text-white relative z-10" />
-                </div>
-              )}
-              <div className={`max-w-[85%] lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
-                {msg.imageUrl && (
-                  <div className="relative rounded-[26px] overflow-hidden mb-3 shadow-2xl border border-white/20 ring-1 ring-black/5">
-                    <img src={msg.imageUrl} alt="Uploaded" className="w-full max-h-72 object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="relative w-20 h-20 mx-auto mb-6">
+                  <div className="absolute inset-0 rounded-3xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
+                    <div className="absolute inset-0 bg-navy/[0.02] rounded-3xl" />
+                    <Bot className="w-9 h-9 text-navy relative z-20" />
                   </div>
-                )}
+                </div>
+                <h2 className="text-3xl font-display font-black text-navy tracking-tight mb-3">AI Mechanic</h2>
+                <p className="text-[15px] font-medium text-slate-500 max-w-[280px] mx-auto leading-relaxed">
+                  Upload a dashboard photo or describe your issue to start an analysis.
+                </p>
+              </motion.div>
 
-                {/* Message Bubble — LUXE */}
-                <div className={`px-6 py-4.5 rounded-[26px] text-sm leading-relaxed shadow-sm transition-all assistant-card-bubble ${msg.role === 'user'
-                    ? 'bg-navy text-white rounded-tr-none shadow-navy/20'
-                    : 'bg-[#fafbfd] border border-slate-100 text-slate-800 rounded-tl-none shadow-[0_2px_15px_rgba(0,18,51,0.03)]'
-                  }`}>
-                  {msg.role === 'assistant' ? (
-                    msg.issueData ? (
-                      <div className="space-y-0 relative">
-                        {/* 1. Header & Priority */}
-                        <div className="mb-6 flex items-start justify-between gap-4">
-                          <div className="pr-2">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40 block mb-1">Detected Fault</span>
-                            <h3 className="text-[22px] leading-tight font-display font-black text-[#0E1B39] tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
-                          </div>
-                          <div className={`px-3 py-1.5 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
-                            {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
-                          </div>
-                        </div>
+              <div className="flex flex-wrap items-center justify-center gap-2.5 w-full max-w-xl mb-10 px-4">
+                {ISSUE_CHIPS.map((chip, idx) => (
+                  <motion.button
+                    key={chip.value}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 + idx * 0.05 }}
+                    onClick={() => sendMessage(chip.value, undefined, chip.label)}
+                    className="group flex items-center gap-2.5 px-5 py-3 rounded-full bg-white border border-slate-200/60 shadow-sm hover:border-navy hover:bg-navy hover:text-white transition-all active:scale-95"
+                  >
+                    <chip.icon className="w-4 h-4 text-navy/40 group-hover:text-white transition-colors" />
+                    <span className="text-[11px] font-black uppercase tracking-wider leading-none">{chip.label}</span>
+                  </motion.button>
+                ))}
+              </div>
 
-                        {/* 2. Dashboard Symbols & Text (Contextual) */}
-                        {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
-                          <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col gap-3">
-                            {msg.issueData.warning_light_name && (
-                              <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-                                  <Aperture className="w-4 h-4 text-navy/60" />
-                                </div>
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
-                                  <p className="text-[13px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
-                                </div>
+              {!loadingVehicle && !activeVehicle && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={() => setShowVehicleModal(true)}
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#f1f3f6] text-navy/40 hover:text-navy hover:bg-white border border-transparent hover:border-slate-200 transition-all active:scale-95 text-[9px] font-black uppercase tracking-widest"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform" />
+                  Configure vehicle context
+                </motion.button>
+              )}
+            </div>
+          )}
+
+          {/* ── Message Thread ────────────────────────────────── */}
+          <div className="space-y-6">
+            {messages.map((msg, idx) => {
+              // Optionally skip greeting if empty state handles it
+              if (messages.length === 1 && idx === 0 && msg.id === '0') return null;
+
+              return (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  {msg.role === 'assistant' && (
+                    <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center flex-shrink-0 mr-3 mt-1 shadow-lg border border-white/10 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                      <Bot className="w-4 h-4 text-white relative z-10" />
+                    </div>
+                  )}
+                  <div className={`max-w-[85%] lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
+                    {msg.imageUrl && (
+                      <div className="relative rounded-2xl overflow-hidden mb-2 shadow-xl border border-white/20 ring-1 ring-black/5 max-w-[280px] ml-auto">
+                        <img src={msg.imageUrl} alt="Uploaded" className="w-full h-auto object-cover" />
+                      </div>
+                    )}
+
+                    <div className={`transition-all ${msg.role === 'user'
+                        ? 'px-5 py-3 rounded-[24px] rounded-tr-none bg-navy text-white shadow-lg shadow-navy/10 text-sm'
+                        : 'text-slate-800'
+                      }`}>
+                      {msg.role === 'assistant' ? (
+                        <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden assistant-card-bubble">
+                          {msg.issueData ? (
+                            <div className="p-6 md:p-8 space-y-8 relative">
+                            {/* 1. Header & Priority */}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="pr-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/30 block mb-1">AI Diagnostic Analysis</span>
+                                <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
                               </div>
-                            )}
-                            {msg.issueData.fault_message_text && (
-                              <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-                                  <FileText className="w-4 h-4 text-navy/60" />
-                                </div>
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Message</p>
-                                  <p className="text-[13px] font-bold text-navy leading-tight line-clamp-2">“{msg.issueData.fault_message_text}”</p>
-                                </div>
+                              <div className={`px-2.5 py-1 rounded-lg border font-black text-[9px] uppercase tracking-widest shrink-0 ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
+                                {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
                               </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* 3. Driving Status */}
-                        <div className="mb-6 pt-5 border-t border-slate-100">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Car className="w-3.5 h-3.5 text-navy/30" />
-                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/40">Can you keep driving?</p>
-                          </div>
-                          <div className={`flex items-center gap-4 p-4 rounded-2xl border ${msg.issueData.can_drive ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${msg.issueData.can_drive ? 'bg-white text-emerald-500' : 'bg-white text-rose-500'}`}>
-                              {msg.issueData.can_drive ? (
-                                <CheckCircle className="w-6 h-6" />
-                              ) : (
-                                <AlertTriangle className="w-6 h-6" />
-                              )}
                             </div>
-                            <div>
-                              <p className={`text-[15px] font-black leading-none mb-1 ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
-                                {msg.issueData.can_drive ? 'YES, CAUTIOUSLY' : 'NO, STOP IMMEDIATELY'}
+
+                            {/* 2. Dashboard Symbols & Text (Contextual) */}
+                            {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
+                              <div className="flex flex-col gap-4">
+                                {msg.issueData.warning_light_name && (
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
+                                      <Aperture className="w-5 h-5 text-navy/40" />
+                                    </div>
+                                    <div>
+                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
+                                      <p className="text-[14px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                {msg.issueData.fault_message_text && (
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
+                                      <FileText className="w-5 h-5 text-navy/40" />
+                                    </div>
+                                    <div>
+                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Text</p>
+                                      <p className="text-[14px] font-bold text-navy leading-tight">“{msg.issueData.fault_message_text}”</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* 3. Safety Check - Integrated High-End Block */}
+                            <div className="relative group">
+                              <div className={`p-5 rounded-3xl border transition-all duration-500 ${
+                                msg.issueData.can_drive 
+                                  ? 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-50/50' 
+                                  : 'bg-rose-50/30 border-rose-100/50 hover:bg-rose-50/50'
+                              }`}>
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${
+                                    msg.issueData.can_drive 
+                                      ? 'bg-white border-emerald-100 text-emerald-600' 
+                                      : 'bg-white border-rose-100 text-rose-600'
+                                  }`}>
+                                    {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-navy/30 mb-1">Safety Status</p>
+                                    <p className={`text-[16px] font-black leading-tight ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                      {msg.issueData.can_drive ? 'Safe to drive cautiously' : 'Stop driving immediately'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* 4. Deep Analysis */}
+                            <div className="pt-6 border-t border-slate-100 px-1">
+                              <div className="flex items-center gap-2 mb-3 text-navy/30">
+                                <Activity className="w-4 h-4" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">In-depth Analysis</span>
+                              </div>
+                              <p className="text-[17px] font-medium text-slate-600 leading-[1.6] tracking-tight">
+                                {msg.issueData.explanation || msg.issueData.likelyCause}
                               </p>
-                              <p className="text-[12px] font-medium text-slate-500 leading-tight">Safety is priority #1.</p>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* 4. Explanation */}
-                        <div className="mb-6 pt-5 border-t border-slate-100">
-                           <div className="flex items-center gap-2 mb-2.5">
-                            <Activity className="w-3.5 h-3.5 text-navy/30" />
-                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/40">AI Analysis</p>
-                          </div>
-                          <p className="text-[14px] font-medium text-slate-600 leading-relaxed pl-5.5 relative">
-                            <span className="absolute left-1.5 top-2 w-1.5 h-1.5 rounded-full bg-navy/20" />
-                            {msg.issueData.explanation || msg.issueData.likelyCause}
-                          </p>
-                        </div>
+                            {/* 5. Recommended Action */}
+                            <div className="pt-6 border-t border-slate-100 px-1">
+                              <div className="flex items-center gap-2 mb-3 text-navy/30">
+                                <Wrench className="w-4 h-4" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Recommended Action</span>
+                              </div>
+                              <p className="text-[18px] font-black text-navy leading-snug">
+                                {msg.issueData.next_step}
+                              </p>
+                            </div>
 
-                        {/* 5. Next Step */}
-                        <div className="pt-6 border-t border-slate-100 bg-[#fafbfd] -mx-6 -mb-4.5 px-6 pb-6 rounded-b-[26px]">
-                          <div className="flex items-center gap-2 mb-2.5">
-                            <Wrench className="w-4 h-4 text-navy/40" />
-                            <p className="text-[10px] font-black uppercase tracking-widest text-navy/50">Recommended Next Step</p>
-                          </div>
-                          <p className="text-[15px] font-black text-navy leading-snug pl-0">
-                            {msg.issueData.next_step}
-                          </p>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="mt-5 -mx-6 -mb-4.5 bg-[#fafbfd] border-t border-slate-100 px-6 py-6 rounded-b-[26px]">
-                          <div className="flex flex-col gap-3">
-                            <motion.button
-                              whileHover={{ y: -1, scale: 1.01 }}
-                              whileTap={{ scale: 0.99 }}
-                              onClick={() => {
-                                setReportDiagnosis(msg.issueData!);
-                                setShowReport(true);
-                              }}
-                              className="w-full flex items-center justify-center gap-3 px-6 py-4.5 rounded-[20px] bg-navy text-white text-[12px] font-black uppercase tracking-widest shadow-xl shadow-navy/20 transition-all group"
-                            >
-                              <FileText className="w-4.5 h-4.5" />
-                              Generate Official Report
-                            </motion.button>
-                            
-                            <div className="flex gap-3 w-full">
+                            {/* 6. Integrated Premium Actions */}
+                            <div className="pt-4 flex flex-col gap-3">
                               <motion.button
-                                whileHover={{ y: -1, scale: 1.01 }}
-                                whileTap={{ scale: 0.99 }}
-                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-4 rounded-[18px] bg-white border-2 border-slate-100 text-navy text-[11px] font-bold uppercase tracking-widest transition-all hover:border-navy"
+                                whileHover={{ y: -4, boxShadow: "0 25px 50px -12px rgba(0,112,224,0.4)" }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                  setReportDiagnosis(msg.issueData!);
+                                  setShowReport(true);
+                                }}
+                                className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
                               >
-                                <Search className="w-4 h-4" />
-                                Find Mechanic
+                                <FileText className="w-5.5 h-5.5 text-white/90" />
+                                <span className="font-display">Generate Detailed Report</span>
                               </motion.button>
                               
-                              <motion.button
-                                whileHover={{ y: -1, scale: 1.01 }}
-                                whileTap={{ scale: 0.99 }}
-                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                className="flex-1 flex items-center justify-center gap-2.5 px-4 py-4 rounded-[18px] bg-white border-2 border-slate-100 text-navy text-[11px] font-bold uppercase tracking-widest transition-all hover:border-navy"
-                              >
-                                <Truck className="w-4 h-4" />
-                                Towing
-                              </motion.button>
+                              <div className="grid grid-cols-2 gap-3 w-full">
+                                <motion.button
+                                  whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
+                                  whileTap={{ scale: 0.96 }}
+                                  onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                  className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
+                                >
+                                  <MapPin className="w-4 h-4 text-navy/40" />
+                                  Find Mechanic
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
+                                  whileTap={{ scale: 0.96 }}
+                                  onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                  className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
+                                >
+                                  <Zap className="w-4 h-4 text-navy/40" />
+                                  Towing
+                                </motion.button>
+                              </div>
+
+                              <div className="pt-6 flex justify-center">
+                                <ListenButton
+                                  currentAudioRef={currentAudioRef}
+                                  text={`Diagnosis: ${msg.issueData.normalized_issue}. Severity: ${msg.issueData.severity}. Safety check: ${msg.issueData.can_drive ? 'You can keep driving cautiously.' : 'No, stop as soon as it is safe.'} ${msg.issueData.explanation}. Next step: ${msg.issueData.next_step}`}
+                                />
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div className="mt-5 pt-4 border-t border-slate-50 flex justify-center">
-                            <ListenButton
-                              currentAudioRef={currentAudioRef}
-                              text={`Diagnosis: ${msg.issueData.normalized_issue}. Severity: ${msg.issueData.severity}. Safety check: ${msg.issueData.can_drive ? 'You can keep driving cautiously.' : 'No, stop as soon as it is safe.'} ${msg.issueData.explanation}. Next step: ${msg.issueData.next_step}`}
-                            />
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble">
+                              {formatContent(msg.content)}
+                            </div>
+                          )}
                         </div>
+                      ) : (
+                        <p className="font-semibold">{msg.content}</p>
+                      )}
+                    </div>
+
+                    {msg.role === 'assistant' && !msg.issueData && (
+                      <div className="mt-2 flex justify-start pl-2">
+                        <ListenButton
+                          currentAudioRef={currentAudioRef}
+                          text={msg.content}
+                        />
                       </div>
-                    ) : formatContent(msg.content)
-                  ) : (
-                    <p className="font-semibold">{msg.content}</p>
-                  )}
-                </div>
-
-                {/* Listen button — plain AI messages ONLY. Structured msgs have it inside the card */}
-                {msg.role === 'assistant' && msg.id !== '0' && !msg.issueData && (
-                  <ListenButton
-                    currentAudioRef={currentAudioRef}
-                    text={msg.content}
-                  />
-                )}
-
-
-              </div>
-            </motion.div>
-          );
-        })}
-
-        {isGated && <UpgradeGate />}
-
-        {(loading || streamingMessage) && (
-          <div className="flex justify-start items-start">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center mr-3 bg-navy shadow-lg border border-white/10 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-              <Bot className="w-4 h-4 text-white relative z-10" />
-            </div>
-            <div className="space-y-2 max-w-[85%] lg:max-w-lg">
-              <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-[#fafbfd] border border-slate-100 text-slate-800 shadow-[0_2px_15px_rgba(0,18,51,0.03)] assistant-card-bubble">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Loader2 className="w-3 h-3 text-navy animate-spin" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-navy/60">
-                      {streamingMessage ? 'Live Analysis' : 'Connecting to Systems'}
-                    </span>
+                    )}
                   </div>
-                  <p className="text-sm leading-relaxed text-on-surface/90 font-medium">
-                    {streamingMessage || 'Initializing diagnostic modules...'}
-                  </p>
-                </div>
-              </div>
-
-              {isPreparingAudio && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy/5 border border-navy/10 w-fit ml-2"
-                >
-                  <AudioLines className="w-3 h-3 text-navy animate-pulse" />
-                  <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">Preparing voice...</span>
                 </motion.div>
-              )}
+              );
+            })}
+          {/* ── Loading / Streaming Status ─────────────────────── */}
+          {(loading || streamingMessage) && (
+            <div className="flex justify-start items-start mt-6">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center mr-3 bg-navy shadow-lg border border-white/10 relative overflow-hidden transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                <Bot className="w-4 h-4 text-white relative z-10" />
+              </div>
+              <div className="space-y-2 max-w-[85%] lg:max-w-lg">
+                <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-white border border-slate-100 text-slate-800 shadow-[0_2px_15px_rgba(0,18,51,0.03)] assistant-card-bubble">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Loader2 className="w-3 h-3 text-navy animate-spin" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-navy/60">
+                        {streamingMessage ? 'Live Analysis' : 'Connecting to Systems'}
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-slate-600 font-medium">
+                      {streamingMessage || 'Initializing diagnostic modules...'}
+                    </p>
+                  </div>
+                </div>
+
+                {isPreparingAudio && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy/5 border border-navy/10 w-fit ml-2"
+                  >
+                    <AudioLines className="w-3 h-3 text-navy animate-pulse" />
+                    <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">Preparing voice...</span>
+                  </motion.div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} className="h-4" />
+          )}
+        </div>
+
+        {isGated && (
+            <div className="mt-8">
+              <UpgradeGate />
+            </div>
+          )}
+
+          <div ref={messagesEndRef} className="h-8" />
+        </div>
       </div>
 
       {/* Premium Voice Activity Indicator */}
@@ -1000,15 +1025,19 @@ ${diagnosticHistory}
         )}
       </AnimatePresence>
 
-      {/* ══ Premium ChatGPT-style Composer ══ */}
-      <div className="flex-none z-30 bg-[#fafbfd]/80 backdrop-blur-2xl border-t border-white/[0.08] pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4">
+      {/* ── Layer 2: Floating Composer ────────────────────────────── */}
+      <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
+        {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/90 to-transparent pointer-events-none" />
+        
+        <div className="max-w-3xl mx-auto px-4 relative z-10 pointer-events-auto">
         {/* Hidden file pickers */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
           onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
-        <div className="max-w-3xl mx-auto px-4">
+
           {/* ══ Attachment Preview ══ */}
           <AnimatePresence mode="wait">
             {isImageProcessing ? (
@@ -1033,7 +1062,7 @@ ${diagnosticHistory}
                 className="mb-3 flex justify-start"
               >
                 <div className="relative group">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white shadow-xl">
+                  <div className="w-24 h-24 rounded-[22px] overflow-hidden border-2 border-white shadow-2xl ring-1 ring-black/5">
                     <img src={attachedImage} alt="Attachment" className="w-full h-full object-cover" />
                   </div>
                   <button
@@ -1047,7 +1076,7 @@ ${diagnosticHistory}
             ) : null}
           </AnimatePresence>
 
-          <div className="relative flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-[32px] p-2 pr-3 focus-within:border-blue-500/10 focus-within:bg-white focus-within:shadow-[0_12px_40px_rgba(0,18,51,0.08)] transition-all duration-300">
+          <div className="relative flex items-end gap-2 bg-white border border-slate-200/60 rounded-[32px] p-2 pr-3 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] transition-all duration-500">
             {/* Left: Camera */}
             <div className="flex items-center self-center pl-1">
               <button
