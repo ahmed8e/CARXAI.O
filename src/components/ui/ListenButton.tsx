@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, RotateCcw, Volume2, AlertCircle } from 'lucide-react'
 import { useTTS } from '../../lib/useTTS'
+import { supabase } from '../../lib/supabase'
 
 interface ListenButtonProps {
   text: string
@@ -23,9 +24,11 @@ export default function ListenButton({ text, currentAudioRef }: ListenButtonProp
 
   const cleanText = useMemo(() => stripMarkdown(text), [text])
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (status === 'idle' || status === 'error') {
-      play(cleanText)
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+      play(cleanText, token)
     } else if (status === 'playing') {
       pause()
     } else if (status === 'paused') {

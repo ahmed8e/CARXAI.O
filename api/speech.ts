@@ -16,6 +16,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ error: 'Missing Authorization header' });
@@ -43,14 +47,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'OpenAI API key not configured on server' });
   }
 
+  const { text, model = 'tts-1', voice = 'nova' } = req.body;
+  if (!text) {
+    return res.status(400).json({ error: 'Missing text in request body' });
+  }
+
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify({
+        model,
+        voice,
+        input: text,
+        response_format: 'mp3',
+      }),
     });
 
     if (!response.ok) {
@@ -58,25 +72,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(response.status).json(error);
     }
 
-    // Proxy the stream
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('No reader available');
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
-    }
-
-    res.end();
+    const arrayBuffer = await response.arrayBuffer();
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.send(Buffer.from(arrayBuffer));
   } catch (error: any) {
-    console.error('Proxy Error:', error);
-    if (!res.writableEnded) {
-      res.status(500).json({ error: error.message });
-    }
+    console.error('Speech Proxy Error:', error);
+    res.status(500).json({ error: error.message });
   }
 }

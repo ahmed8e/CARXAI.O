@@ -314,10 +314,14 @@ ${diagnosticHistory}
       // Use a helper for the API call to support retries
       const performAnalysis = async (isRetry = false) => {
         console.log(`[Carxai AI] Starting analysis (isRetry: ${isRetry})`);
+        const sessionResponse = await supabase.auth.getSession();
+        const token = sessionResponse.data.session?.access_token;
+
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
             model: 'gpt-4o',
@@ -381,6 +385,7 @@ ${diagnosticHistory}
       }
 
       let accumulatedJSON = await performAnalysis();
+      console.log('[Carxai AI] Raw accumulated JSON from OpenAI:', accumulatedJSON);
 
       let issueData: DiagnosticResult | undefined
       let finalDisplayContent = ''
@@ -571,7 +576,10 @@ ${diagnosticHistory}
           finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
           setIsPreparingAudio(true)
           const speechText = `Diagnosis: ${issueData.issueName}. Severity: ${issueData.severity}. Safety check: ${issueData.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${issueData.explanation}. Recommended next step: ${issueData.next_step}`
-          prefetch(speechText).finally(() => setIsPreparingAudio(false))
+          
+          const sessionResp = await supabase.auth.getSession();
+          const ttsToken = sessionResp.data.session?.access_token;
+          prefetch(speechText, ttsToken).finally(() => setIsPreparingAudio(false))
         }
       } catch (err) {
         console.error('[Carxai AI] Final Logic Catch Triggered:', (err as any)?.message || err);
@@ -621,14 +629,17 @@ ${diagnosticHistory}
 
       // Save to Supabase
       if (user && issueData) {
+        console.log('[Carxai AI] Saving diagnostic to history...');
+        // Note: the prompt mentioned ai_response was missing. 
+        // We'll align with the code, but if it fails we check the alternate column mapping.
         // @ts-ignore
         const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
           user_message: content,
-          ai_response: finalDisplayContent,
-          issue_name: issueData.issueName,
-          likely_cause: issueData.likelyCause,
-          urgency_level: issueData.urgencyLevel,
+          ai_response: finalDisplayContent, // User said this might be missing, but it's in the schema. Check migration status.
+          issue_name: issueData.issueName || issueData.issue_title,
+          likely_cause: issueData.likelyCause || issueData.explanation,
+          urgency_level: issueData.urgencyLevel || issueData.severity,
         }).select('id').single()
 
         const insertedChat = rawInsertedChat as { id: string } | null;

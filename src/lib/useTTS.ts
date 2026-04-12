@@ -9,8 +9,8 @@ interface UseTTSOptions {
 
 interface UseTTSReturn {
   status: TTSStatus
-  play: (text: string) => Promise<void>
-  prefetch: (text: string) => Promise<string | null>
+  play: (text: string, token?: string) => Promise<void>
+  prefetch: (text: string, token?: string) => Promise<string | null>
   pause: () => void
   resume: () => void
   replay: () => void
@@ -45,7 +45,7 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     return audio
   }, [currentAudioRef])
 
-  const play = useCallback(async (text: string) => {
+  const play = useCallback(async (text: string, token?: string) => {
     // If we already have a cached blob, just replay it
     if (blobUrlRef.current) {
       stopCurrentGlobal()
@@ -63,24 +63,16 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     stopCurrentGlobal()
 
     try {
-      const apiKey = import.meta.env.OPENAI_API_KEY
-      if (!apiKey || apiKey === 'sk-placeholder') {
-        setStatus('error')
-        return
-      }
-
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      const response = await fetch('/api/speech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          model: 'tts-1-hd',
+          text,
+          model: 'tts-1',
           voice: 'nova',
-          input: text,
-          response_format: 'mp3',
-          speed: 1.0,
         }),
       })
 
@@ -100,25 +92,20 @@ export function useTTS({ currentAudioRef }: UseTTSOptions): UseTTSReturn {
     }
   }, [stopCurrentGlobal, createAudio])
 
-  const prefetch = useCallback(async (text: string) => {
+  const prefetch = useCallback(async (text: string, token?: string) => {
     if (blobUrlRef.current) return blobUrlRef.current
 
     try {
-      const apiKey = import.meta.env.OPENAI_API_KEY
-      if (!apiKey || apiKey === 'sk-placeholder') return null
-
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      const response = await fetch('/api/speech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          model: 'tts-1-hd',
+          text,
+          model: 'tts-1',
           voice: 'nova',
-          input: text,
-          response_format: 'mp3',
-          speed: 1.0,
         }),
       })
 
