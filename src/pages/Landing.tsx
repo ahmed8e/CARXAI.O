@@ -58,7 +58,7 @@ const steps = [
 ]
 
 export default function Landing() {
-  const { user, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -81,6 +81,16 @@ export default function Landing() {
       }, 5000)
     }
   }
+
+  useEffect(() => {
+    // If user is logged in, redirect them to their last path or dashboard
+    if (!loading && user) {
+      const lastPath = localStorage.getItem('carxai.last_path') || '/dashboard'
+      navigate(lastPath, { replace: true })
+    }
+  }, [user, loading, navigate])
+
+  if (loading) return null;
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)

@@ -154,7 +154,20 @@ export default function AIMechanic() {
           const bubbles = document.querySelectorAll('.assistant-card-bubble');
           const lastBubble = bubbles[bubbles.length - 1];
           if (lastBubble) {
-            lastBubble.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Precise alignment: target the top of the bubble sitting ~100px from screen top
+            const topOffset = 110; 
+            const rect = lastBubble.getBoundingClientRect();
+            const scrollContainer = lastBubble.closest('.overflow-y-auto');
+            
+            if (scrollContainer) {
+              const currentScroll = scrollContainer.scrollTop;
+              const targetScroll = currentScroll + rect.top - topOffset;
+              
+              scrollContainer.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+              });
+            }
           }
         }, 150);
       }
@@ -714,7 +727,7 @@ ${diagnosticHistory}
       {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
       <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6">
 
-        <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-48 relative z-10">
+        <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-36 relative z-10">
           {/* Welcome State when empty */}
           {messages.length === 0 && !loading && (
             <div className="flex flex-col items-center justify-center pt-20 pb-12">
@@ -1026,7 +1039,7 @@ ${diagnosticHistory}
       </AnimatePresence>
 
       {/* ── Layer 2: Floating Composer ────────────────────────────── */}
-      <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
+      <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
         {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/90 to-transparent pointer-events-none" />
         

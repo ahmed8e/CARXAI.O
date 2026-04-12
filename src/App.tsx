@@ -5,6 +5,25 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
 
+// ── SPA Path Persistence ───────────────────────────────────────────────────
+function PathTracker() {
+  const location = useLocation()
+  
+  useEffect(() => {
+    // Only persist paths that belong to the app experience
+    const isInApp = location.pathname.startsWith('/dashboard') || 
+                    location.pathname.startsWith('/my-account') ||
+                    location.pathname.startsWith('/admin') ||
+                    location.pathname === '/choose-plan'
+    
+    if (isInApp) {
+      localStorage.setItem('carxai.last_path', location.pathname + location.search)
+    }
+  }, [location])
+
+  return null
+}
+
 // ── SPA GTM Tracking ─────────────────────────────────────────────────────────
 function GTMTracker() {
   const location = useLocation()
@@ -55,6 +74,7 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <PathTracker />
           <GTMTracker />
           <Routes>
             {/* Public routes */}
