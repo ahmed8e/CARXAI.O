@@ -34,76 +34,49 @@ const ISSUE_CHIPS = [
   { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
-// Strict Vision Prompting for Dashboard Analysis
-const SYSTEM_PROMPT = `You are an automotive dashboard fault reader.
+// Strict Multimodal Automotive Reasoning
+const SYSTEM_PROMPT = `You are CarxAI AI Mechanic, a multimodal automotive assistant.
 
-Your task:
-Analyze dashboard-related evidence from:
-1. dashboard image/photo
-2. user-written message
-3. optional audio transcript
+Your job is to help users understand car problems using any combination of:
+- user text
+- uploaded image/photo
+- audio transcript
+- mixed inputs
 
-You must detect:
-- dashboard warning lights / symbols
-- dashboard fault text messages
-- both together if present
-- and combine them with the user's extra explanation when useful
+You handle general car issues across multiple input types.
 
-Important:
-- Focus only on dashboard warnings, dashboard symbols, and dashboard fault messages
-- Do not analyze the whole car unless the user's message adds dashboard-specific context
-- If a text fault message is visible in the image, treat it as strong evidence
-- If both icon and message are visible, combine them
-- If the user message or audio transcript adds useful clarification, use it as supporting context
-- User text/audio should improve the interpretation, but should not override clear dashboard evidence from the image
-- If the user sends photo + text, combine both
-- If the user sends photo + audio transcript, combine both
-- If the user sends text only, infer carefully and lower confidence if no dashboard evidence is visible
-- Return only valid JSON
-- Do not return markdown
-- Do not return freeform paragraphs
+REASONING MODES:
+1. "dashboard": For dashboard images. Focus ONLY on dashboard warnings, symbols, and fault messages. If fault text is visible, treat it as strong evidence. Combine icon and message if both present.
+2. "visual_issue": For non-dashboard images (engine bay, tire, leak, smoke, battery, etc.). Focus on the visible issue. Do not hallucinate details. If unclear, be honest.
+3. "symptom_based": For no-image cases (text/audio only). Reason from reported symptoms (clicking, vibration, rough idle, etc.). Use safety-first logic.
+4. "mixed": For combined evidence (image + text/audio). Use all evidence together. Image is primary if clear; text/audio is supporting. If they agree, raise confidence. If they conflict, prioritize clearest direct evidence and mention uncertainty. Do not return generic fallback if evidence is strong enough.
 
-Input interpretation rules:
-- Image = primary evidence when available
-- User message = supporting context
-- Audio transcript = supporting context
-- If dashboard image clearly shows a known warning light, do not return generic low confidence
-- If dashboard text fault message is readable, extract it accurately
-- If both are present, combine them into one final issue
-- Only return low confidence if:
-  - the image is too blurry
-  - too dark
-  - warning/message is unreadable
-  - or the user only gave vague text/audio without visible dashboard evidence
+RESPONSE STYLE:
+- practical, safety-first, easy to understand.
+- no unnecessary jargon.
+- focused on likely issue, severity, driveability, and next step.
 
 Return this exact schema:
 {
-  "dashboard_type": "warning_light" | "text_message" | "both" | "unknown",
-  "warning_light_name": string | null,
-  "fault_message_text": string | null,
-  "normalized_issue": string,
+  "analysis_mode": "dashboard" | "visual_issue" | "symptom_based" | "mixed",
+  "issue_title": string,
   "severity": "low" | "medium" | "high",
   "can_drive": boolean,
   "confidence": "low" | "medium" | "high",
   "explanation": string,
-  "next_step": string
+  "next_step": string,
+  "needs_more_input": boolean,
+  "visible_area": string | null,
+  "dashboard_type": "warning_light" | "text_message" | "both" | "non_dashboard" | "unknown" | null,
+  "warning_light_name": string | null,
+  "fault_message_text": string | null
 }
 
-Additional reasoning rules:
-- If image evidence and user text/audio agree, increase confidence
-- If image evidence is clear and user text/audio is vague, prioritize the image
-- If user text/audio mentions symptoms that match the visible dashboard warning, use that to improve explanation and next_step
-- If user text/audio conflicts with a clearly visible dashboard warning, prioritize the visible dashboard evidence
-- If only user text/audio is available and no readable dashboard evidence exists, use cautious interpretation and lower confidence
-
-Severity rules:
-- high = likely unsafe to continue driving, urgent stop/check needed
-- medium = caution, may drive short distance depending on issue
-- low = informational or lower urgency warning
-
-can_drive rules:
-- true only if likely safe for cautious/limited driving
-- false if warning suggests immediate stop or unsafe driving`;
+Additional rules:
+- If evidence is weak, say so clearly.
+- If the issue may be dangerous, prioritize safety and set can_drive to false.
+- Extract any readable text in the image.
+- Return only valid JSON. Do not return markdown.`;
 
 export default function AIMechanic() {
   const { user } = useAuth()
@@ -359,7 +332,7 @@ ${diagnosticHistory}
               {
                 role: 'user',
                 content: imageUrl ? [
-                  { type: 'text', text: content || 'Analyze this dashboard or car issue image. Read all text carefully.' },
+                  { type: 'text', text: content || 'Analyze this automotive image (dashboard, engine, tire, leak, etc.). Read all text and identify any visible faults or abnormalities.' },
                   { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } }
                 ] : content
               }
@@ -392,8 +365,9 @@ ${diagnosticHistory}
                 chunkedJSON += delta
                 
                 // Partial streaming feedback
-                if (chunkedJSON.includes('"normalized_issue": "')) {
-                  const parts = chunkedJSON.split('"normalized_issue": "')
+                const titleField = chunkedJSON.includes('"issue_title": "') ? '"issue_title": "' : '"normalized_issue": "';
+                if (chunkedJSON.includes(titleField)) {
+                  const parts = chunkedJSON.split(titleField)
                   if (parts.length > 1) {
                     const partialText = parts[1].split('"')[0]
                     if (partialText) setStreamingMessage(partialText)
@@ -466,7 +440,7 @@ ${diagnosticHistory}
           towingRecommended: false,
           spokenSummary: 'The check engine light is on. It\'s usually safe for a short drive, but don\'t ignore it.'
         }
-        if (lowerInput.includes('overheating') || lowerInput.includes('smoke') || lowerInput.includes('steam')) return {
+        if (lowerInput.includes('overheating') || lowerInput.includes('steam')) return {
           issueName: 'Engine Overheating Alert',
           likelyCause: 'Low coolant, a burst hose, or a failing water pump.',
           explanation: 'Excessive heat will melt engine components, leading to total engine destruction.',
@@ -477,6 +451,30 @@ ${diagnosticHistory}
           mechanicRecommended: true,
           towingRecommended: true,
           spokenSummary: 'Your engine is overheating. Pull over and stop immediately to prevent a total rebuild.'
+        }
+        if (lowerInput.includes('leak') || lowerInput.includes('fluid') || lowerInput.includes('dripping')) return {
+          issueName: 'Fluid Leak Detected',
+          likelyCause: 'Leaks can range from engine oil to coolant or brake fluid.',
+          explanation: 'Loss of vital fluids can lead to component failure or loss of braking/steering capability.',
+          can_drive: false,
+          driveWhy: 'Loss of vital fluids can lead to component failure or loss of braking/steering capability.',
+          urgencyLevel: 'high',
+          next_step: 'Identify the color of the fluid and check levels before driving. Do not drive if it is brake fluid.',
+          mechanicRecommended: true,
+          towingRecommended: true,
+          spokenSummary: 'I detected a fluid leak. You should check your fluid levels before driving further.'
+        }
+        if (lowerInput.includes('smoke') || lowerInput.includes('burning') || lowerInput.includes('smell')) return {
+          issueName: 'Burning or Smoke Detected',
+          likelyCause: 'Could be electrical short, leaking oil on hot exhaust, or stuck brake.',
+          explanation: 'Burning smells or smoke are signs of excessive heat or friction and pose a fire risk.',
+          can_drive: false,
+          driveWhy: 'Burning smells or smoke are signs of excessive heat or friction and pose a fire risk.',
+          urgencyLevel: 'stop_driving',
+          next_step: 'Pull over safely and investigate source. Avoid driving until the cause is identified.',
+          mechanicRecommended: true,
+          towingRecommended: true,
+          spokenSummary: 'I detected a burning smell or smoke. This is a potential fire hazard, please stop safely.'
         }
         if (lowerInput.includes('noise') || lowerInput.includes('grinding') || lowerInput.includes('squeak')) return {
           issueName: 'Mechanical Noise Issue',
@@ -489,6 +487,18 @@ ${diagnosticHistory}
           mechanicRecommended: true,
           towingRecommended: false,
           spokenSummary: 'That strange noise sounds like a mechanical component wearing out. Get it looked at soon.'
+        }
+        if (lowerInput.includes('damage') || lowerInput.includes('crash') || lowerInput.includes('accident')) return {
+          issueName: 'Vehicle Damage Assessment',
+          likelyCause: 'Physical impact or collision.',
+          explanation: 'Structural damage or impact may have affected internal components or safety systems.',
+          can_drive: false,
+          driveWhy: 'Structural damage or impact may have affected internal components or safety systems.',
+          urgencyLevel: 'high',
+          next_step: 'Check for fluid leaks and ensure no parts are rubbing against tires before attempting to drive.',
+          mechanicRecommended: true,
+          towingRecommended: true,
+          spokenSummary: 'Vehicle damage detected. Please ensure the car is safe to move before driving.'
         }
         return null
       }
@@ -520,16 +530,23 @@ ${diagnosticHistory}
         
         console.log('[Carxai AI] Branch: Valid result identified. Priority rules MET.');
         
-        if (imageUrl) {
-          console.group('[Carxai Dashboard AI Logs]')
-          console.log('Final Result Choice: SUCCESS - VALID DETECTION')
-          console.log('Type:', parsed.dashboard_type)
-          console.log('Issue:', parsed.normalized_issue)
+        console.group('[Carxai Diagnostic AI Logs]')
+        console.log('Mode:', parsed.analysis_mode || 'unknown')
+        console.log('Result Choice: SUCCESS - VALID DETECTION')
+        if (parsed.analysis_mode === 'dashboard') {
+          console.log('Dashboard Type:', parsed.dashboard_type)
           console.log('Icon:', parsed.warning_light_name)
           console.log('Msg:', parsed.fault_message_text)
-          console.log('Confidence:', parsed.confidence)
-          console.groupEnd()
+        } else if (parsed.analysis_mode === 'visual_issue') {
+          console.log('Visible Area:', parsed.visible_area)
+        } else if (parsed.analysis_mode === 'symptom_based') {
+          console.log('Symptom Source: Text/Audio Evidence')
+        } else if (parsed.analysis_mode === 'mixed') {
+          console.log('Evidence Source: Combined Multimodal')
         }
+        console.log('Issue:', parsed.issue_title || parsed.normalized_issue)
+        console.log('Confidence:', parsed.confidence)
+        console.groupEnd()
         
         // Map new schema to IssueData maintaining compatibility for existing logic
         // Rule: If high severity AND cannot drive, map to stop_driving for UI coloring
@@ -539,7 +556,7 @@ ${diagnosticHistory}
 
         issueData = {
           ...parsed,
-          issueName: parsed.normalized_issue || parsed.warning_light_name || 'Dashboard Alert',
+          issueName: parsed.issue_title || parsed.normalized_issue || parsed.warning_light_name || 'Dashboard Alert',
           likelyCause: parsed.explanation || (imageUrl ? 'A system fault was detected on your dashboard.' : 'Issue detected from description.'),
           urgencyLevel: mappedUrgency as 'low' | 'medium' | 'high' | 'stop_driving',
           driveWhy: parsed.explanation || 'Safety status based on detected dashboard signal.',

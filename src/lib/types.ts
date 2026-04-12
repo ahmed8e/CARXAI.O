@@ -347,7 +347,10 @@ export interface DiagnosticResult {
   severity?: 'low' | 'medium' | 'high'
   can_drive: boolean
   confidence?: 'low' | 'medium' | 'high'
-  used_vehicle_context?: boolean
+  analysis_mode?: 'dashboard' | 'visual_issue' | 'symptom_based' | 'mixed' | 'general'
+  visible_area?: string
+  issue_title?: string
+  needs_more_input?: boolean
   explanation: string
   next_step: string
 
