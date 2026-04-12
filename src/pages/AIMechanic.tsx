@@ -643,7 +643,6 @@ ${diagnosticHistory}
           user_id: user.id,
           issue_name: issueData.issueName || issueData.issue_title,
           urgency_level: issueData.urgencyLevel || issueData.severity,
-          vehicle_id: activeVehicle?.id || null,
         }).select('id').single()
 
         const insertedChat = rawInsertedChat as { id: string } | null;
