@@ -25,7 +25,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Missing Authorization header' });
   }
 
-  const token = authHeader.replace('Bearer ', '');
+  const token = authHeader.split(' ').pop();
+  if (!token) {
+    return res.status(401).json({ error: 'Invalid Authorization header format' });
+  }
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 

@@ -335,9 +335,9 @@ ${diagnosticHistory}
               ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
               {
                 role: 'user',
-                content: imageUrl ? [
+                content: finalImageUrl ? [
                   { type: 'text', text: content || 'Analyze this automotive image (dashboard, engine, tire, leak, etc.). Read all text and identify any visible faults or abnormalities.' },
-                  { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } }
+                  { type: 'image_url', image_url: { url: finalImageUrl, detail: 'high' } }
                 ] : content
               }
             ],
@@ -636,9 +636,8 @@ ${diagnosticHistory}
         const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
           user_message: content,
-          ai_response: finalDisplayContent, // User said this might be missing, but it's in the schema. Check migration status.
+          ai_response: finalDisplayContent,
           issue_name: issueData.issueName || issueData.issue_title,
-          likely_cause: issueData.likelyCause || issueData.explanation,
           urgency_level: issueData.urgencyLevel || issueData.severity,
         }).select('id').single()
 
