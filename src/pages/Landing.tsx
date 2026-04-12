@@ -25,8 +25,7 @@ import {
   LogOut, 
   MessageSquare, 
   Cpu, 
-  MapPin, 
-  Navigation 
+  MapPin
 } from 'lucide-react'
 
 
@@ -90,8 +89,6 @@ export default function Landing() {
     }
   }, [user, loading, navigate])
 
-  if (loading) return null;
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     window.addEventListener('resize', handleResize)
@@ -102,6 +99,8 @@ export default function Landing() {
     resetTimer()
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [isMobile])
+
+
 
   return (
     <div className="relative min-h-screen bg-surface dark:bg-surface-low text-on-surface selection:bg-navy/10 transition-colors duration-300">
