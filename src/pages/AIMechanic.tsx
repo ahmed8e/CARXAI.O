@@ -209,7 +209,7 @@ export default function AIMechanic() {
       if (user?.id) {
         const { data: history } = await supabase
           .from('ai_chats')
-          .select('issue_name, likely_cause, created_at')
+          .select('issue_name, created_at')
           .eq('user_id', user.id)
           .not('issue_name', 'is', null)
           .order('created_at', { ascending: false })
@@ -217,7 +217,7 @@ export default function AIMechanic() {
 
         if (history && (history as any[]).length > 0) {
           const historySummary = (history as any[]).map(h => 
-            `- ${new Date(h.created_at).toLocaleDateString()}: ${h.issue_name} (Cause: ${h.likely_cause})`
+            `- ${new Date(h.created_at).toLocaleDateString()}: ${h.issue_name}`
           ).join('\n')
           setDiagnosticHistory(historySummary)
         }
@@ -525,11 +525,17 @@ ${diagnosticHistory}
           }
         }
 
-        // Loosened validation: prioritize ANY valid dashboard detection
-        const hasValidIssue = parsed && (parsed.normalized_issue || parsed.warning_light_name || parsed.fault_message_text);
+        // Loosened validation: prioritize ANY valid diagnostic result
+        const hasValidIssue = parsed && (
+          parsed.issue_title || 
+          parsed.normalized_issue || 
+          parsed.warning_light_name || 
+          parsed.fault_message_text ||
+          parsed.issue_name
+        );
         
         if (!hasValidIssue) {
-          console.warn('[Carxai AI] Result priority check failed. No valid issue found in parsed object.');
+          console.warn('[Carxai AI] Result validation failed. No valid issue found in parsed object:', parsed);
           throw new Error('Parsed JSON missing core diagnostic fields');
         }
         
@@ -635,10 +641,9 @@ ${diagnosticHistory}
         // @ts-ignore
         const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
-          user_message: content,
-          ai_response: finalDisplayContent,
           issue_name: issueData.issueName || issueData.issue_title,
           urgency_level: issueData.urgencyLevel || issueData.severity,
+          vehicle_id: activeVehicle?.id || null,
         }).select('id').single()
 
         const insertedChat = rawInsertedChat as { id: string } | null;

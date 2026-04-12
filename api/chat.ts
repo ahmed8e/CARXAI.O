@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'Missing Authorization header' });
   }
 
-  const token = authHeader.split(' ').pop();
+  const token = authHeader.split(' ').pop()?.trim();
   if (!token) {
     return res.status(401).json({ error: 'Invalid Authorization header format' });
   }
