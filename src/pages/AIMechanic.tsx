@@ -11,7 +11,7 @@ import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
-  Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Lock
+  Thermometer, ImagePlus, Lock
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -25,14 +25,10 @@ const FREE_MESSAGE_LIMIT = 2
 const RESET_WINDOW_HOURS = 5
 
 const ISSUE_CHIPS = [
-  { label: 'Engine light', value: 'My check engine light is on', icon: Activity },
-  { label: 'Car won\'t start', value: 'My car won\'t start', icon: Zap },
-  { label: 'Strange noise', value: 'I hear a strange noise from my car', icon: AudioLines },
-  { label: 'Brake warning', value: 'My brake warning light is on', icon: Disc },
-  { label: 'Flat tire', value: 'I have a flat tire', icon: Gauge },
+  { label: 'Engine Light', value: 'My check engine light is on', icon: Activity },
+  { label: 'Car Won\'t Start', value: 'My car won\'t start', icon: Zap },
+  { label: 'Strange Noise', value: 'I hear a strange noise from my car', icon: AudioLines },
   { label: 'Overheating', value: 'My car is overheating', icon: Thermometer },
-  { label: 'Battery dead', value: 'My car battery seems dead', icon: Battery },
-  { label: 'Fluid leak', value: 'I see fluid leaking under my car', icon: Droplets },
 ]
 
 // Strict Multimodal Automotive Reasoning
@@ -106,6 +102,7 @@ export default function AIMechanic() {
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
   const [isGated, setIsGated] = useState(false)
+  const [isLimitReached, setIsLimitReached] = useState(false)
   const [isImageGated, setIsImageGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
   const [isImageProcessing, setIsImageProcessing] = useState(false)
@@ -232,6 +229,8 @@ export default function AIMechanic() {
       if (!isPaid) {
         const chatGated = chatCount >= FREE_MESSAGE_LIMIT
         const imgGated = usage.image_count >= 1
+        
+        setIsLimitReached(chatGated)
         setIsGated(chatGated)
         setIsImageGated(imgGated)
         setCanShareReport(reportCount < 1) // Only 1 report per 5h
@@ -386,9 +385,11 @@ export default function AIMechanic() {
   }
 
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
-    // 1. HARD PRE-FLIGHT CHECK
     const currentlyGated = await fetchUsageCount()
-    if (currentlyGated || isGated) return
+    if (currentlyGated || isLimitReached) {
+      setIsGated(true)
+      return
+    }
 
     const finalImageUrl = imageUrl || attachedImage || undefined
 
@@ -872,8 +873,11 @@ ${diagnosticHistory}
     <div className="h-full relative overflow-hidden">
       {/* ── Layer 0: Global Background Decoration ──────────────────── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-navy/[0.04] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/[0.03] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 animate-pulse-slow" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-navy/[0.02] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
+        
+        {/* Technical Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
       {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
@@ -882,11 +886,11 @@ ${diagnosticHistory}
         <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-36 relative z-10">
           {/* Welcome State when empty */}
           {messages.length === 0 && !loading && (
-            <div className="flex flex-col items-center justify-center pt-20 pb-12">
+            <div className="flex flex-col items-center justify-center pt-8 pb-10">
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center mb-12 w-full px-6"
+                className="text-center mb-10 w-full px-6"
               >
                 <div className="relative w-20 h-20 mx-auto mb-6">
                   <div className="absolute inset-0 rounded-3xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
@@ -894,38 +898,101 @@ ${diagnosticHistory}
                     <Bot className="w-9 h-9 text-navy relative z-20" />
                   </div>
                 </div>
-                <h2 className="text-3xl font-display font-black text-navy tracking-tight mb-3">AI Mechanic</h2>
-                <p className="text-[15px] font-medium text-slate-500 max-w-[280px] mx-auto leading-relaxed">
-                  Upload a dashboard photo or describe your issue to start an analysis.
+                <h2 className="text-4xl font-display font-[900] text-navy tracking-tight mb-4">AI Mechanic</h2>
+                <div className="w-12 h-1 bg-gradient-to-r from-transparent via-navy/10 to-transparent mx-auto mb-6" />
+                <p className="text-[17px] font-semibold text-slate-500 max-w-[320px] mx-auto leading-relaxed tracking-tight">
+                  High-fidelity diagnostic intelligence. <br/>
+                  <span className="text-navy/40 text-[13px] font-black uppercase tracking-[0.2em]">Ready for analysis</span>
                 </p>
               </motion.div>
 
-              <div className="flex flex-wrap items-center justify-center gap-2.5 w-full max-w-xl mb-10 px-4">
+              <div className="grid grid-cols-2 gap-5 w-full max-w-xl mb-12 px-4">
                 {ISSUE_CHIPS.map((chip, idx) => (
                   <motion.button
                     key={chip.value}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + idx * 0.05 }}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ 
+                      delay: 0.2 + idx * 0.08, 
+                      duration: 0.8, 
+                      ease: [0.16, 1, 0.3, 1] 
+                    }}
                     onClick={() => sendMessage(chip.value, undefined, chip.label)}
-                    className="group flex items-center gap-2.5 px-5 py-3 rounded-full bg-white border border-slate-200/60 shadow-sm hover:border-navy hover:bg-navy hover:text-white transition-all active:scale-95"
+                    whileHover={{ 
+                      y: -8, 
+                      transition: { duration: 0.4, ease: "easeOut" }
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative flex flex-col items-start p-5.5 rounded-[28px] bg-white border border-slate-100/80 shadow-[0_4px_20px_rgba(0,0,0,0.02),0_20px_40px_rgba(0,18,51,0.04)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.04),0_30px_60px_rgba(0,18,51,0.08)] transition-all duration-500 text-left overflow-hidden ring-1 ring-white/10"
                   >
-                    <chip.icon className="w-4 h-4 text-navy/40 group-hover:text-white transition-colors" />
-                    <span className="text-[11px] font-black uppercase tracking-wider leading-none">{chip.label}</span>
+                    {/* Inner Glow & Glass Effect */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center mb-4 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 relative z-10 shadow-sm border border-white/40 ${
+                      idx === 0 ? 'bg-gradient-to-tr from-amber-50 to-orange-50/50 text-amber-600' :
+                      idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
+                      idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
+                      'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
+                    }`}>
+                      <chip.icon className="w-5 h-5 stroke-[2.5]" />
+                    </div>
+
+                    <div className="relative z-10">
+                      <span className="text-[15px] font-black text-navy leading-tight block mb-0.5 tracking-tight group-hover:text-blue-600 transition-colors">
+                        {chip.label}
+                      </span>
+                      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-1 group-hover:translate-y-0">
+                        <span className="text-[9px] font-black text-blue-600/60 uppercase tracking-[0.2em]">Initialize</span>
+                        <Send className="w-2.5 h-2.5 text-blue-600/60" />
+                      </div>
+                    </div>
                   </motion.button>
                 ))}
               </div>
 
               {!loadingVehicle && !activeVehicle && (
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={() => setShowVehicleModal(true)}
-                  className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#f1f3f6] text-navy/40 hover:text-navy hover:bg-white border border-transparent hover:border-slate-200 transition-all active:scale-95 text-[9px] font-black uppercase tracking-widest"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:scale-125 transition-transform" />
-                  Configure vehicle context
-                </motion.button>
+                <div className="w-full max-w-xl px-4">
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -4 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => setShowVehicleModal(true)}
+                    className="w-full relative overflow-hidden rounded-[36px] bg-white border border-slate-200/50 p-7 flex items-center justify-between gap-6 shadow-[0_15px_30px_-5px_rgba(0,18,51,0.03)] transition-all duration-500 group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    <div className="flex items-center gap-6 relative z-10">
+                      <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-[0_12px_24px_-8px_rgba(0,18,51,0.5)] relative overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-700">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
+                        <Activity className="w-7 h-7 text-white relative z-10" />
+                        
+                        {/* Status Pulse */}
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-navy animate-pulse" />
+                      </div>
+                      
+                      <div className="text-left">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Configuration Required</span>
+                        </div>
+                        <h4 className="text-[19px] font-black text-navy leading-none mb-2 tracking-tight">Add Vehicle Details</h4>
+                        <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">Enable vehicle-specific logic for 34% more accurate results</p>
+                      </div>
+                    </div>
+                    
+                    <div className="w-12 h-12 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:bg-navy group-hover:border-navy transition-all duration-500 shadow-sm relative z-10">
+                      <RefreshCw className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-all duration-700" />
+                    </div>
+
+                    {/* Interactive Scan Line Effect */}
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent w-full h-[20%] opacity-0 group-hover:opacity-100"
+                      animate={{ top: ['-20%', '120%'] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    />
+                  </motion.button>
+                </div>
               )}
             </div>
           )}
@@ -1093,7 +1160,7 @@ ${diagnosticHistory}
                                 />
                               </div>
                             </div>
-                            </div>
+                          </div>
                           ) : (
                             <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble">
                               {formatContent(msg.content)}
@@ -1160,17 +1227,7 @@ ${diagnosticHistory}
       </div>
 
 
-      {/* Pro Usage Indicator */}
-      {isPro && !isGated && (
-        <div className="fixed top-24 right-6 z-40">
-          <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-full px-4 py-1.5 shadow-sm flex items-center gap-2">
-            <Activity className="w-3 h-3 text-navy/40" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-navy">
-              PRO ACCESS • <span className="text-blue-600">15 REPORTS / MO</span>
-            </span>
-          </div>
-        </div>
-      )}
+
 
       {/* Premium Voice Activity Indicator */}
       <AnimatePresence>
@@ -1235,7 +1292,7 @@ ${diagnosticHistory}
               >
                 <div className="relative group">
                   <div className="w-24 h-24 rounded-[22px] overflow-hidden border-2 border-white shadow-2xl ring-1 ring-black/5">
-                    <img src={attachedImage} alt="Attachment" className="w-full h-full object-cover" />
+                    <img src={attachedImage || undefined} alt="Attachment" className="w-full h-full object-cover" />
                   </div>
                   <button
                     onClick={() => setAttachedImage(null)}
@@ -1320,8 +1377,14 @@ ${diagnosticHistory}
             <div className="flex items-center gap-1.5 self-center">
               {!isListening && (
                 <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={loading || isGated || isImageGated || isImageProcessing}
+                  onClick={() => {
+                    if (isLimitReached || isImageGated) {
+                      setIsGated(true)
+                      return
+                    }
+                    fileInputRef.current?.click()
+                  }}
+                  disabled={loading || isImageProcessing}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
                 >
                   <ImagePlus className="w-[20px] h-[20px]" />
@@ -1335,7 +1398,13 @@ ${diagnosticHistory}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      onClick={toggleListening}
+                      onClick={() => {
+                        if (!isPaid) {
+                          setIsGated(true)
+                          return
+                        }
+                        toggleListening()
+                      }}
                       disabled={loading || isProcessing}
                       className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
                       whileTap={{ scale: 0.9 }}
@@ -1351,7 +1420,7 @@ ${diagnosticHistory}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.8, x: 10 }}
                     onClick={() => isListening ? toggleListening() : sendMessage(input)}
-                    disabled={loading || isGated || (!input.trim() && !attachedImage && !isListening)}
+                    disabled={loading || (!input.trim() && !attachedImage && !isListening)}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                       isListening 
                       ? 'bg-red-500 text-white shadow-xl shadow-red-500/20' 
