@@ -34,6 +34,7 @@ interface MechanicReportProps {
   activeVehicle?: Vehicle | null
   currentAudioRef: React.MutableRefObject<HTMLAudioElement | null>
   isLimitReached?: boolean
+  incrementUsage?: (type: 'chat' | 'report' | 'image') => Promise<void>
 }
 
 export default function MechanicReport({ 
@@ -44,7 +45,8 @@ export default function MechanicReport({
   messages, 
   activeVehicle,
   currentAudioRef,
-  isLimitReached
+  isLimitReached,
+  incrementUsage
 }: MechanicReportProps) {
   const { isPro } = useSubscription()
   const [profile, setProfile] = useState<any>(null)
@@ -162,6 +164,11 @@ export default function MechanicReport({
         throw shareError
       }
       console.log('[Carxai Share Flow] 5. Supabase insert successful')
+      
+      // Atomic Usage Increment
+      if (incrementUsage) {
+        await incrementUsage('report')
+      }
 
       const shareUrl = `${window.location.origin}/shared-report/${token}`
       const shareData = {

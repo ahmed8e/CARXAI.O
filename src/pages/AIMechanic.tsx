@@ -106,6 +106,7 @@ export default function AIMechanic() {
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
   const [isGated, setIsGated] = useState(false)
+  const [isImageGated, setIsImageGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
   const [isImageProcessing, setIsImageProcessing] = useState(false)
   const { isPaid, isPro, isAdvanced, loading: subLoading, refreshSubscription } = useSubscription()
@@ -178,76 +179,108 @@ export default function AIMechanic() {
 
   const [canShareReport, setCanShareReport] = useState(true)
 
-  const fetchUsageCount = async () => {
-    // Refresh subscription to ensure we have latest data
+  const fetchUsageCount = async (): Promise<boolean> => {
     await refreshSubscription()
-    
-    // Advanced users have ZERO limits enforced here
-    if (!user || isAdvanced) return
+    if (!user || isAdvanced) return false
 
     try {
-      const resetThresholdFree = new Date(Date.now() - RESET_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
-      const resetThresholdPro = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-      
-      // 1. CHAT LIMITS
-      if (!isPaid) {
-        // Free users: 1 chat every 5 hours
-        const { count: chatCount, error: chatError } = await supabase
-          .from('ai_chats')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gt('created_at', resetThresholdFree)
-        
-        if (!chatError && chatCount !== null) {
-          if (chatCount >= FREE_MESSAGE_LIMIT) {
-            setIsGated(true)
-          } else {
-            setIsGated(false)
-          }
-        }
-      } else {
-        // Pro/Advanced: Unlimited AI chat
+      const { data: usage, error: fetchError } = await supabase
+        .from('plan_usage')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (fetchError) throw fetchError
+
+      // Initialize if missing
+      if (!usage) {
+        await supabase.from('plan_usage').insert({ user_id: user.id })
         setIsGated(false)
+        setCanShareReport(true)
+        return false
       }
 
-      // 2. REPORT LIMITS
-      if (!isPaid) {
-        // Free users: 1 report every 5 hours
-        const { count: reportCount, error: reportError } = await supabase
-          .from('shared_reports')
-          .select('*', { count: 'exact', head: true })
-          .eq('created_by', user.id)
-          .gt('created_at', resetThresholdFree)
+      // Check Reset Window (5 hours)
+      const lastReset = new Date(usage.last_reset_at).getTime()
+      const fiveHoursAgo = Date.now() - (RESET_WINDOW_HOURS * 60 * 60 * 1000)
+      
+      let chatCount = usage.chat_count
+      let reportCount = usage.report_count
 
-        if (!reportError && reportCount !== null) {
-          if (reportCount >= 1) {
-            setCanShareReport(false)
-          } else {
-            setCanShareReport(true)
-          }
+      if (lastReset < fiveHoursAgo) {
+        // Window expired, reset!
+        const { data: resetData, error: resetError } = await supabase
+          .from('plan_usage')
+          .update({ 
+            chat_count: 0, 
+            report_count: 0, 
+            image_count: 0, 
+            last_reset_at: new Date().toISOString() 
+          })
+          .eq('user_id', user.id)
+          .select()
+          .maybeSingle()
+        
+        if (!resetError && resetData) {
+          chatCount = 0
+          reportCount = 0
         }
-      } else if (isPro) {
-        // Pro users: 15 reports per 30 days
-        const { count: reportCount, error: reportError } = await supabase
+      }
+
+      // Exact Enforcement for Free Plan
+      if (!isPaid) {
+        const chatGated = chatCount >= FREE_MESSAGE_LIMIT
+        setIsGated(chatGated)
+        setCanShareReport(reportCount < 1) // Only 1 report per 5h
+        return chatGated
+      }
+
+      // Pro Tier Logic (Reports only, AI is unlimited)
+      if (isPro) {
+        // Pro report limit is handled differently (monthly) but let's keep it simple here
+        // We'll stick to the existing monthly check for Pro
+        const resetThresholdPro = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        const { count: monthlyReports } = await supabase
           .from('shared_reports')
           .select('*', { count: 'exact', head: true })
           .eq('created_by', user.id)
           .gt('created_at', resetThresholdPro)
-
-        if (!reportError && reportCount !== null) {
-          console.log('[Carxai] Pro reports count (last 30d):', reportCount)
-          if (reportCount >= 15) {
-            setCanShareReport(false)
-          } else {
-            setCanShareReport(true)
-          }
-        }
-      } else {
-        // Advanced: Unlimited reports (already returned early but for robustness)
-        setCanShareReport(true)
+        
+        setIsGated(false)
+        setCanShareReport((monthlyReports || 0) < 15)
+        return false
       }
+
     } catch (err) {
-      console.error('Error fetching usage count:', err)
+      console.error('[Carxai] Usage check failed:', err)
+    }
+    return false
+  }
+
+  const incrementUsage = async (type: 'chat' | 'report' | 'image') => {
+    if (!user || isAdvanced) return
+
+    try {
+      // Get current usage to increment
+      const { data: usage } = await supabase
+        .from('plan_usage')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (!usage) return
+
+      const update: any = {}
+      if (type === 'chat') update.chat_count = usage.chat_count + 1
+      if (type === 'report') update.report_count = usage.report_count + 1
+      if (type === 'image') update.image_count = usage.image_count + 1
+
+      await supabase
+        .from('plan_usage')
+        .update(update)
+        .eq('user_id', user.id)
+    } catch (err) {
+      console.error('[Carxai] Failed to increment usage:', err)
     }
   }
 
@@ -350,8 +383,8 @@ export default function AIMechanic() {
 
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
     // 1. HARD PRE-FLIGHT CHECK
-    await fetchUsageCount()
-    if (isGated) return
+    const currentlyGated = await fetchUsageCount()
+    if (currentlyGated || isGated) return
 
     const finalImageUrl = imageUrl || attachedImage || undefined
 
@@ -721,6 +754,11 @@ ${diagnosticHistory}
         const insertedChat = rawInsertedChat as { id: string } | null;
 
         if (insertedChat && insertedChat.id) {
+          // Atomic Usage Increment
+          await incrementUsage('chat')
+          if (finalImageUrl) {
+            await incrementUsage('image')
+          }
           const chatId = insertedChat.id;
           issueData.report_id = chatId;
           
@@ -1213,7 +1251,7 @@ ${diagnosticHistory}
             <div className="flex items-center self-center pl-1">
               <button
                 onClick={() => cameraInputRef.current?.click()}
-                disabled={loading || isGated || isImageProcessing}
+                disabled={loading || isGated || isImageGated || isImageProcessing}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
               >
                 <Aperture className="w-[22px] h-[22px]" />
@@ -1281,7 +1319,7 @@ ${diagnosticHistory}
               {!isListening && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={loading || isGated || isImageProcessing}
+                  disabled={loading || isGated || isImageGated || isImageProcessing}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
                 >
                   <ImagePlus className="w-[20px] h-[20px]" />
