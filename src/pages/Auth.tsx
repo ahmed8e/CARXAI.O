@@ -24,8 +24,16 @@ export default function Auth() {
         redirect_target: from,
       })
       if (sessionStorage.getItem('newly_signed_up') === 'true') {
-        sessionStorage.removeItem('newly_signed_up')
-        navigate('/choose-plan')
+        const subData = user.user_metadata?.subscription_status
+        const isAlreadyPro = subData === 'active' || subData === 'pro'
+        
+        if (isAlreadyPro) {
+          sessionStorage.removeItem('newly_signed_up')
+          navigate('/dashboard', { replace: true })
+        } else {
+          sessionStorage.removeItem('newly_signed_up')
+          navigate('/choose-plan')
+        }
       } else {
         navigate(from, { replace: true })
       }

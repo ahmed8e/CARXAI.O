@@ -30,93 +30,101 @@ export default function UpgradeGate() {
   ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      className="mx-auto w-full max-w-[480px] my-12"
-    >
-      <div className="relative overflow-hidden rounded-[32px] bg-white border border-overlay shadow-[0_25px_60px_rgba(0,0,0,0.12)] p-1">
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-[#0070E0]/5 to-transparent blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-12 overflow-y-auto">
+      {/* Heavy Backdrop Blur Overlay */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md pointer-events-none"
+      />
 
-        <div className="relative z-10 p-8 pt-10">
-          {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-[#0070E0] shadow-xl shadow-[#0070E0]/30 flex items-center justify-center mb-6 border border-white/20 transform -rotate-3">
-              <Crown className="w-7 h-7 text-white" />
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        className="relative w-full max-w-[480px] z-10"
+      >
+        <div className="relative overflow-hidden rounded-[40px] bg-white border border-white/20 shadow-[0_30px_70px_rgba(0,0,0,0.25)] p-0.5">
+          {/* Subtle Ambient Glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-[#0070E0]/10 to-transparent blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 p-10 pt-12">
+            {/* Header */}
+            <div className="flex flex-col items-center text-center mb-8">
+              <div className="w-16 h-16 rounded-[24px] bg-[#0070E0] shadow-2xl shadow-[#0070E0]/40 flex items-center justify-center mb-8 border border-white/30 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                <Crown className="w-8 h-8 text-white" />
+              </div>
+              
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-100/50 mb-6">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">Access Restricted</span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-display font-black text-[#0E1B39] tracking-tight mb-4 leading-tight">
+                Unlock Premium <br />AI Assistance
+              </h2>
+              
+              <p className="text-[16px] font-medium text-slate-500 leading-relaxed max-w-sm">
+                Your free usage limit has been reached. Upgrade now for unlimited diagnostic support and professional tools.
+              </p>
             </div>
-            
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-100 mb-4">
-              <Sparkles className="w-3 h-3 text-amber-600" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Free Limit Reached</span>
+
+            {/* Benefits List */}
+            <div className="space-y-4 mb-12 px-2">
+              {benefits.map((benefit, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + idx * 0.05 }}
+                  className="flex items-center gap-4 group"
+                >
+                  <div className="w-6.5 h-6.5 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:bg-[#0070E0]/5 transition-colors">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  </div>
+                  <span className="text-[15px] font-bold text-[#0E1B39]/80 transition-colors group-hover:text-[#0070E0]">{benefit}</span>
+                </motion.div>
+              ))}
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-display font-black text-[#0E1B39] tracking-tight mb-4">
-              Upgrade your account
-            </h2>
-            
-            <p className="text-[15px] font-medium text-slate-500 leading-relaxed px-4">
-              Continue with a paid CarxAI plan to unlock more AI support, full reports, and premium assistance.
-            </p>
-          </div>
-
-          {/* Benefits Grid */}
-          <div className="grid grid-cols-1 gap-4 mb-10 px-4">
-            {benefits.map((benefit, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + idx * 0.05 }}
-                className="flex items-center gap-3.5 group"
+            {/* CTA Buttons */}
+            <div className="space-y-4">
+              <motion.button
+                whileHover={{ y: -3, boxShadow: "0 20px 40px rgba(5,150,105,0.3)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleWhatsAppActivate}
+                className="w-full h-16 rounded-[24px] bg-emerald-600 text-white font-black text-[13px] uppercase tracking-[0.15em] shadow-xl shadow-emerald-600/20 transition-all flex items-center justify-center gap-3 group"
               >
-                <div className="w-6 h-6 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                </div>
-                <span className="text-sm font-bold text-[#0E1B39]/80 group-hover:text-[#0070E0] transition-colors">{benefit}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="space-y-4 px-4 pb-4">
-            <button
-              onClick={handleWhatsAppActivate}
-              className="w-full h-16 rounded-2xl bg-emerald-600 text-white font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-600/30 hover:shadow-[0_15px_35px_rgba(5,150,105,0.4)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3 active:scale-[0.98] group"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span>Continue on WhatsApp</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-full py-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-[#0E1B39] transition-colors"
-            >
-              Maybe later
-            </button>
-          </div>
-
-          {/* Trust Row */}
-          <div className="mt-4 pt-6 border-t border-slate-50 flex items-center justify-center gap-6 px-4">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Secure Billing</span>
+                <MessageSquare className="w-5 h-5 text-emerald-200" />
+                <span>Activate Professional Tier</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+              </motion.button>
+              
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-full py-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] hover:text-[#0E1B39] transition-colors"
+              >
+                Return to Dashboard
+              </button>
             </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Cancel Anytime</span>
+
+            {/* Trust Badges */}
+            <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-slate-300" />
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Secure Activation</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-slate-300" />
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Instant Support</span>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Diagonal Polish Line */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/20 to-transparent -rotate-45 translate-x-12 -translate-y-12" />
-      </div>
-      
-      <p className="text-center mt-6 text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">
-        Premium AI Diagnostic Experience
-      </p>
-    </motion.div>
+        
+        <p className="text-center mt-8 text-[11px] font-black text-white/40 uppercase tracking-[0.4em] italic">
+          CARXAI INTELLIGENCE v4.0
+        </p>
+      </motion.div>
+    </div>
   )
 }

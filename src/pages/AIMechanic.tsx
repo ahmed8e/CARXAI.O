@@ -108,7 +108,7 @@ export default function AIMechanic() {
   const [isGated, setIsGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
   const [isImageProcessing, setIsImageProcessing] = useState(false)
-  const { isPaid, loading: subLoading } = useSubscription()
+  const { isPaid, isPro, isAdvanced, loading: subLoading, refreshSubscription } = useSubscription()
 
   // Effect 1: Basic scroll to bottom during typing/user-send
   useEffect(() => {
@@ -164,40 +164,83 @@ export default function AIMechanic() {
     }
   }, [isPaid, subLoading, user])
 
+  // Polling for status when gated (Immediate Admin Assignment Sync)
+  useEffect(() => {
+    if (!isGated) return
+    
+    // Poll every 5 seconds while gated to see if an admin upgraded the user
+    const interval = setInterval(() => {
+      refreshSubscription()
+    }, 5000)
+    
+    return () => clearInterval(interval)
+  }, [isGated, refreshSubscription])
+
   const [canShareReport, setCanShareReport] = useState(true)
 
   const fetchUsageCount = async () => {
-    if (!user || isPaid) return
+    // Refresh subscription to ensure we have latest data
+    await refreshSubscription()
+    
+    // Advanced users have ZERO limits enforced here
+    if (!user || isAdvanced) return
 
     try {
-      const resetThreshold = new Date(Date.now() - RESET_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
+      const resetThresholdFree = new Date(Date.now() - RESET_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
+      const resetThresholdPro = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
       
-      // Count AI Chats in the last 5 hours
-      const { count: chatCount, error: chatError } = await supabase
-        .from('ai_chats')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gt('created_at', resetThreshold)
-      
-      if (!chatError && chatCount !== null) {
-        console.log('[Carxai] AI Mechanic usage count (last 5h):', chatCount)
-        if (chatCount >= FREE_MESSAGE_LIMIT) {
-          setIsGated(true)
+      // 1. CHAT LIMITS
+      if (!isPaid) {
+        // Free users: 1 chat every 5 hours
+        const { count: chatCount, error: chatError } = await supabase
+          .from('ai_chats')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gt('created_at', resetThresholdFree)
+        
+        if (!chatError && chatCount !== null) {
+          if (chatCount >= FREE_MESSAGE_LIMIT) {
+            setIsGated(true)
+          }
         }
+      } else {
+        // Pro/Advanced: Unlimited AI chat
+        setIsGated(false)
       }
 
-      // Count Shared Reports in the last 5 hours
-      const { count: reportCount, error: reportError } = await supabase
-        .from('shared_reports')
-        .select('*', { count: 'exact', head: true })
-        .eq('created_by', user.id)
-        .gt('created_at', resetThreshold)
+      // 2. REPORT LIMITS
+      if (!isPaid) {
+        // Free users: 1 report every 5 hours
+        const { count: reportCount, error: reportError } = await supabase
+          .from('shared_reports')
+          .select('*', { count: 'exact', head: true })
+          .eq('created_by', user.id)
+          .gt('created_at', resetThresholdFree)
 
-      if (!reportError && reportCount !== null) {
-        console.log('[Carxai] Shared reports count (last 5h):', reportCount)
-        if (reportCount >= 1) { // 1 report every 5 hours
-          setCanShareReport(false)
+        if (!reportError && reportCount !== null) {
+          if (reportCount >= 1) {
+            setCanShareReport(false)
+          }
         }
+      } else if (isPro) {
+        // Pro users: 15 reports per 30 days
+        const { count: reportCount, error: reportError } = await supabase
+          .from('shared_reports')
+          .select('*', { count: 'exact', head: true })
+          .eq('created_by', user.id)
+          .gt('created_at', resetThresholdPro)
+
+        if (!reportError && reportCount !== null) {
+          console.log('[Carxai] Pro reports count (last 30d):', reportCount)
+          if (reportCount >= 15) {
+            setCanShareReport(false)
+          } else {
+            setCanShareReport(true)
+          }
+        }
+      } else {
+        // Advanced: Unlimited reports (already returned early but for robustness)
+        setCanShareReport(true)
       }
     } catch (err) {
       console.error('Error fetching usage count:', err)
@@ -302,7 +345,10 @@ export default function AIMechanic() {
   }
 
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
+    if (isGated) return
+
     const finalImageUrl = imageUrl || attachedImage || undefined
+
     if (!content.trim() && !finalImageUrl) return
     
     stop() // Interrupt any playing audio
@@ -1017,6 +1063,8 @@ ${diagnosticHistory}
                 </motion.div>
               );
             })}
+          </div>
+
           {/* ── Loading / Streaming Status ─────────────────────── */}
           {(loading || streamingMessage) && (
             <div className="flex justify-start items-start mt-6">
@@ -1054,15 +1102,23 @@ ${diagnosticHistory}
           )}
         </div>
 
-        {isGated && (
-            <div className="mt-8">
-              <UpgradeGate />
-            </div>
-          )}
-
-          <div ref={messagesEndRef} className="h-8" />
-        </div>
+        <div ref={messagesEndRef} className="h-8" />
       </div>
+
+      {/* Premium Upgrade Modal (Blocking) */}
+      {isGated && <UpgradeGate />}
+
+      {/* Pro Usage Indicator */}
+      {isPro && !isGated && (
+        <div className="fixed top-24 right-6 z-40">
+          <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-full px-4 py-1.5 shadow-sm flex items-center gap-2">
+            <Activity className="w-3 h-3 text-navy/40" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-navy">
+              PRO ACCESS • <span className="text-blue-600">15 REPORTS / MO</span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Premium Voice Activity Indicator */}
       <AnimatePresence>
@@ -1096,12 +1152,11 @@ ${diagnosticHistory}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/90 to-transparent pointer-events-none" />
         
         <div className="max-w-3xl mx-auto px-4 relative z-10 pointer-events-auto">
-        {/* Hidden file pickers */}
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
-          onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
-        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
-          onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
-
+          {/* Hidden file pickers */}
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+            onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
+          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden"
+            onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
 
           {/* ══ Attachment Preview ══ */}
           <AnimatePresence mode="wait">
@@ -1211,7 +1266,6 @@ ${diagnosticHistory}
 
             {/* Right: Actions */}
             <div className="flex items-center gap-1.5 self-center">
-              {/* Always show gallery/upload if not sending audio */}
               {!isListening && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -1292,7 +1346,7 @@ ${diagnosticHistory}
           messages={messages}
           activeVehicle={activeVehicle}
           currentAudioRef={currentAudioRef}
-          isLimitReached={!canShareReport && !isPaid}
+          isLimitReached={!canShareReport}
         />
       )}
     </div>

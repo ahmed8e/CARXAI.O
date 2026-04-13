@@ -23,17 +23,16 @@ const plans: {
   popular: boolean
 }[] = [
   {
-    id: 'starter',
-    name: 'Starter',
+    id: 'free',
+    name: 'Free',
     description: 'Essential AI car help for occasional issues and everyday peace of mind.',
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
-      'Limited AI car diagnosis',
-      'Limited diagnostic reports',
+      'Limited AI chat',
+      'Limited reports',
       'Limited image analysis',
       'No microphone access',
-      '24/7 AI mechanic availability',
     ],
     cta: 'Get Started',
     popular: false,
@@ -47,11 +46,11 @@ const plans: {
     trial: '3-Day Free Trial',
     features: [
       '3-day free trial included',
-      'Instant AI car diagnosis',
-      '15 detailed diagnostic reports each month',
+      'Unlimited AI car diagnosis',
+      '15 reports / month',
+      'Image analysis included',
       'Step-by-step resolution guidance',
       'Nearby provider discovery map',
-      'Specialized vehicle health insights',
     ],
     cta: 'Get Started',
     popular: true,
@@ -63,12 +62,12 @@ const plans: {
     monthlyPrice: 29,
     yearlyPrice: 24,
     features: [
-      'Instant AI car diagnosis',
+      'Unlimited AI car diagnosis',
       'Unlimited diagnostic reports',
+      'Full image analysis',
+      'Premium access',
       'Priority step-by-step guidance',
       'Full provider network visibility',
-      'Faster priority support',
-      'Multi-vehicle management',
     ],
     cta: 'Get Started',
     popular: false,
@@ -178,8 +177,8 @@ User ID: ${user.id}`
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-8 items-stretch relative max-w-5xl mx-auto">
-          {plans.filter(p => p.id !== 'starter').map((plan, i) => {
+        <div className="grid md:grid-cols-3 gap-8 items-stretch relative max-w-7xl mx-auto">
+          {plans.map((plan, i) => {
             return (
               <motion.div
                 key={plan.name}

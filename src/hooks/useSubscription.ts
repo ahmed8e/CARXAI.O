@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export type SubscriptionStatus = 'active' | 'pending' | 'expired' | 'cancelled' | 'trialing' | 'none'
-export type PlanType = 'pro' | 'advanced' | 'free' | 'starter'
+export type PlanType = 'free' | 'pro' | 'advanced'
 
 interface Subscription {
   id: string
@@ -31,9 +31,9 @@ export function useSubscription() {
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('[useSubscription] Error fetching:', error)
       }
 
@@ -69,6 +69,7 @@ export function useSubscription() {
   }, [user])
 
   const isPaid = subscription?.status === 'active' || subscription?.status === 'trialing'
+  const isFree = subscription?.planType === 'free' || !subscription
   const isPro = isPaid && subscription?.planType === 'pro'
   const isAdvanced = isPaid && subscription?.planType === 'advanced'
 
@@ -76,6 +77,7 @@ export function useSubscription() {
     subscription,
     loading,
     isPaid,
+    isFree,
     isPro,
     isAdvanced,
     refreshSubscription: fetchSubscription

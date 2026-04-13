@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
+import { useSubscription } from '../hooks/useSubscription'
 
 // ── Navigation groups ────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -47,17 +48,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const userInitial = user?.email?.[0]?.toUpperCase() ?? 'U'
   const userName    = user?.email?.split('@')[0] ?? 'User'
 
-  // Trial expiration logic
-  const trialEndsAtStr = user?.user_metadata?.trial_ends_at
-  const subscriptionStatus = user?.user_metadata?.subscription_status || 'free'
+  const { subscription, loading: subLoading, isFree } = useSubscription()
   
-  let isExpired = false
-  if (trialEndsAtStr && subscriptionStatus !== 'active') {
-    const trialEndsAt = new Date(trialEndsAtStr)
-    if (new Date() > trialEndsAt) {
-      isExpired = true
-    }
-  }
+  // Trial expiration logic
+  const isExpired = subscription?.status === 'expired' && !isFree
 
   // ── Sidebar JSX ──────────────────────────────────────────────────
   function SidebarContent({ mobile = false }: { mobile?: boolean }) {
@@ -245,7 +239,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main content */}
       <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))]'}`}>
         <main className="flex-1 overflow-y-auto relative">
-          {isExpired ? <Paywall /> : children}
+          {subLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-sm z-[100]">
+              <div className="flex flex-col items-center gap-4">
+                <LayoutDashboard className="w-10 h-10 text-navy animate-pulse" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40">Securing Access...</p>
+              </div>
+            </div>
+          ) : isExpired ? (
+            <Paywall />
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>

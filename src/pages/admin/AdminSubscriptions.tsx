@@ -281,13 +281,18 @@ export default function AdminSubscriptions() {
                     <td className="px-5 py-4 text-sm font-medium text-slate-800">
                       {user.subscription ? (
                         <div className="flex flex-col">
-                          <span className="capitalize">{user.subscription.plan_name} • {user.subscription.billing_cycle}</span>
-                          <span className="text-xs text-muted mt-0.5">{user.subscription.payment_method?.replace('_', ' ')}</span>
+                          <span className="capitalize font-black text-navy">{user.subscription.plan_name}</span>
+                          <span className="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">
+                            {user.subscription.plan_name === 'free' && '1 AI Chat / 5h'}
+                            {user.subscription.plan_name === 'pro' && 'Unlimited AI • 15 Reports/mo'}
+                            {user.subscription.plan_name === 'advanced' && 'Full Unlimited Access'}
+                            {user.subscription.status === 'active' ? ' • Active' : ` • ${user.subscription.status}`}
+                          </span>
                         </div>
                       ) : (
                         <div className="flex flex-col">
-                          <span className="capitalize text-slate-800">Free</span>
-                          <span className="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">Community Tier</span>
+                          <span className="capitalize font-black text-navy">Free</span>
+                          <span className="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">1 AI Chat / 5h • No Record</span>
                         </div>
                       )}
                     </td>
@@ -353,9 +358,9 @@ export default function AdminSubscriptions() {
                       onChange={e => setFormData({ ...formData, plan_name: e.target.value })}
                       className="w-full text-sm font-medium border border-overlay rounded-xl p-2.5 bg-white"
                     >
-                      <option value="free">Free</option>
-                      <option value="pro">Pro</option>
-                      <option value="advanced">Advanced</option>
+                      <option value="free">Free (1 Chat / 5h)</option>
+                      <option value="pro">Pro (Unlimited AI + 15 Reports)</option>
+                      <option value="advanced">Advanced (Everything Unlimited)</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">

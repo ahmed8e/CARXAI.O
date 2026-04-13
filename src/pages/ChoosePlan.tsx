@@ -1,13 +1,24 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Zap, ShieldCheck, CreditCard } from 'lucide-react'
 import Pricing from '../components/Pricing'
 import { useSubscription } from '../hooks/useSubscription'
 
 export default function ChoosePlan() {
   const location = useLocation()
-  const { subscription } = useSubscription()
+  const { subscription, loading } = useSubscription()
+  const navigate = useNavigate()
   const intent = location.state?.intent || 'onboarding'
+
+  useEffect(() => {
+    // If the user has an active Pro/Advanced plan and is not explicitly trying to upgrade,
+    // they should not be on this page. Send them to the dashboard.
+    if (!loading && (subscription?.status === 'active' || subscription?.status === 'trialing') && intent !== 'upgrade') {
+      console.log('[ChoosePlan] User already has active plan, redirecting to dashboard.')
+      navigate('/dashboard', { replace: true })
+    }
+  }, [subscription, loading, intent, navigate])
 
   return (
     <div className="min-h-screen bg-white">

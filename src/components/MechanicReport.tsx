@@ -10,6 +10,7 @@ import {
 import { supabase } from '../lib/supabase'
 import type { Message, DiagnosticResult, Database } from '../lib/types'
 import { getUrgencyBadge } from '../lib/utils'
+import { useSubscription } from '../hooks/useSubscription'
 import ListenButton from './ui/ListenButton'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
@@ -45,6 +46,7 @@ export default function MechanicReport({
   currentAudioRef,
   isLimitReached
 }: MechanicReportProps) {
+  const { isPro } = useSubscription()
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
   const [loading, setLoading] = useState(true)
@@ -552,7 +554,12 @@ export default function MechanicReport({
                 {isLimitReached && (
                   <div className="mt-4 text-center">
                     <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
-                      Free report shared. Next reset in 5 hours. <span className="text-[#0070E0] cursor-pointer" onClick={() => window.location.href='/dashboard'}>Upgrade for unlimited sharing.</span>
+                      {isPro 
+                        ? "Monthly report limit reached (15/month). " 
+                        : "Free report shared. Next reset in 5 hours. "}
+                      <span className="text-[#0070E0] cursor-pointer" onClick={() => window.location.href='/choose-plan'}>
+                        Upgrade for more sharing.
+                      </span>
                     </p>
                   </div>
                 )}
