@@ -68,8 +68,8 @@ export function useSubscription() {
     fetchSubscription()
   }, [user])
 
-  const isPaid = subscription?.status === 'active' || subscription?.status === 'trialing'
-  const isFree = subscription?.planType === 'free' || !subscription
+  const isPaid = (subscription?.status === 'active' || subscription?.status === 'trialing') && subscription?.planType !== 'free'
+  const isFree = subscription?.planType === 'free' || !subscription || !isPaid
   const isPro = isPaid && subscription?.planType === 'pro'
   const isAdvanced = isPaid && subscription?.planType === 'advanced'
 

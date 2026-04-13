@@ -201,6 +201,8 @@ export default function AIMechanic() {
         if (!chatError && chatCount !== null) {
           if (chatCount >= FREE_MESSAGE_LIMIT) {
             setIsGated(true)
+          } else {
+            setIsGated(false)
           }
         }
       } else {
@@ -220,6 +222,8 @@ export default function AIMechanic() {
         if (!reportError && reportCount !== null) {
           if (reportCount >= 1) {
             setCanShareReport(false)
+          } else {
+            setCanShareReport(true)
           }
         }
       } else if (isPro) {
@@ -345,6 +349,8 @@ export default function AIMechanic() {
   }
 
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
+    // 1. HARD PRE-FLIGHT CHECK
+    await fetchUsageCount()
     if (isGated) return
 
     const finalImageUrl = imageUrl || attachedImage || undefined
@@ -778,6 +784,12 @@ ${diagnosticHistory}
   }
 
   const toggleListening = () => {
+    // 2. HARD MICROPHONE GUARD
+    if (!isPaid) {
+      setIsGated(true)
+      return
+    }
+
     if (isListening) {
       recognitionRef.current?.stop()
       setIsListening(false)
@@ -1285,7 +1297,7 @@ ${diagnosticHistory}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={toggleListening}
-                      disabled={loading || isProcessing || isGated}
+                      disabled={loading || isProcessing}
                       className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90"
                       whileTap={{ scale: 0.9 }}
                     >
