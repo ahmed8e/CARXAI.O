@@ -7,7 +7,7 @@ import { getUrgencyColor, getUrgencyBadge } from '../lib/utils'
 import { useTTS } from '../lib/useTTS'
 import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
-import { 
+import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
@@ -32,7 +32,7 @@ const ISSUE_CHIPS = [
 ]
 
 // Strict Multimodal Automotive Reasoning
-const SYSTEM_PROMPT = `You are CarxAI AI Mechanic, a multimodal automotive assistant.
+const STANDARD_PROMPT = `You are CarxAI AI Mechanic, a multimodal automotive assistant.
 
 Your job is to help users understand car problems using any combination of:
 - user text
@@ -75,6 +75,51 @@ Additional rules:
 - Extract any readable text in the image.
 - Return only valid JSON. Do not return markdown.`;
 
+const FAST_ANSWER_PROMPT = `You are the FAST ANSWER engine for carx.ai.
+Your job is to give a quick, high-value, practical answer.
+
+JSON SCHEMA:
+{
+  "mode": "fast_answer",
+  "issue_title": string,
+  "explanation": string,
+  "severity": "low" | "medium" | "high" | "emergency",
+  "can_drive": boolean,
+  "next_step": string,
+  "needs_followup": false,
+  "confidence": "medium" | "high",
+  "recommended_actions": string[]
+}`;
+
+const EXPERT_ANSWER_PROMPT = `You are the EXPERT DIAGNOSTIC engine for carx.ai.
+Your identity: Lukas Schneider, Senior Diagnostic Specialist.
+Your methodology: Master Technician "Mental Sandbox".
+
+DIAGNOSTIC HIERARCHY:
+1. System Identification
+2. Symptom Analysis
+3. Urgency Determination
+4. Precision Resolution
+
+VAGUE INPUT RULE:
+If input is vague, set needs_followup to true and provide 1-2 followup_questions.
+
+JSON SCHEMA:
+{
+  "mode": "expert_answer",
+  "needs_followup": boolean,
+  "followup_questions": string[],
+  "issue_title": string | null,
+  "severity": "low" | "medium" | "high" | null,
+  "can_drive": boolean,
+  "confidence": "low" | "medium" | "high",
+  "explanation": string,
+  "next_step": string,
+  "possible_causes": string[],
+  "recommended_checks": string[],
+  "tow_recommended": boolean
+}`;
+
 export default function AIMechanic() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -102,7 +147,7 @@ export default function AIMechanic() {
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
   const [isGated, setIsGated] = useState(false)
-  const [responseMode, setResponseMode] = useState<'fast' | 'expert'>('expert')
+  const [responseMode, setResponseMode] = useState<'fast_answer' | 'expert_answer'>('expert_answer')
   const [isLimitReached, setIsLimitReached] = useState(false)
   const [isImageGated, setIsImageGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
@@ -128,14 +173,14 @@ export default function AIMechanic() {
           const lastBubble = bubbles[bubbles.length - 1];
           if (lastBubble) {
             // Precise alignment: target the top of the bubble sitting ~100px from screen top
-            const topOffset = 110; 
+            const topOffset = 110;
             const rect = lastBubble.getBoundingClientRect();
             const scrollContainer = lastBubble.closest('.overflow-y-auto');
-            
+
             if (scrollContainer) {
               const currentScroll = scrollContainer.scrollTop;
               const targetScroll = currentScroll + rect.top - topOffset;
-              
+
               scrollContainer.scrollTo({
                 top: targetScroll,
                 behavior: 'smooth'
@@ -166,12 +211,12 @@ export default function AIMechanic() {
   // Polling for status when gated (Immediate Admin Assignment Sync)
   useEffect(() => {
     if (!isGated) return
-    
+
     // Poll every 5 seconds while gated to see if an admin upgraded the user
     const interval = setInterval(() => {
       refreshSubscription()
     }, 5000)
-    
+
     return () => clearInterval(interval)
   }, [isGated, refreshSubscription])
 
@@ -202,7 +247,7 @@ export default function AIMechanic() {
       // Check Reset Window (5 hours)
       const lastReset = new Date(usage.last_reset_at).getTime()
       const fiveHoursAgo = Date.now() - (RESET_WINDOW_HOURS * 60 * 60 * 1000)
-      
+
       let chatCount = usage.chat_count
       let reportCount = usage.report_count
 
@@ -210,16 +255,16 @@ export default function AIMechanic() {
         // Window expired, reset!
         const { data: resetData, error: resetError } = await (supabase as any)
           .from('plan_usage')
-          .update({ 
-            chat_count: 0, 
-            report_count: 0, 
-            image_count: 0, 
-            last_reset_at: new Date().toISOString() 
+          .update({
+            chat_count: 0,
+            report_count: 0,
+            image_count: 0,
+            last_reset_at: new Date().toISOString()
           })
           .eq('user_id', user.id)
           .select()
           .maybeSingle()
-        
+
         if (!resetError && resetData) {
           chatCount = 0
           reportCount = 0
@@ -230,7 +275,7 @@ export default function AIMechanic() {
       if (!isPaid) {
         const chatGated = chatCount >= FREE_MESSAGE_LIMIT
         const imgGated = usage.image_count >= 1
-        
+
         setIsLimitReached(chatGated)
         setIsGated(chatGated)
         setIsImageGated(imgGated)
@@ -248,7 +293,7 @@ export default function AIMechanic() {
           .select('*', { count: 'exact', head: true })
           .eq('created_by', user.id)
           .gt('created_at', resetThresholdPro)
-        
+
         setIsGated(false)
         setCanShareReport((monthlyReports || 0) < 15)
         return false
@@ -297,9 +342,9 @@ export default function AIMechanic() {
         .from('vehicles')
         .select('*')
         .eq('user_id', user.id)
-      
+
       const vehicles = rawVehicles as any[] | null;
-      
+
       if (vehicles && vehicles.length > 0) {
         // Prefer default vehicle, otherwise take latest
         const defaultVehicle = vehicles.find(v => v.is_default) || vehicles[0];
@@ -321,7 +366,7 @@ export default function AIMechanic() {
           .limit(5)
 
         if (history && (history as any[]).length > 0) {
-          const historySummary = (history as any[]).map(h => 
+          const historySummary = (history as any[]).map(h =>
             `- ${new Date(h.created_at).toLocaleDateString()}: ${h.issue_name}`
           ).join('\n')
           setDiagnosticHistory(historySummary)
@@ -395,7 +440,7 @@ export default function AIMechanic() {
     const finalImageUrl = imageUrl || attachedImage || undefined
 
     if (!content.trim() && !finalImageUrl) return
-    
+
     stop() // Interrupt any playing audio
     setLoading(true)
     setInput('')
@@ -405,7 +450,7 @@ export default function AIMechanic() {
 
     try {
       const symptomContext = chipLabel ? `USER SELECTED SYMPTOM: ${chipLabel}` : '';
-      
+
       const vehicleContext = activeVehicle ? {
         make: activeVehicle.make,
         model: activeVehicle.model,
@@ -420,8 +465,8 @@ export default function AIMechanic() {
       const historyContext = diagnosticHistory ? `
 DIAGNOSTIC HISTORY (Last 5 events):
 ${diagnosticHistory}
-(Note: Use this history to spot recurring patterns or unresolved issues.)` 
-: 'DIAGNOSTIC HISTORY: Initial session. No previous records.'
+(Note: Use this history to spot recurring patterns or unresolved issues.)`
+        : 'DIAGNOSTIC HISTORY: Initial session. No previous records.'
 
       // Use a helper for the API call to support retries
       const performAnalysis = async (isRetry = false, customContext?: any) => {
@@ -438,14 +483,14 @@ ${diagnosticHistory}
           body: JSON.stringify({
             model: 'gpt-4o',
             stream: true,
-            plan: isAdvanced ? 'Advanced' : isPro ? 'Pro' : 'Free',
-            response_mode: responseMode,
+            plan: isAdvanced ? 'advanced' : isPro ? 'pro' : 'free',
+            response_mode: isAdvanced ? responseMode : 'standard',
             followup_context: customContext || null,
             messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
-              { 
-                role: 'system', 
-                content: `VEHICLE CONTEXT: ${vehicleContext ? JSON.stringify(vehicleContext) : 'None provided'}\n\n${symptomContext}\n\n${historyContext}${isRetry ? '\n\nIMPORTANT: Your previous response was invalid JSON. Please return ONLY valid JSON matching the requested schema.' : ''}` 
+              { role: 'system', content: isAdvanced ? (responseMode === 'fast_answer' ? FAST_ANSWER_PROMPT : EXPERT_ANSWER_PROMPT) : STANDARD_PROMPT },
+              {
+                role: 'system',
+                content: `VEHICLE CONTEXT: ${vehicleContext ? JSON.stringify(vehicleContext) : 'None provided'}\n\n${symptomContext}\n\n${historyContext}${isRetry ? '\n\nIMPORTANT: Your previous response was invalid JSON. Please return ONLY valid JSON matching the requested schema.' : ''}`
               },
               ...messages.slice(-5).map(m => ({ role: m.role, content: m.content })),
               {
@@ -462,11 +507,11 @@ ${diagnosticHistory}
         })
 
         if (!response.body) throw new Error('No response body')
-        
+
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
         let chunkedJSON = ''
-        
+
         setStreamingMessage(imageUrl ? 'Analyzing your photo…' : 'Analyzing systems...')
 
         while (true) {
@@ -475,14 +520,14 @@ ${diagnosticHistory}
 
           const chunk = decoder.decode(value)
           const lines = chunk.split('\n')
-          
+
           for (const line of lines) {
             if (line.startsWith('data: ') && line !== 'data: [DONE]') {
               try {
                 const json = JSON.parse(line.replace('data: ', ''))
                 const delta = json.choices[0]?.delta?.content || ''
                 chunkedJSON += delta
-                
+
                 // Partial streaming feedback
                 const titleField = chunkedJSON.includes('"issue_title": "') ? '"issue_title": "' : '"normalized_issue": "';
                 if (chunkedJSON.includes(titleField)) {
@@ -626,12 +671,15 @@ ${diagnosticHistory}
         let parsed: any;
 
         try {
+          // Log the raw received data for backend parity
+          console.log('[Carxai AI] RAW API Payload:', accumulatedJSON);
           parsed = extractJSON(accumulatedJSON)
           console.log('[Carxai AI] Initial parse result:', parsed);
         } catch (e) {
           console.warn('[Carxai AI] First parse failed, retrying once...', e)
-          accumulatedJSON = await performAnalysis(true)
+          accumulatedJSON = await performAnalysis(true, customContext)
           try {
+            console.log('[Carxai AI] RETRY RAW API Payload:', accumulatedJSON);
             parsed = extractJSON(accumulatedJSON)
             console.log('[Carxai AI] Retry parse result:', parsed);
           } catch (e2) {
@@ -641,32 +689,38 @@ ${diagnosticHistory}
 
         // Final Expert Schema Validation (Strict 11-field)
         if (isAdvanced) {
+          const isExpertAnswer = parsed?.mode === 'expert_answer' || parsed?.mode === 'fast_answer';
           const hasBaseFields = (parsed?.issue_title || parsed?.normalized_issue) && parsed?.explanation;
-          const isFollowup = parsed?.needs_followup === true && (parsed?.followup_question || parsed?.followup_questions?.length > 0);
-          
+          const isFollowup = parsed?.needs_followup === true && (parsed?.followup_questions?.length > 0);
+
+          if (!isExpertAnswer) {
+            console.warn('[Carxai AI] Expert validation failed: Incorrect mode.', parsed?.mode);
+            throw new Error(`AI response invalid mode: ${parsed?.mode || 'undefined'}`);
+          }
+
           if (!hasBaseFields && !isFollowup) {
-            console.warn('[Carxai AI] Expert validation failed. Expected issue_title and explanation. Mode:', parsed?.mode);
-            throw new Error(`AI response missing core expert fields for mode: ${parsed?.mode || 'unknown'}`);
+            console.warn('[Carxai AI] Expert validation failed: Missing title/explanation.', parsed);
+            throw new Error('AI Expert response missing core diagnostic fields (title/explanation).');
           }
         } else {
           // Standard validation for non-advanced results
           const hasValidIssue = parsed && (
-            parsed.issue_title || 
-            parsed.normalized_issue || 
+            parsed.issue_title ||
+            parsed.normalized_issue ||
             parsed.issueName ||
-            parsed.warning_light_name || 
+            parsed.warning_light_name ||
             parsed.fault_message_text ||
             parsed.needs_followup === true
           );
-          
+
           if (!hasValidIssue) {
             console.warn('[Carxai AI] Result validation failed. No valid issue field found in parsed object:', parsed);
             throw new Error('Parsed JSON missing core diagnostic fields');
           }
         }
-        
+
         console.log('[Carxai AI] Branch: Valid result identified. Standardizing for UI.');
-        
+
         console.group('[Carxai Diagnostic AI Logs]')
         console.log('Mode:', parsed.analysis_mode || 'unknown')
         console.log('Result Choice: SUCCESS - VALID DETECTION')
@@ -684,15 +738,15 @@ ${diagnosticHistory}
         console.log('Issue:', parsed.issue_title || parsed.normalized_issue)
         console.log('Confidence:', parsed.confidence)
         console.groupEnd()
-        
+
         // Map results to IssueData with full schema support
         const rawSeverity = parsed.severity || parsed.urgency || 'medium';
         const mappedUrgency = (rawSeverity === 'high' || rawSeverity === 'emergency' || parsed.tow_recommended) && parsed.can_drive === false
-          ? 'stop_driving' 
+          ? 'stop_driving'
           : rawSeverity;
 
         const isFollowup = parsed.needs_followup === true;
-        
+
         issueData = {
           ...parsed,
           issueName: parsed.issue_title || parsed.normalized_issue || parsed.issueName || (isFollowup ? 'Seeking Clarification...' : 'Diagnostic Report'),
@@ -704,22 +758,22 @@ ${diagnosticHistory}
           next_step: parsed.next_step || (isFollowup ? 'Please respond to the clarification question.' : 'Consult a professional for further verification.'),
           towingRecommended: parsed.tow_recommended || parsed.towingRecommended || false
         }
-        
+
         if (issueData) {
           console.log('[Carxai AI] Final mapped issueData for UI:', issueData);
-          
+
           if (isFollowup) {
-            const question = parsed.followup_question || (parsed.followup_questions?.length > 0 ? parsed.followup_questions[0] : 'I need a few more details to provide an accurate diagnosis.');
+            const question = parsed.followup_questions?.length > 0 ? parsed.followup_questions[0] : 'I need a few more details to provide an accurate diagnosis.';
             finalDisplayContent = `${parsed.explanation || 'To provide a precise diagnosis, I need to know a little more: '}\n\n${question}`;
           } else {
             finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
           }
 
           setIsPreparingAudio(true)
-          const speechText = isFollowup 
+          const speechText = isFollowup
             ? (parsed.explanation || "I have a couple of follow-up questions to help me narrow this down.")
             : `Diagnosis: ${issueData.issueName}. Severity: ${issueData.severity}. Safety check: ${issueData.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${issueData.explanation}. Recommended next step: ${issueData.next_step}`
-          
+
           const sessionResp = await supabase.auth.getSession();
           const ttsToken = sessionResp.data.session?.access_token;
           prefetch(speechText, ttsToken).finally(() => setIsPreparingAudio(false))
@@ -755,7 +809,7 @@ ${diagnosticHistory}
           }
           issueData = imageFallback
           finalDisplayContent = imageFallback.explanation || ''
-          prefetch(imageUrl ? 'We couldn’t confidently read this dashboard photo. Please upload a clearer image.' : 'I need more details to give you a precise diagnosis.').catch(() => {})
+          prefetch(imageUrl ? 'We couldn’t confidently read this dashboard photo. Please upload a clearer image.' : 'I need more details to give you a precise diagnosis.').catch(() => { })
         }
       }
 
@@ -766,7 +820,7 @@ ${diagnosticHistory}
         timestamp: new Date(),
         issueData,
       }
-      
+
       setStreamingMessage('')
       setMessages(prev => [...prev, assistantMsg])
 
@@ -797,11 +851,11 @@ ${diagnosticHistory}
           }
           const chatId = insertedChat.id;
           issueData.report_id = chatId;
-          
+
           // Update the message in state so it has the report_id for the UI
-          setMessages(prev => prev.map(m => 
-            m.id === assistantMsg.id 
-              ? { ...m, issueData: { ...m.issueData!, report_id: chatId } } 
+          setMessages(prev => prev.map(m =>
+            m.id === assistantMsg.id
+              ? { ...m, issueData: { ...m.issueData!, report_id: chatId } }
               : m
           ))
 
@@ -815,7 +869,7 @@ ${diagnosticHistory}
         } else if (chatError) {
           console.error('[Carxai AI] Failed to save chat to DB:', chatError)
         }
-        
+
         // Final: Re-fetch usage to see if we hit the limit
         await fetchUsageCount()
       }
@@ -868,7 +922,7 @@ ${diagnosticHistory}
       recognitionRef.current?.stop()
       setIsListening(false)
       setIsProcessing(true)
-      
+
       // If we have content (either recorded or already there with a photo), send it
       setTimeout(() => {
         if (input.trim() || attachedImage) {
@@ -906,7 +960,7 @@ ${diagnosticHistory}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/[0.03] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 animate-pulse-slow" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-navy/[0.02] rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4" />
-        
+
         {/* Technical Grid Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
@@ -932,7 +986,7 @@ ${diagnosticHistory}
                 <h2 className="text-4xl font-display font-[900] text-navy tracking-tight mb-4">AI Mechanic</h2>
                 <div className="w-12 h-1 bg-gradient-to-r from-transparent via-navy/10 to-transparent mx-auto mb-6" />
                 <p className="text-[17px] font-semibold text-slate-500 max-w-[320px] mx-auto leading-relaxed tracking-tight">
-                  High-fidelity diagnostic intelligence. <br/>
+                  High-fidelity diagnostic intelligence. <br />
                   <span className="text-navy/40 text-[13px] font-black uppercase tracking-[0.2em]">Ready for analysis</span>
                 </p>
               </motion.div>
@@ -943,14 +997,14 @@ ${diagnosticHistory}
                     key={chip.value}
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ 
-                      delay: 0.2 + idx * 0.08, 
-                      duration: 0.8, 
-                      ease: [0.16, 1, 0.3, 1] 
+                    transition={{
+                      delay: 0.2 + idx * 0.08,
+                      duration: 0.8,
+                      ease: [0.16, 1, 0.3, 1]
                     }}
                     onClick={() => sendMessage(chip.value, undefined, chip.label)}
-                    whileHover={{ 
-                      y: -8, 
+                    whileHover={{
+                      y: -8,
                       transition: { duration: 0.4, ease: "easeOut" }
                     }}
                     whileTap={{ scale: 0.98 }}
@@ -959,13 +1013,12 @@ ${diagnosticHistory}
                     {/* Inner Glow & Glass Effect */}
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    
-                    <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center mb-4 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 relative z-10 shadow-sm border border-white/40 ${
-                      idx === 0 ? 'bg-gradient-to-tr from-amber-50 to-orange-50/50 text-amber-600' :
-                      idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
-                      idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
-                      'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
-                    }`}>
+
+                    <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center mb-4 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 relative z-10 shadow-sm border border-white/40 ${idx === 0 ? 'bg-gradient-to-tr from-amber-50 to-orange-50/50 text-amber-600' :
+                        idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
+                          idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
+                            'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
+                      }`}>
                       <chip.icon className="w-5 h-5 stroke-[2.5]" />
                     </div>
 
@@ -993,16 +1046,16 @@ ${diagnosticHistory}
                     className="w-full relative overflow-hidden rounded-[36px] bg-white border border-slate-200/50 p-7 flex items-center justify-between gap-6 shadow-[0_15px_30px_-5px_rgba(0,18,51,0.03)] transition-all duration-500 group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    
+
                     <div className="flex items-center gap-6 relative z-10">
                       <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-[0_12px_24px_-8px_rgba(0,18,51,0.5)] relative overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-700">
                         <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
                         <Activity className="w-7 h-7 text-white relative z-10" />
-                        
+
                         {/* Status Pulse */}
                         <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-navy animate-pulse" />
                       </div>
-                      
+
                       <div className="text-left">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Configuration Required</span>
@@ -1011,13 +1064,13 @@ ${diagnosticHistory}
                         <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">Enable vehicle-specific logic for 34% more accurate results</p>
                       </div>
                     </div>
-                    
+
                     <div className="w-12 h-12 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:bg-navy group-hover:border-navy transition-all duration-500 shadow-sm relative z-10">
                       <RefreshCw className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-all duration-700" />
                     </div>
 
                     {/* Interactive Scan Line Effect */}
-                    <motion.div 
+                    <motion.div
                       className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent w-full h-[20%] opacity-0 group-hover:opacity-100"
                       animate={{ top: ['-20%', '120%'] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -1055,169 +1108,167 @@ ${diagnosticHistory}
                     )}
 
                     <div className={`transition-all ${msg.role === 'user'
-                        ? 'px-5 py-3 rounded-[24px] rounded-tr-none bg-navy text-white shadow-lg shadow-navy/10 text-sm'
-                        : 'text-slate-800'
+                      ? 'px-5 py-3 rounded-[24px] rounded-tr-none bg-navy text-white shadow-lg shadow-navy/10 text-sm'
+                      : 'text-slate-800'
                       }`}>
                       {msg.role === 'assistant' ? (
                         <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden assistant-card-bubble">
                           {msg.issueData && !msg.issueData.needs_followup ? (
                             <div className="p-6 md:p-8 space-y-8 relative">
-                            {/* 1. Header & Priority */}
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="pr-2">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/30 block mb-1">AI Diagnostic Analysis</span>
-                                <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                              {/* 1. Header & Priority */}
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="pr-2">
+                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/30 block mb-1">AI Diagnostic Analysis</span>
+                                  <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                                </div>
+                                <div className={`px-2.5 py-1 rounded-lg border font-black text-[9px] uppercase tracking-widest shrink-0 ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
+                                  {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
+                                </div>
                               </div>
-                              <div className={`px-2.5 py-1 rounded-lg border font-black text-[9px] uppercase tracking-widest shrink-0 ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
-                                {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
-                              </div>
-                            </div>
 
-                            {/* 2. Dashboard Symbols & Text (Contextual) */}
-                            {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
-                              <div className="flex flex-col gap-4">
-                                {msg.issueData.warning_light_name && (
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
-                                      <Aperture className="w-5 h-5 text-navy/40" />
+                              {/* 2. Dashboard Symbols & Text (Contextual) */}
+                              {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
+                                <div className="flex flex-col gap-4">
+                                  {msg.issueData.warning_light_name && (
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
+                                        <Aperture className="w-5 h-5 text-navy/40" />
+                                      </div>
+                                      <div>
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
+                                        <p className="text-[14px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
-                                      <p className="text-[14px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
+                                  )}
+                                  {msg.issueData.fault_message_text && (
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
+                                        <FileText className="w-5 h-5 text-navy/40" />
+                                      </div>
+                                      <div>
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Text</p>
+                                        <p className="text-[14px] font-bold text-navy leading-tight">“{msg.issueData.fault_message_text}”</p>
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
-                                {msg.issueData.fault_message_text && (
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm shrink-0">
-                                      <FileText className="w-5 h-5 text-navy/40" />
-                                    </div>
-                                    <div>
-                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Text</p>
-                                      <p className="text-[14px] font-bold text-navy leading-tight">“{msg.issueData.fault_message_text}”</p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                  )}
+                                </div>
+                              )}
 
-                            {/* 3. Safety Check - Integrated High-End Block */}
-                            <div className="relative group">
-                              <div className={`p-5 rounded-3xl border transition-all duration-500 ${
-                                msg.issueData.can_drive 
-                                  ? 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-50/50' 
-                                  : 'bg-rose-50/30 border-rose-100/50 hover:bg-rose-50/50'
-                              }`}>
-                                <div className="flex items-center gap-4">
-                                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${
-                                    msg.issueData.can_drive 
-                                      ? 'bg-white border-emerald-100 text-emerald-600' 
-                                      : 'bg-white border-rose-100 text-rose-600'
+                              {/* 3. Safety Check - Integrated High-End Block */}
+                              <div className="relative group">
+                                <div className={`p-5 rounded-3xl border transition-all duration-500 ${msg.issueData.can_drive
+                                    ? 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-50/50'
+                                    : 'bg-rose-50/30 border-rose-100/50 hover:bg-rose-50/50'
                                   }`}>
-                                    {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-navy/30 mb-1">Safety Status</p>
-                                    <p className={`text-[16px] font-black leading-tight ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
-                                      {msg.issueData.can_drive ? 'Safe to drive cautiously' : 'Stop driving immediately'}
-                                    </p>
+                                  <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${msg.issueData.can_drive
+                                        ? 'bg-white border-emerald-100 text-emerald-600'
+                                        : 'bg-white border-rose-100 text-rose-600'
+                                      }`}>
+                                      {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+                                    </div>
+                                    <div className="flex-1">
+                                      <p className="text-[10px] font-black uppercase tracking-widest text-navy/30 mb-1">Safety Status</p>
+                                      <p className={`text-[16px] font-black leading-tight ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                        {msg.issueData.can_drive ? 'Safe to drive cautiously' : 'Stop driving immediately'}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
 
-                            {/* 4. Deep Analysis */}
-                            <div className="pt-6 border-t border-slate-100 px-1">
-                              <div className="flex items-center gap-2 mb-3 text-navy/30">
-                                <Activity className="w-4 h-4" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">In-depth Analysis</span>
+                              {/* 4. Deep Analysis */}
+                              <div className="pt-6 border-t border-slate-100 px-1">
+                                <div className="flex items-center gap-2 mb-3 text-navy/30">
+                                  <Activity className="w-4 h-4" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">In-depth Analysis</span>
+                                </div>
+                                <p className="text-[17px] font-medium text-slate-600 leading-[1.6] tracking-tight">
+                                  {msg.issueData.explanation || msg.issueData.likelyCause}
+                                </p>
                               </div>
-                              <p className="text-[17px] font-medium text-slate-600 leading-[1.6] tracking-tight">
-                                {msg.issueData.explanation || msg.issueData.likelyCause}
-                              </p>
-                            </div>
 
-                            {/* 5. Recommended Action */}
-                            <div className="pt-6 border-t border-slate-100 px-1">
-                              <div className="flex items-center gap-2 mb-3 text-navy/30">
-                                <Wrench className="w-4 h-4" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Recommended Action</span>
+                              {/* 5. Recommended Action */}
+                              <div className="pt-6 border-t border-slate-100 px-1">
+                                <div className="flex items-center gap-2 mb-3 text-navy/30">
+                                  <Wrench className="w-4 h-4" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">Recommended Action</span>
+                                </div>
+                                <p className="text-[18px] font-black text-navy leading-snug">
+                                  {msg.issueData.next_step}
+                                </p>
                               </div>
-                              <p className="text-[18px] font-black text-navy leading-snug">
-                                {msg.issueData.next_step}
-                              </p>
-                            </div>
 
-                            {/* 6. Integrated Premium Actions */}
-                            <div className="pt-4 flex flex-col gap-3">
-                              <motion.button
-                                whileHover={{ y: -4, boxShadow: "0 25px 50px -12px rgba(0,112,224,0.4)" }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => {
-                                  setReportDiagnosis(msg.issueData!);
-                                  setShowReport(true);
-                                }}
-                                className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
-                              >
-                                <FileText className="w-5.5 h-5.5 text-white/90" />
-                                <span className="font-display">Generate Detailed Report</span>
-                              </motion.button>
-                              
-                              <div className="grid grid-cols-2 gap-3 w-full">
+                              {/* 6. Integrated Premium Actions */}
+                              <div className="pt-4 flex flex-col gap-3">
                                 <motion.button
-                                  whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
-                                  whileTap={{ scale: 0.96 }}
-                                  onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                  className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
+                                  whileHover={{ y: -4, boxShadow: "0 25px 50px -12px rgba(0,112,224,0.4)" }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => {
+                                    setReportDiagnosis(msg.issueData!);
+                                    setShowReport(true);
+                                  }}
+                                  className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
                                 >
-                                  <MapPin className="w-4 h-4 text-navy/40" />
-                                  Find Mechanic
+                                  <FileText className="w-5.5 h-5.5 text-white/90" />
+                                  <span className="font-display">Generate Detailed Report</span>
                                 </motion.button>
-                                <motion.button
-                                  whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
-                                  whileTap={{ scale: 0.96 }}
-                                  onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                  className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
-                                >
-                                  <Zap className="w-4 h-4 text-navy/40" />
-                                  Towing
-                                </motion.button>
-                              </div>
 
-                              <div className="pt-6 flex justify-center">
-                                <ListenButton
-                                  currentAudioRef={currentAudioRef}
-                                  text={`Diagnosis: ${msg.issueData.normalized_issue}. Severity: ${msg.issueData.severity}. Safety check: ${msg.issueData.can_drive ? 'You can keep driving cautiously.' : 'No, stop as soon as it is safe.'} ${msg.issueData.explanation}. Next step: ${msg.issueData.next_step}`}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          ) : (
-                          <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble relative">
-                            {formatContent(msg.issueData?.followup_question || msg.content)}
-                            
-                            {/* Interactive Follow-up Chips for Advanced users */}
-                            {msg.issueData?.needs_followup && (msg.issueData.options || msg.issueData.followup_questions) && (
-                              <div className="mt-6 flex flex-wrap gap-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                {(msg.issueData.options || msg.issueData.followup_questions || []).map((q: string, idx: number) => (
+                                <div className="grid grid-cols-2 gap-3 w-full">
                                   <motion.button
-                                    key={idx}
-                                    whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => sendMessage(q, undefined, undefined, {
-                                      original_issue: messages.find(m => m.role === 'user')?.content,
-                                      previous_followup_question: msg.issueData?.followup_question || msg.content,
-                                      selected_option: q,
-                                      finalize: true
-                                    })}
-                                    className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-bold transition-all shadow-sm"
+                                    whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
+                                    whileTap={{ scale: 0.96 }}
+                                    onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                    className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
                                   >
-                                    {q}
+                                    <MapPin className="w-4 h-4 text-navy/40" />
+                                    Find Mechanic
                                   </motion.button>
-                                ))}
+                                  <motion.button
+                                    whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
+                                    whileTap={{ scale: 0.96 }}
+                                    onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                    className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
+                                  >
+                                    <Zap className="w-4 h-4 text-navy/40" />
+                                    Towing
+                                  </motion.button>
+                                </div>
+
+                                <div className="pt-6 flex justify-center">
+                                  <ListenButton
+                                    currentAudioRef={currentAudioRef}
+                                    text={`Diagnosis: ${msg.issueData.normalized_issue}. Severity: ${msg.issueData.severity}. Safety check: ${msg.issueData.can_drive ? 'You can keep driving cautiously.' : 'No, stop as soon as it is safe.'} ${msg.issueData.explanation}. Next step: ${msg.issueData.next_step}`}
+                                  />
+                                </div>
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble relative">
+                              {formatContent(msg.issueData?.followup_questions?.[0] || msg.content)}
+
+                              {/* Interactive Follow-up Chips for Advanced users */}
+                              {msg.issueData?.needs_followup && (msg.issueData.followup_questions || []) && (
+                                <div className="mt-6 flex flex-wrap gap-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                  {(msg.issueData.followup_questions || []).map((q: string, idx: number) => (
+                                    <motion.button
+                                      key={idx}
+                                      whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => sendMessage(q, undefined, undefined, {
+                                        original_issue: messages.find(m => m.role === 'user')?.content,
+                                        previous_followup_question: msg.issueData?.followup_questions?.[0] || msg.content,
+                                        selected_option: q,
+                                        finalize: true
+                                      })}
+                                      className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-bold transition-all shadow-sm"
+                                    >
+                                      {q}
+                                    </motion.button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       ) : (
@@ -1312,7 +1363,7 @@ ${diagnosticHistory}
       <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
         {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/90 to-transparent pointer-events-none" />
-        
+
         <div className="max-w-3xl mx-auto px-4 relative z-10 pointer-events-auto">
           {/* Hidden file pickers */}
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
@@ -1367,22 +1418,20 @@ ${diagnosticHistory}
             >
               <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 p-1 rounded-full flex items-center gap-1 shadow-sm">
                 <button
-                  onClick={() => setResponseMode('fast')}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                    responseMode === 'fast' 
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                  onClick={() => setResponseMode('fast_answer')}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'fast_answer'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                       : 'text-slate-400 hover:text-slate-600'
-                  }`}
+                    }`}
                 >
                   Fast Answer
                 </button>
                 <button
-                  onClick={() => setResponseMode('expert')}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                    responseMode === 'expert' 
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                  onClick={() => setResponseMode('expert_answer')}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'expert_answer'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                       : 'text-slate-400 hover:text-slate-600'
-                  }`}
+                    }`}
                 >
                   Expert Diagnosis
                 </button>
@@ -1479,25 +1528,25 @@ ${diagnosticHistory}
               <AnimatePresence mode="popLayout">
                 {(!input.trim() && !attachedImage && !isListening) ? (
                   <motion.button
-                      key="mic"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      onClick={() => {
-                        if (!isPaid) {
-                          setIsGated(true)
-                          return
-                        }
-                        toggleListening()
-                      }}
-                      disabled={loading || isProcessing}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      {isProcessing
-                        ? <RefreshCw className="w-5 h-5 animate-spin" />
-                        : (<><Mic className="w-5 h-5" />{!isPaid && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-100 rounded-full flex items-center justify-center border border-white shadow-sm"><Lock className="w-2 h-2 text-amber-600" /></div>}</>)}
-                    </motion.button>
+                    key="mic"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => {
+                      if (!isPaid) {
+                        setIsGated(true)
+                        return
+                      }
+                      toggleListening()
+                    }}
+                    disabled={loading || isProcessing}
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {isProcessing
+                      ? <RefreshCw className="w-5 h-5 animate-spin" />
+                      : (<><Mic className="w-5 h-5" />{!isPaid && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-100 rounded-full flex items-center justify-center border border-white shadow-sm"><Lock className="w-2 h-2 text-amber-600" /></div>}</>)}
+                  </motion.button>
                 ) : (
                   <motion.button
                     key="send"
@@ -1506,13 +1555,12 @@ ${diagnosticHistory}
                     exit={{ opacity: 0, scale: 0.8, x: 10 }}
                     onClick={() => isListening ? toggleListening() : sendMessage(input)}
                     disabled={loading || (!input.trim() && !attachedImage && !isListening)}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      isListening 
-                      ? 'bg-red-500 text-white shadow-xl shadow-red-500/20' 
-                      : (input.trim() || attachedImage) && !loading
-                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
-                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${isListening
+                        ? 'bg-red-500 text-white shadow-xl shadow-red-500/20'
+                        : (input.trim() || attachedImage) && !loading
+                          ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}
                     whileTap={{ scale: 0.9 }}
                   >
                     {loading ? (
@@ -1531,9 +1579,9 @@ ${diagnosticHistory}
       </div>
 
       {/* Upgrade Popup Gate */}
-      <UpgradeGate 
-        isOpen={isGated} 
-        onClose={() => setIsGated(false)} 
+      <UpgradeGate
+        isOpen={isGated}
+        onClose={() => setIsGated(false)}
       />
 
       {/* Vehicle Add Modal — opened from header or onboarding card */}
@@ -1562,3 +1610,4 @@ ${diagnosticHistory}
     </div>
   )
 }
+

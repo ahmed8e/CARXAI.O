@@ -86,7 +86,7 @@ DIAGNOSTIC HIERARCHY:
 4. Precision Resolution
 
 VAGUE INPUT RULE:
-If input is vague, set needs_followup to true and provide followup_questions.
+If input is vague, set needs_followup to true and provide 1-2 followup_questions.
 
 JSON SCHEMA:
 {
@@ -106,6 +106,7 @@ JSON SCHEMA:
 
     const GUARDRAILS = `GUARDRAILS:
 - RETURN ONLY VALID JSON. No markdown blocks.
+- You MUST include the exact "mode": "${response_mode === 'fast' ? 'fast_answer' : 'expert_answer'}" field in the root of your response.
 - If needs_followup is true, followup_questions MUST be an array of strings.
 - can_drive and tow_recommended must be booleans.
 - severity must be: low, medium, high, or null.`;
@@ -123,12 +124,14 @@ IMPORTANT: ALWAYS return standardized JSON matching the EXACT schema above.`;
 
     // Inject as the very first message
     if (Array.isArray(openAiPayload.messages)) {
-      openAiPayload.messages.unshift({ role: 'system', content: ADVANCED_SYSTEM_PROMPT });
+      openAiPayload.messages.unshift({ role: 'system', content: FINAL_SYSTEM_PROMPT });
     }
     
-    // Enforce consistency
+    // Force structured output for Advanced/Expert flows
     openAiPayload.response_format = { type: "json_object" };
     openAiPayload.model = "gpt-4o";
+    // Ensure we don't stream if we want to log the full response on backend
+    openAiPayload.stream = false;
   }
 
   try {
@@ -143,28 +146,44 @@ IMPORTANT: ALWAYS return standardized JSON matching the EXACT schema above.`;
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('[API Chat] OpenAI Error:', error);
       return res.status(response.status).json(error);
     }
 
-    // Proxy the stream
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
+    const data = await response.json();
+    const rawContent = data.choices?.[0]?.message?.content;
 
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('No reader available');
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
+    // ── Raw Logging (Requested by User) ──────────────────────────────────
+    if (plan === 'Advanced') {
+      console.log('[Expert API] RAW OpenAI Response Content:', rawContent);
     }
 
-    res.end();
+    // If it's a JSON response, we send the parsed content or raw string
+    // depending on the client's expectations.
+    // For carx.ai AIMechanic.tsx, it expects a stream or a structured object.
+    
+    if (req.body.stream === true || plan !== 'Advanced') {
+      // If client requested stream, we manually send a single-chunk stream 
+      // of the final content to maintain frontend compatibility.
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      
+      const chunk = `data: ${JSON.stringify(data)}\n\ndata: [DONE]\n\n`;
+      res.write(chunk);
+      res.end();
+    } else {
+      // Standard JSON response
+      return res.status(200).json(data);
+    }
   } catch (error: any) {
     console.error('Proxy Error:', error);
     if (!res.writableEnded) {
-      res.status(500).json({ error: error.message });
+      // Return a structured error that the frontend can parse
+      res.status(500).json({ 
+        error: error.message,
+        details: 'Expert diagnostic engine encountered an internal issue.'
+      });
     }
   }
 }
