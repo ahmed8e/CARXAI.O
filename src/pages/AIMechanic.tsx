@@ -102,6 +102,7 @@ export default function AIMechanic() {
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
   const [isGated, setIsGated] = useState(false)
+  const [responseMode, setResponseMode] = useState<'fast' | 'expert'>('expert')
   const [isLimitReached, setIsLimitReached] = useState(false)
   const [isImageGated, setIsImageGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
@@ -437,6 +438,8 @@ ${diagnosticHistory}
           body: JSON.stringify({
             model: 'gpt-4o',
             stream: true,
+            plan: isAdvanced ? 'Advanced' : isPro ? 'Pro' : 'Free',
+            response_mode: responseMode,
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               { 
@@ -453,7 +456,7 @@ ${diagnosticHistory}
               }
             ],
             response_format: { type: "json_object" },
-            max_tokens: 800,
+            max_tokens: 1000,
           }),
         })
 
@@ -676,23 +679,32 @@ ${diagnosticHistory}
           ? 'stop_driving' 
           : (parsed.severity || 'medium');
 
+        const isFollowup = parsed.needs_followup === true;
+        
         issueData = {
           ...parsed,
-          issueName: parsed.issue_title || parsed.normalized_issue || parsed.warning_light_name || 'Dashboard Alert',
+          issueName: parsed.issue_title || parsed.normalized_issue || parsed.warning_light_name || (isFollowup ? 'Seeking Clarification...' : 'Dashboard Alert'),
           likelyCause: parsed.explanation || (imageUrl ? 'A system fault was detected on your dashboard.' : 'Issue detected from description.'),
           urgencyLevel: mappedUrgency as 'low' | 'medium' | 'high' | 'stop_driving',
           driveWhy: parsed.explanation || 'Safety status based on detected dashboard signal.',
           severity: parsed.severity || 'medium',
           can_drive: typeof parsed.can_drive === 'boolean' ? parsed.can_drive : true,
-          next_step: parsed.next_step || 'Consult a mechanic for a full diagnostic scan.'
+          next_step: parsed.next_step || (isFollowup ? 'Please provide the requested details.' : 'Consult a mechanic for a full diagnostic scan.')
         }
         
         if (issueData) {
           console.log('[Carxai AI] Final mapped issueData for UI:', issueData);
           
-          finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
+          if (isFollowup && parsed.followup_questions?.length) {
+            finalDisplayContent = `${parsed.explanation || 'I need a few more details to be certain. '}\n\n${parsed.followup_questions.join('\n')}`;
+          } else {
+            finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
+          }
+
           setIsPreparingAudio(true)
-          const speechText = `Diagnosis: ${issueData.issueName}. Severity: ${issueData.severity}. Safety check: ${issueData.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${issueData.explanation}. Recommended next step: ${issueData.next_step}`
+          const speechText = isFollowup 
+            ? (parsed.explanation || "I have a couple of follow-up questions to help me narrow this down.")
+            : `Diagnosis: ${issueData.issueName}. Severity: ${issueData.severity}. Safety check: ${issueData.can_drive ? 'You can keep driving cautiously.' : 'Stop driving immediately.'} ${issueData.explanation}. Recommended next step: ${issueData.next_step}`
           
           const sessionResp = await supabase.auth.getSession();
           const ttsToken = sessionResp.data.session?.access_token;
@@ -744,7 +756,11 @@ ${diagnosticHistory}
       setStreamingMessage('')
       setMessages(prev => [...prev, assistantMsg])
 
-      // Save to Supabase
+      // Only show report if it's NOT a follow-up phase
+      if (issueData && !issueData.needs_followup) {
+        setReportDiagnosis(issueData)
+        setTimeout(() => setShowReport(true), 1500)
+      }
       if (user && issueData) {
         console.log('[Carxai AI] Saving diagnostic to history...');
         // Note: the prompt mentioned ai_response was missing. 
@@ -1029,7 +1045,7 @@ ${diagnosticHistory}
                       }`}>
                       {msg.role === 'assistant' ? (
                         <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden assistant-card-bubble">
-                          {msg.issueData ? (
+                          {msg.issueData && !msg.issueData.needs_followup ? (
                             <div className="p-6 md:p-8 space-y-8 relative">
                             {/* 1. Header & Priority */}
                             <div className="flex items-start justify-between gap-4">
@@ -1162,9 +1178,26 @@ ${diagnosticHistory}
                             </div>
                           </div>
                           ) : (
-                            <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble">
-                              {formatContent(msg.content)}
-                            </div>
+                          <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble relative">
+                            {formatContent(msg.issueData?.followup_question || msg.content)}
+                            
+                            {/* Interactive Follow-up Chips for Advanced users */}
+                            {msg.issueData?.needs_followup && (msg.issueData.options || msg.issueData.followup_questions) && (
+                              <div className="mt-6 flex flex-wrap gap-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                {(msg.issueData.options || msg.issueData.followup_questions || []).map((q: string, idx: number) => (
+                                  <motion.button
+                                    key={idx}
+                                    whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => sendMessage(q)}
+                                    className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-bold transition-all shadow-sm"
+                                  >
+                                    {q}
+                                  </motion.button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                           )}
                         </div>
                       ) : (
@@ -1304,6 +1337,38 @@ ${diagnosticHistory}
               </motion.div>
             ) : null}
           </AnimatePresence>
+
+          {/* ══ Advanced Mode Selector ══ */}
+          {isAdvanced && !loading && messages.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-center mb-6"
+            >
+              <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 p-1 rounded-full flex items-center gap-1 shadow-sm">
+                <button
+                  onClick={() => setResponseMode('fast')}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    responseMode === 'fast' 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Fast Answer
+                </button>
+                <button
+                  onClick={() => setResponseMode('expert')}
+                  className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    responseMode === 'expert' 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Expert Diagnosis
+                </button>
+              </div>
+            </motion.div>
+          )}
 
           <div className="relative flex items-end gap-2 bg-white border border-slate-200/60 rounded-[32px] p-2 pr-3 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] transition-all duration-500">
             {/* Left: Camera */}

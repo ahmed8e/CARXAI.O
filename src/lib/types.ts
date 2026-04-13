@@ -353,7 +353,10 @@ export interface DiagnosticResult {
   issue_title?: string
   needs_more_input?: boolean
   needs_followup?: boolean
+  followup_question?: string
   followup_questions?: string[]
+  options?: string[]
+  recommended_actions?: string[]
   explanation: string
   next_step: string
 
