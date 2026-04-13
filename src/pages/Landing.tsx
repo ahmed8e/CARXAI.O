@@ -25,7 +25,9 @@ import {
   LogOut, 
   MessageSquare, 
   Cpu, 
-  MapPin
+  MapPin,
+  ShieldCheck,
+  BadgeCheck
 } from 'lucide-react'
 
 
@@ -558,6 +560,190 @@ export default function Landing() {
                   className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-navy' : 'w-4 bg-navy/10'}`}
                 />
               ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* Built Like a Mechanic Thinks — Trust Section */}
+        <section className="py-12 md:py-32 bg-white relative overflow-hidden">
+          {/* Subtle Background Pattern */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0E3882 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
+              
+              {/* Left Column: Trust Value Propositions */}
+              <div className="flex flex-col items-start text-left">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="px-3 py-1.5 rounded-full mb-6 md:mb-8 border border-navy/10 bg-navy/5 backdrop-blur-md inline-flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-3 h-3 text-navy" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-navy font-black">Trusted diagnostic logic</span>
+                </motion.div>
+
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="font-display font-black text-3xl md:text-5xl lg:text-6xl leading-[1.1] mb-6 md:mb-8 text-navy tracking-tight"
+                >
+                  Built with the mindset of <br />
+                  <span className="text-[#0070E0]">an experienced mechanic</span>
+                </motion.h2>
+
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="text-muted text-sm md:text-xl mb-8 md:mb-12 max-w-xl font-medium leading-relaxed"
+                >
+                  carx.ai was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step faster and with more confidence.
+                </motion.p>
+
+                {/* Trust Points */}
+                <div className="space-y-4 md:space-y-8 mb-8 md:mb-12">
+                  {[
+                    { 
+                      icon: Bot, 
+                      title: 'Symptom-first thinking', 
+                      desc: 'Logic-based symptom assessment.' 
+                    },
+                    { 
+                      icon: ShieldAlert, 
+                      title: 'Urgency guidance', 
+                      desc: 'Differentiates critical vs minor issues.' 
+                    },
+                    { 
+                      icon: CheckCircle2, 
+                      title: 'Clear next steps', 
+                      desc: 'Simple, actionable guidance.' 
+                    }
+                  ].map((pt, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 + (i * 0.1) }}
+                      className="flex items-start gap-4 md:gap-5 group"
+                    >
+                      <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-navy/5 border border-navy/10 flex items-center justify-center shrink-0 transition-all duration-500 group-hover:bg-navy group-hover:text-white">
+                        <pt.icon className="w-4 h-4 md:w-6 md:h-6 text-navy group-hover:text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-[15px] md:text-lg font-black text-navy mb-0.5 tracking-tight">{pt.title}</h4>
+                        <p className="text-muted font-medium text-[12px] md:text-[15px]">{pt.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <motion.button 
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/auth')}
+                  className="px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 flex items-center gap-3"
+                >
+                  Ask Carx AI Now
+                  <Zap className="w-4 h-4 text-cyan-light" fill="currentColor" />
+                </motion.button>
+              </div>
+
+              {/* Right Column: Premium Profile Card */}
+              <div className="relative">
+                {/* Decorative Elements */}
+                <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#5DB0EE]/10 rounded-full blur-3xl opacity-60" />
+                <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-[#CDFF00]/10 rounded-full blur-3xl opacity-40" />
+                
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="relative group p-5 md:p-10 rounded-[24px] md:rounded-[48px] bg-surface border border-navy/5 shadow-[0_40px_100px_-20px_rgba(0,112,224,0.12)] overflow-hidden"
+                >
+                  {/* Subtle Grainy Overlay */}
+                   <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+                  
+                  {/* Profile Header */}
+                  <div className="flex flex-row items-center gap-4 md:gap-8 mb-4 md:mb-8 pb-4 md:pb-8 border-b border-navy/5">
+                    <div className="relative shrink-0">
+                      <div className="absolute inset-0 bg-gradient-to-br from-navy to-cyan-light rounded-full blur-[10px] opacity-20" />
+                      <div className="w-16 h-16 md:w-32 md:h-32 rounded-full border-2 md:border-4 border-surface shadow-xl relative z-10 overflow-hidden ring-1 ring-navy/5">
+                        <img 
+                          src="/lukas_mechanic_avatar.png" 
+                          alt="Lukas Schneider" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 md:w-10 md:h-10 bg-navy rounded-full border-2 md:border-4 border-surface flex items-center justify-center shadow-lg z-20">
+                        <BadgeCheck className="w-3 h-3 md:w-5 md:h-5 text-white" />
+                      </div>
+                    </div>
+ 
+                    <div className="text-left flex-1">
+                      <div className="inline-flex items-center gap-2 px-2 py-0.5 md:px-3 md:py-1 rounded-full bg-navy text-white text-[7px] md:text-[8px] font-black uppercase tracking-widest mb-1 shadow-sm">
+                        Lead Expert
+                      </div>
+                      <h3 className="text-xl md:text-3xl font-display font-black text-navy tracking-tight">Lukas Schneider</h3>
+                      <p className="text-muted font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs">Senior Diagnostic Specialist</p>
+                    </div>
+                  </div>
+
+                  {/* Profile Metrics */}
+                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-8">
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-3xl bg-navy/5 border border-navy/5">
+                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-muted font-black mb-0.5">Experience</p>
+                      <p className="text-base md:text-xl font-black text-navy">14+ Years</p>
+                    </div>
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-3xl bg-navy/5 border border-navy/5">
+                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-muted font-black mb-0.5">Cases</p>
+                      <p className="text-base md:text-xl font-black text-navy">5,200+</p>
+                    </div>
+                  </div>
+
+                  {/* Specialties */}
+                  <div className="space-y-4 md:space-y-6 text-left">
+                    <div>
+                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-slate-400 font-black mb-2 md:mb-4">Core Specialties</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
+                          <span key={idx} className="px-2.5 py-1 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-white border border-slate-100 text-[#0E3882] text-[10px] md:text-[12px] font-bold shadow-sm whitespace-nowrap inline-flex">
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+ 
+                    <div>
+                      <p className="text-slate-600 font-medium leading-relaxed italic text-[12px] md:text-[14px] max-w-sm">
+                        "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms."
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+
+                {/* Floating Micro Badge */}
+                <motion.div 
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                  className="absolute -top-4 -left-4 md:-top-6 md:-left-6 px-3 py-2 md:p-4 rounded-xl md:rounded-2xl bg-navy shadow-xl shadow-navy/20 border-2 border-surface z-20 flex items-center gap-2 md:gap-3"
+                >
+                  <div className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-white font-black text-[9px] md:text-[11px] leading-tight uppercase tracking-wider">Expert Verified</p>
+                    <p className="text-white/60 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Diagnostic Engine</p>
+                  </div>
+                </motion.div>
+              </div>
+
             </div>
           </div>
         </section>

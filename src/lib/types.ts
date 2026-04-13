@@ -359,6 +359,9 @@ export interface DiagnosticResult {
   recommended_actions?: string[]
   explanation: string
   next_step: string
+  possible_causes?: string[]
+  recommended_checks?: string[]
+  tow_recommended?: boolean
 
   // Backward Compatibility / Legacy mapping
   issueName?: string

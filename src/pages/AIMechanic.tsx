@@ -639,21 +639,33 @@ ${diagnosticHistory}
           }
         }
 
-        // Loosened validation: prioritize ANY valid diagnostic result
-        const hasValidIssue = parsed && (
-          parsed.issue_title || 
-          parsed.normalized_issue || 
-          parsed.warning_light_name || 
-          parsed.fault_message_text ||
-          parsed.issue_name
-        );
-        
-        if (!hasValidIssue) {
-          console.warn('[Carxai AI] Result validation failed. No valid issue found in parsed object:', parsed);
-          throw new Error('Parsed JSON missing core diagnostic fields');
+        // Final Expert Schema Validation (Strict 11-field)
+        if (isAdvanced) {
+          const hasBaseFields = (parsed?.issue_title || parsed?.normalized_issue) && parsed?.explanation;
+          const isFollowup = parsed?.needs_followup === true && (parsed?.followup_question || parsed?.followup_questions?.length > 0);
+          
+          if (!hasBaseFields && !isFollowup) {
+            console.warn('[Carxai AI] Expert validation failed. Expected issue_title and explanation. Mode:', parsed?.mode);
+            throw new Error(`AI response missing core expert fields for mode: ${parsed?.mode || 'unknown'}`);
+          }
+        } else {
+          // Standard validation for non-advanced results
+          const hasValidIssue = parsed && (
+            parsed.issue_title || 
+            parsed.normalized_issue || 
+            parsed.issueName ||
+            parsed.warning_light_name || 
+            parsed.fault_message_text ||
+            parsed.needs_followup === true
+          );
+          
+          if (!hasValidIssue) {
+            console.warn('[Carxai AI] Result validation failed. No valid issue field found in parsed object:', parsed);
+            throw new Error('Parsed JSON missing core diagnostic fields');
+          }
         }
         
-        console.log('[Carxai AI] Branch: Valid result identified. Priority rules MET.');
+        console.log('[Carxai AI] Branch: Valid result identified. Standardizing for UI.');
         
         console.group('[Carxai Diagnostic AI Logs]')
         console.log('Mode:', parsed.analysis_mode || 'unknown')
@@ -673,30 +685,32 @@ ${diagnosticHistory}
         console.log('Confidence:', parsed.confidence)
         console.groupEnd()
         
-        // Map new schema to IssueData maintaining compatibility for existing logic
-        // Rule: If high severity AND cannot drive, map to stop_driving for UI coloring
-        const mappedUrgency = (parsed.severity === 'high' && parsed.can_drive === false) 
+        // Map results to IssueData with full schema support
+        const rawSeverity = parsed.severity || parsed.urgency || 'medium';
+        const mappedUrgency = (rawSeverity === 'high' || rawSeverity === 'emergency' || parsed.tow_recommended) && parsed.can_drive === false
           ? 'stop_driving' 
-          : (parsed.severity || 'medium');
+          : rawSeverity;
 
         const isFollowup = parsed.needs_followup === true;
         
         issueData = {
           ...parsed,
-          issueName: parsed.issue_title || parsed.normalized_issue || parsed.warning_light_name || (isFollowup ? 'Seeking Clarification...' : 'Dashboard Alert'),
-          likelyCause: parsed.explanation || (imageUrl ? 'A system fault was detected on your dashboard.' : 'Issue detected from description.'),
+          issueName: parsed.issue_title || parsed.normalized_issue || parsed.issueName || (isFollowup ? 'Seeking Clarification...' : 'Diagnostic Report'),
+          likelyCause: parsed.explanation || parsed.likelyCause || 'Logic-based diagnostic assessment.',
           urgencyLevel: mappedUrgency as 'low' | 'medium' | 'high' | 'stop_driving',
-          driveWhy: parsed.explanation || 'Safety status based on detected dashboard signal.',
-          severity: parsed.severity || 'medium',
+          driveWhy: parsed.explanation || parsed.driveWhy || 'Safety status based on detected symptoms.',
+          severity: (rawSeverity === 'emergency' ? 'high' : rawSeverity) as 'low' | 'medium' | 'high',
           can_drive: typeof parsed.can_drive === 'boolean' ? parsed.can_drive : true,
-          next_step: parsed.next_step || (isFollowup ? 'Please provide the requested details.' : 'Consult a mechanic for a full diagnostic scan.')
+          next_step: parsed.next_step || (isFollowup ? 'Please respond to the clarification question.' : 'Consult a professional for further verification.'),
+          towingRecommended: parsed.tow_recommended || parsed.towingRecommended || false
         }
         
         if (issueData) {
           console.log('[Carxai AI] Final mapped issueData for UI:', issueData);
           
-          if (isFollowup && parsed.followup_questions?.length) {
-            finalDisplayContent = `${parsed.explanation || 'I need a few more details to be certain. '}\n\n${parsed.followup_questions.join('\n')}`;
+          if (isFollowup) {
+            const question = parsed.followup_question || (parsed.followup_questions?.length > 0 ? parsed.followup_questions[0] : 'I need a few more details to provide an accurate diagnosis.');
+            finalDisplayContent = `${parsed.explanation || 'To provide a precise diagnosis, I need to know a little more: '}\n\n${question}`;
           } else {
             finalDisplayContent = issueData.explanation || issueData.likelyCause || ''
           }
