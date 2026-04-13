@@ -385,7 +385,7 @@ export default function AIMechanic() {
     return newMsg
   }
 
-  const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string) => {
+  const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string, customContext?: any) => {
     const currentlyGated = await fetchUsageCount()
     if (currentlyGated || isLimitReached) {
       setIsGated(true)
@@ -424,7 +424,7 @@ ${diagnosticHistory}
 : 'DIAGNOSTIC HISTORY: Initial session. No previous records.'
 
       // Use a helper for the API call to support retries
-      const performAnalysis = async (isRetry = false) => {
+      const performAnalysis = async (isRetry = false, customContext?: any) => {
         console.log(`[Carxai AI] Starting analysis (isRetry: ${isRetry})`);
         const sessionResponse = await supabase.auth.getSession();
         const token = sessionResponse.data.session?.access_token;
@@ -440,6 +440,7 @@ ${diagnosticHistory}
             stream: true,
             plan: isAdvanced ? 'Advanced' : isPro ? 'Pro' : 'Free',
             response_mode: responseMode,
+            followup_context: customContext || null,
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               { 
@@ -498,12 +499,11 @@ ${diagnosticHistory}
         return chunkedJSON;
       }
 
-      let accumulatedJSON = await performAnalysis();
+      let accumulatedJSON = await performAnalysis(false, customContext);
       console.log('[Carxai AI] Raw accumulated JSON from OpenAI:', accumulatedJSON);
 
       let issueData: DiagnosticResult | undefined
       let finalDisplayContent = ''
-
       const extractJSON = (text: string) => {
         try {
           return JSON.parse(text.trim())
@@ -756,10 +756,11 @@ ${diagnosticHistory}
       setStreamingMessage('')
       setMessages(prev => [...prev, assistantMsg])
 
-      // Only show report if it's NOT a follow-up phase
+      // 4. REMOVE AUTO REPORT POPUP BEHAVIOR
+      // We no longer trigger setShowReport(true) automatically.
+      // The user must click "Generate Detailed Report" manually.
       if (issueData && !issueData.needs_followup) {
         setReportDiagnosis(issueData)
-        setTimeout(() => setShowReport(true), 1500)
       }
       if (user && issueData) {
         console.log('[Carxai AI] Saving diagnostic to history...');
@@ -1189,7 +1190,12 @@ ${diagnosticHistory}
                                     key={idx}
                                     whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => sendMessage(q)}
+                                    onClick={() => sendMessage(q, undefined, undefined, {
+                                      original_issue: messages.find(m => m.role === 'user')?.content,
+                                      previous_followup_question: msg.issueData?.followup_question || msg.content,
+                                      selected_option: q,
+                                      finalize: true
+                                    })}
                                     className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-bold transition-all shadow-sm"
                                   >
                                     {q}

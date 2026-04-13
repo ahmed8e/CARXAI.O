@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'OpenAI API key not configured on server' });
   }
 
-  const { plan, response_mode, ...openAiPayload } = req.body;
+  const { plan, response_mode, followup_context, ...openAiPayload } = req.body;
 
   // ── Advanced Tier Special Logic ──────────────────────────────────────────
   if (plan === 'Advanced') {
@@ -68,8 +68,7 @@ FAST mode rules:
 - Give immediate value first.
 - Do not over-explain.
 - Ask at most 1 follow-up unless absolutely necessary.
-- If the problem is vague, provide a short guided follow-up with selectable options in the "options" field.
-- Preferred follow-up style: "Choose what matches best:", "Pick the closest symptom:", "Which of these fits best?".
+- If the problem is vague, provide a short guided follow-up with selectable options (e.g. "Choose what matches best:", "Which of these sounds closest?").
 - Focus on likely issue, quick reason, urgency, and what to do now.
 - Output style: Short, Clean, Premium, Easy to scan, Useful in urgent moments.`;
     } else {
@@ -88,7 +87,7 @@ EXPERT mode rules:
     }
 
     const GUARDRAILS = `GUARDRAILS:
-- Never say “I need more information” without trying to guide the user with options first.
+- Never say "I need more information" without trying to guide the user with options first.
 - Never ask many open-ended questions in a row.
 - Never respond with a long generic explanation when a short structured answer is enough.
 - Never overload the user with jargon.
@@ -97,27 +96,23 @@ EXPERT mode rules:
 - If the issue is dangerous (unsafe driving, fire risk, brake failure), clearly raise urgency to HIGH or STOP_DRIVING.
 - If the issue is emergency-like, prioritize towing / urgent mechanic recommendation.`;
 
-    // Detect if we should append the Finalization Prompt (if more than 2 messages in history)
-    let finalizationPrompt = '';
-    if (openAiPayload.messages && openAiPayload.messages.length > 3) {
-      finalizationPrompt = `\n\nFINALIZATION RULES (User has answered your follow-up):
-- Once the user has answered your follow-up questions, you MUST finalize the diagnosis.
-- Do NOT restart the questioning flow or ask unnecessary extra questions.
-- Use the original issue plus the follow-up answers to produce the strongest likely diagnosis.
-- If confidence is still limited, say so clearly but still provide the best likely direction.
-- The result should feel stronger and more precise than before.
-- RETURN: needs_followup = false, options = [], followup_question = null, plus the final diagnostic fields.`;
+    // Finalization + Context Logic
+    let contextPrompt = '';
+    if (followup_context) {
+      contextPrompt = `\n\nPREVIOUS CONTEXT: ${JSON.stringify(followup_context)}
+If "finalize" is true in context, USE ALL PREVIOUS ANSWERS to produce the FINAL high-confidence diagnosis. 
+Do NOT ask more questions unless the result would be dangerously wrong.`;
     }
 
     const ADVANCED_SYSTEM_PROMPT = `${MASTER_PROMPT}
 
 ${modeInstruction}
 
-${GUARDRAILS}${finalizationPrompt}
+${GUARDRAILS}${contextPrompt}
 
-JSON SCHEMA:
+JSON SCHEMA (You MUST return valid JSON):
 {
-  "status": "success" | "error",
+  "status": "success" | "error" | "needs_followup",
   "response_mode": "${response_mode}",
   "issue_title": string | null,
   "explanation": string,
@@ -132,7 +127,9 @@ JSON SCHEMA:
 }
 
 IMPORTANT:
-- Do NOT behave like a generic chatbot.
+- RETURN ONLY THE JSON OBJECT.
+- Do NOT include markdown code blocks.
+- Do NOT include conversational filler.
 - Do NOT produce long essays.
 - Always prioritize safety, urgency, and next action.`;
 
