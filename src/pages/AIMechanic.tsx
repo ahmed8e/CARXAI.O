@@ -838,7 +838,7 @@ ${diagnosticHistory}
         const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
           user_id: user.id,
           issue_name: issueData.issueName || issueData.issue_title,
-          urgency_level: issueData.urgencyLevel || issueData.severity,
+          urgency_level: issueData.severity || 'medium',
         }).select('id').maybeSingle()
 
         const insertedChat = rawInsertedChat as { id: string } | null;
