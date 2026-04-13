@@ -43,19 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    // Role might be updated in DB but not in current session — refresh once
-    try {
-      console.log('[AuthContext] Verifying role via session refresh...')
-      const { data, error } = await supabase.auth.refreshSession()
-      if (error) throw error
-      const refreshedUser = data?.user ?? user
-      const finalRole = refreshedUser.user_metadata?.role ?? refreshedUser.app_metadata?.role ?? null
-      setIsAdmin(finalRole === 'admin')
-    } catch {
-      setIsAdmin(false)
-    } finally {
-      setIsRoleVerified(true)
-    }
+    // Role verification: Admin state is primarily driven by metadata for performance and avoiding loops.
+    // If a manual refresh is needed, it should be triggered by specific user actions, not on every event.
+    setIsAdmin(role === 'admin')
+    setIsRoleVerified(true)
   }
 
   useEffect(() => {

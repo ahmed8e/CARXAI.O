@@ -30,7 +30,7 @@ export default function Dashboard() {
         .select('*')
         .eq('user_id', user?.id)
         .eq('is_default', true)
-        .single()
+        .maybeSingle()
       
       if (data) {
         setDefaultVehicle(data)
@@ -41,7 +41,7 @@ export default function Dashboard() {
           .select('*')
           .eq('user_id', user?.id)
           .limit(1)
-          .single()
+          .maybeSingle()
         if (firstVal) setDefaultVehicle(firstVal)
       }
     } catch (err) {
