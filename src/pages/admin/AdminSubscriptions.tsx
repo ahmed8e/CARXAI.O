@@ -24,12 +24,13 @@ type SubscriptionRow = {
 
 type UserWithSub = ProfileRow & { subscription: SubscriptionRow | null }
 
-type FilterKey = 'all' | 'active' | 'pending' | 'expired' | 'cancelled' | 'trialing'
+type FilterKey = 'all' | 'free' | 'active' | 'pending' | 'expired' | 'cancelled' | 'trialing'
 
 function StatusBadge({ status }: { status?: string }) {
   const map: Record<string, string> = {
     trialing: 'text-amber-600 bg-amber-50 border-amber-200',
     active: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    free: 'text-navy-600 bg-navy/5 border-navy/20',
     pending: 'text-blue-600 bg-blue-50 border-blue-200',
     cancelled: 'text-red-600 bg-red-50 border-red-100',
     expired: 'text-orange-600 bg-orange-50 border-orange-200',
@@ -61,27 +62,35 @@ export default function AdminSubscriptions() {
     setLoading(true)
     setError(null)
     try {
-      // Use the explicit relation hint to join profiles
-      // Query: subscriptions?select=*,profile:profiles!fk_subscriptions_user_profile(...)
+      // Fetch ALL profiles and their subscriptions
       const { data: rawData, error: subErr } = await supabase
-        .from('subscriptions')
+        .from('profiles')
         .select(`
-          *,
-          profile:profiles!fk_subscriptions_user_profile (
+          id,
+          email,
+          full_name,
+          created_at,
+          subscription:subscriptions!fk_subscriptions_user_profile (
             id,
-            email,
-            full_name,
-            created_at
+            plan_name,
+            billing_cycle,
+            status,
+            starts_at,
+            ends_at,
+            payment_method,
+            notes
           )
         `)
         .order('created_at', { ascending: false })
 
       if (subErr) throw subErr
 
-      // If there are zero rows, load will still set an empty array
-      const merged: UserWithSub[] = (rawData ?? []).map((s: any) => ({
-        ...(s.profile || { id: s.user_id, email: s.email || '—', full_name: '—', created_at: s.created_at }),
-        subscription: s
+      const merged: UserWithSub[] = (rawData ?? []).map((p: any) => ({
+        id: p.id,
+        email: p.email,
+        full_name: p.full_name,
+        created_at: p.created_at,
+        subscription: Array.isArray(p.subscription) ? (p.subscription[0] ?? null) : (p.subscription ?? null)
       }))
 
       setUsers(merged)
@@ -179,8 +188,13 @@ export default function AdminSubscriptions() {
       (u.full_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
       u.id.toLowerCase().includes(search.toLowerCase())
     
-    const status = u.subscription?.status ?? 'none'
-    const matchFilter = filter === 'all' || status === filter
+    const sub = u.subscription
+    const plan = sub?.plan_name || 'free'
+    const status = sub?.status || 'free'
+
+    const matchFilter = filter === 'all' || 
+                       (filter === 'free' && (!sub || plan === 'free')) || 
+                       status === filter
     return matchSearch && matchFilter
   })
 
@@ -216,7 +230,7 @@ export default function AdminSubscriptions() {
           />
         </div>
         <div className="flex gap-2 flex-wrap">
-          {['all', 'active', 'pending', 'trialing', 'expired'].map(t => (
+          {['all', 'free', 'active', 'pending', 'trialing', 'expired'].map(t => (
             <button
               key={t}
               onClick={() => setFilter(t as FilterKey)}
@@ -271,11 +285,14 @@ export default function AdminSubscriptions() {
                           <span className="text-xs text-muted mt-0.5">{user.subscription.payment_method?.replace('_', ' ')}</span>
                         </div>
                       ) : (
-                        <span className="text-muted text-xs italic">No Record</span>
+                        <div className="flex flex-col">
+                          <span className="capitalize text-slate-800">Free</span>
+                          <span className="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">Community Tier</span>
+                        </div>
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      {user.subscription ? <StatusBadge status={user.subscription.status} /> : <StatusBadge status="none" />}
+                      {user.subscription ? <StatusBadge status={user.subscription.status} /> : <StatusBadge status="free" />}
                     </td>
                     <td className="px-5 py-4 text-xs font-mono text-muted">
                        {user.subscription?.starts_at ? new Date(user.subscription.starts_at).toLocaleDateString() : '-'} <br/>
@@ -336,6 +353,7 @@ export default function AdminSubscriptions() {
                       onChange={e => setFormData({ ...formData, plan_name: e.target.value })}
                       className="w-full text-sm font-medium border border-overlay rounded-xl p-2.5 bg-white"
                     >
+                      <option value="free">Free</option>
                       <option value="pro">Pro</option>
                       <option value="advanced">Advanced</option>
                     </select>

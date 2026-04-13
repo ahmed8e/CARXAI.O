@@ -29,9 +29,10 @@ const plans: {
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
-      'Instant AI car diagnosis',
-      '3 detailed diagnostic reports each month',
-      'Expert car guidance',
+      'Limited AI car diagnosis',
+      'Limited diagnostic reports',
+      'Limited image analysis',
+      'No microphone access',
       '24/7 AI mechanic availability',
     ],
     cta: 'Get Started',

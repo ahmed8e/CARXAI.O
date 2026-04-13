@@ -21,7 +21,8 @@ import type { Database } from '../lib/types'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
-const FREE_MESSAGE_LIMIT = 2
+const FREE_MESSAGE_LIMIT = 1
+const RESET_WINDOW_HOURS = 5
 
 const ISSUE_CHIPS = [
   { label: 'Engine light', value: 'My check engine light is on', icon: Activity },
@@ -163,19 +164,39 @@ export default function AIMechanic() {
     }
   }, [isPaid, subLoading, user])
 
+  const [canShareReport, setCanShareReport] = useState(true)
+
   const fetchUsageCount = async () => {
     if (!user || isPaid) return
 
     try {
-      const { count, error } = await supabase
+      const resetThreshold = new Date(Date.now() - RESET_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
+      
+      // Count AI Chats in the last 5 hours
+      const { count: chatCount, error: chatError } = await supabase
         .from('ai_chats')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
+        .gt('created_at', resetThreshold)
       
-      if (!error && count !== null) {
-        console.log('[Carxai] AI Mechanic usage count:', count)
-        if (count >= FREE_MESSAGE_LIMIT) {
+      if (!chatError && chatCount !== null) {
+        console.log('[Carxai] AI Mechanic usage count (last 5h):', chatCount)
+        if (chatCount >= FREE_MESSAGE_LIMIT) {
           setIsGated(true)
+        }
+      }
+
+      // Count Shared Reports in the last 5 hours
+      const { count: reportCount, error: reportError } = await supabase
+        .from('shared_reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('created_by', user.id)
+        .gt('created_at', resetThreshold)
+
+      if (!reportError && reportCount !== null) {
+        console.log('[Carxai] Shared reports count (last 5h):', reportCount)
+        if (reportCount >= 1) { // 1 report every 5 hours
+          setCanShareReport(false)
         }
       }
     } catch (err) {
@@ -1203,20 +1224,22 @@ ${diagnosticHistory}
 
               <AnimatePresence mode="popLayout">
                 {(!input.trim() && !attachedImage && !isListening) ? (
-                  <motion.button
-                    key="mic"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={toggleListening}
-                    disabled={loading || isProcessing || isGated}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90"
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {isProcessing
-                      ? <RefreshCw className="w-5 h-5 animate-spin" />
-                      : <Mic className="w-5 h-5" />}
-                  </motion.button>
+                  isPaid && (
+                    <motion.button
+                      key="mic"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      onClick={toggleListening}
+                      disabled={loading || isProcessing || isGated}
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90"
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {isProcessing
+                        ? <RefreshCw className="w-5 h-5 animate-spin" />
+                        : <Mic className="w-5 h-5" />}
+                    </motion.button>
+                  )
                 ) : (
                   <motion.button
                     key="send"
@@ -1269,6 +1292,7 @@ ${diagnosticHistory}
           messages={messages}
           activeVehicle={activeVehicle}
           currentAudioRef={currentAudioRef}
+          isLimitReached={!canShareReport && !isPaid}
         />
       )}
     </div>

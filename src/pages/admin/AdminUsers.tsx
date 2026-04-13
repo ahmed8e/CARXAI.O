@@ -16,16 +16,17 @@ interface UserRow {
 }
 
 function StatusBadge({ status }: { status?: string }) {
-  if (!status) return <span className="text-[10px] font-bold text-muted uppercase tracking-widest border border-overlay px-2 py-0.5 rounded-full bg-surface-low">No Plan</span>
   const map: Record<string, string> = {
     trialing: 'text-amber-600 bg-amber-50 border-amber-200',
     active: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    free: 'text-navy-600 bg-navy/5 border-navy/20',
     cancelled: 'text-red-600 bg-red-50 border-red-100',
     expired: 'text-orange-600 bg-orange-50 border-orange-200',
   }
+  const label = status || 'free'
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${map[status] ?? 'text-muted bg-surface-low border-overlay'}`}>
-      {status.replace('_', ' ')}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${map[label] ?? 'text-muted bg-surface-low border-overlay'}`}>
+      {label.replace('_', ' ')}
     </span>
   )
 }
@@ -93,13 +94,34 @@ export default function AdminUsers() {
       )}
 
       {/* Stats summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-overlay p-5">
            <div className="w-9 h-9 rounded-xl bg-navy/10 flex items-center justify-center mb-3">
              <Users className="w-4.5 h-4.5 text-navy" />
            </div>
            <p className="text-2xl font-display font-black text-on-surface">{profiles.length}</p>
            <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Total Registered Users</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-overlay p-5">
+           <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+             <span className="text-xs font-black text-slate-500">F</span>
+           </div>
+           <p className="text-2xl font-display font-black text-on-surface">{profiles.filter(p => !p.subscription || p.subscription.plan_name === 'free').length}</p>
+           <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Free Plan Users</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-overlay p-5">
+           <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center mb-3">
+             <span className="text-xs font-black text-emerald-600">P</span>
+           </div>
+           <p className="text-2xl font-display font-black text-on-surface">{profiles.filter(p => p.subscription?.plan_name === 'pro').length}</p>
+           <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Pro Plan Users</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-overlay p-5">
+           <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+             <span className="text-xs font-black text-blue-600">A</span>
+           </div>
+           <p className="text-2xl font-display font-black text-on-surface">{profiles.filter(p => p.subscription?.plan_name === 'advanced').length}</p>
+           <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Advanced Users</p>
         </div>
       </div>
 
@@ -136,12 +158,10 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-col gap-1">
-                        <StatusBadge status={p.subscription?.status} />
-                        {p.subscription?.plan_name && (
-                           <span className="text-[10px] text-muted font-bold uppercase tracking-widest">
-                             {p.subscription.plan_name} — {p.subscription.billing_cycle || 'manual'}
-                           </span>
-                        )}
+                        <StatusBadge status={p.subscription?.status || 'free'} />
+                        <span className="text-[10px] text-muted font-bold uppercase tracking-widest">
+                          {p.subscription?.plan_name || 'free'} — {p.subscription?.billing_cycle || 'manual'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-5 py-4 text-xs font-medium text-muted">

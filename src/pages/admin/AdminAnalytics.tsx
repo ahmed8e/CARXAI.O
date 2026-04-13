@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts'
-import { Zap, Truck, Wrench, AlertCircle, TrendingUp, Activity, MousePointerClick, RefreshCw, Info } from 'lucide-react'
+import { Zap, Truck, Wrench, AlertCircle, TrendingUp, Activity, MousePointerClick, RefreshCw, Info, Users } from 'lucide-react'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
@@ -42,14 +42,16 @@ export default function AdminAnalytics() {
   const [events, setEvents] = useState<any[]>([])
   const [topIssues, setTopIssues] = useState<{ name: string; count: number }[]>([])
   const [urgencyDist, setUrgencyDist] = useState<{ name: string; value: number; color: string }[]>([])
+  const [planDist, setPlanDist] = useState<{ name: string; value: number; color: string }[]>([])
   const [activityChart, setActivityChart] = useState<any[]>([])
 
   const load = async () => {
     setError(null)
     try {
-      const [chatsRes, eventsRes] = await Promise.all([
+      const [chatsRes, eventsRes, profilesRes] = await Promise.all([
         (supabase as any).from('ai_chats').select('id, issue_name, urgency_level, created_at').order('created_at', { ascending: false }),
         (supabase as any).from('app_events').select('event_type, created_at'),
+        (supabase as any).from('profiles').select('id, subscription:subscriptions!fk_subscriptions_user_profile(plan_name)'),
       ])
 
       if (chatsRes.error) throw chatsRes.error
@@ -78,6 +80,21 @@ export default function AdminAnalytics() {
       }
       setUrgencyDist(
         Object.entries(urgMap).map(([name, value]) => ({ name, value, color: COLORS[name] ?? '#94a3b8' }))
+      )
+
+      // Plan distribution
+      const profiles = profilesRes.data ?? []
+      const planMap: Record<string, number> = { free: 0, pro: 0, advanced: 0 }
+      for (const p of profiles) {
+        const sub = Array.isArray(p.subscription) ? p.subscription[0] : p.subscription
+        const plan = sub?.plan_name || 'free'
+        planMap[plan] = (planMap[plan] || 0) + 1
+      }
+      const PLAN_COLORS: Record<string, string> = {
+        free: '#94a3b8', pro: '#10b981', advanced: '#0070E0'
+      }
+      setPlanDist(
+        Object.entries(planMap).map(([name, value]) => ({ name, value, color: PLAN_COLORS[name] ?? '#94a3b8' }))
       )
 
       // Daily activity chart (last 14 days)
@@ -239,6 +256,40 @@ export default function AdminAnalytics() {
                   <div key={d.name} className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
                     <span className="text-xs text-muted capitalize flex-1">{d.name.replace('_', ' ')}</span>
+                    <span className="text-xs font-bold text-on-surface">{d.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Plan Distribution */}
+        <div className="bg-white rounded-2xl border border-overlay p-6">
+          <h2 className="text-sm font-display font-black text-on-surface mb-1">Plan Distribution</h2>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-5">Current subscriptions</p>
+          {loading ? (
+            <div className="h-52 bg-surface-low rounded-xl animate-pulse" />
+          ) : planDist.length === 0 ? (
+            <div className="h-52 flex flex-col items-center justify-center gap-2">
+              <Users className="w-8 h-8 text-muted/20" />
+              <p className="text-xs text-muted font-medium">No users yet</p>
+            </div>
+          ) : (
+            <div>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie data={planDist} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
+                    {planDist.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                  </Pie>
+                  <Tooltip formatter={(v: any, n: any) => [v, n]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-1.5 mt-2">
+                {planDist.map(d => (
+                  <div key={d.name} className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
+                    <span className="text-xs text-muted capitalize flex-1">{d.name}</span>
                     <span className="text-xs font-bold text-on-surface">{d.value}</span>
                   </div>
                 ))}

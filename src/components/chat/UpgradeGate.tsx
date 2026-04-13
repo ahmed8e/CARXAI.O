@@ -23,10 +23,10 @@ export default function UpgradeGate() {
   }
 
   const benefits = [
-    "Continue AI chat",
-    "Unlock full diagnosis reports",
-    "Better dashboard analysis",
-    "Mechanic-ready sharing"
+    "Unlimited AI car diagnosis",
+    "Unlimited diagnostic reports",
+    "Advanced dashboard analysis",
+    "Professional mechanic sharing"
   ]
 
   return (

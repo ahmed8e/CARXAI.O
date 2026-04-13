@@ -5,7 +5,7 @@ import {
   Truck, ShieldAlert, User,
   Car, Info, AlertTriangle, FileText,
   Calendar, Hash, Loader2,
-  ShieldCheck, Zap
+  ShieldCheck, Zap, Lock
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Message, DiagnosticResult, Database } from '../lib/types'
@@ -32,6 +32,7 @@ interface MechanicReportProps {
   messages: Message[]
   activeVehicle?: Vehicle | null
   currentAudioRef: React.MutableRefObject<HTMLAudioElement | null>
+  isLimitReached?: boolean
 }
 
 export default function MechanicReport({ 
@@ -41,7 +42,8 @@ export default function MechanicReport({
   diagnosis, 
   messages, 
   activeVehicle,
-  currentAudioRef
+  currentAudioRef,
+  isLimitReached
 }: MechanicReportProps) {
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
@@ -529,14 +531,14 @@ export default function MechanicReport({
                 {/* Secondary Utility Actions */}
                 <div className="flex items-center gap-4 w-full lg:w-auto lg:border-l border-slate-200 lg:pl-8 pt-6 lg:pt-0 border-t lg:border-t-0">
                   <motion.button 
-                    whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleShare}
-                    disabled={sharing}
-                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${sharing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    whileHover={!isLimitReached ? { y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' } : {}}
+                    whileTap={!isLimitReached ? { scale: 0.98 } : {}}
+                    onClick={!isLimitReached ? handleShare : undefined}
+                    disabled={sharing || isLimitReached}
+                    className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${sharing || isLimitReached ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#0070E0]'}`}
                   >
-                    {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} 
-                    {sharing ? 'Sharing...' : 'Share Report'}
+                    {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : isLimitReached ? <Lock className="w-4 h-4" /> : <Share2 className="w-4 h-4" />} 
+                    {sharing ? 'Sharing...' : isLimitReached ? 'Limit Reached' : 'Share Report'}
                   </motion.button>
                   <motion.button 
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
@@ -547,6 +549,13 @@ export default function MechanicReport({
                     <Copy className="w-4 h-4" /> Copy Summary
                   </motion.button>
                 </div>
+                {isLimitReached && (
+                  <div className="mt-4 text-center">
+                    <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
+                      Free report shared. Next reset in 5 hours. <span className="text-[#0070E0] cursor-pointer" onClick={() => window.location.href='/dashboard'}>Upgrade for unlimited sharing.</span>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
