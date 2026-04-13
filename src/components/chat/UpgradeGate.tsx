@@ -1,10 +1,15 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, CheckCircle2, Crown, ArrowRight, ShieldCheck, Zap } from 'lucide-react'
 import { MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
-export default function UpgradeGate() {
+interface UpgradeGateProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function UpgradeGate({ isOpen, onClose }: UpgradeGateProps) {
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -30,13 +35,17 @@ export default function UpgradeGate() {
   ]
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-12 overflow-y-auto">
-      {/* Heavy Backdrop Blur Overlay */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md pointer-events-none"
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-12 overflow-y-auto">
+          {/* Heavy Backdrop Blur Overlay */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md cursor-pointer"
+          />
 
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -126,5 +135,7 @@ export default function UpgradeGate() {
         </p>
       </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   )
 }

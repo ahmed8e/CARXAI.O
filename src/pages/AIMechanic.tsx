@@ -11,7 +11,7 @@ import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
-  Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus
+  Disc, Gauge, Thermometer, Battery, Droplets, ImagePlus, Lock
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -21,7 +21,7 @@ import type { Database } from '../lib/types'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
-const FREE_MESSAGE_LIMIT = 1
+const FREE_MESSAGE_LIMIT = 2
 const RESET_WINDOW_HOURS = 5
 
 const ISSUE_CHIPS = [
@@ -184,7 +184,7 @@ export default function AIMechanic() {
     if (!user || isAdvanced) return false
 
     try {
-      const { data: usage, error: fetchError } = await supabase
+      const { data: rawUsage, error: fetchError } = await (supabase as any)
         .from('plan_usage')
         .select('*')
         .eq('user_id', user.id)
@@ -193,8 +193,9 @@ export default function AIMechanic() {
       if (fetchError) throw fetchError
 
       // Initialize if missing
+      const usage = rawUsage as any;
       if (!usage) {
-        await supabase.from('plan_usage').insert({ user_id: user.id })
+        await (supabase as any).from('plan_usage').insert({ user_id: user.id })
         setIsGated(false)
         setCanShareReport(true)
         return false
@@ -209,7 +210,7 @@ export default function AIMechanic() {
 
       if (lastReset < fiveHoursAgo) {
         // Window expired, reset!
-        const { data: resetData, error: resetError } = await supabase
+        const { data: resetData, error: resetError } = await (supabase as any)
           .from('plan_usage')
           .update({ 
             chat_count: 0, 
@@ -230,7 +231,9 @@ export default function AIMechanic() {
       // Exact Enforcement for Free Plan
       if (!isPaid) {
         const chatGated = chatCount >= FREE_MESSAGE_LIMIT
+        const imgGated = usage.image_count >= 1
         setIsGated(chatGated)
+        setIsImageGated(imgGated)
         setCanShareReport(reportCount < 1) // Only 1 report per 5h
         return chatGated
       }
@@ -262,12 +265,13 @@ export default function AIMechanic() {
 
     try {
       // Get current usage to increment
-      const { data: usage } = await supabase
+      const { data: rawUsageInc } = await (supabase as any)
         .from('plan_usage')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle()
 
+      const usage = rawUsageInc as any;
       if (!usage) return
 
       const update: any = {}
@@ -275,7 +279,7 @@ export default function AIMechanic() {
       if (type === 'report') update.report_count = usage.report_count + 1
       if (type === 'image') update.image_count = usage.image_count + 1
 
-      await supabase
+      await (supabase as any)
         .from('plan_usage')
         .update(update)
         .eq('user_id', user.id)
@@ -1155,8 +1159,6 @@ ${diagnosticHistory}
         <div ref={messagesEndRef} className="h-8" />
       </div>
 
-      {/* Premium Upgrade Modal (Blocking) */}
-      {isGated && <UpgradeGate />}
 
       {/* Pro Usage Indicator */}
       {isPro && !isGated && (
@@ -1328,22 +1330,20 @@ ${diagnosticHistory}
 
               <AnimatePresence mode="popLayout">
                 {(!input.trim() && !attachedImage && !isListening) ? (
-                  isPaid && (
-                    <motion.button
+                  <motion.button
                       key="mic"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={toggleListening}
                       disabled={loading || isProcessing}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90"
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
                       whileTap={{ scale: 0.9 }}
                     >
                       {isProcessing
                         ? <RefreshCw className="w-5 h-5 animate-spin" />
-                        : <Mic className="w-5 h-5" />}
+                        : (<><Mic className="w-5 h-5" />{!isPaid && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-100 rounded-full flex items-center justify-center border border-white shadow-sm"><Lock className="w-2 h-2 text-amber-600" /></div>}</>)}
                     </motion.button>
-                  )
                 ) : (
                   <motion.button
                     key="send"
@@ -1375,6 +1375,12 @@ ${diagnosticHistory}
           </div>
         </div>
       </div>
+
+      {/* Upgrade Popup Gate */}
+      <UpgradeGate 
+        isOpen={isGated} 
+        onClose={() => setIsGated(false)} 
+      />
 
       {/* Vehicle Add Modal — opened from header or onboarding card */}
       <VehicleAddModal
