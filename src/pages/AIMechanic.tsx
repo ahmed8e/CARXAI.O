@@ -1196,33 +1196,78 @@ ${diagnosticHistory}
                                   {/* 5. Dynamic Smart Actions */}
                                   <div className="pt-2 flex flex-col gap-3">
                                     {(() => {
-                                      const isEmergency = msg.issueData!.tow_recommended || msg.issueData!.can_drive === false || msg.issueData!.severity === 'high';
+                                      const severity = msg.issueData!.severity || msg.issueData!.urgencyLevel || 'medium';
+                                      
                                       return (
-                                        <div className={`grid ${isEmergency ? 'grid-cols-1 gap-3' : 'grid-cols-2 gap-2.5'} w-full`}>
-                                          <motion.button
-                                            whileHover={{ y: -2, scale: 1.02 }}
-                                            whileTap={{ scale: 0.96 }}
-                                            onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                            className={`flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all ${!isEmergency
-                                              ? 'bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1'
-                                              : 'bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2'
-                                              }`}
-                                          >
-                                            <MapPin className={`w-3.5 h-3.5 ${!isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
-                                            Find Mechanic
-                                          </motion.button>
-                                          <motion.button
-                                            whileHover={{ y: -2, scale: 1.02 }}
-                                            whileTap={{ scale: 0.96 }}
-                                            onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                            className={`flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all ${isEmergency
-                                              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[11px] shadow-lg shadow-red-500/30 border border-white/20 order-1'
-                                              : 'bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2'
-                                              }`}
-                                          >
-                                            <ShieldAlert className={`w-3.5 h-3.5 ${isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
-                                            Towing
-                                          </motion.button>
+                                        <div className="grid grid-cols-2 gap-2.5 w-full">
+                                          {severity === 'high' && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[11px] shadow-lg shadow-red-500/30 border border-white/20 order-1"
+                                              >
+                                                <ShieldAlert className="w-3.5 h-3.5 text-white/90" />
+                                                Towing
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
+                                              >
+                                                <MapPin className="w-3.5 h-3.5 text-navy/40" />
+                                                Find Mechanic
+                                              </motion.button>
+                                            </>
+                                          )}
+                                          
+                                          {severity === 'medium' && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1"
+                                              >
+                                                <MapPin className="w-3.5 h-3.5 text-white/90" />
+                                                Find Mechanic
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => sendMessage("I will continue driving with caution. Are there any specific signs I should watch out for?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
+                                              >
+                                                <Activity className="w-3.5 h-3.5 text-navy/40" />
+                                                Drive w/ Caution
+                                              </motion.button>
+                                            </>
+                                          )}
+
+                                          {(!severity || severity === 'low') && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => sendMessage("How should I best monitor this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1"
+                                              >
+                                                <Activity className="w-3.5 h-3.5 text-white/90" />
+                                                Monitor Issue
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
+                                              >
+                                                <MapPin className="w-3.5 h-3.5 text-navy/40" />
+                                                Find Mechanic
+                                              </motion.button>
+                                            </>
+                                          )}
                                         </div>
                                       );
                                     })()}
@@ -1348,37 +1393,78 @@ ${diagnosticHistory}
 
                                     {/* Dynamic Action Priority */}
                                     {(() => {
-                                      const isEmergency = msg.issueData!.tow_recommended || msg.issueData!.can_drive === false || msg.issueData!.severity === 'high';
+                                      const severity = msg.issueData!.severity || msg.issueData!.urgencyLevel || 'medium';
 
                                       return (
-                                        <div className={`grid ${isEmergency ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-3'} w-full`}>
-                                          {/* Secondary if Emergency, Primary if Not */}
-                                          <motion.button
-                                            whileHover={{ y: -2, scale: 1.02 }}
-                                            whileTap={{ scale: 0.96 }}
-                                            onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                            className={`flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all ${!isEmergency
-                                              ? 'bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1'
-                                              : 'bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2'
-                                              }`}
-                                          >
-                                            <MapPin className={`w-4 h-4 ${!isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
-                                            Find Mechanic
-                                          </motion.button>
+                                        <div className="grid grid-cols-2 gap-3 w-full">
+                                          {severity === 'high' && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(239,68,68,0.4)] border border-white/20 order-1"
+                                              >
+                                                <Zap className="w-4 h-4 text-white/90" />
+                                                Towing
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
+                                              >
+                                                <MapPin className="w-4 h-4 text-navy/40" />
+                                                Find Mechanic
+                                              </motion.button>
+                                            </>
+                                          )}
 
-                                          {/* Primary if Emergency, Secondary if Not */}
-                                          <motion.button
-                                            whileHover={{ y: -2, scale: 1.02 }}
-                                            whileTap={{ scale: 0.96 }}
-                                            onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                            className={`flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all ${isEmergency
-                                              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(239,68,68,0.4)] border border-white/20 order-1'
-                                              : 'bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2'
-                                              }`}
-                                          >
-                                            <Zap className={`w-4 h-4 ${isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
-                                            Towing
-                                          </motion.button>
+                                          {severity === 'medium' && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
+                                              >
+                                                <MapPin className="w-4 h-4 text-white/90" />
+                                                Find Mechanic
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => sendMessage("I will continue driving with caution. Are there any specific signs I should watch out for?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
+                                              >
+                                                <Activity className="w-4 h-4 text-navy/40" />
+                                                Drive w/ Caution
+                                              </motion.button>
+                                            </>
+                                          )}
+
+                                          {(!severity || severity === 'low') && (
+                                            <>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => sendMessage("How should I best monitor this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
+                                              >
+                                                <Activity className="w-4 h-4 text-white/90" />
+                                                Monitor Issue
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.96 }}
+                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
+                                              >
+                                                <MapPin className="w-4 h-4 text-navy/40" />
+                                                Find Mechanic
+                                              </motion.button>
+                                            </>
+                                          )}
                                         </div>
                                       );
                                     })()}
