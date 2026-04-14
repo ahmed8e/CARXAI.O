@@ -11,7 +11,7 @@ import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
-  Thermometer, ImagePlus, Lock, ShieldAlert
+  ImagePlus, Lock, ShieldAlert, CarFront
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -24,14 +24,6 @@ type Vehicle = Database['public']['Tables']['vehicles']['Row']
 const FREE_MESSAGE_LIMIT = 2
 const RESET_WINDOW_HOURS = 5
 
-const ISSUE_CHIPS = [
-  { label: 'Engine Light', value: 'My check engine light is on', icon: Activity },
-  { label: 'Car Won\'t Start', value: 'My car won\'t start', icon: Zap },
-  { label: 'Strange Noise', value: 'I hear a strange noise from my car', icon: AudioLines },
-  { label: 'Overheating', value: 'My car is overheating', icon: Thermometer },
-]
-
-// Prompts securely held by backend api/chat.ts
 
 
 export default function AIMechanic() {
@@ -61,7 +53,7 @@ export default function AIMechanic() {
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
   const [isGated, setIsGated] = useState(false)
-  const [responseMode, setResponseMode] = useState<'fast_answer' | 'expert_answer'>('expert_answer')
+  const [responseMode, setResponseMode] = useState<'fast_answer' | 'expert_answer'>('fast_answer')
   const [isLimitReached, setIsLimitReached] = useState(false)
   const [isImageGated, setIsImageGated] = useState(false)
   const [attachedImage, setAttachedImage] = useState<string | null>(null)
@@ -1019,91 +1011,124 @@ ${diagnosticHistory}
                   </p>
                 </motion.div>
 
-                <div className="grid grid-cols-2 gap-5 w-full max-w-xl mb-12 px-4">
-                  {ISSUE_CHIPS.map((chip, idx) => (
-                    <motion.button
-                      key={chip.value}
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{
-                        delay: 0.2 + idx * 0.08,
-                        duration: 0.8,
-                        ease: [0.16, 1, 0.3, 1]
+                {/* Mode Selector Segmented Control */}
+                <div className="w-full max-w-sm mx-auto mb-10 px-4">
+                  <div className="p-1.5 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 shadow-inner flex relative">
+                   <motion.div
+                      layout
+                      className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-sm border border-slate-200/50 z-0"
+                      initial={false}
+                      animate={{
+                        left: responseMode === 'fast_answer' ? '6px' : 'calc(50%)'
                       }}
-                      onClick={() => sendMessage(chip.value, undefined, chip.label)}
-                      whileHover={{
-                        y: -8,
-                        transition: { duration: 0.4, ease: "easeOut" }
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                      className="group relative flex flex-col items-start p-5.5 rounded-[28px] bg-white border border-slate-100/80 shadow-[0_4px_20px_rgba(0,0,0,0.02),0_20px_40px_rgba(0,18,51,0.04)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.04),0_30px_60px_rgba(0,18,51,0.08)] transition-all duration-500 text-left overflow-hidden ring-1 ring-white/10"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+
+                    <button
+                      onClick={() => setResponseMode('fast_answer')}
+                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0070E0]' : 'text-slate-500 hover:text-navy/70'}`}
                     >
-                      {/* Inner Glow & Glass Effect */}
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
-                      <div className="absolute inset-0 bg-gradient-to-br from-slate-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                      <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center mb-4 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 relative z-10 shadow-sm border border-white/40 ${idx === 0 ? 'bg-gradient-to-tr from-amber-50 to-orange-50/50 text-amber-600' :
-                        idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
-                          idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
-                            'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
-                        }`}>
-                        <chip.icon className="w-5 h-5 stroke-[2.5]" />
-                      </div>
-
-                      <div className="relative z-10">
-                        <span className="text-[15px] font-black text-navy leading-tight block mb-0.5 tracking-tight group-hover:text-blue-600 transition-colors">
-                          {chip.label}
-                        </span>
-                        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-1 group-hover:translate-y-0">
-                          <span className="text-[9px] font-black text-blue-600/60 uppercase tracking-[0.2em]">Initialize</span>
-                          <Send className="w-2.5 h-2.5 text-blue-600/60" />
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
+                      <Zap className={`w-4 h-4 ${responseMode === 'fast_answer' ? 'text-[#0070E0]' : 'text-slate-400'}`} />
+                      Fast Answer
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!isAdvanced) {
+                          setIsGated(true)
+                          return
+                        }
+                        setResponseMode('expert_answer')
+                      }}
+                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-500 hover:text-navy/70'}`}
+                    >
+                      <Activity className={`w-4 h-4 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-400'}`} />
+                      Expert
+                      {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0070E0]/10 text-[#0070E0] text-[8px] font-black md:inline-block">PRO</div>}
+                    </button>
+                  </div>
                 </div>
 
-                {!loadingVehicle && !activeVehicle && (
+                {!loadingVehicle && (
                   <div className="w-full max-w-xl px-4">
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ y: -4 }}
-                      whileTap={{ scale: 0.99 }}
-                      onClick={() => setShowVehicleModal(true)}
-                      className="w-full relative overflow-hidden rounded-[36px] bg-white border border-slate-200/50 p-7 flex items-center justify-between gap-6 shadow-[0_15px_30px_-5px_rgba(0,18,51,0.03)] transition-all duration-500 group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    {!activeVehicle ? (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => setShowVehicleModal(true)}
+                        className="w-full relative overflow-hidden rounded-[36px] bg-white border border-slate-200/50 p-7 flex items-center justify-between gap-6 shadow-[0_15px_30px_-5px_rgba(0,18,51,0.03)] transition-all duration-500 group"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                      <div className="flex items-center gap-6 relative z-10">
-                        <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-[0_12px_24px_-8px_rgba(0,18,51,0.5)] relative overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-700">
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
-                          <Activity className="w-7 h-7 text-white relative z-10" />
-
-                          {/* Status Pulse */}
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-navy animate-pulse" />
-                        </div>
-
-                        <div className="text-left">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Configuration Required</span>
+                        <div className="flex items-center gap-6 relative z-10">
+                          <div className="w-16 h-16 rounded-[24px] bg-navy flex items-center justify-center shadow-[0_12px_24px_-8px_rgba(0,18,51,0.5)] relative overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-700">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
+                            <Activity className="w-7 h-7 text-white relative z-10" />
+                            {/* Status Pulse */}
+                            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-navy animate-pulse" />
                           </div>
-                          <h4 className="text-[19px] font-black text-navy leading-none mb-2 tracking-tight">Add Vehicle Details</h4>
-                          <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">Enable vehicle-specific logic for 34% more accurate results</p>
+
+                          <div className="text-left">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Configuration Required</span>
+                            </div>
+                            <h4 className="text-[19px] font-black text-navy leading-none mb-2 tracking-tight">Add Vehicle Details</h4>
+                            <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">Enable vehicle-specific logic for 34% more accurate results</p>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="w-12 h-12 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:bg-navy group-hover:border-navy transition-all duration-500 shadow-sm relative z-10">
-                        <RefreshCw className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-all duration-700" />
-                      </div>
+                        <div className="w-12 h-12 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:bg-navy group-hover:border-navy transition-all duration-500 shadow-sm relative z-10">
+                          <RefreshCw className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-all duration-700" />
+                        </div>
 
-                      {/* Interactive Scan Line Effect */}
+                        {/* Interactive Scan Line Effect */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent w-full h-[20%] opacity-0 group-hover:opacity-100"
+                          animate={{ top: ['-20%', '120%'] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        />
+                      </motion.button>
+                    ) : (
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent w-full h-[20%] opacity-0 group-hover:opacity-100"
-                        animate={{ top: ['-20%', '120%'] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      />
-                    </motion.button>
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="w-full relative overflow-hidden rounded-[32px] bg-white border border-slate-200/60 p-6 flex flex-col items-start shadow-[0_15px_40px_-10px_rgba(0,18,51,0.03)] transition-all duration-500"
+                      >
+                        <div className="flex items-center gap-5 w-full mb-5">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0070E0] to-[#004A99] flex items-center justify-center shadow-lg shadow-blue-500/20 relative overflow-hidden shrink-0">
+                            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:10px_10px] opacity-20" />
+                            <CarFront className="w-6 h-6 text-white relative z-10" />
+                          </div>
+                          
+                          <div className="text-left flex-1">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#0070E0]">Diagnostic Target</span>
+                              <div className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Active</span>
+                              </div>
+                            </div>
+                            <h4 className="text-[20px] font-black text-navy leading-none tracking-tight">
+                              {activeVehicle.year} {activeVehicle.make} {activeVehicle.model}
+                            </h4>
+                          </div>
+                        </div>
+
+                        <div className="w-full grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100/60 flex flex-col justify-center">
+                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Mileage</span>
+                            <span className="text-[13px] font-bold text-navy tracking-tight">{activeVehicle.mileage ? `${activeVehicle.mileage.toLocaleString()} mi` : 'Not Set'}</span>
+                          </div>
+                          <div className="bg-emerald-50/30 rounded-2xl p-3 border border-emerald-100/50 flex flex-col justify-center">
+                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600/50 mb-1">System Status</span>
+                            <div className="flex items-center gap-1.5">
+                              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                              <span className="text-[12px] font-bold text-emerald-700 tracking-tight">Ready for Scan</span>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 )}
               </div>

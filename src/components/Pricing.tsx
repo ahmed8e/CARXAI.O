@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Sparkles, ShieldCheck, Zap, Lock, Headphones, Globe, MessageSquare } from 'lucide-react'
+import { Check, Sparkles, ShieldCheck, Zap, Lock, MessageSquare } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import type { PlanType } from '../hooks/useSubscription'
@@ -25,14 +25,14 @@ const plans: {
   {
     id: 'free',
     name: 'Free',
-    description: 'Essential AI car help for occasional issues and everyday peace of mind.',
+    description: 'Limited AI access for basic dashboard checks and essential guidance.',
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
-      'Limited AI chat',
-      'Limited reports',
-      'Limited image analysis',
-      'No microphone access',
+      '2 AI Reports / month',
+      'Fast Answer Mode only',
+      'Limited Image Analysis',
+      'No Microphone Access',
     ],
     cta: 'Get Started',
     popular: false,
@@ -40,34 +40,32 @@ const plans: {
   {
     id: 'pro',
     name: 'Pro',
-    description: 'The complete car assistance experience for drivers who want faster answers and better support.',
+    description: 'Upgraded plan for more reports and stronger AI guidance when you need it.',
     monthlyPrice: 12,
     yearlyPrice: 9,
     trial: '3-Day Free Trial',
     features: [
-      '3-day free trial included',
-      'Unlimited AI chat',
-      '15 reports / month',
-      'Standard AI Mechanic - One normal answer mode only',
-      'Step-by-step resolution guidance',
-      'Nearby provider discovery map',
+      '15 AI Reports / month',
+      'Fast + Expert Answer Modes',
+      'Full Image Analysis',
+      'Nearby Provider Map',
+      'Standard Support',
     ],
-    cta: 'Get Started',
+    cta: 'Start Free Trial',
     popular: true,
   },
   {
     id: 'advanced',
     name: 'Advanced',
-    description: 'Maximum coverage and priority access for users who rely on car support more often.',
+    description: 'The ultimate AI mechanic experience with Expert Diagnosis and full analysis.',
     monthlyPrice: 29,
     yearlyPrice: 24,
     features: [
-      'Unlimited AI chat',
-      'Unlimited diagnostic reports',
-      'Premium AI Mechanic - Fast or Expert Answer modes',
-      'Full image analysis',
-      'Priority step-by-step guidance',
-      'Full provider network visibility',
+      'Unlimited AI Reports',
+      'Fast + Expert Answer Modes',
+      'Full Image + Voice Analysis',
+      'Full Provider Visibility',
+      'Priority Human Support',
     ],
     cta: 'Get Started',
     popular: false,
@@ -110,7 +108,7 @@ User ID: ${user.id}`
   }
 
   return (
-    <section id="pricing" className="py-16 md:py-32 px-6 bg-slate-50/30 overflow-hidden">
+    <section id="pricing" className="py-16 md:py-32 px-6 bg-white dark:bg-surface overflow-hidden border-t border-overlay shadow-sm">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-20 flex flex-col items-center">
@@ -200,7 +198,7 @@ User ID: ${user.id}`
                 )}
 
                 <div className="mb-10 text-left">
-                  <h3 className={`text-2xl font-display font-black text-slate-900 mb-3 ${plan.popular ? 'text-[#0070E0]' : ''}`}>{plan.name}</h3>
+                  <h3 className={`text-2xl font-display font-black text-slate-900 mb-3 ${plan.popular ? 'text-[#0070E0]' : plan.id === 'advanced' ? 'text-indigo-600' : ''}`}>{plan.name}</h3>
                   <p className="text-sm text-slate-500 font-medium leading-relaxed">{plan.description}</p>
                 </div>
 
@@ -229,10 +227,10 @@ User ID: ${user.id}`
                 <div className="flex-grow space-y-5 mb-12 text-left">
                   {plan.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start gap-3.5 group/feat">
-                      <div className={`mt-0.5 w-6 h-6 rounded-xl flex items-center justify-center shrink-0 border transition-all ${plan.popular ? 'bg-[#0070E0]/5 border-[#0070E0]/20 shadow-sm' : 'bg-slate-50 border-slate-100'}`}>
-                        <Check className={`w-3 h-3 ${plan.popular ? 'text-[#0070E0]' : 'text-slate-400'}`} strokeWidth={3} />
+                      <div className={`mt-0.5 w-6 h-6 rounded-xl flex items-center justify-center shrink-0 border transition-all ${plan.popular ? 'bg-[#0070E0]/5 border-[#0070E0]/20 shadow-sm' : plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'bg-indigo-50 border-indigo-100' : 'bg-slate-50 border-slate-100'}`}>
+                        <Check className={`w-3 h-3 ${plan.popular ? 'text-[#0070E0]' : plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'text-indigo-600' : 'text-slate-400'}`} strokeWidth={3} />
                       </div>
-                      <span className="text-[15px] font-medium text-slate-600 transition-colors group-hover/feat:text-slate-900 leading-snug">{feature}</span>
+                      <span className={`text-[15px] font-medium transition-colors group-hover/feat:text-slate-900 leading-snug ${plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'text-indigo-700' : 'text-slate-600'}`}>{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -247,6 +245,12 @@ User ID: ${user.id}`
                   <MessageSquare className="w-5 h-5" />
                   {plan.cta}
                 </motion.button>
+
+                {plan.id === 'advanced' && (
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-200">
+                    Expert Support Included
+                  </div>
+                )}
               </motion.div>
             )
           })}
@@ -270,45 +274,22 @@ User ID: ${user.id}`
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col md:row items-center justify-between gap-8"
+          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col items-center"
         >
-          <div className="flex items-center gap-10">
-            <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">
-              <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center bg-white shadow-sm group-hover:border-slate-200 group-hover:shadow-md transition-all">
-                <ShieldCheck className="w-5 h-5 text-emerald-500" />
+          <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+            {[
+              { title: 'Cancel anytime', icon: ShieldCheck },
+              { title: 'Secure payment', icon: Lock },
+              { title: 'No hidden fees', icon: Check },
+              { title: 'Clear plan limits', icon: Sparkles },
+            ].map((trust, idx) => (
+              <div key={idx} className="flex items-center gap-2 text-slate-500">
+                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                  <trust.icon className="w-3.5 h-3.5 text-slate-400" />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-widest leading-none">{trust.title}</span>
               </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">Cancel anytime</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Full control via support</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">
-              <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center bg-white shadow-sm group-hover:border-slate-200 group-hover:shadow-md transition-all">
-                <Lock className="w-5 h-5 text-emerald-500" strokeWidth={2.5} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">Manual Activation</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Verified via WhatsApp</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 group text-slate-400 hover:text-slate-600 transition-colors">
-              <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center bg-white shadow-sm group-hover:border-slate-200 group-hover:shadow-md transition-all">
-                <Headphones className="w-5 h-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">24/7 Priority</p>
-                <p className="text-[9px] font-medium leading-none mt-0.5">Personal assistance</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-slate-400 border-l border-slate-100 pl-8 hidden lg:flex">
-             <Globe className="w-4 h-4" />
-             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
-               Global Community Support
-             </p>
+            ))}
           </div>
         </motion.div>
       </div>

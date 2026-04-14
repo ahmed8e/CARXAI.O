@@ -43,12 +43,12 @@ const features = [
 ]
 
 const reviews = [
-  { name: 'Jason M.', car: 'Toyota RAV4', rating: 5, text: 'Saved me from an unnecessary garage visit. The AI diagnosis was spot on and explained the warning light in simple terms.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
-  { name: 'Jessica W.', car: 'BMW 3 Series', rating: 5, text: 'I understood the warning light in seconds. Usually, I\'d spend an hour Googling and getting more confused.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
-  { name: 'Sarah J.', car: 'VW Golf', rating: 5, text: 'Found towing in minutes when I was stuck on the highway. Truly a lifesaver in stressful situations.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
-  { name: 'Michael B.', car: 'Audi A3', rating: 5, text: 'Simple, clear, and actually useful. It feels like having a professional mechanic in my pocket at all times.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
-  { name: 'Robert T.', car: 'Mercedes C-Class', rating: 5, text: 'I found help nearby much faster than using traditional search. The map view is incredibly helpful.', date: '5 days ago', image: '/JBJ RIV 5.jpg' },
-  { name: 'Ryan K.', car: 'Peugeot 208', rating: 5, text: 'Much clearer than a mechanic\'s explanation. I finally feel like I actually understand what\'s happening with my car.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
+  { name: 'Jason M.', car: 'Toyota RAV4 • Sensor Fault', rating: 5, text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
+  { name: 'Jessica W.', car: 'BMW 3 Series • Warning Light', rating: 5, text: 'Carx.ai helped me understand the warning light in seconds and showed me the right next step without confusing jargon.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
+  { name: 'Sarah J.', car: 'VW Golf • Overheating', rating: 5, text: 'My temperature gauge spiked. The AI told me exactly what to check safely and helped me find a nearby tow truck immediately. A total lifesaver.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
+  { name: 'Michael B.', car: 'Audi A3 • No-Start Issue', rating: 5, text: 'Simple, clear, and actually useful. My car wouldn\'t turn over, and the breakdown analysis pointed right to the battery instead of the starter.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
+  { name: 'Robert T.', car: 'Mercedes C-Class • Stranded', rating: 5, text: 'I broke down at night and needed visibility fast. The nearby help map found an open mechanic and towing option much faster than standard searching.', date: '5 days ago', image: '/JBJ RIV 5.jpg' },
+  { name: 'Ryan K.', car: 'Peugeot 208 • Strange Noise', rating: 5, text: 'I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
 ]
 
 const steps = [
@@ -186,257 +186,133 @@ export default function Landing() {
         </AnimatePresence>
 
         {/* Hero Section */}
-        <section className="relative min-h-[85vh] flex items-center px-6 pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-20 overflow-hidden">
-          <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
-            {/* Left Column: Content */}
-            <div className="text-left">
-              {/* Hero Badge */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border border-navy/10 bg-navy/5 backdrop-blur-md"
-              >
-                <div className="w-2 h-2 rounded-full bg-navy animate-pulse" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">All-in-one car assistance</span>
-              </motion.div>
+        <section className="relative min-h-[95vh] flex flex-col items-center justify-center px-6 pt-[calc(8rem_+_env(safe-area-inset-top))] pb-32 overflow-hidden bg-white dark:bg-surface">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0070E0 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          
+          <div className="max-w-4xl mx-auto w-full relative z-10 text-center">
+            {/* Hero Badge */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border border-navy/10 bg-navy/5 backdrop-blur-md"
+            >
+              <div className="w-2 h-2 rounded-full bg-navy animate-pulse" />
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">All-in-one car assistance</span>
+            </motion.div>
 
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="font-display font-bold text-5xl md:text-7xl leading-[1.1] mb-8 text-on-surface tracking-tight"
-              >
-                Car trouble? <br />
-                <span className="text-navy">Find clarity fast.</span>
-              </motion.h1>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="font-display font-bold text-5xl md:text-8xl leading-[1.05] mb-8 text-on-surface tracking-tight"
+            >
+              Car trouble? <br />
+              <span className="text-navy">Find clarity fast.</span>
+            </motion.h1>
 
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-muted text-lg md:text-xl mb-12 max-w-xl font-medium leading-relaxed"
-              >
-                Get instant AI diagnosis, clear step-by-step guidance, and reliable nearby provider discovery in one smart platform.
-              </motion.p>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-muted text-lg md:text-2xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed"
+            >
+              Get instant AI diagnosis, clear step-by-step guidance, and reliable nearby provider discovery in one smart platform.
+            </motion.p>
 
-              {/* Service Pillar Cards */}
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="grid grid-cols-3 gap-3 mb-10 sm:mb-12"
-              >
-                {[
-                  {
-                    icon: Bot,
-                    title: 'AI Diagnosis',
-                    desc: 'Instant digital reports from a voice or photo.',
-                    tag: 'AI-Powered',
-                    accent: '#0070E0',
-                    halo: 'rgba(0,112,224,0.22)',
-                    bg: 'rgba(0,112,224,0.05)',
-                    tagBg: 'rgba(0,112,224,0.08)',
-                    tagBorder: 'rgba(0,112,224,0.2)',
-                    destination: '/dashboard/ai-mechanic',
-                  },
-                  {
-                    icon: Users,
-                    title: 'Clear Next Steps',
-                    desc: 'Understand the issue and explore trusted local options.',
-                    tag: 'Discovery',
-                    accent: '#0891b2',
-                    halo: 'rgba(8,145,178,0.22)',
-                    bg: 'rgba(8,145,178,0.05)',
-                    tagBg: 'rgba(8,145,178,0.08)',
-                    tagBorder: 'rgba(8,145,178,0.2)',
-                    destination: '/dashboard/mechanic',
-                  },
-                  {
-                    icon: Truck,
-                    title: 'Towing Options',
-                    desc: 'Discover nearby towing services when you need visibility.',
-                    tag: 'Visibility',
-                    accent: '#ea580c',
-                    halo: 'rgba(234,88,12,0.22)',
-                    bg: 'rgba(234,88,12,0.05)',
-                    tagBg: 'rgba(234,88,12,0.08)',
-                    tagBorder: 'rgba(234,88,12,0.2)',
-                    destination: '/dashboard/towing',
-                  },
-                ].map((sol, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                    onClick={() => navigate(user ? sol.destination : '/auth')}
-                    className="relative flex flex-col items-start overflow-hidden rounded-[20px] sm:rounded-[26px] bg-surface cursor-pointer group active:brightness-95"
-                    style={{
-                      border: `1.5px solid ${sol.accent}22`,
-                      boxShadow: `0 4px 20px ${sol.halo}`,
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.boxShadow = `0 12px 40px ${sol.halo}, 0 0 0 2px ${sol.accent}40`
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.boxShadow = `0 4px 20px ${sol.halo}`
-                    }}
-                  >
-                    {/* Top Accent Bar */}
-                    <div
-                      className="w-full h-[4px] shrink-0"
-                      style={{ background: `linear-gradient(90deg, ${sol.accent}, ${sol.accent}33)` }}
-                    />
-
-                    {/* Card Body */}
-                    <div className="flex flex-col items-start gap-3 sm:gap-4 p-3 sm:p-5">
-                      {/* Icon Orb */}
-                      <div className="relative mt-1">
-                        {/* Halo ring */}
-                        <div
-                          className="absolute inset-0 rounded-full blur-[14px] scale-150 opacity-60"
-                          style={{ background: sol.halo }}
-                        />
-                        <div
-                          className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center"
-                          style={{
-                            background: `radial-gradient(circle at 30% 30%, ${sol.accent}28, ${sol.bg})`,
-                            border: `1.5px solid ${sol.accent}30`,
-                            boxShadow: `0 4px 16px ${sol.halo}, inset 0 1px 0 rgba(255,255,255,0.5)`,
-                          }}
-                        >
-                          <sol.icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sol.accent }} strokeWidth={1.75} />
-                        </div>
-                      </div>
-
-                      {/* Text */}
-                      <div>
-                        <div
-                          className="font-display font-black text-xs sm:text-base leading-tight tracking-tight text-on-surface mb-1"
-                        >
-                          {sol.title}
-                        </div>
-                        <p className="text-[9px] sm:text-[11px] text-muted font-medium leading-snug hidden sm:block">
-                          {sol.desc}
-                        </p>
-                      </div>
-
-                      {/* Capability Tag */}
-                      <div
-                        className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest"
-                        style={{
-                          background: sol.tagBg,
-                          border: `1px solid ${sol.tagBorder}`,
-                          color: sol.accent,
-                        }}
-                      >
-                        <div
-                          className="w-1 h-1 rounded-full animate-pulse"
-                          style={{ background: sol.accent }}
-                        />
-                        {sol.tag}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex flex-col sm:flex-row items-center gap-5"
-              >
-                <button 
-                  onClick={() => navigate('/auth?mode=register')} 
-                  className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_40px_rgba(0,112,224,0.25)] hover:translate-y-[-4px] hover:brightness-110 transition-all"
+            {/* Service Pillar Cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12"
+            >
+              {[
+                {
+                  icon: Bot,
+                  title: 'AI Diagnosis',
+                  desc: 'Instant digital reports from a voice or photo.',
+                  tag: 'AI-Powered',
+                  accent: '#0070E0',
+                  halo: 'rgba(0,112,224,0.22)',
+                  destination: '/dashboard/ai-mechanic',
+                },
+                {
+                  icon: Users,
+                  title: 'Clear Next Steps',
+                  desc: 'Understand the issue and explore local options.',
+                  tag: 'Discovery',
+                  accent: '#005BB5',
+                  halo: 'rgba(0,91,181,0.22)',
+                  destination: '/dashboard/mechanic',
+                },
+                {
+                  icon: Truck,
+                  title: 'Towing Options',
+                  desc: 'Discover nearby towing services when you need visibility.',
+                  tag: 'Visibility',
+                  accent: '#0070E0',
+                  halo: 'rgba(0,112,224,0.22)',
+                  destination: '/dashboard/towing',
+                },
+              ].map((sol, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                  onClick={() => navigate(user ? sol.destination : '/auth')}
+                  className="relative flex flex-col items-center p-6 rounded-[28px] bg-white border border-overlay shadow-sm cursor-pointer group hover:shadow-xl hover:border-navy/20 transition-all"
                 >
-                  Start 3 Days Free
-                </button>
-                <button 
-                  onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
-                  className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
-                >
-                  View Pricing
-                </button>
-              </motion.div>
-
-              <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center sm:justify-start gap-y-6 sm:gap-x-12 mt-8 py-6 border-t border-navy/5">
-                {['Diagnose with AI', 'Understand urgency', 'Discover providers'].map((point, i) => (
-                  <div 
-                    key={i} 
-                    className={`flex items-center justify-center sm:justify-start gap-2 ${i === 2 ? 'col-span-2' : ''}`}
-                  >
-                    <Check className="w-3 h-3 text-navy/60" strokeWidth={3} />
-                    <span className="text-[9px] font-bold text-muted uppercase tracking-[0.15em] whitespace-nowrap">
-                      {point}
-                    </span>
+                  <div className="w-14 h-14 rounded-2xl bg-navy/5 flex items-center justify-center text-navy mb-4 group-hover:bg-navy group-hover:text-white transition-all">
+                    <sol.icon className="w-6 h-6" />
                   </div>
-                ))}
-              </div>
+                  <h3 className="font-display font-black text-lg mb-1">{sol.title}</h3>
+                  <p className="text-xs text-muted font-medium mb-4">{sol.desc}</p>
+                  <div className="px-2.5 py-1 rounded-full bg-navy/5 text-navy text-[9px] font-black uppercase tracking-widest border border-navy/10">
+                    {sol.tag}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-5"
+            >
+              <button 
+                onClick={() => navigate('/auth?mode=register')} 
+                className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_40px_rgba(0,112,224,0.25)] hover:translate-y-[-4px] hover:brightness-110 transition-all"
+              >
+                Start 3 Days Free
+              </button>
+              <button 
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} 
+                className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
+              >
+                How it Works
+              </button>
+            </motion.div>
+
+            <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-x-12 mt-12 py-6 border-t border-navy/5">
+              {['Diagnose with AI', 'Understand urgency', 'Discover providers'].map((point, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Check className="w-3 h-3 text-navy/60" strokeWidth={3} />
+                  <span className="text-[9px] font-bold text-muted uppercase tracking-[0.15em] whitespace-nowrap">
+                    {point}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            {/* Right Column: Visual Container (Ready for custom hero image) */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="relative group lg:h-full flex items-center justify-center lg:justify-end"
-            >
-              <div className="relative w-full aspect-square md:aspect-video lg:aspect-[4/5] max-w-xl rounded-[40px] bg-surface-low dark:bg-surface-high/40 border border-overlay shadow-2xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-700">
-                {/* Custom Hero Image Background */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 group-hover:scale-105"
-                  style={{ backgroundImage: "url('/section-bg1.jpg')" }}
-                />
-                
-                {/* Clearer, sharper overlay that keeps the image bright but maintains legible contrast for floating cards */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900/10 pointer-events-none" />
-                <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] pointer-events-none" />
-                <div className="absolute inset-0 ring-1 ring-inset ring-overlay rounded-[40px] pointer-events-none" />
-
-                {/* Floating UI Elements (Premium Micro-Interactions) */}
-                <motion.div 
-                  className="absolute top-4 left-4 sm:top-8 sm:left-8 p-4 sm:p-5 rounded-[24px] bg-surface/95 dark:bg-surface-high backdrop-blur-2xl border border-overlay shadow-xl flex items-center gap-3 sm:gap-4 z-20"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
-                >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-sm z-10">
-                    <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
-                  </div>
-                  <div className="pr-2 sm:pr-4 relative z-10">
-                    <div className="text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest mb-0.5">AI Check</div>
-                    <div className="text-sm sm:text-base font-bold text-on-surface leading-tight">Vehicle Healthy</div>
-                  </div>
-                </motion.div>
-
-                <motion.div 
-                  className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 p-4 sm:p-5 rounded-[24px] bg-surface/95 dark:bg-surface-high backdrop-blur-2xl border border-overlay shadow-xl flex items-center gap-3 sm:gap-4 z-20"
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 1 }}
-                >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-2xl bg-navy/10 flex items-center justify-center border border-navy/20 shadow-sm z-10">
-                    <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-navy" />
-                  </div>
-                  <div className="pr-2 sm:pr-4 relative z-10">
-                    <div className="text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest mb-0.5">AI Mechanic</div>
-                    <div className="text-sm sm:text-base font-bold text-on-surface leading-tight">Towing Required</div>
-                  </div>
-                </motion.div>
-                
-                {/* Content Protection Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent pointer-events-none" />
-              </div>
-
-              {/* Background Glow */}
-              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-navy/[0.03] rounded-full blur-[120px] pointer-events-none" />
-            </motion.div>
+            {/* Background Glow */}
+            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160%] h-[160%] bg-navy/[0.05] rounded-full blur-[120px] pointer-events-none" />
           </div>
         </section>
 
         {/* Problem Section */}
-        <section id="problem" className="pt-12 pb-6 md:pt-20 md:pb-10 px-6">
+        <section id="problem" className="pt-12 pb-6 md:pt-20 md:pb-10 px-6 bg-[#F8FAFC] dark:bg-surface-low">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">The Problem</span>
@@ -464,7 +340,7 @@ export default function Landing() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" className="pt-6 pb-12 md:pt-10 md:pb-24 px-0 overflow-hidden">
+        <section id="how-it-works" className="pt-12 pb-12 md:pt-20 md:pb-24 px-0 overflow-hidden bg-white dark:bg-surface">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
@@ -563,47 +439,146 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        {/* Product Proof & Capabilities Section */}
+        <section className="py-16 md:py-32 px-6 overflow-hidden bg-slate-50 dark:bg-surface-high/20 border-y border-overlay">
+          {/* Extracted Centered Header */}
+          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Real world proof</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">See how carx.ai helps in a real situation</h2>
+            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto">A clear example of how AI diagnosis, urgency guidance, and next-step recommendations work together.</p>
+          </div>
+
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+            {/* Left Col: Text & Capabilities */}
+            <div className="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start">
+              
+              {/* Trust / Capability Metrics */}
+              <div className="w-full">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-navy mb-6">Built for real car problems</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                  {[
+                    { title: 'Warning lights guidance', icon: ShieldAlert },
+                    { title: 'No-start issue support', icon: Zap },
+                    { title: 'Smoke & overheating analysis', icon: Activity },
+                    { title: 'Nearby help discovery', icon: MapPin },
+                  ].map((capability, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-4 bg-surface rounded-2xl border border-[#0070E0]/20 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="w-10 h-10 rounded-xl bg-navy/5 flex items-center justify-center text-navy shrink-0 border border-navy/10">
+                        <capability.icon className="w-5 h-5 text-navy" strokeWidth={2} />
+                      </div>
+                      <span className="text-[13px] md:text-sm font-bold text-on-surface leading-snug">{capability.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Col: The Realistic AI Diagnosis Example Card */}
+            <div className="flex-1 w-full max-w-lg relative">
+              {/* Behind glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0070E0]/20 to-[#005BB5]/20 blur-[100px] scale-90 -z-10 rounded-full" />
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="bg-surface rounded-[32px] p-6 md:p-8 shadow-[0_24px_80px_rgba(0,112,224,0.12)] border border-overlay relative"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center border border-navy/20">
+                      <Bot className="w-5 h-5 text-navy" />
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted mb-[2px]">AI Mechanic</h4>
+                      <p className="font-bold text-on-surface text-sm leading-none">Diagnosis Complete</p>
+                    </div>
+                  </div>
+                  <div className="px-3 py-1.5 bg-[#0070E0]/10 text-[#0070E0] border border-[#0070E0]/30 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldAlert className="w-3 h-3" />
+                    High Urgency
+                  </div>
+                </div>
+
+                <div className="space-y-3 md:space-y-4">
+                  <div className="p-4 rounded-[20px] bg-surface-low border border-overlay/60">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Likely Issue</p>
+                    <p className="font-bold text-on-surface text-lg">Excessive exhaust smoke</p>
+                  </div>
+
+                  <div className="p-4 rounded-[20px] bg-[#005BB5]/5 border border-[#005BB5]/20">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#0070E0] mb-1">Driving Advice</p>
+                    <p className="font-bold text-[#005BB5] text-[15px]">Stop safely. Not recommended to continue driving.</p>
+                  </div>
+
+                  <div className="p-4 rounded-[20px] bg-surface-low border border-overlay/60">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Likely Cause</p>
+                    <p className="font-medium text-slate-600 text-sm">Possible oil burning or incomplete combustion.</p>
+                  </div>
+
+                  <div className="pt-4 mt-2 border-t border-overlay/50">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 text-center">Best Next Steps</p>
+                    <div className="flex flex-col gap-2.5">
+                       <button disabled className="w-full py-3.5 rounded-xl bg-navy text-white font-bold text-sm shadow-md shadow-navy/20 flex items-center justify-center gap-2 opacity-100 cursor-default">
+                         <Truck className="w-4 h-4" /> Towing recommended
+                       </button>
+                       <button disabled className="w-full py-3.5 rounded-xl bg-surface border border-overlay text-on-surface font-bold text-sm flex items-center justify-center gap-2 opacity-100 cursor-default">
+                         <Users className="w-4 h-4 text-muted" /> Find mechanic
+                       </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
         
         {/* Built Like a Mechanic Thinks — Trust Section */}
-        <section className="py-12 md:py-32 bg-white relative overflow-hidden">
+        <section className="py-12 md:py-32 bg-white dark:bg-surface relative overflow-hidden">
           {/* Subtle Background Pattern */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0E3882 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
           
+          {/* Centered Header */}
+          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md"
+            >
+              <ShieldCheck className="w-3 h-3 text-navy" />
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted diagnostic logic</span>
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface"
+            >
+              Built with the mindset of <br className="md:hidden" />
+              <span className="text-[#0070E0]">an experienced mechanic</span>
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6"
+            >
+              carx.ai was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step faster and with more confidence.
+            </motion.p>
+          </div>
+
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="grid lg:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
               
               {/* Left Column: Trust Value Propositions */}
               <div className="flex flex-col items-start text-left">
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="px-3 py-1.5 rounded-full mb-6 md:mb-8 border border-navy/10 bg-navy/5 backdrop-blur-md inline-flex items-center gap-2"
-                >
-                  <ShieldCheck className="w-3 h-3 text-navy" />
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-navy font-black">Trusted diagnostic logic</span>
-                </motion.div>
-
-                <motion.h2 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className="font-display font-black text-3xl md:text-5xl lg:text-6xl leading-[1.1] mb-6 md:mb-8 text-navy tracking-tight"
-                >
-                  Built with the mindset of <br />
-                  <span className="text-[#0070E0]">an experienced mechanic</span>
-                </motion.h2>
-
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="text-muted text-sm md:text-xl mb-8 md:mb-12 max-w-xl font-medium leading-relaxed"
-                >
-                  carx.ai was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step faster and with more confidence.
-                </motion.p>
 
                 {/* Trust Points */}
                 <div className="space-y-4 md:space-y-8 mb-8 md:mb-12">
@@ -655,10 +630,10 @@ export default function Landing() {
               </div>
 
               {/* Right Column: Premium Profile Card */}
-              <div className="relative">
+              <div className="relative mt-8 md:mt-0">
                 {/* Decorative Elements */}
-                <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#5DB0EE]/10 rounded-full blur-3xl opacity-60" />
-                <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-[#CDFF00]/10 rounded-full blur-3xl opacity-40" />
+                <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#0070E0]/10 rounded-full blur-3xl opacity-60" />
+                <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-[#005BB5]/10 rounded-full blur-3xl opacity-40" />
                 
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -672,7 +647,7 @@ export default function Landing() {
                   {/* Profile Header */}
                   <div className="flex flex-row items-center gap-4 md:gap-8 mb-4 md:mb-8 pb-4 md:pb-8 border-b border-navy/5">
                     <div className="relative shrink-0">
-                      <div className="absolute inset-0 bg-gradient-to-br from-navy to-cyan-light rounded-full blur-[10px] opacity-20" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-navy to-[#005BB5] rounded-full blur-[10px] opacity-20" />
                       <div className="w-16 h-16 md:w-32 md:h-32 rounded-full border-2 md:border-4 border-surface shadow-xl relative z-10 overflow-hidden ring-1 ring-navy/5">
                         <img 
                           src="/lukas_mechanic_avatar.png" 
@@ -732,14 +707,14 @@ export default function Landing() {
                 <motion.div 
                   animate={{ y: [0, -8, 0] }}
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  className="absolute -top-4 -left-4 md:-top-6 md:-left-6 px-3 py-2 md:p-4 rounded-xl md:rounded-2xl bg-navy shadow-xl shadow-navy/20 border-2 border-surface z-20 flex items-center gap-2 md:gap-3"
+                  className="absolute -top-4 -left-4 md:-top-6 md:-left-6 px-3 py-2 md:p-4 rounded-xl md:rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-200 border-2 border-surface z-20 flex items-center gap-2 md:gap-3"
                 >
-                  <div className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-emerald-400" />
+                  <div className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </div>
                   <div className="text-left">
                     <p className="text-white font-black text-[9px] md:text-[11px] leading-tight uppercase tracking-wider">Expert Verified</p>
-                    <p className="text-white/60 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Diagnostic Engine</p>
+                    <p className="text-white/60 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
                   </div>
                 </motion.div>
               </div>
@@ -800,7 +775,7 @@ export default function Landing() {
         </section>
 
         {/* Reviews Section */}
-        <section id="reviews" className="py-16 md:py-32 px-0 bg-[#f9fafc]">
+        <section id="reviews" className="py-16 md:py-32 px-0 bg-[#F8FAFC] dark:bg-surface-low border-t border-overlay">
           <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>

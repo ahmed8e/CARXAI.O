@@ -5,9 +5,9 @@
   --color-navy: #0070E0;
   --color-navy-dark: #005BB5;
   --color-navy-light: #E0EFFF;
-  --color-teal: #0B4E63;
-  --color-teal-dark: #083A4A;
-  --color-teal-light: #0D6080;
+  --color-teal: #0070E0;
+  --color-teal-dark: #005BB5;
+  --color-teal-light: #E0EFFF;
   --color-cyan: #0070E0;
   --color-cyan-light: #E0EFFF;
   --color-cyan-dim: #005BB5;
@@ -17,7 +17,7 @@
   --color-on-surface: #0F172A;
   --color-surface: #FFFFFF;
   --color-surface-low: #F8FAFC;
-  --color-surface-high: #F1F5F9;
+  --color-surface-high: #E0EFFF;
   --color-surface-highest: #E2E8F0;
   --color-surface-container: #FFFFFF;
 
@@ -28,8 +28,8 @@
   --radius-3xl: 1.5rem;
   --radius-4xl: 2rem;
 
-  --shadow-glow: 0 0 30px rgba(0, 112, 224, 0.15);
-  --shadow-glow-lg: 0 0 60px rgba(0, 112, 224, 0.2);
+  --shadow-glow: 0 0 30px rgba(0, 112, 224, 0.4);
+  --shadow-glow-lg: 0 0 60px rgba(0, 112, 224, 0.4);
   --shadow-card: 0 24px 80px rgba(15, 23, 42, 0.08);
   --shadow-ambient: 0 20px 40px rgba(15, 23, 42, 0.05);
 }
@@ -134,14 +134,14 @@
     font-size: 0.875rem;
     transition: all 0.2s;
     cursor: pointer;
-    border: 1px solid rgba(87, 214, 232, 0.3);
-    color: #57D6E8;
+    border: 1px solid rgba(0, 112, 224, 0.3);
+    color: #0070E0;
     background: transparent;
     text-decoration: none;
   }
   .btn-ghost:hover {
-    background: rgba(87, 214, 232, 0.08);
-    border-color: rgba(87, 214, 232, 0.6);
+    background: rgba(0, 112, 224, 0.08);
+    border-color: rgba(0, 112, 224, 0.6);
   }
 
   .card {
@@ -189,8 +189,8 @@
     color: #B8C6CC;
   }
   .input-field:focus {
-    border-color: rgba(87, 214, 232, 0.4);
-    box-shadow: 0 0 0 3px rgba(87, 214, 232, 0.08);
+    border-color: rgba(0, 112, 224, 0.4);
+    box-shadow: 0 0 0 3px rgba(0, 112, 224, 0.08);
   }
 
   .label-sm {
@@ -225,15 +225,15 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    background: rgba(13, 58, 82, 0.6);
-    border: 1px solid rgba(87, 214, 232, 0.15);
-    color: #B8C6CC;
+    background: rgba(0, 112, 224, 0.05);
+    border: 1px solid rgba(0, 112, 224, 0.15);
+    color: var(--color-on-surface);
     white-space: nowrap;
   }
   .chip:hover, .chip.active {
-    background: rgba(87, 214, 232, 0.12);
-    border-color: rgba(87, 214, 232, 0.4);
-    color: #57D6E8;
+    background: rgba(0, 112, 224, 0.12);
+    border-color: rgba(0, 112, 224, 0.4);
+    color: #0070E0;
   }
   .chip:disabled {
     opacity: 0.5;
@@ -251,14 +251,14 @@
 
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(135deg, #57D6E8, #8EF3FF);
+    background: linear-gradient(135deg, #0070E0, #005BB5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .glow {
-    box-shadow: 0 0 30px rgba(87, 214, 232, 0.25);
+    box-shadow: 0 0 30px rgba(0, 112, 224, 0.4);
   }
 
   .bg-mesh {
