@@ -608,13 +608,16 @@ ${diagnosticHistory}
           if (parsed?.possibleCauses && !parsed?.possible_causes) parsed.possible_causes = parsed.possibleCauses;
           if (parsed?.towRecommended !== undefined && parsed?.tow_recommended === undefined) parsed.tow_recommended = parsed.towRecommended;
 
-          const isExpertAnswer = parsed?.mode === 'expert_answer' || parsed?.mode === 'fast_answer';
-          const hasBaseFields = (parsed?.issue_title || parsed?.normalized_issue || parsed?.issueName) && parsed?.explanation;
-          const isFollowup = parsed?.needs_followup === true && (parsed?.followup_questions?.length > 0);
+          const isExpertAnswer = parsed?.mode === 'expert_answer' || parsed?.mode === 'fast_answer' || parsed?.mode === 'expert' || parsed?.mode === 'fast';
+          const hasBaseFields = !!(parsed?.issue_title || parsed?.normalized_issue || parsed?.issueName || parsed?.explanation || parsed?.title || parsed?.cause || parsed?.diagnosis);
+          const isFollowup = parsed?.needs_followup === true || (Array.isArray(parsed?.followup_questions) && parsed.followup_questions.length > 0);
 
           if (!isExpertAnswer) {
-            console.warn('[Carxai AI] Expert validation failed: Incorrect mode.', parsed?.mode);
-            throw new Error(`AI response invalid mode: ${parsed?.mode || 'undefined'}`);
+            // Be forgiving if it missed the exact mode explicitly but we matched other strong fields
+            if (!hasBaseFields && !isFollowup) {
+              console.warn('[Carxai AI] Expert validation failed: Incorrect mode.', parsed?.mode);
+              throw new Error(`AI response invalid mode: ${parsed?.mode || 'undefined'}`);
+            }
           }
 
           if (!hasBaseFields && !isFollowup) {
@@ -1033,7 +1036,110 @@ ${diagnosticHistory}
                       {msg.role === 'assistant' ? (
                         <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden assistant-card-bubble">
                           {msg.issueData && !msg.issueData.needs_followup ? (
-                            <div className="p-6 md:p-8 space-y-8 relative">
+                            msg.issueData.mode === 'fast_answer' ? (
+                              <div className="p-5 md:p-6 space-y-5 relative">
+                                {/* 1. Badge & Title */}
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="pr-2">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                      <Zap className="w-3.5 h-3.5 text-blue-500 fill-blue-500" />
+                                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">Fast Guidance</span>
+                                    </div>
+                                    <h3 className="text-[20px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                                  </div>
+                                </div>
+
+                                {/* 2. Structured Compact Data */}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Severity</p>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string).replace('bg-', 'bg-').replace('text-', '').replace('border-', '').split(' ')[0]}`} />
+                                      <p className="text-[12px] font-bold text-navy capitalize tracking-wide">{msg.issueData.severity || msg.issueData.urgencyLevel}</p>
+                                    </div>
+                                  </div>
+                                  <div className={`p-3.5 rounded-2xl border flex flex-col justify-center ${msg.issueData.can_drive ? 'bg-emerald-50/50 border-emerald-100/50' : 'bg-rose-50/50 border-rose-100/50'}`}>
+                                    <p className={`text-[9px] font-black uppercase tracking-widest mb-1.5 ${msg.issueData.can_drive ? 'text-emerald-600/50' : 'text-rose-600/50'}`}>Driveable?</p>
+                                    <div className="flex items-center gap-1.5">
+                                      {msg.issueData.can_drive ? <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> : <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />}
+                                      <p className={`text-[12px] font-bold tracking-wide ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                        {msg.issueData.can_drive ? 'Be cautious' : 'Stop safely'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* 3. Short Explanation */}
+                                <div className="px-1 py-1">
+                                  <p className="text-[14px] font-medium text-slate-600 leading-relaxed tracking-tight">
+                                    {msg.issueData.explanation}
+                                  </p>
+                                </div>
+
+                                {/* 4. Action Recommendation */}
+                                <div className="p-4.5 rounded-[20px] bg-gradient-to-br from-slate-50 to-white shadow-sm border border-slate-200/60">
+                                  <div className="flex items-center gap-2 mb-2 text-navy/40">
+                                    <Wrench className="w-3.5 h-3.5" />
+                                    <span className="text-[9px] font-black uppercase tracking-[0.15em]">Next Step</span>
+                                  </div>
+                                  <p className="text-[13px] font-bold text-navy leading-snug">
+                                    {msg.issueData.next_step}
+                                  </p>
+                                </div>
+
+                                {/* 5. Dynamic Smart Actions */}
+                                <div className="pt-2 flex flex-col gap-3">
+                                  {(() => {
+                                    const isEmergency = msg.issueData!.tow_recommended || msg.issueData!.can_drive === false || msg.issueData!.severity === 'high';
+                                    return (
+                                      <div className={`grid ${isEmergency ? 'grid-cols-1 gap-3' : 'grid-cols-2 gap-2.5'} w-full`}>
+                                        <motion.button
+                                          whileHover={{ y: -2, scale: 1.02 }}
+                                          whileTap={{ scale: 0.96 }}
+                                          onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                          className={`flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all ${
+                                            !isEmergency
+                                              ? 'bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1'
+                                              : 'bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2'
+                                          }`}
+                                        >
+                                          <MapPin className={`w-3.5 h-3.5 ${!isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
+                                          Find Mechanic
+                                        </motion.button>
+                                        <motion.button
+                                          whileHover={{ y: -2, scale: 1.02 }}
+                                          whileTap={{ scale: 0.96 }}
+                                          onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                          className={`flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all ${
+                                            isEmergency
+                                              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[11px] shadow-lg shadow-red-500/30 border border-white/20 order-1'
+                                              : 'bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2'
+                                          }`}
+                                        >
+                                          <ShieldAlert className={`w-3.5 h-3.5 ${isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
+                                          Towing
+                                        </motion.button>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+
+                                {/* 6. Upgrade / CTA */}
+                                <div className="pt-2 border-t border-slate-100 flex justify-center">
+                                  <button onClick={() => {
+                                      setResponseMode('expert_answer');
+                                      setTimeout(() => {
+                                        const prompt = 'I would like a deeper, expert-level diagnostic report on this.';
+                                        sendMessage(prompt, undefined, undefined, { previous_diagnosis: msg.issueData });
+                                      }, 50);
+                                  }} className="flex items-center gap-1.5 py-2 px-4 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0070E0] hover:bg-[#0070E0]/5 transition-colors">
+                                    <Activity className="w-3.5 h-3.5" />
+                                    Switch to Expert Answer
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="p-6 md:p-8 space-y-8 relative">
                               {/* 1. Header & Priority */}
                               <div className="flex items-start justify-between gap-4">
                                 <div className="pr-2">
@@ -1178,9 +1284,18 @@ ${diagnosticHistory}
                                 </div>
                               </div>
                             </div>
-                          ) : (
-                            <div className="px-6 py-4.5 text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble relative">
-                              {formatContent(msg.issueData?.followup_questions?.[0] || msg.content)}
+                          )
+                        ) : (
+                          <div className={`px-6 py-5 relative ${isAdvanced ? 'border border-[#0070E0]/10 bg-gradient-to-br from-[#0070E0]/5 to-white shadow-lg shadow-[#0070E0]/5 assistant-card-bubble' : 'text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble'}`}>
+                              {isAdvanced && (
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Activity className="w-4 h-4 text-[#0070E0]" />
+                                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0070E0]">Diagnostic Interrogation</span>
+                                </div>
+                              )}
+                              <p className={isAdvanced ? "text-[16px] font-medium text-slate-700 leading-relaxed tracking-tight" : ""}>
+                                {formatContent(msg.issueData?.followup_questions?.[0] || msg.content)}
+                              </p>
 
                               {/* Interactive Follow-up Chips for Advanced users */}
                               {msg.issueData?.needs_followup && (msg.issueData.followup_questions || []) && (
@@ -1196,7 +1311,7 @@ ${diagnosticHistory}
                                         selected_option: q,
                                         finalize: true
                                       })}
-                                      className="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-bold transition-all shadow-sm"
+                                      className={`px-4 py-2.5 rounded-2xl border transition-all shadow-sm ${isAdvanced ? 'bg-white border-[#0070E0]/20 text-[#0070E0] text-[13px] font-bold hover:shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700 text-[13px] font-bold'}`}
                                     >
                                       {q}
                                     </motion.button>
