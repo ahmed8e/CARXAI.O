@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
 import Pricing from '../components/Pricing'
 import ReviewsSlider from '../components/ReviewsSlider'
+import StoryModal from '../components/StoryModal'
 import { 
   Bot, 
   Users, 
@@ -13,32 +14,211 @@ import {
   CheckCircle2, 
   Zap,
   Clock,
-  Check,
-  X, 
-  Activity, 
-  Radar, 
-  ShieldAlert, 
-  Camera, 
-  DollarSign, 
-  LayoutDashboard, 
-  User, 
-  LogOut, 
-  MessageSquare, 
-  Cpu, 
-  MapPin,
-  ShieldCheck,
-  BadgeCheck
+  CheckCircle, Activity,
+  Aperture,
+  MapPin, Mic,
+  ImagePlus, ShieldAlert,
+  MessageSquare, Sparkles,
+  UserCircle, X, ChevronRight, 
+  DollarSign, LayoutDashboard, User, LogOut, Cpu, ShieldCheck, BadgeCheck, Send
 } from 'lucide-react'
 
+// ─────────────────────────────────────────────────────────────────────────────
+// IMMERSIVE SCROLL DEMO COMPONENTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CHAT_SEQUENCE = [
+  { 
+    id: 1, 
+    type: 'user', 
+    content: "My check engine light just came on and I hear a slight ticking noise.", 
+    timestamp: "10:12 AM" 
+  },
+  { 
+    id: 2, 
+    type: 'ai', 
+    sender: 'AI Mechanic',
+    content: "I can help with that. Does the ticking speed up when you accelerate?", 
+    timestamp: "10:12 AM" 
+  },
+  { 
+    id: 3, 
+    type: 'user', 
+    content: "Yes, it gets faster as I rev the engine.", 
+    timestamp: "10:13 AM" 
+  },
+  { 
+    id: 4, 
+    type: 'ai', 
+    sender: 'AI Mechanic',
+    content: "Got it. This often points to a valve train issue or low oil pressure. Please scan your dashboard now.", 
+    timestamp: "10:13 AM",
+    action: "Dashboard Scanned"
+  },
+  { 
+    id: 5, 
+    type: 'ai-card',
+    title: "Diagnostic Report",
+    severity: "Medium",
+    drivable: "Limited",
+    finding: "Low Oil Pressure / Valve Ticking",
+    advice: "Check oil levels immediately. Avoid high RPMs.",
+    timestamp: "10:14 AM"
+  }
+];
+
+const ScrollChatDemo = ({ progress }: { progress: any }) => {
+  // Map 0-1 progress to message indices
+  // Messages 1 & 2: ALWAYS visible on load (pre-loaded state - makes hero alive)
+  // Messages 3, 4 & card: Reveal progressively on scroll
+  const messageOpacity3 = useTransform(progress, [0.35, 0.5], [0, 1]);
+  const messageY3 = useTransform(progress, [0.35, 0.5], [16, 0]);
+  
+  const messageOpacity4 = useTransform(progress, [0.55, 0.7], [0, 1]);
+  const messageY4 = useTransform(progress, [0.55, 0.7], [16, 0]);
+  
+  const cardOpacity = useTransform(progress, [0.75, 0.9], [0, 1]);
+  const cardScale = useTransform(progress, [0.75, 0.9], [0.96, 1]);
+  
+  // Chat scroll starts when messages 3+ begin revealing
+  const chatScrollY = useTransform(progress, [0.45, 0.9], [0, -180]);
+
+  return (
+    <div className="relative w-full max-w-[270px] md:max-w-[380px] max-h-[430px] md:max-h-none aspect-[9/18.5] bg-white rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,112,224,0.15)] ring-1 ring-slate-200/60 overflow-hidden flex flex-col border-[8px] border-slate-50">
+      {/* App Header */}
+      <div className="px-6 py-4 flex items-center justify-between border-b border-slate-50 bg-white/90 backdrop-blur-xl z-20">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#0070E0] flex items-center justify-center text-white scale-90 shadow-sm">
+            <Zap size={15} fill="currentColor" />
+          </div>
+          <span className="font-display font-black text-base tracking-tighter text-[#0F172A]">car<span className="text-[#0070E0]">x</span>ai</span>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100/50">
+          <UserCircle className="w-4.5 h-4.5 text-slate-400" />
+        </div>
+      </div>
+
+      {/* Chat Messages Area */}
+      <div className="flex-1 overflow-hidden relative bg-white">
+        <motion.div 
+          style={{ y: chatScrollY }}
+          className="p-5 flex flex-col gap-5"
+        >
+          {/* Message 1: Always visible on load */}
+          <div className="flex flex-col items-end">
+            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tr-none bg-[#0070E0] text-white text-[12px] font-medium leading-relaxed shadow-sm">
+              {CHAT_SEQUENCE[0].content}
+            </div>
+            <span className="text-[8px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{CHAT_SEQUENCE[0].timestamp}</span>
+          </div>
+
+          {/* Message 2: Always visible on load */}
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-2 mb-1.5">
+               <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
+                 <Bot size={12} />
+               </div>
+               <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">AI Mechanic</span>
+            </div>
+            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 text-slate-700 text-[12px] font-medium leading-relaxed">
+              {CHAT_SEQUENCE[1].content}
+            </div>
+          </div>
+
+          {/* Typing indicator - visible between message 2 and scroll-triggered 3 */}
+          <motion.div
+            style={{ opacity: useTransform(progress, [0, 0.3], [1, 0]) }}
+            className="flex items-center gap-2"
+          >
+            <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
+              <Bot size={12} />
+            </div>
+            <div className="px-4 py-2.5 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </motion.div>
+
+          {/* Message 3 - Reveals on Scroll */}
+          <motion.div style={{ opacity: messageOpacity3, y: messageY3 }} className="flex flex-col items-end">
+            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tr-none bg-[#0070E0] text-white text-[12px] font-medium leading-relaxed shadow-sm">
+              {CHAT_SEQUENCE[2].content}
+            </div>
+            <span className="text-[8px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{CHAT_SEQUENCE[2].timestamp}</span>
+          </motion.div>
+
+          {/* Message 4 - Reveals on Scroll */}
+          <motion.div style={{ opacity: messageOpacity4, y: messageY4 }} className="flex flex-col items-start">
+            <div className="flex items-center gap-2 mb-1.5">
+               <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
+                 <Bot size={12} />
+               </div>
+               <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">AI Mechanic</span>
+            </div>
+            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 text-slate-700 text-[12px] font-medium leading-relaxed mb-4">
+              {CHAT_SEQUENCE[3].content}
+            </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
+               <CheckCircle size={12} />
+               <span className="text-[9px] font-bold uppercase tracking-widest">Dashboard Scanned</span>
+            </div>
+          </motion.div>
+
+          {/* Final Card - Reveals on Scroll */}
+          <motion.div 
+            style={{ opacity: cardOpacity, scale: cardScale }}
+            className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xl flex flex-col gap-4 relative overflow-hidden ring-1 ring-slate-100"
+          >
+            <div className="flex items-center justify-between mb-1">
+               <div className="flex items-center gap-2">
+                 <div className="w-1.5 h-1.5 rounded-full bg-[#0070E0] animate-pulse" />
+                 <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">Diagnostic Ready</span>
+               </div>
+               <div className="px-2 py-0.5 rounded-md bg-orange-50 text-orange-600 text-[8px] font-black uppercase tracking-wider border border-orange-100">
+                  {CHAT_SEQUENCE[4].severity} Priority
+               </div>
+            </div>
+            
+            <h4 className="font-display font-bold text-[14px] leading-tight text-slate-900">{CHAT_SEQUENCE[4].finding}</h4>
+
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-[10px] text-slate-600 font-medium leading-relaxed">
+               {CHAT_SEQUENCE[4].advice}
+            </div>
+
+            <button className="w-full py-2.5 rounded-xl bg-[#0070E0] text-white flex items-center justify-center gap-2 shadow-md shadow-blue-500/10 active:scale-95 transition-transform text-[10px] font-black uppercase tracking-widest">
+              <MapPin size={12} />
+              Find Provider
+            </button>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Input Bar */}
+      <div className="px-5 py-5 bg-white border-t border-slate-50 mt-auto">
+        <div className="h-11 w-full rounded-full bg-slate-50 border border-slate-100 flex items-center px-4 gap-3">
+          <Aperture size={14} className="text-slate-300" />
+          <span className="text-[10px] font-medium text-slate-400 flex-1">Ask anything...</span>
+          <div className="flex items-center gap-3">
+            <Mic size={14} className="text-slate-300" />
+            <div className="w-7 h-7 rounded-full bg-[#0070E0] flex items-center justify-center text-white scale-90">
+              <Send size={12} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const features = [
   { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
   { icon: Zap, title: 'Warning Light Help', desc: 'Understand dashboard alerts' },
   { icon: Users, title: 'Provider Discovery', desc: 'Discover trusted local options' },
   { icon: Truck, title: 'Towing Options', desc: 'Find nearby visibility options' },
-  { icon: Radar, title: 'Nearby Help Map', desc: 'Explore providers on a map' },
+  { icon: Aperture, title: 'Nearby Help Map', desc: 'Explore providers on a map' },
   { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s an emergency' },
-  { icon: Camera, title: 'Photo Analysis', desc: 'AI visual damage check' },
+  { icon: ImagePlus, title: 'Photo Analysis', desc: 'AI visual damage check' },
   { icon: CheckCircle2, title: 'Clear Guidance', desc: 'Step-by-step next steps' },
 ]
 
@@ -59,7 +239,7 @@ const steps = [
 ]
 
 export default function Landing() {
-  const { user, loading, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -69,27 +249,38 @@ export default function Landing() {
   }
 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
-
   const [activeIndex, setActiveIndex] = useState(0)
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [storyOpen, setStoryOpen] = useState(false)
+  const timerRef = useRef<any>(null)
 
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current)
-    if (isMobile) {
-      timerRef.current = setInterval(() => {
-        setActiveIndex((prev) => (prev + 1) % steps.length)
-      }, 5000)
-    }
+    timerRef.current = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % steps.length)
+    }, 5000)
   }
 
-  useEffect(() => {
-    // If user is logged in, redirect them to their last path or dashboard
-    if (!loading && user) {
-      const lastPath = localStorage.getItem('carxai.last_path') || '/dashboard'
-      navigate(lastPath, { replace: true })
-    }
-  }, [user, loading, navigate])
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end end"]
+  });
+
+  const scrollProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  // Natural Hero - Scroll-Driven Focus
+  // Initial state is a clean, composed layout (y:0, scale:1)
+  // Scroll drives the phone upward into a full-focus focal point
+  const textY = useTransform(scrollProgress, [0, 0.5], [0, -50]);
+  const initialFadeOut = useTransform(scrollProgress, [0, 0.4], [1, 0]);
+  const phoneRotate = useTransform(scrollProgress, [0, 0.5, 1], [0, -3, 0]);
+  const phoneScale = useTransform(scrollProgress, [0, 0.5], [1, 1.08]);
+  const phoneY = useTransform(scrollProgress, [0, 0.5, 0.95, 1], [0, -180, -185, -260]); 
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -185,129 +376,124 @@ export default function Landing() {
           )}
         </AnimatePresence>
 
-        {/* Hero Section */}
-        <section className="relative min-h-[95vh] flex flex-col items-center justify-center px-6 pt-[calc(8rem_+_env(safe-area-inset-top))] pb-32 overflow-hidden bg-white dark:bg-surface">
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0070E0 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          
-          <div className="max-w-4xl mx-auto w-full relative z-10 text-center">
-            {/* Hero Badge */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 border border-navy/10 bg-navy/5 backdrop-blur-md"
-            >
-              <div className="w-2 h-2 rounded-full bg-navy animate-pulse" />
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">All-in-one car assistance</span>
-            </motion.div>
-
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-display font-bold text-5xl md:text-8xl leading-[1.05] mb-8 text-on-surface tracking-tight"
-            >
-              Car trouble? <br />
-              <span className="text-navy">Find clarity fast.</span>
-            </motion.h1>
-
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-muted text-lg md:text-2xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed"
-            >
-              Get instant AI diagnosis, clear step-by-step guidance, and reliable nearby provider discovery in one smart platform.
-            </motion.p>
-
-            {/* Service Pillar Cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12"
-            >
-              {[
-                {
-                  icon: Bot,
-                  title: 'AI Diagnosis',
-                  desc: 'Instant digital reports from a voice or photo.',
-                  tag: 'AI-Powered',
-                  accent: '#0070E0',
-                  halo: 'rgba(0,112,224,0.22)',
-                  destination: '/dashboard/ai-mechanic',
-                },
-                {
-                  icon: Users,
-                  title: 'Clear Next Steps',
-                  desc: 'Understand the issue and explore local options.',
-                  tag: 'Discovery',
-                  accent: '#005BB5',
-                  halo: 'rgba(0,91,181,0.22)',
-                  destination: '/dashboard/mechanic',
-                },
-                {
-                  icon: Truck,
-                  title: 'Towing Options',
-                  desc: 'Discover nearby towing services when you need visibility.',
-                  tag: 'Visibility',
-                  accent: '#0070E0',
-                  halo: 'rgba(0,112,224,0.22)',
-                  destination: '/dashboard/towing',
-                },
-              ].map((sol, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                  onClick={() => navigate(user ? sol.destination : '/auth')}
-                  className="relative flex flex-col items-center p-6 rounded-[28px] bg-white border border-overlay shadow-sm cursor-pointer group hover:shadow-xl hover:border-navy/20 transition-all"
-                >
-                  <div className="w-14 h-14 rounded-2xl bg-navy/5 flex items-center justify-center text-navy mb-4 group-hover:bg-navy group-hover:text-white transition-all">
-                    <sol.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-display font-black text-lg mb-1">{sol.title}</h3>
-                  <p className="text-xs text-muted font-medium mb-4">{sol.desc}</p>
-                  <div className="px-2.5 py-1 rounded-full bg-navy/5 text-navy text-[9px] font-black uppercase tracking-widest border border-navy/10">
-                    {sol.tag}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-5"
-            >
-              <button 
-                onClick={() => navigate('/auth?mode=register')} 
-                className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_40px_rgba(0,112,224,0.25)] hover:translate-y-[-4px] hover:brightness-110 transition-all"
-              >
-                Start 3 Days Free
-              </button>
-              <button 
-                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} 
-                className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
-              >
-                How it Works
-              </button>
-            </motion.div>
-
-            <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-x-12 mt-12 py-6 border-t border-navy/5">
-              {['Diagnose with AI', 'Understand urgency', 'Discover providers'].map((point, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Check className="w-3 h-3 text-navy/60" strokeWidth={3} />
-                  <span className="text-[9px] font-bold text-muted uppercase tracking-[0.15em] whitespace-nowrap">
-                    {point}
-                  </span>
-                </div>
-              ))}
+        {/* Immersive Scroll Hero Section - Light SaaS Aesthetic */}
+        <section ref={heroRef} className="relative h-[160vh] bg-white">
+          <div className="sticky top-0 h-screen w-full flex items-start md:items-center justify-center px-6 overflow-hidden">
+            {/* Light SaaS Background Elements */}
+            <div className="absolute inset-0 z-0">
+               {/* Subtle Dot Grid */}
+               <div className="absolute inset-0 opacity-[0.4]" 
+                 style={{ 
+                   backgroundImage: 'radial-gradient(circle, #0070E0 0.5px, transparent 0.5px)', 
+                   backgroundSize: '32px 32px' 
+                 }} 
+               />
+               {/* Soft Blue Glows */}
+               <div className="absolute top-0 left-1/4 w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60" />
+               <div className="absolute bottom-0 right-1/4 w-[30%] h-[30%] bg-indigo-50 rounded-full blur-[100px] opacity-40" />
             </div>
 
-            {/* Background Glow */}
-            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160%] h-[160%] bg-navy/[0.05] rounded-full blur-[120px] pointer-events-none" />
+            <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
+              <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
+                
+                {/* Left Column: Fixed Headlines */}
+                <motion.div style={{ y: textY }} className="text-center lg:text-left">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ opacity: initialFadeOut }}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 border border-blue-100 bg-blue-50/50 backdrop-blur-sm"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#0070E0]" />
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Interactive Product Tour</span>
+                  </motion.div>
+
+                  <motion.h1 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ opacity: initialFadeOut }}
+                    transition={{ delay: 0.1 }}
+                    className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
+                  >
+                    Car trouble? <br />
+                    <span className="text-[#0070E0]">Find clarity fast.</span>
+                  </motion.h1>
+
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ opacity: initialFadeOut }}
+                    transition={{ delay: 0.2 }}
+                    className="text-slate-500 text-base md:text-xl lg:text-2xl mb-6 md:mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                  >
+                    Experience how CarxAI guides you from a warning light to a reliable fix, instantly. Scroll to see the demo.
+                  </motion.p>
+
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ opacity: initialFadeOut }}
+                    transition={{ delay: 0.3 }}
+                    className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 md:gap-4"
+                  >
+                    {/* Primary CTA — Premium Gradient */}
+                    <button 
+                      onClick={() => navigate('/auth?mode=register')} 
+                      className="relative w-full sm:w-auto overflow-hidden rounded-2xl group"
+                    >
+                      <div
+                        className="relative px-8 py-4 md:py-5 flex items-center justify-center gap-2.5 font-black text-[15px] text-white transition-all duration-300 group-hover:-translate-y-0.5"
+                        style={{
+                          background: 'linear-gradient(135deg, #0070E0 0%, #0050C4 100%)',
+                          boxShadow: '0 1px 0 0 rgba(255,255,255,0.15) inset, 0 20px 48px -8px rgba(0,112,224,0.45)',
+                        }}
+                      >
+                        {/* Shimmer line */}
+                        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                        Start 3 Days Free
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                      </div>
+                    </button>
+
+                    {/* Secondary CTA — Refined Glass */}
+                    <button 
+                      onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
+                      className="w-full sm:w-auto px-8 py-4 md:py-5 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-slate-600 font-bold text-[15px] hover:border-[#0070E0]/30 hover:text-[#0070E0] hover:bg-[#F0F7FF]/60 transition-all duration-300 shadow-sm hover:shadow-md"
+                    >
+                      View Pricing
+                    </button>
+                  </motion.div>
+                </motion.div>
+
+                {/* Right Column: Scroll-Synced Phone Demo */}
+                <div className="relative flex justify-center perspective-1000 -mt-2 md:mt-0">
+                  <motion.div 
+                    style={{ 
+                      rotateY: phoneRotate, 
+                      scale: phoneScale,
+                      y: phoneY 
+                    }}
+                    className="w-full flex justify-center"
+                  >
+                    <ScrollChatDemo progress={scrollProgress} />
+                  </motion.div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Scroll Indicator */}
+            <motion.div 
+              style={{ opacity: initialFadeOut }}
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            >
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Scroll for more</span>
+              <motion.div 
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-1 h-8 rounded-full bg-gradient-to-b from-[#0070E0] to-transparent"
+              />
+            </motion.div>
           </div>
         </section>
 
@@ -572,6 +758,20 @@ export default function Landing() {
             >
               carx.ai was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step faster and with more confidence.
             </motion.p>
+
+            {/* Story Trigger */}
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.35 }}
+              onClick={() => setStoryOpen(true)}
+              className="mt-8 group inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white border border-[#0070E0]/20 hover:border-[#0070E0]/50 hover:bg-[#F0F7FF] text-[#0070E0] font-bold text-sm shadow-sm hover:shadow-md transition-all"
+            >
+              <Zap size={14} className="text-[#0070E0] shrink-0" fill="currentColor" />
+              Why I built CarxAI
+              <ChevronRight size={14} className="text-[#0070E0]/60 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
           </div>
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -619,13 +819,22 @@ export default function Landing() {
                 </div>
 
                 <motion.button 
-                  whileHover={{ y: -4, scale: 1.02 }}
+                  whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => navigate('/auth')}
-                  className="px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 flex items-center gap-3"
+                  className="relative overflow-hidden rounded-2xl group w-full sm:w-auto"
                 >
-                  Ask Carx AI Now
-                  <Zap className="w-4 h-4 text-cyan-light" fill="currentColor" />
+                  <div
+                    className="relative px-10 py-5 flex items-center justify-center gap-3 font-black text-[15px] text-white transition-all duration-300"
+                    style={{
+                      background: 'linear-gradient(135deg, #0E3882 0%, #0050C4 60%, #0070E0 100%)',
+                      boxShadow: '0 1px 0 0 rgba(255,255,255,0.12) inset, 0 24px 56px -10px rgba(14,56,130,0.5)',
+                    }}
+                  >
+                    <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                    Ask Carx AI Now
+                    <Zap className="w-4 h-4 text-cyan-300 shrink-0" fill="currentColor" />
+                  </div>
                 </motion.button>
               </div>
 
@@ -636,68 +845,100 @@ export default function Landing() {
                 <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-[#005BB5]/10 rounded-full blur-3xl opacity-40" />
                 
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  initial={{ opacity: 0, scale: 0.92, y: 30 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="relative group p-5 md:p-10 rounded-[24px] md:rounded-[48px] bg-surface border border-navy/5 shadow-[0_40px_100px_-20px_rgba(0,112,224,0.12)] overflow-hidden"
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative group overflow-hidden"
+                  style={{
+                    borderRadius: '32px',
+                    background: 'linear-gradient(160deg, rgba(255,255,255,0.98) 0%, rgba(240,247,255,0.95) 100%)',
+                    border: '1px solid rgba(0,112,224,0.1)',
+                    boxShadow: '0 2px 0 0 rgba(255,255,255,0.9) inset, 0 40px 80px -20px rgba(0,80,196,0.14), 0 0 0 1px rgba(0,112,224,0.06)',
+                  }}
                 >
-                  {/* Subtle Grainy Overlay */}
-                   <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-                  
-                  {/* Profile Header */}
-                  <div className="flex flex-row items-center gap-4 md:gap-8 mb-4 md:mb-8 pb-4 md:pb-8 border-b border-navy/5">
-                    <div className="relative shrink-0">
-                      <div className="absolute inset-0 bg-gradient-to-br from-navy to-[#005BB5] rounded-full blur-[10px] opacity-20" />
-                      <div className="w-16 h-16 md:w-32 md:h-32 rounded-full border-2 md:border-4 border-surface shadow-xl relative z-10 overflow-hidden ring-1 ring-navy/5">
-                        <img 
-                          src="/lukas_mechanic_avatar.png" 
-                          alt="Lukas Schneider" 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 md:w-10 md:h-10 bg-navy rounded-full border-2 md:border-4 border-surface flex items-center justify-center shadow-lg z-20">
-                        <BadgeCheck className="w-3 h-3 md:w-5 md:h-5 text-white" />
-                      </div>
-                    </div>
- 
-                    <div className="text-left flex-1">
-                      <div className="inline-flex items-center gap-2 px-2 py-0.5 md:px-3 md:py-1 rounded-full bg-navy text-white text-[7px] md:text-[8px] font-black uppercase tracking-widest mb-1 shadow-sm">
-                        Lead Expert
-                      </div>
-                      <h3 className="text-xl md:text-3xl font-display font-black text-navy tracking-tight">Lukas Schneider</h3>
-                      <p className="text-muted font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs">Senior Diagnostic Specialist</p>
-                    </div>
-                  </div>
+                  {/* Top shimmer line */}
+                  <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[#0070E0]/25 to-transparent" />
 
-                  {/* Profile Metrics */}
-                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-8">
-                    <div className="p-3 md:p-5 rounded-xl md:rounded-3xl bg-navy/5 border border-navy/5">
-                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-muted font-black mb-0.5">Experience</p>
-                      <p className="text-base md:text-xl font-black text-navy">14+ Years</p>
-                    </div>
-                    <div className="p-3 md:p-5 rounded-xl md:rounded-3xl bg-navy/5 border border-navy/5">
-                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-muted font-black mb-0.5">Cases</p>
-                      <p className="text-base md:text-xl font-black text-navy">5,200+</p>
-                    </div>
-                  </div>
+                  <div className="p-6 md:p-10">
+                    {/* Profile Header */}
+                    <div className="flex flex-row items-center gap-4 md:gap-7 mb-5 md:mb-8 pb-5 md:pb-8 border-b border-[#0070E0]/8">
+                      <div className="relative shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0070E0] to-[#0050C4] rounded-full blur-[14px] opacity-25" />
+                        <div className="w-16 h-16 md:w-28 md:h-28 rounded-full border-[2.5px] md:border-[3px] border-white shadow-xl relative z-10 overflow-hidden"
+                          style={{ boxShadow: '0 0 0 3px rgba(0,112,224,0.1), 0 8px 24px rgba(0,80,196,0.2)' }}
+                        >
+                          <img 
+                            src="/lukas_mechanic_avatar.png" 
+                            alt="Lukas Schneider" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div
+                          className="absolute -bottom-1 -right-1 w-6 h-6 md:w-9 md:h-9 rounded-full border-2 md:border-[2.5px] border-white flex items-center justify-center shadow-lg z-20"
+                          style={{ background: 'linear-gradient(135deg, #0070E0, #0050C4)' }}
+                        >
+                          <BadgeCheck className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                        </div>
+                      </div>
 
-                  {/* Specialties */}
-                  <div className="space-y-4 md:space-y-6 text-left">
-                    <div>
-                      <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-slate-400 font-black mb-2 md:mb-4">Core Specialties</p>
-                      <div className="flex flex-wrap gap-2">
-                        {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
-                          <span key={idx} className="px-2.5 py-1 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-white border border-slate-100 text-[#0E3882] text-[10px] md:text-[12px] font-bold shadow-sm whitespace-nowrap inline-flex">
-                            {spec}
-                          </span>
-                        ))}
+                      <div className="text-left flex-1 min-w-0">
+                        <div
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.12em] mb-1.5 shadow-sm"
+                          style={{ background: 'linear-gradient(135deg, #0E3882, #0070E0)' }}
+                        >
+                          Lead Expert
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">Lukas Schneider</h3>
+                        <p className="text-[#0070E0] font-bold uppercase tracking-[0.12em] text-[9px] md:text-[10px]">Senior Diagnostic Specialist</p>
                       </div>
                     </div>
- 
-                    <div>
-                      <p className="text-slate-600 font-medium leading-relaxed italic text-[12px] md:text-[14px] max-w-sm">
+
+                    {/* Profile Metrics */}
+                    <div className="grid grid-cols-2 gap-3 mb-5 md:mb-7">
+                      {[{ label: 'Experience', value: '14+ Years' }, { label: 'Cases', value: '5,200+' }].map(({ label, value }) => (
+                        <div
+                          key={label}
+                          className="relative overflow-hidden p-3.5 md:p-5 rounded-2xl"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(0,112,224,0.05) 0%, rgba(0,80,196,0.08) 100%)',
+                            border: '1px solid rgba(0,112,224,0.1)',
+                          }}
+                        >
+                          <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-[#0070E0]/20 to-transparent" />
+                          <p className="text-[8px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400 font-black mb-1">{label}</p>
+                          <p className="text-lg md:text-xl font-black" style={{ color: '#0E3882' }}>{value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Specialties */}
+                    <div className="space-y-4 md:space-y-5 text-left">
+                      <div>
+                        <p className="text-[8px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400 font-black mb-2.5">Core Specialties</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1.5 rounded-xl text-[10px] md:text-[11px] font-bold whitespace-nowrap inline-flex"
+                              style={{
+                                background: 'rgba(0,112,224,0.06)',
+                                border: '1px solid rgba(0,112,224,0.15)',
+                                color: '#0E3882',
+                              }}
+                            >
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <blockquote
+                        className="pl-3 md:pl-4 text-[12px] md:text-[13px] text-slate-500 font-medium leading-relaxed italic"
+                        style={{ borderLeft: '2px solid rgba(0,112,224,0.2)' }}
+                      >
                         "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms."
-                      </p>
+                      </blockquote>
                     </div>
                   </div>
                 </motion.div>
@@ -707,14 +948,22 @@ export default function Landing() {
                 <motion.div 
                   animate={{ y: [0, -8, 0] }}
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  className="absolute -top-4 -left-4 md:-top-6 md:-left-6 px-3 py-2 md:p-4 rounded-xl md:rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-200 border-2 border-surface z-20 flex items-center gap-2 md:gap-3"
+                  className="absolute -top-4 -left-4 md:-top-5 md:-left-5 z-20"
                 >
-                  <div className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-white font-black text-[9px] md:text-[11px] leading-tight uppercase tracking-wider">Expert Verified</p>
-                    <p className="text-white/60 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
+                  <div
+                    className="px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-2.5 border border-white/20"
+                    style={{
+                      background: 'linear-gradient(135deg, #3B4FD8 0%, #5B21B6 100%)',
+                      boxShadow: '0 8px 24px rgba(91,33,182,0.35), 0 1px 0 rgba(255,255,255,0.15) inset',
+                    }}
+                  >
+                    <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-white font-black text-[8px] md:text-[10px] leading-tight uppercase tracking-wider">Expert Verified</p>
+                      <p className="text-white/55 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -924,6 +1173,13 @@ export default function Landing() {
           </div>
         </footer>
       </div>
+
+      {/* Premium Story Modal */}
+      <StoryModal
+        isOpen={storyOpen}
+        onClose={() => setStoryOpen(false)}
+        onCTAClick={() => navigate('/auth?mode=register')}
+      />
     </div>
   )
 }
