@@ -1,4 +1,4 @@
-import { Settings, Shield, Database, Bell } from 'lucide-react'
+import { Shield, Database, Bell } from 'lucide-react'
 
 export default function AdminSettings() {
   return (
