@@ -689,8 +689,13 @@ ${diagnosticHistory}
 
         // Final Expert Schema Validation (Strict 11-field)
         if (isAdvanced) {
+          // Normalize common LLM field hallucinations
+          if (parsed?.issue && !parsed?.issue_title) parsed.issue_title = parsed.issue;
+          if (parsed?.possibleCauses && !parsed?.possible_causes) parsed.possible_causes = parsed.possibleCauses;
+          if (parsed?.towRecommended !== undefined && parsed?.tow_recommended === undefined) parsed.tow_recommended = parsed.towRecommended;
+
           const isExpertAnswer = parsed?.mode === 'expert_answer' || parsed?.mode === 'fast_answer';
-          const hasBaseFields = (parsed?.issue_title || parsed?.normalized_issue) && parsed?.explanation;
+          const hasBaseFields = (parsed?.issue_title || parsed?.normalized_issue || parsed?.issueName) && parsed?.explanation;
           const isFollowup = parsed?.needs_followup === true && (parsed?.followup_questions?.length > 0);
 
           if (!isExpertAnswer) {
@@ -1015,9 +1020,9 @@ ${diagnosticHistory}
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                     <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center mb-4 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 relative z-10 shadow-sm border border-white/40 ${idx === 0 ? 'bg-gradient-to-tr from-amber-50 to-orange-50/50 text-amber-600' :
-                        idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
-                          idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
-                            'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
+                      idx === 1 ? 'bg-gradient-to-tr from-red-50 to-rose-50/50 text-red-600' :
+                        idx === 2 ? 'bg-gradient-to-tr from-blue-50 to-indigo-50/50 text-blue-600' :
+                          'bg-gradient-to-tr from-purple-50 to-fuchsia-50/50 text-purple-600'
                       }`}>
                       <chip.icon className="w-5 h-5 stroke-[2.5]" />
                     </div>
@@ -1157,13 +1162,13 @@ ${diagnosticHistory}
                               {/* 3. Safety Check - Integrated High-End Block */}
                               <div className="relative group">
                                 <div className={`p-5 rounded-3xl border transition-all duration-500 ${msg.issueData.can_drive
-                                    ? 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-50/50'
-                                    : 'bg-rose-50/30 border-rose-100/50 hover:bg-rose-50/50'
+                                  ? 'bg-emerald-50/30 border-emerald-100/50 hover:bg-emerald-50/50'
+                                  : 'bg-rose-50/30 border-rose-100/50 hover:bg-rose-50/50'
                                   }`}>
                                   <div className="flex items-center gap-4">
                                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${msg.issueData.can_drive
-                                        ? 'bg-white border-emerald-100 text-emerald-600'
-                                        : 'bg-white border-rose-100 text-rose-600'
+                                      ? 'bg-white border-emerald-100 text-emerald-600'
+                                      : 'bg-white border-rose-100 text-rose-600'
                                       }`}>
                                       {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                                     </div>
@@ -1214,26 +1219,42 @@ ${diagnosticHistory}
                                   <span className="font-display">Generate Detailed Report</span>
                                 </motion.button>
 
-                                <div className="grid grid-cols-2 gap-3 w-full">
-                                  <motion.button
-                                    whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
-                                    whileTap={{ scale: 0.96 }}
-                                    onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                    className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
-                                  >
-                                    <MapPin className="w-4 h-4 text-navy/40" />
-                                    Find Mechanic
-                                  </motion.button>
-                                  <motion.button
-                                    whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 1)", borderColor: "rgba(0, 112, 224, 0.2)" }}
-                                    whileTap={{ scale: 0.96 }}
-                                    onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                    className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] font-black uppercase tracking-wider transition-all shadow-sm shadow-slate-200/40"
-                                  >
-                                    <Zap className="w-4 h-4 text-navy/40" />
-                                    Towing
-                                  </motion.button>
-                                </div>
+                                {/* Dynamic Action Priority */}
+                                {(() => {
+                                  const isEmergency = msg.issueData!.tow_recommended || msg.issueData!.can_drive === false || msg.issueData!.severity === 'high';
+
+                                  return (
+                                    <div className={`grid ${isEmergency ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-3'} w-full`}>
+                                      {/* Secondary if Emergency, Primary if Not */}
+                                      <motion.button
+                                        whileHover={{ y: -2, scale: 1.02 }}
+                                        whileTap={{ scale: 0.96 }}
+                                        onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                        className={`flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all ${!isEmergency
+                                            ? 'bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1'
+                                            : 'bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2'
+                                          }`}
+                                      >
+                                        <MapPin className={`w-4 h-4 ${!isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
+                                        Find Mechanic
+                                      </motion.button>
+
+                                      {/* Primary if Emergency, Secondary if Not */}
+                                      <motion.button
+                                        whileHover={{ y: -2, scale: 1.02 }}
+                                        whileTap={{ scale: 0.96 }}
+                                        onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                        className={`flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all ${isEmergency
+                                            ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(239,68,68,0.4)] border border-white/20 order-1'
+                                            : 'bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2'
+                                          }`}
+                                      >
+                                        <Zap className={`w-4 h-4 ${isEmergency ? 'text-white/90' : 'text-navy/40'}`} />
+                                        Towing
+                                      </motion.button>
+                                    </div>
+                                  );
+                                })()}
 
                                 <div className="pt-6 flex justify-center">
                                   <ListenButton
@@ -1420,8 +1441,8 @@ ${diagnosticHistory}
                 <button
                   onClick={() => setResponseMode('fast_answer')}
                   className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'fast_answer'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-slate-400 hover:text-slate-600'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : 'text-slate-400 hover:text-slate-600'
                     }`}
                 >
                   Fast Answer
@@ -1429,8 +1450,8 @@ ${diagnosticHistory}
                 <button
                   onClick={() => setResponseMode('expert_answer')}
                   className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'expert_answer'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-slate-400 hover:text-slate-600'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : 'text-slate-400 hover:text-slate-600'
                     }`}
                 >
                   Expert Diagnosis
@@ -1556,10 +1577,10 @@ ${diagnosticHistory}
                     onClick={() => isListening ? toggleListening() : sendMessage(input)}
                     disabled={loading || (!input.trim() && !attachedImage && !isListening)}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${isListening
-                        ? 'bg-red-500 text-white shadow-xl shadow-red-500/20'
-                        : (input.trim() || attachedImage) && !loading
-                          ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
-                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      ? 'bg-red-500 text-white shadow-xl shadow-red-500/20'
+                      : (input.trim() || attachedImage) && !loading
+                        ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                       }`}
                     whileTap={{ scale: 0.9 }}
                   >
