@@ -98,13 +98,15 @@ JSON SCHEMA:
 {
   "mode": "fast_answer",
   "issue_title": string,
-  "explanation": string,
-  "severity": "low" | "medium" | "high" | "emergency",
+  "severity": "low" | "medium" | "high",
   "can_drive": boolean,
-  "next_step": string,
-  "needs_followup": false,
   "confidence": "medium" | "high",
-  "recommended_actions": string[]
+  "explanation": string,
+  "next_step": string,
+  "needs_followup": boolean,
+  "followup_questions": string[],
+  "recommended_checks": string[],
+  "tow_recommended": boolean
 }`;
 
   const EXPERT_ANSWER_PROMPT = `You are the EXPERT DIAGNOSTIC engine for carx.ai.
@@ -123,15 +125,14 @@ If input is vague, set needs_followup to true and provide 1-2 followup_questions
 JSON SCHEMA:
 {
   "mode": "expert_answer",
-  "needs_followup": boolean,
-  "followup_questions": string[],
-  "issue_title": string | null,
-  "severity": "low" | "medium" | "high" | null,
+  "issue_title": string,
+  "severity": "low" | "medium" | "high",
   "can_drive": boolean,
   "confidence": "low" | "medium" | "high",
   "explanation": string,
   "next_step": string,
-  "possible_causes": string[],
+  "needs_followup": boolean,
+  "followup_questions": string[],
   "recommended_checks": string[],
   "tow_recommended": boolean
 }`;
