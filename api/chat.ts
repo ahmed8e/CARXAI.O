@@ -95,8 +95,9 @@ Additional rules:
 Your job is to give a quick, high-value, practical answer.
 
 CRITICAL RULES:
-1. Keep the "explanation" extremely short (1-2 sentences maximum).
-2. DO NOT set "needs_followup" to true unless absolutely critical. Prefer giving your highest probability direct answer.
+1. You MUST return ONLY the JSON object defined below. Do NOT output raw text outside the JSON.
+2. Keep the "explanation" extremely short (1-2 sentences maximum).
+3. DO NOT set "needs_followup" to true unless absolutely critical. Prefer giving your highest probability direct answer.
 
 JSON SCHEMA:
 {

@@ -348,7 +348,7 @@ export interface DiagnosticResult {
   can_drive: boolean
   confidence?: 'low' | 'medium' | 'high'
   analysis_mode?: 'dashboard' | 'visual_issue' | 'symptom_based' | 'mixed' | 'general'
-  mode?: 'fast_answer' | 'expert_diagnosis'
+  mode?: 'fast_answer' | 'expert_answer'
   visible_area?: string
   issue_title?: string
   needs_more_input?: boolean

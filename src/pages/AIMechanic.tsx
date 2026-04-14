@@ -11,7 +11,7 @@ import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
-  Thermometer, ImagePlus, Lock
+  Thermometer, ImagePlus, Lock, ShieldAlert
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -1139,17 +1139,20 @@ ${diagnosticHistory}
                                 </div>
                               </div>
                             ) : (
-                              <div className="p-6 md:p-8 space-y-8 relative">
-                              {/* 1. Header & Priority */}
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="pr-2">
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/30 block mb-1">AI Diagnostic Analysis</span>
-                                  <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
-                                </div>
-                                <div className={`px-2.5 py-1 rounded-lg border font-black text-[9px] uppercase tracking-widest shrink-0 ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
-                                  {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
-                                </div>
-                              </div>
+                              <div className={`p-6 md:p-8 space-y-8 relative ${msg.issueData.mode === 'expert_answer' ? 'bg-gradient-to-br from-[#0070E0]/5 to-white border-t-4 border-[#0070E0]' : ''}`}>
+                               {/* 1. Header & Priority */}
+                               <div className="flex items-start justify-between gap-4">
+                                 <div className="pr-2">
+                                   <span className={`text-[10px] font-black uppercase tracking-[0.2em] block mb-2 ${msg.issueData.mode === 'expert_answer' ? 'text-[#0070E0] flex items-center gap-1.5' : 'text-navy/30'}`}>
+                                      {msg.issueData.mode === 'expert_answer' && <Activity className="w-3.5 h-3.5" />}
+                                      {msg.issueData.mode === 'expert_answer' ? 'Master Technician Analysis' : 'AI Diagnostic Analysis'}
+                                   </span>
+                                   <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                                 </div>
+                                 <div className={`px-2.5 py-1 rounded-lg border font-black text-[9px] uppercase tracking-widest shrink-0 ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}`}>
+                                   {getUrgencyBadge((msg.issueData.severity || msg.issueData.urgencyLevel) as string)}
+                                 </div>
+                               </div>
 
                               {/* 2. Dashboard Symbols & Text (Contextual) */}
                               {(msg.issueData.warning_light_name || msg.issueData.fault_message_text) && (
