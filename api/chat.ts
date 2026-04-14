@@ -154,7 +154,7 @@ JSON SCHEMA:
 
   // Force structured output globally since all prompts expect JSON
   openAiPayload.response_format = { type: "json_object" };
-  
+
   // Inject retry and followup contexts securely on backend
   let diagnosticContext = `\n\nGUARDRAILS:\n- RETURN ONLY VALID JSON.\n- You MUST include the exact "mode": "${modeString}" field in the root of your response.`;
   if (followup_context) {
@@ -178,38 +178,75 @@ JSON SCHEMA:
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(openAiPayload),
+      body: JSON.stringify({
+        ...openAiPayload,
+        stream: false, // force non-stream for stable JSON
+      }),
     });
 
+    const rawText = await response.text();
+
+    console.log('[API Chat] OpenAI status:', response.status);
+    console.log('[API Chat] Raw response preview:', rawText.slice(0, 1000));
+
     if (!response.ok) {
-      const error = await response.json();
-      console.error('[API Chat] OpenAI Error:', error);
-      return res.status(response.status).json(error);
+      let parsedError: any = null;
+      try {
+        parsedError = JSON.parse(rawText);
+      } catch {
+        parsedError = { error: rawText || 'Unknown OpenAI error' };
+      }
+
+      console.error('[API Chat] OpenAI Error:', parsedError);
+      return res.status(response.status).json(parsedError);
     }
 
-    if (openAiPayload.stream) {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      
-      if (response.body) {
-        const reader = response.body.getReader();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          res.write(value);
-        }
-      }
-      res.end();
-    } else {
-      const data = await response.json();
-      res.status(200).json(data);
+    let data: any;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr: any) {
+      console.error('[API Chat] Failed to parse OpenAI raw response:', parseErr?.message || parseErr);
+
+      return res.status(502).json({
+        error: 'Invalid JSON returned from OpenAI proxy layer',
+        details: rawText.slice(0, 2000),
+      });
     }
+
+    // Extract final assistant content safely
+    const finalContent = data?.choices?.[0]?.message?.content;
+
+    if (!finalContent) {
+      console.error('[API Chat] Missing assistant content:', data);
+      return res.status(502).json({
+        error: 'Missing assistant content from OpenAI response',
+      });
+    }
+
+    // Make sure assistant content itself is valid JSON
+    let validatedContent: any;
+    try {
+      validatedContent = typeof finalContent === 'string'
+        ? JSON.parse(finalContent)
+        : finalContent;
+    } catch (contentErr: any) {
+      console.error('[API Chat] Assistant content is not valid JSON:', finalContent);
+
+      return res.status(502).json({
+        error: 'Assistant content was not valid JSON',
+        details: typeof finalContent === 'string' ? finalContent.slice(0, 2000) : finalContent,
+      });
+    }
+
+    return res.status(200).json({
+      content: validatedContent
+    });
   } catch (error: any) {
-    console.error('Proxy Error:', error);
+    console.error('[API Chat] Proxy Error:', error);
+
     if (!res.writableEnded) {
-      res.status(500).json({ 
-        error: error.message,
+      return res.status(500).json({
+        error: error.message || 'Unknown proxy error',
         details: 'Expert diagnostic engine encountered an internal issue.'
       });
     }
