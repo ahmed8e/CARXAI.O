@@ -338,6 +338,11 @@ export interface Message {
   issueData?: DiagnosticResult
 }
 
+export interface FollowupQuestion {
+  question: string;
+  options: string[];
+}
+
 export interface DiagnosticResult {
   // New Dashboard Analysis Fields
   dashboard_type?: 'warning_light' | 'text_message' | 'both' | 'unknown'
@@ -354,7 +359,7 @@ export interface DiagnosticResult {
   needs_more_input?: boolean
   needs_followup?: boolean
   followup_question?: string
-  followup_questions?: string[]
+  followup_questions?: (string | FollowupQuestion)[]
   options?: string[]
   recommended_actions?: string[]
   explanation: string

@@ -1404,35 +1404,50 @@ ${diagnosticHistory}
                                   <p className={isAdvanced ? "text-[16px] font-medium text-slate-700 leading-relaxed tracking-tight" : ""}>
                                     {formatContent(msg.issueData?.explanation || msg.content)}
                                   </p>
-
-                                  {msg.issueData?.followup_questions?.[0] && (
-                                    <p className="text-[14px] font-bold text-[#0070E0]">
-                                      {msg.issueData.followup_questions[0]}
-                                    </p>
-                                  )}
                                 </div>
 
-                                {/* Interactive Follow-up Chips for Advanced users */}
-                                {msg.issueData?.needs_followup && (msg.issueData.followup_questions || []) && (
-                                  <div className="mt-6 flex flex-wrap gap-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                    {(msg.issueData.followup_questions || []).map((q: string, idx: number) => (
-                                      <motion.button
-                                        key={idx}
-                                        whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => sendMessage(q, undefined, undefined, {
-                                          original_issue: messages.find(m => m.role === 'user')?.content,
-                                          previous_followup_question: msg.issueData?.followup_questions?.[0] || msg.content,
-                                          selected_option: q,
-                                          finalize: true
-                                        })}
-                                        className={`px-4 py-2.5 rounded-2xl border transition-all shadow-sm ${isAdvanced ? 'bg-white border-[#0070E0]/20 text-[#0070E0] text-[13px] font-bold hover:shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700 text-[13px] font-bold'}`}
-                                      >
-                                        {q}
-                                      </motion.button>
-                                    ))}
-                                  </div>
-                                )}
+                                  {/* Render Structured or Legacy Follow-ups */}
+                                  {(msg.issueData?.followup_questions || []).map((item: any, qIdx: number) => {
+                                    const isObj = typeof item === 'object' && item !== null && 'question' in item;
+                                    // If it's a legacy string array, we only render the first item as the question title conceptually if at all, but normally legacy just had chips.
+                                    // Let's render the question text if it's structured:
+                                    const questionText = isObj ? item.question : (qIdx === 0 ? item : null);
+                                    const optionsList = isObj ? (item.options || []) : (qIdx === 0 ? msg.issueData!.followup_questions : []);
+
+                                    if (!isObj && qIdx > 0) return null; // Only render legacy strings once grouping them
+
+                                    if (!questionText && optionsList.length === 0) return null;
+
+                                    return (
+                                      <div key={qIdx} className="mt-4">
+                                        {questionText && (
+                                          <p className="text-[14px] font-bold text-[#0070E0] mb-3">
+                                            {questionText}
+                                          </p>
+                                        )}
+                                        {optionsList.length > 0 && (
+                                          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                            {optionsList.map((opt: string, optIdx: number) => (
+                                              <motion.button
+                                                key={optIdx}
+                                                whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => sendMessage(opt, undefined, undefined, {
+                                                  original_issue: messages.find(m => m.role === 'user')?.content,
+                                                  previous_followup_question: questionText,
+                                                  selected_option: opt,
+                                                  finalize: true
+                                                })}
+                                                className={`px-4 py-3 rounded-2xl border transition-all shadow-sm w-full text-center ${isAdvanced ? 'bg-white border-[#0070E0]/20 text-[#0070E0] text-[13px] font-bold hover:shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700 text-[13px] font-bold'}`}
+                                              >
+                                                {opt}
+                                              </motion.button>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
                               </div>
                             )}
                           </div>
