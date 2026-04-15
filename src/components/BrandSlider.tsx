@@ -52,7 +52,7 @@ const BRANDS: Brand[] = [
   { id: 'citroen', label: 'Citroën',    path: siCitroen.path,    color: '#DA291C', scale: 1.0  },
 ]
 
-const BASE_SIZE = 34
+const BASE_SIZE = 36 // Slightly larger for better detail
 
 function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
   const size = Math.round(BASE_SIZE * scale)
@@ -63,7 +63,7 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
       aria-label={label}
       className="
         flex-shrink-0 flex items-center justify-center
-        opacity-[0.85] hover:opacity-100
+        opacity-100 md:opacity-[0.85] hover:opacity-100
         transition-all duration-500 ease-out
         cursor-default select-none
         hover:scale-110
@@ -77,6 +77,7 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
         width={size}
         height={size}
         aria-label={label}
+        className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.05)]" // Tiny shadow for sharpness on white
       >
         <path d={path} />
       </svg>
@@ -89,60 +90,48 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
 export function BrandSlider() {
   return (
     <section
-      className="relative w-full py-20 md:py-28 overflow-hidden"
+      className="relative w-full py-16 md:py-28 overflow-hidden"
       style={{
-        // Matches the "slate-50/60 backdrop-blur" sections in Landing.tsx
-        background: 'linear-gradient(180deg, rgba(248,250,252,0.7) 0%, rgba(255,255,255,0.9) 50%, rgba(248,250,252,0.7) 100%)',
+        background: 'linear-gradient(180deg, rgba(248,250,252,0.8) 0%, rgba(255,255,255,1) 50%, rgba(248,250,252,0.8) 100%)',
         borderTop: '1px solid rgba(226,232,240,0.8)',
         borderBottom: '1px solid rgba(226,232,240,0.8)',
       }}
     >
-      {/* ── Soft background glow — CarxAI blue, very subtle ── */}
+      {/* ── Soft background glow ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex items-center justify-center"
       >
         <div
-          className="w-[900px] h-[500px] rounded-full opacity-[0.045] blur-[80px]"
+          className="w-[900px] h-[500px] rounded-full opacity-[0.06] blur-[80px]"
           style={{ background: 'radial-gradient(ellipse at center, #0070E0, transparent 70%)' }}
         />
       </div>
 
-      {/* ── Optional faint blueprint dot grid — very light ── */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #0070E0 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-
       {/* ── Heading ── */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 mb-14 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 mb-12 md:mb-14 text-center">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Badge — identical style to Landing.tsx section badges */}
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-            style={{ background: 'rgba(0,112,224,0.06)', border: '1px solid rgba(0,112,224,0.12)' }}
+            style={{ background: 'rgba(0,112,224,0.08)', border: '1px solid rgba(0,112,224,0.15)' }}
           >
             <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">
               Trust &amp; Compatibility
             </span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#0F172A] mb-5 tracking-tight">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-[#0F172A] mb-5 tracking-tight">
             Compatible with the vehicles{' '}
             <br className="hidden md:block" />
             <span className="text-[#0070E0]">people rely&nbsp;on</span>
           </h2>
 
-          <p className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#64748B] text-base md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
             CarxAI delivers expert diagnostics across every major automotive
             brand — from everyday city cars to premium series.
           </p>
@@ -157,16 +146,15 @@ export function BrandSlider() {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="relative w-full z-10"
       >
-        {/* Inner separator lines — hairline, matching Landing card borders */}
-        <div style={{ borderTop: '1px solid rgba(0,112,224,0.07)' }} />
+        <div style={{ borderTop: '1px solid rgba(0,112,224,0.1)' }} />
 
         <div
-          className="relative py-6 md:py-8"
-          style={{ background: 'linear-gradient(90deg, rgba(248,250,252,0.9), rgba(255,255,255,0.95) 30%, rgba(255,255,255,0.95) 70%, rgba(248,250,252,0.9))' }}
+          className="relative py-7 md:py-8"
+          style={{ background: 'rgba(255,255,255,0.7)' }}
         >
           <InfiniteSlider
-            gap={48}
-            duration={50}
+            gap={40}
+            duration={45}
             durationOnHover={180}
             className="flex items-center"
           >
@@ -175,20 +163,20 @@ export function BrandSlider() {
             ))}
           </InfiniteSlider>
 
-          {/* Fade edges — significantly narrower on mobile to preserve central clarity */}
+          {/* Fade edges — tightened significantly for mobile legibility */}
           <ProgressiveBlur
-            blurIntensity={1.4}
-            className="pointer-events-none absolute top-0 left-0 h-full w-[40px] md:w-[180px] z-10"
+            blurIntensity={1.2}
+            className="pointer-events-none absolute top-0 left-0 h-full w-[32px] md:w-[180px] z-10"
             direction="left"
           />
           <ProgressiveBlur
-            blurIntensity={1.4}
-            className="pointer-events-none absolute top-0 right-0 h-full w-[40px] md:w-[180px] z-10"
+            blurIntensity={1.2}
+            className="pointer-events-none absolute top-0 right-0 h-full w-[32px] md:w-[180px] z-10"
             direction="right"
           />
         </div>
 
-        <div style={{ borderBottom: '1px solid rgba(0,112,224,0.07)' }} />
+        <div style={{ borderBottom: '1px solid rgba(0,112,224,0.1)' }} />
       </motion.div>
     </section>
   )

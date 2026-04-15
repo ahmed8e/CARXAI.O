@@ -65,6 +65,24 @@
     --sparkles-color: #ffffff;
   }
 
+  :root {
+    --component-inactive-color: var(--color-muted);
+    --component-bg: var(--color-surface);
+    --component-shadow: var(--color-overlay);
+    --component-active-bg: rgba(0, 112, 224, 0.05);
+    --component-line-inactive-color: var(--color-overlay);
+    --component-active-color-default: var(--color-navy);
+  }
+
+  .dark {
+    --component-inactive-color: var(--color-muted);
+    --component-bg: var(--color-surface);
+    --component-shadow: var(--color-overlay);
+    --component-active-bg: rgba(0, 112, 224, 0.1);
+    --component-line-inactive-color: var(--color-overlay);
+    --component-active-color-default: #FFFFFF;
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -257,6 +275,59 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* ── Modern Bottom Menu ─────────────────────────────────────────── */
+  .menu {
+    @apply fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around;
+    @apply mx-4 mb-[calc(1.25rem_+_env(safe-area-inset-bottom))] p-2;
+    @apply bg-surface/80 backdrop-blur-xl border border-overlay rounded-[24px] shadow-2xl;
+    height: 4.5rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .menu__item {
+    @apply relative flex flex-col items-center justify-center flex-1 h-full gap-1;
+    @apply transition-all duration-300 outline-none;
+    color: var(--component-inactive-color);
+  }
+
+  .menu__item.active {
+    color: var(--component-active-color);
+  }
+
+  .menu__icon {
+    @apply relative z-10 flex items-center justify-center transition-transform duration-300;
+  }
+
+  .menu__item.active .menu__icon {
+    @apply -translate-y-1;
+    animation: iconBounce 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .menu__item .icon {
+    @apply w-5 h-5 transition-all duration-300;
+  }
+
+  .menu__text {
+    @apply text-[10px] font-black uppercase tracking-widest opacity-0 transform translate-y-2;
+    @apply transition-all duration-300 pointer-events-none absolute bottom-1;
+  }
+
+  .menu__text.active {
+    @apply opacity-100 translate-y-0 text-navy;
+  }
+
+  /* Sliding line indicator managed by component ref but styled here */
+  .menu__item::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full;
+    @apply bg-navy opacity-0 transition-all duration-300;
+    width: var(--lineWidth, 0);
+  }
+
+  .menu__item.active::after {
+    @apply opacity-100 bottom-0;
+  }
 }
 
 @layer utilities {
@@ -351,6 +422,14 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  20% { transform: translateY(-4px); }
+  40% { transform: translateY(0); }
+  60% { transform: translateY(-2px); }
+  80% { transform: translateY(0); }
 }
 
 /* Scrollbar */

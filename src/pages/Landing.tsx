@@ -566,9 +566,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Brand Compatibility Slider */}
-        <BrandSlider />
-
         {/* Problem Section */}
         <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
@@ -1071,6 +1068,9 @@ export default function Landing() {
             </motion.div>
           </div>
         </section>
+
+        {/* Brand Compatibility Slider */}
+        <BrandSlider />
 
         {/* Features */}
         <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
