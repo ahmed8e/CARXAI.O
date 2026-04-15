@@ -519,6 +519,45 @@ export default function AIMechanic() {
     return { kind: 'soft_fallback', data: buildSoftFallback(imageUrl) }
   }
 
+  // ── Vague First-Message Detection Layer ──
+  // Only fires on the very first user message when it's short, vague,
+  // has no image, and contains no specific symptom/danger keywords.
+  // Gives a calm, low-stress response with 1 narrowing question,
+  // then lets normal diagnostic logic handle everything after.
+  const isVagueFirstMessage = (text: string, hasImage: boolean): boolean => {
+    // Only applies when there are zero prior messages in this session
+    if (messages.length > 0) return false
+    if (hasImage) return false
+
+    const trimmed = text.trim().toLowerCase()
+    if (trimmed.length === 0) return false
+
+    // If message has substantial detail (>80 chars), not vague
+    if (trimmed.length > 80) return false
+
+    // Specific symptom / danger keywords → NOT vague, proceed to full diagnosis
+    const specificKeywords = [
+      'noise', 'grinding', 'squeak', 'rattle', 'vibrat',
+      'smoke', 'burning', 'smell', 'steam', 'overheat',
+      'leak', 'fluid', 'drip', 'oil',
+      'light', 'warning', 'check engine', 'dashboard', 'abs', 'airbag',
+      'brake', 'steering', 'suspension', 'tire', 'flat',
+      'battery', 'won\'t start', 'dead', 'stall', 'misfire',
+      'accident', 'crash', 'damage', 'dent',
+      'transmission', 'clutch', 'gear', 'shift',
+      'error', 'code', 'p0', 'dtc', 'obd',
+      'ac', 'heat', 'coolant', 'radiator', 'fan',
+      'exhaust', 'catalytic', 'turbo', 'boost',
+      'pull', 'drift', 'alignment', 'wobble',
+    ]
+
+    for (const kw of specificKeywords) {
+      if (trimmed.includes(kw)) return false
+    }
+
+    return true
+  }
+
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string, customContext?: any) => {
     const currentlyGated = await fetchUsageCount()
     if (currentlyGated || isLimitReached) {
@@ -529,6 +568,28 @@ export default function AIMechanic() {
     const finalImageUrl = imageUrl || attachedImage || undefined
 
     if (!content.trim() && !finalImageUrl) return
+
+    // ── Vague First-Message Intercept ──
+    // Calm, reassuring local response — no API call, no usage counted.
+    if (isVagueFirstMessage(content, !!finalImageUrl) && !chipLabel) {
+      stop()
+      setInput('')
+      setAttachedImage(null)
+      addMessage({ role: 'user', content, imageUrl: finalImageUrl })
+      // Small delay to feel natural
+      setLoading(true)
+      setTimeout(() => {
+        const vagueResponse: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `No worries — I'm here to help. Let's figure this out together.\n\nTo point you in the right direction, could you tell me:\n**What's the main thing your car is doing (or not doing) right now?**\n\nFor example: a strange noise, a warning light, trouble starting, or something you noticed while driving.`,
+          timestamp: new Date(),
+        }
+        setMessages(prev => [...prev, vagueResponse])
+        setLoading(false)
+      }, 800)
+      return
+    }
 
     stop() // Interrupt any playing audio
     setLoading(true)

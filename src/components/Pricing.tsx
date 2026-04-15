@@ -1,9 +1,16 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Sparkles, ShieldCheck, Zap, Lock, MessageSquare } from 'lucide-react'
+import NumberFlow from '@number-flow/react'
+import {
+  Check, Sparkles, ShieldCheck, Lock, MessageSquare,
+  Zap, Brain, ImageIcon, Mic, MessageCircle, Activity,
+  FileText, MapPin, Star
+} from 'lucide-react'
+import { Card, CardContent, CardHeader } from './ui/card'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import type { PlanType } from '../hooks/useSubscription'
+
 type BillingCycleType = 'monthly' | 'yearly'
 
 interface PricingProps {
@@ -11,67 +18,136 @@ interface PricingProps {
   currentSubscription?: any
 }
 
+// ── Plan data ─────────────────────────────────────────────────────────────────
 const plans: {
   id: PlanType
   name: string
+  tagline: string
   description: string
   monthlyPrice: number
   yearlyPrice: number
   trial?: string
-  features: string[]
   cta: string
   popular: boolean
+  accentColor: string
+  badgeLabel?: string
+  features: { text: string; icon: React.ReactNode; highlight?: boolean }[]
+  includes: string[]
 }[] = [
   {
     id: 'free',
     name: 'Free',
-    description: 'Limited AI access for basic dashboard checks and essential guidance.',
+    tagline: 'Try it out, no commitment',
+    description: 'Basic AI access to get started with automotive diagnosis.',
     monthlyPrice: 0,
     yearlyPrice: 0,
-    features: [
-      '2 AI Reports / month',
-      'Fast Answer Mode only',
-      'Limited Image Analysis',
-      'No Microphone Access',
-    ],
-    cta: 'Get Started',
+    cta: 'Get Started Free',
     popular: false,
+    accentColor: 'slate',
+    features: [
+      { text: '2 AI messages every 5 hours', icon: <MessageCircle size={16} /> },
+      { text: '1 image analysis every 5 hours', icon: <ImageIcon size={16} /> },
+      { text: '1 report share every 5 hours', icon: <FileText size={16} /> },
+      { text: 'Basic AI mechanic access', icon: <Zap size={16} /> },
+    ],
+    includes: [
+      'Free includes:',
+      'Fast Answer mode',
+      'Dashboard photo analysis',
+      'Diagnostic report generation',
+    ],
   },
   {
     id: 'pro',
     name: 'Pro',
-    description: 'Upgraded plan for more reports and stronger AI guidance when you need it.',
+    tagline: 'For frequent drivers & car owners',
+    description: 'Unlimited AI chat with smarter guidance and expanded reports.',
     monthlyPrice: 12,
     yearlyPrice: 9,
     trial: '3-Day Free Trial',
-    features: [
-      '15 AI Reports / month',
-      'Fast + Expert Answer Modes',
-      'Full Image Analysis',
-      'Nearby Provider Map',
-      'Standard Support',
-    ],
     cta: 'Start Free Trial',
-    popular: true,
+    popular: false,
+    accentColor: 'blue',
+    features: [
+      { text: 'Unlimited AI chat sessions', icon: <MessageCircle size={16} /> },
+      { text: 'Full image & dashboard analysis', icon: <ImageIcon size={16} /> },
+      { text: '15 shareable reports / month', icon: <FileText size={16} /> },
+      { text: 'Nearby provider map', icon: <MapPin size={16} /> },
+      { text: 'Standard support', icon: <ShieldCheck size={16} /> },
+    ],
+    includes: [
+      'Everything in Free, plus:',
+      'Expert Answer mode',
+      'Voice input (microphone)',
+      'Advanced follow-up flow',
+    ],
   },
   {
     id: 'advanced',
     name: 'Advanced',
-    description: 'The ultimate AI mechanic experience with Expert Diagnosis and full analysis.',
+    tagline: 'The complete AI mechanic experience',
+    description: 'Full diagnostic power with image AI, voice, and Expert analysis.',
     monthlyPrice: 29,
     yearlyPrice: 24,
+    cta: 'Get Advanced',
+    popular: true,
+    accentColor: 'blue',
+    badgeLabel: 'Most Powerful',
     features: [
-      'Unlimited AI Reports',
-      'Fast + Expert Answer Modes',
-      'Full Image + Voice Analysis',
-      'Full Provider Visibility',
-      'Priority Human Support',
+      { text: 'Fast + Expert Answer modes', icon: <Activity size={16} />, highlight: true },
+      { text: 'Advanced diagnostic logic', icon: <Brain size={16} />, highlight: true },
+      { text: 'Image-based diagnosis', icon: <ImageIcon size={16} />, highlight: true },
+      { text: 'Voice input & TTS readback', icon: <Mic size={16} />, highlight: true },
+      { text: 'Structured follow-up flow', icon: <Star size={16} />, highlight: true },
+      { text: 'Priority human support', icon: <ShieldCheck size={16} /> },
     ],
-    cta: 'Get Started',
-    popular: false,
-  }
+    includes: [
+      'Everything in Pro, plus:',
+      'Unlimited report sharing',
+      'Full provider visibility',
+      'Expert Support included',
+    ],
+  },
 ]
 
+
+// ── Billing toggle ────────────────────────────────────────────────────────────
+function BillingToggle({ value, onChange }: { value: BillingCycleType; onChange: (v: BillingCycleType) => void }) {
+  return (
+    <div className="flex justify-center">
+      <div className="relative flex items-center w-fit rounded-full bg-white border border-slate-200 shadow-sm p-1.5 gap-1">
+        {(['monthly', 'yearly'] as BillingCycleType[]).map((cycle) => (
+          <button
+            key={cycle}
+            onClick={() => onChange(cycle)}
+            className={`relative z-10 h-10 rounded-full px-6 text-xs font-black uppercase tracking-widest transition-colors duration-200 ${
+              value === cycle ? 'text-white' : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {value === cycle && (
+              <motion.span
+                layoutId="billing-pill"
+                className="absolute inset-0 rounded-full bg-[#0070E0] shadow-lg shadow-[#0070E0]/25"
+                transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+              />
+            )}
+            <span className="relative flex items-center gap-2">
+              {cycle === 'yearly' ? 'Yearly' : 'Monthly'}
+              {cycle === 'yearly' && (
+                <span className="rounded-full bg-emerald-50 border border-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+                  −20%
+                </span>
+              )}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+
+// ── Main component ────────────────────────────────────────────────────────────
 export default function Pricing({ mode = 'onboarding', currentSubscription }: PricingProps) {
   const [billingCycle, setBillingCycle] = useState<BillingCycleType>('yearly')
   const { user } = useAuth()
@@ -82,206 +158,238 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
       navigate('/auth?redirect=choose-plan')
       return
     }
-    
-    // Build WhatsApp Message
+
     const isUpgrade = mode === 'upgrade' || (currentSubscription && currentSubscription.planType !== 'Free')
-    const phone = "33756816551" // Admin WhatsApp
-    
-    let text = ""
+    const phone = '33756816551'
+
+    let text = ''
     if (isUpgrade && currentSubscription) {
-      text = `Hello, I would like to upgrade my CarxAI account.
-Current Plan: ${currentSubscription.planType || 'Free'}
-Requested Plan: ${plan.name}
-Billing Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}
-Email: ${user.email}
-User ID: ${user.id}`
+      text = `Hello, I would like to upgrade my CarxAI account.\nCurrent Plan: ${currentSubscription.planType || 'Free'}\nRequested Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
     } else {
-      text = `Hello, I would like to activate a paid CarxAI plan for my account.
-Selected Plan: ${plan.name}
-Billing Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}
-Email: ${user.email}
-User ID: ${user.id}`
+      text = `Hello, I would like to activate a paid CarxAI plan for my account.\nSelected Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
     }
 
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
-    window.open(whatsappUrl, '_blank')
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  // Card animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 24, filter: 'blur(8px)' },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    }),
   }
 
   return (
-    <section id="pricing" className="py-16 md:py-32 px-6 bg-white dark:bg-surface overflow-hidden border-t border-overlay shadow-sm">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center mb-12 md:mb-20 flex flex-col items-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
+    <section id="pricing" className="relative py-24 md:py-36 px-4 bg-slate-50 overflow-hidden border-t border-slate-100">
+
+      {/* Background glow */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+        }}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
+
+        {/* ── Section header ── */}
+        <div className="text-center mb-14 flex flex-col items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-6 border border-[#0070E0]/10 bg-[#0070E0]/5"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 border border-[#0070E0]/15 bg-[#0070E0]/6"
           >
             <Zap className="w-3.5 h-3.5 text-[#0070E0]" fill="currentColor" />
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#0070E0] font-black">Choose Your Plan</span>
           </motion.div>
-          
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
+
+          <motion.h2
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-display font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]"
+            transition={{ delay: 0.07 }}
+            className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-5 leading-[1.1]"
           >
-            Simple Pricing for <br className="hidden md:block" /> Smarter Car Help
+            Smarter car help,{' '}
+            <span className="inline-block border border-dashed border-[#0070E0]/60 bg-[#0070E0]/5 px-3 py-1 rounded-xl text-[#0070E0]">
+              your budget
+            </span>
           </motion.h2>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
+
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.14 }}
+            className="text-slate-500 text-base md:text-lg font-medium max-w-lg mx-auto mb-10 leading-relaxed"
+          >
+            From a quick free check to a full AI mechanic experience — pick the plan that fits how you drive.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-slate-500 text-lg md:text-xl font-medium max-w-xl mx-auto mb-12 leading-relaxed"
           >
-            Experience the future of automotive assistance. Start free, upgrade anytime via WhatsApp manual activation.
-          </motion.p>
-
-          <div className="relative inline-flex items-center p-1.5 rounded-2xl bg-white border border-slate-200 shadow-sm transition-all hover:border-slate-300">
-            <button 
-              onClick={() => setBillingCycle('monthly')}
-              className={`relative z-10 px-8 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${billingCycle === 'monthly' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Monthly
-            </button>
-            <button 
-              onClick={() => setBillingCycle('yearly')}
-              className={`relative z-10 px-8 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${billingCycle === 'yearly' ? 'text-white' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Yearly
-            </button>
-            
-            <motion.div 
-              layout
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute inset-y-1.5 rounded-xl bg-[#0070E0] shadow-lg shadow-[#0070E0]/20"
-              style={{ 
-                left: billingCycle === 'monthly' ? 6 : 'calc(50% + 3px)',
-                width: 'calc(50% - 9px)'
-              }}
-            />
-          </div>
-          
-          <div className="mt-4 flex items-center gap-2">
-             <div className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider border border-emerald-100 flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5" /> Save 20% on Yearly
-             </div>
-          </div>
+            <BillingToggle value={billingCycle} onChange={setBillingCycle} />
+          </motion.div>
         </div>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-8 items-stretch relative max-w-7xl mx-auto">
+        {/* ── Pricing cards grid ── */}
+        <div className="grid md:grid-cols-3 gap-5 items-stretch">
           {plans.map((plan, i) => {
+            const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice
+            const isPopular = plan.popular
+
             return (
               <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                key={plan.id}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8 }}
-                className={`relative flex flex-col p-10 md:p-12 rounded-[40px] bg-white border transition-all duration-500 ${
-                  plan.popular 
-                    ? 'border-[#0070E0] shadow-[0_30px_70px_rgba(0,112,224,0.12)] ring-1 ring-[#0070E0]/5 group' 
-                    : 'border-slate-100 shadow-[0_15px_60px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.08)] hover:border-slate-200'
-                }`}
+                variants={cardVariants}
+                whileHover={{ y: -6, transition: { duration: 0.25 } }}
               >
-                {plan.popular && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-5 py-2 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.25em] shadow-2xl shadow-[#0070E0]/30 flex items-center gap-2">
-                    <Sparkles className="w-3 h-3 animate-pulse" /> Most Popular
-                  </div>
-                )}
-
-                <div className="mb-10 text-left">
-                  <h3 className={`text-2xl font-display font-black text-slate-900 mb-3 ${plan.popular ? 'text-[#0070E0]' : plan.id === 'advanced' ? 'text-indigo-600' : ''}`}>{plan.name}</h3>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{plan.description}</p>
-                </div>
-
-                <div className="mb-10 flex items-baseline gap-2">
-                  <span className="text-5xl font-display font-black text-slate-900 tracking-tighter">
-                    ${billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice}
-                  </span>
-                  <div className="flex flex-col">
-                     <span className="text-slate-400 font-black uppercase text-[10px] tracking-widest leading-none mb-1">/ month</span>
-                     {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
-                       <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded leading-none w-fit">
-                         Billed annually
-                       </span>
-                     )}
-                  </div>
-                </div>
-
-                {plan.id === 'pro' && (
-                  <div className="mb-8 flex items-center gap-3">
-                    <div className="h-px flex-grow bg-slate-100" />
-                    <span className="text-[11px] font-black text-[#0070E0] uppercase tracking-[0.2em]">3-Day Free Trial Included</span>
-                    <div className="h-px flex-grow bg-slate-100" />
-                  </div>
-                )}
-
-                <div className="flex-grow space-y-5 mb-12 text-left">
-                  {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-3.5 group/feat">
-                      <div className={`mt-0.5 w-6 h-6 rounded-xl flex items-center justify-center shrink-0 border transition-all ${plan.popular ? 'bg-[#0070E0]/5 border-[#0070E0]/20 shadow-sm' : plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'bg-indigo-50 border-indigo-100' : 'bg-slate-50 border-slate-100'}`}>
-                        <Check className={`w-3 h-3 ${plan.popular ? 'text-[#0070E0]' : plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'text-indigo-600' : 'text-slate-400'}`} strokeWidth={3} />
-                      </div>
-                      <span className={`text-[15px] font-medium transition-colors group-hover/feat:text-slate-900 leading-snug ${plan.id === 'advanced' && (feature.includes('Expert') || feature.includes('Voice')) ? 'text-indigo-700' : 'text-slate-600'}`}>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* WhatsApp Activation CTA */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleGetStarted(plan)}
-                  className={`w-full py-5 rounded-[24px] text-sm font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 bg-[#0070e0] text-white shadow-[0_15px_40px_rgba(0,112,224,0.3)] hover:bg-[#005bb5]`}
+                <Card
+                  className={`relative flex flex-col h-full transition-all duration-300 overflow-visible ${
+                    isPopular
+                      ? 'ring-2 ring-[#0070E0] shadow-[0_24px_72px_rgba(0,112,224,0.16)] bg-gradient-to-b from-[#EBF5FF] to-white border-[#0070E0]/30'
+                      : 'border-slate-200 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.09)] hover:border-slate-300 bg-white'
+                  }`}
                 >
-                  <MessageSquare className="w-5 h-5" />
-                  {plan.cta}
-                </motion.button>
+                  {/* Popular badge */}
+                  {isPopular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-[#0070E0]/30">
+                      <Sparkles className="w-3 h-3 animate-pulse" />
+                      {plan.badgeLabel}
+                    </div>
+                  )}
 
-                {plan.id === 'advanced' && (
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-200">
-                    Expert Support Included
-                  </div>
-                )}
+                  <CardHeader className="pb-4 pt-8 px-7">
+                    {/* Plan name + tagline */}
+                    <div className="mb-5">
+                      <h3 className={`text-2xl font-bold mb-1 ${isPopular ? 'text-[#0070E0]' : 'text-slate-900'}`}>
+                        {plan.name}
+                      </h3>
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">{plan.tagline}</p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-5xl font-bold text-slate-900 tracking-tight tabular-nums">
+                        $<NumberFlow value={price} className="font-bold" />
+                      </span>
+                      <div className="flex flex-col items-start">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">/ mo</span>
+                        {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
+                          <span className="mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded leading-none">
+                            Billed annually
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Trial badge */}
+                    {plan.trial && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <div className="h-px flex-grow bg-slate-100" />
+                        <span className="text-[10px] font-black text-[#0070E0] uppercase tracking-[0.18em] whitespace-nowrap">
+                          {plan.trial}
+                        </span>
+                        <div className="h-px flex-grow bg-slate-100" />
+                      </div>
+                    )}
+
+                    <p className="mt-3 text-sm text-slate-500 leading-relaxed">{plan.description}</p>
+                  </CardHeader>
+
+                  <CardContent className="px-7 pb-8 flex flex-col flex-grow">
+                    {/* CTA button */}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => handleGetStarted(plan)}
+                      className={`w-full mb-7 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.18em] flex items-center justify-center gap-2.5 transition-all duration-300 ${
+                        isPopular
+                          ? 'bg-[#0070E0] text-white shadow-[0_12px_36px_rgba(0,112,224,0.35)] hover:bg-[#005bb5] hover:shadow-[0_16px_44px_rgba(0,112,224,0.45)]'
+                          : 'bg-slate-900 text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)] hover:bg-slate-700 hover:shadow-[0_12px_32px_rgba(0,0,0,0.25)]'
+                      }`}
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      {plan.cta}
+                    </motion.button>
+
+                    {/* Key features */}
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-3">
+                          <span className={`grid place-content-center w-7 h-7 rounded-xl shrink-0 border ${
+                            isPopular || feature.highlight
+                              ? 'bg-[#0070E0]/8 border-[#0070E0]/20 text-[#0070E0]'
+                              : 'bg-slate-50 border-slate-100 text-slate-400'
+                          }`}>
+                            {feature.icon}
+                          </span>
+                          <span className={`text-sm font-medium leading-snug ${
+                            feature.highlight ? 'text-slate-800' : 'text-slate-600'
+                          }`}>
+                            {feature.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Divider + includes list */}
+                    <div className="mt-auto pt-5 border-t border-slate-100 space-y-3">
+                      <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                        {plan.includes[0]}
+                      </h4>
+                      <ul className="space-y-2.5">
+                        {plan.includes.slice(1).map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2.5">
+                            <span className={`w-5 h-5 shrink-0 rounded-full grid place-content-center border ${
+                              isPopular
+                                ? 'bg-[#0070E0]/8 border-[#0070E0]/25'
+                                : 'bg-emerald-50 border-emerald-100'
+                            }`}>
+                              <Check className={`w-3 h-3 ${isPopular ? 'text-[#0070E0]' : 'text-emerald-500'}`} strokeWidth={3} />
+                            </span>
+                            <span className="text-sm text-slate-600">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             )
           })}
         </div>
 
-        {/* Trial Nudge */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+        {/* ── Footer trust strip ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center"
+          transition={{ delay: 0.4 }}
+          className="mt-16 pt-10 border-t border-slate-100 flex flex-col items-center gap-6"
         >
-          <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em]">
-            Start free, upgrade anytime via WhatsApp.
+          <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+            Start free · Upgrade anytime via WhatsApp
           </p>
-        </motion.div>
-
-        {/* Global Footer Trust Row */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 md:mt-20 pt-8 md:pt-10 border-t border-slate-100 flex flex-col items-center"
-        >
           <div className="flex flex-wrap justify-center gap-6 md:gap-12">
             {[
               { title: 'Cancel anytime', icon: ShieldCheck },
-              { title: 'Secure payment', icon: Lock },
-              { title: 'No hidden fees', icon: Check },
-              { title: 'Clear plan limits', icon: Sparkles },
+              { title: 'No hidden fees', icon: Lock },
+              { title: 'Clear plan limits', icon: Check },
+              { title: 'Instant activation', icon: Sparkles },
             ].map((trust, idx) => (
               <div key={idx} className="flex items-center gap-2 text-slate-500">
                 <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">

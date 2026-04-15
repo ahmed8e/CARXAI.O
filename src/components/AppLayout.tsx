@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
+import { FuturisticNav } from './ui/futuristic-nav'
 import { useSubscription } from '../hooks/useSubscription'
 
 // ── Navigation groups ────────────────────────────────────────────────
@@ -237,7 +238,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))]'}`}>
+      <div className={`flex-1 flex flex-col overflow-hidden relative pb-28 lg:pb-0 ${isAIMechanic ? 'pt-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))]'}`}>
         <main className="flex-1 overflow-y-auto relative">
           {subLoading ? (
             <div className="absolute inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-sm z-[100]">
@@ -252,6 +253,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             children
           )}
         </main>
+      </div>
+
+      {/* Floating Bottom Navigation — Mobile Only */}
+      <div className="lg:hidden">
+        <FuturisticNav />
       </div>
     </div>
   )

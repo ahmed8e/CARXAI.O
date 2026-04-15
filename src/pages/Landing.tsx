@@ -31,181 +31,254 @@ const CHAT_SEQUENCE = [
   { 
     id: 1, 
     type: 'user', 
-    content: "My check engine light just came on and I hear a slight ticking noise.", 
+    content: "My ABS light just came on while driving. Is it safe to keep going?", 
+    image: "/dashboard_abs_warning_light.png",
     timestamp: "10:12 AM" 
   },
   { 
     id: 2, 
     type: 'ai', 
     sender: 'AI Mechanic',
-    content: "I can help with that. Does the ticking speed up when you accelerate?", 
+    content: "I can see the ABS warning light on your dashboard. Your normal brakes still work — but the anti-lock system is off, so your wheels could lock up under hard braking. When did you first notice it?", 
     timestamp: "10:12 AM" 
   },
   { 
     id: 3, 
     type: 'user', 
-    content: "Yes, it gets faster as I rev the engine.", 
+    content: "About 10 minutes ago. It started raining and the light came on after I braked hard at a traffic light.", 
     timestamp: "10:13 AM" 
   },
   { 
     id: 4, 
     type: 'ai', 
     sender: 'AI Mechanic',
-    content: "Got it. This often points to a valve train issue or low oil pressure. Please scan your dashboard now.", 
-    timestamp: "10:13 AM",
-    action: "Dashboard Scanned"
+    content: "That timing is helpful. Hard braking in wet conditions can trigger an ABS fault if a wheel speed sensor loses signal. Has the light stayed on continuously since then, or does it come and go?", 
+    timestamp: "10:13 AM"
   },
   { 
     id: 5, 
+    type: 'user', 
+    content: "It's stayed on the whole time. Should I pull over?", 
+    timestamp: "10:14 AM" 
+  },
+  { 
+    id: 6, 
+    type: 'ai', 
+    sender: 'AI Mechanic',
+    content: "You don't need to pull over immediately — your main brakes are fine. But avoid sudden stops and drive below 50 km/h until you can get it scanned. Here's my full assessment:", 
+    timestamp: "10:14 AM",
+    action: "Diagnostic Analysis Complete"
+  },
+  { 
+    id: 7, 
     type: 'ai-card',
     title: "Diagnostic Report",
     severity: "Medium",
-    drivable: "Limited",
-    finding: "Low Oil Pressure / Valve Ticking",
-    advice: "Check oil levels immediately. Avoid high RPMs.",
-    timestamp: "10:14 AM"
+    finding: "ABS Module — Wheel Speed Sensor Fault",
+    advice: "Most likely cause: a dirty or failing front wheel speed sensor. Common on this model after 50k km. Not urgent, but should be scanned within the next few days.",
+    mechanic: "Schneider Automotive",
+    mechanicReason: "Specializes in ABS & braking systems",
+    timestamp: "10:15 AM"
   }
 ];
 
-const ScrollChatDemo = ({ progress }: { progress: any }) => {
-  // Map 0-1 progress to message indices
-  // Messages 1 & 2: ALWAYS visible on load (pre-loaded state - makes hero alive)
-  // Messages 3, 4 & card: Reveal progressively on scroll
-  const messageOpacity3 = useTransform(progress, [0.35, 0.5], [0, 1]);
-  const messageY3 = useTransform(progress, [0.35, 0.5], [16, 0]);
-  
-  const messageOpacity4 = useTransform(progress, [0.55, 0.7], [0, 1]);
-  const messageY4 = useTransform(progress, [0.55, 0.7], [16, 0]);
-  
-  const cardOpacity = useTransform(progress, [0.75, 0.9], [0, 1]);
-  const cardScale = useTransform(progress, [0.75, 0.9], [0.96, 1]);
-  
-  // Chat scroll starts when messages 3+ begin revealing
-  const chatScrollY = useTransform(progress, [0.45, 0.9], [0, -180]);
+// Render a single user message - Messenger Style
+const UserBubble = ({ msg }: { msg: any }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+    className="flex flex-col items-end gap-2"
+  >
+    {msg.image && (
+      <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md">
+        <img src={msg.image} alt="Dashboard scan" className="w-full h-auto object-cover max-h-[130px]" />
+      </div>
+    )}
+    <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-[4px] bg-[#0084FF] text-white text-[11px] font-medium leading-relaxed shadow-sm">
+      {msg.content}
+    </div>
+  </motion.div>
+);
+
+// Render a single AI message - Messenger Style
+const AiBubble = ({ msg }: { msg: any }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+    className="flex flex-col items-start"
+  >
+    <div className="flex items-center gap-2 mb-1.5 opacity-60">
+      <div className="w-4.5 h-4.5 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
+        <Bot size={11} />
+      </div>
+      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">CarxAI Assistant</span>
+    </div>
+    <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tl-[4px] bg-[#F0F2F5] text-[#1C1E21] text-[11px] font-medium leading-relaxed border border-slate-100/50">
+      {msg.content}
+    </div>
+    {msg.action && (
+      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 text-emerald-600 mt-2.5 shadow-sm">
+        <CheckCircle size={10} />
+        <span className="text-[7px] font-bold uppercase tracking-widest">Analysis Linked</span>
+      </div>
+    )}
+  </motion.div>
+);
+
+// Render the diagnostic report card - Premium Messenger Style
+const DiagnosticCard = ({ msg }: { msg: any }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.98, y: 12 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+    className="p-4 rounded-[24px] bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col gap-3 relative overflow-hidden ring-1 ring-slate-50"
+  >
+    <div className="flex items-center justify-between mb-0.5">
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-[#0084FF] animate-pulse" />
+        <span className="text-[8px] font-black text-[#0084FF] uppercase tracking-widest">Report Ready</span>
+      </div>
+      <div className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-[7px] font-black uppercase tracking-wider border border-orange-100/50">
+        {msg.severity} Priority
+      </div>
+    </div>
+    <h4 className="font-display font-bold text-[12px] leading-tight text-slate-900 pr-4">{msg.finding}</h4>
+    <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-100/50 text-[9px] text-slate-600 font-medium leading-relaxed">
+      {msg.advice}
+    </div>
+    <div className="p-2.5 rounded-2xl bg-[#F0F7FF] border border-blue-100/50 flex items-start gap-2.5">
+      <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#0084FF] shadow-sm border border-blue-50 mt-0.5 flex-shrink-0">
+        <MapPin size={12} />
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-[10px] font-bold text-slate-800">{msg.mechanic}</span>
+        <span className="text-[8px] text-slate-500 font-medium leading-tight">{msg.mechanicReason}</span>
+      </div>
+    </div>
+    <button className="w-full py-2.5 rounded-xl bg-[#0084FF] text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 active:scale-[0.98] transition-all text-[9px] font-black uppercase tracking-widest">
+      <MapPin size={11} />
+      Open Map
+    </button>
+  </motion.div>
+);
+
+// Refined delays for a snappy replay feel
+const MESSAGE_DELAYS = [
+  400,   // msg 1: fast intro
+  1600,  // msg 2: ai response time
+  2400,  // msg 3: user context
+  1800,  // msg 4: ai follow up
+  2200,  // msg 5: user urgency
+  1600,  // msg 6: ai safety advice
+  1200,  // card: final report reveal
+];
+
+const ScrollChatDemo = () => {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-play replay logic: Snappy reveal, no typing indicators
+  useEffect(() => {
+    const totalMessages = CHAT_SEQUENCE.length;
+    let currentIndex = 0;
+    let timeoutId: any;
+
+    const showNext = () => {
+      if (currentIndex < totalMessages) {
+        const delay = MESSAGE_DELAYS[currentIndex] || 1500;
+        
+        timeoutId = setTimeout(() => {
+          setVisibleCount(currentIndex + 1);
+          currentIndex++;
+          showNext();
+        }, delay);
+      } else {
+        // Continuous Replay: Pause at end then restart
+        timeoutId = setTimeout(() => {
+          setVisibleCount(0);
+          currentIndex = 0;
+          showNext();
+        }, 6000);
+      }
+    };
+
+    showNext();
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  // Auto-scroll chat container when new messages appear
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [visibleCount]);
 
   return (
-    <div className="relative w-full max-w-[270px] md:max-w-[380px] max-h-[430px] md:max-h-none aspect-[9/18.5] bg-white rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,112,224,0.15)] ring-1 ring-slate-200/60 overflow-hidden flex flex-col border-[8px] border-slate-50">
-      {/* App Header */}
-      <div className="px-6 py-4 flex items-center justify-between border-b border-slate-50 bg-white/90 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#0070E0] flex items-center justify-center text-white scale-90 shadow-sm">
-            <Zap size={15} fill="currentColor" />
-          </div>
-          <span className="font-display font-black text-base tracking-tighter text-[#0F172A]">car<span className="text-[#0070E0]">x</span>ai</span>
-        </div>
-        <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100/50">
-          <UserCircle className="w-4.5 h-4.5 text-slate-400" />
-        </div>
-      </div>
-
-      {/* Chat Messages Area */}
-      <div className="flex-1 overflow-hidden relative bg-white">
-        <motion.div 
-          style={{ y: chatScrollY }}
-          className="p-5 flex flex-col gap-5"
-        >
-          {/* Message 1: Always visible on load */}
-          <div className="flex flex-col items-end">
-            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tr-none bg-[#0070E0] text-white text-[12px] font-medium leading-relaxed shadow-sm">
-              {CHAT_SEQUENCE[0].content}
-            </div>
-            <span className="text-[8px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{CHAT_SEQUENCE[0].timestamp}</span>
+    <div className="relative w-full max-w-[280px] md:max-w-[340px] aspect-[9/19] mx-auto scale-[0.91] md:scale-100 pb-12">
+      <div className="absolute inset-0 bg-[#0F0F0F] rounded-[54px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.1)] ring-[6px] ring-[#1A1A1A] overflow-hidden">
+        <div className="absolute inset-[10px] bg-white rounded-[44px] overflow-hidden flex flex-col">
+          
+          {/* Top Bezel Notch */}
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[110px] h-[30px] bg-[#0F0F0F] rounded-full z-[100] flex items-center justify-center gap-3 shadow-inner">
+             <div className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A] shadow-inner" />
+             <div className="w-8 h-1 bg-[#1A1A1A] rounded-full opacity-50" />
           </div>
 
-          {/* Message 2: Always visible on load */}
-          <div className="flex flex-col items-start">
-            <div className="flex items-center gap-2 mb-1.5">
-               <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
-                 <Bot size={12} />
-               </div>
-               <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">AI Mechanic</span>
+          {/* Messenger-Like Header */}
+          <div className="pt-11 pb-3 px-5 flex items-center justify-between border-b border-slate-50/80 bg-white/95 backdrop-blur-md z-20">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#0084FF] to-[#00C6FF] flex items-center justify-center text-white shadow-md">
+                <Zap size={13} fill="currentColor" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-display font-black text-xs tracking-tight text-[#0F172A] leading-none mb-0.5">CarxAI Mechanic</span>
+                <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-wider leading-none">Live Replay</span>
+              </div>
             </div>
-            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 text-slate-700 text-[12px] font-medium leading-relaxed">
-              {CHAT_SEQUENCE[1].content}
+            <div className="flex gap-2">
+              <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100 text-slate-300">
+                <UserCircle className="w-4 h-4" />
+              </div>
             </div>
           </div>
 
-          {/* Typing indicator - visible between message 2 and scroll-triggered 3 */}
-          <motion.div
-            style={{ opacity: useTransform(progress, [0, 0.3], [1, 0]) }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
-              <Bot size={12} />
+          {/* Chat Replay Stream */}
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto relative bg-white scrollbar-hide px-4 py-5" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex flex-col gap-5">
+              {CHAT_SEQUENCE.slice(0, visibleCount).map((msg) => {
+                if (msg.type === 'user') return <UserBubble key={msg.id} msg={msg} />;
+                if (msg.type === 'ai') return <AiBubble key={msg.id} msg={msg} />;
+                if (msg.type === 'ai-card') return <DiagnosticCard key={msg.id} msg={msg} />;
+                return null;
+              })}
+              <div ref={chatEndRef} />
             </div>
-            <div className="px-4 py-2.5 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
-          </motion.div>
+          </div>
 
-          {/* Message 3 - Reveals on Scroll */}
-          <motion.div style={{ opacity: messageOpacity3, y: messageY3 }} className="flex flex-col items-end">
-            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tr-none bg-[#0070E0] text-white text-[12px] font-medium leading-relaxed shadow-sm">
-              {CHAT_SEQUENCE[2].content}
-            </div>
-            <span className="text-[8px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{CHAT_SEQUENCE[2].timestamp}</span>
-          </motion.div>
-
-          {/* Message 4 - Reveals on Scroll */}
-          <motion.div style={{ opacity: messageOpacity4, y: messageY4 }} className="flex flex-col items-start">
-            <div className="flex items-center gap-2 mb-1.5">
-               <div className="w-5 h-5 rounded-lg bg-[#0070E0]/5 flex items-center justify-center text-[#0070E0] border border-[#0070E0]/10">
-                 <Bot size={12} />
-               </div>
-               <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">AI Mechanic</span>
-            </div>
-            <div className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-100 text-slate-700 text-[12px] font-medium leading-relaxed mb-4">
-              {CHAT_SEQUENCE[3].content}
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
-               <CheckCircle size={12} />
-               <span className="text-[9px] font-bold uppercase tracking-widest">Dashboard Scanned</span>
-            </div>
-          </motion.div>
-
-          {/* Final Card - Reveals on Scroll */}
-          <motion.div 
-            style={{ opacity: cardOpacity, scale: cardScale }}
-            className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xl flex flex-col gap-4 relative overflow-hidden ring-1 ring-slate-100"
-          >
-            <div className="flex items-center justify-between mb-1">
-               <div className="flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-[#0070E0] animate-pulse" />
-                 <span className="text-[9px] font-black text-[#0070E0] uppercase tracking-widest">Diagnostic Ready</span>
-               </div>
-               <div className="px-2 py-0.5 rounded-md bg-orange-50 text-orange-600 text-[8px] font-black uppercase tracking-wider border border-orange-100">
-                  {CHAT_SEQUENCE[4].severity} Priority
-               </div>
-            </div>
-            
-            <h4 className="font-display font-bold text-[14px] leading-tight text-slate-900">{CHAT_SEQUENCE[4].finding}</h4>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-[10px] text-slate-600 font-medium leading-relaxed">
-               {CHAT_SEQUENCE[4].advice}
-            </div>
-
-            <button className="w-full py-2.5 rounded-xl bg-[#0070E0] text-white flex items-center justify-center gap-2 shadow-md shadow-blue-500/10 active:scale-95 transition-transform text-[10px] font-black uppercase tracking-widest">
-              <MapPin size={12} />
-              Find Provider
-            </button>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Input Bar */}
-      <div className="px-5 py-5 bg-white border-t border-slate-50 mt-auto">
-        <div className="h-11 w-full rounded-full bg-slate-50 border border-slate-100 flex items-center px-4 gap-3">
-          <Aperture size={14} className="text-slate-300" />
-          <span className="text-[10px] font-medium text-slate-400 flex-1">Ask anything...</span>
-          <div className="flex items-center gap-3">
-            <Mic size={14} className="text-slate-300" />
-            <div className="w-7 h-7 rounded-full bg-[#0070E0] flex items-center justify-center text-white scale-90">
-              <Send size={12} />
+          {/* Static Clean Input Bar */}
+          <div className="px-4 py-4 bg-white border-t border-slate-50 mt-auto pb-8">
+            <div className="h-10 w-full rounded-full bg-[#F0F2F5] flex items-center px-4 gap-3 text-slate-400 opacity-60">
+              <span className="text-[10px] font-medium flex-1">Recorded Session Replay</span>
+              <div className="flex items-center gap-3">
+                <Mic size={14} className="text-slate-300" />
+                <div className="w-7 h-7 rounded-full bg-[#E4E6EB] flex items-center justify-center text-white scale-90">
+                  <Send size={12} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Realistic Side Buttons */}
+        <div className="absolute right-[-4px] top-[100px] w-1 h-12 bg-[#1A1A1A] rounded-l-md" />
+        <div className="absolute left-[-4px] top-[100px] w-1 h-8 bg-[#1A1A1A] rounded-r-md" />
+        <div className="absolute left-[-4px] top-[148px] w-1 h-8 bg-[#1A1A1A] rounded-r-md" />
       </div>
     </div>
   )
@@ -475,7 +548,7 @@ export default function Landing() {
                     }}
                     className="w-full flex justify-center"
                   >
-                    <ScrollChatDemo progress={scrollProgress} />
+                    <ScrollChatDemo />
                   </motion.div>
                 </div>
 
