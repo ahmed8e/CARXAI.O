@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar'
 import Pricing from '../components/Pricing'
 import ReviewsSlider from '../components/ReviewsSlider'
 import StoryModal from '../components/StoryModal'
+import CarxGradientBg from '../components/ui/CarxGradientBg'
 import { 
   Bot, 
   Users, 
@@ -369,8 +370,9 @@ export default function Landing() {
 
 
   return (
-    <div className="relative min-h-screen bg-surface dark:bg-surface-low text-on-surface selection:bg-navy/10 transition-colors duration-300">
-      {/* Background is now localized to specific sections (e.g. Hero) */}
+    <div className="relative min-h-screen bg-white text-on-surface selection:bg-navy/10 transition-colors duration-300">
+      {/* Global atmospheric gradient background */}
+      <CarxGradientBg />
 
       <div className="relative z-10">
         <ScrollProgress variant="carx" size="sm" showPercentage={false} />
@@ -449,25 +451,9 @@ export default function Landing() {
           )}
         </AnimatePresence>
 
-        {/* Immersive Scroll Hero Section - Light SaaS Aesthetic */}
-        <section ref={heroRef} className="relative h-[160vh] bg-white">
+        {/* Immersive Scroll Hero Section */}
+        <section ref={heroRef} className="relative h-[160vh]">
           <div className="sticky top-0 h-screen w-full flex items-start md:items-center justify-center px-6 overflow-hidden">
-             {/* Light SaaS Background Elements */}
-            <div className="absolute inset-0 z-0 bg-white">
-               {/* Subtle Dot Grid — Refined for unification */}
-               <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
-                 style={{ 
-                   backgroundImage: 'radial-gradient(circle, #0070E0 0.5px, transparent 0.5px)', 
-                   backgroundSize: '48px 48px' 
-                 }} 
-               />
-               {/* Soft Blue Glow — Identical to Pricing for unification */}
-               <div className="absolute inset-0 z-0"
-                 style={{
-                   background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.06) 0%, transparent 80%)',
-                 }}
-               />
-            </div>
 
             <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
               <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
@@ -573,15 +559,8 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Problem Section — Standardized Background */}
-        <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50 overflow-hidden border-t border-slate-100">
-          {/* Section Glow Overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-60"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
+        {/* Problem Section */}
+        <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">The Problem</span>
@@ -608,15 +587,8 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* How It Works — Standardized Background */}
-        <section id="how-it-works" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white border-t border-slate-100">
-          {/* Section Glow Overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-40"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
+        {/* How It Works */}
+        <section id="how-it-works" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
@@ -720,15 +692,7 @@ export default function Landing() {
 
         
         {/* ── Expert Trust Section ─────────────────────────────────── */}
-        <section className="relative py-24 md:py-36 bg-slate-50 border-t border-slate-100 overflow-hidden">
-          {/* Section Glow */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0070E0 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        <section className="relative py-24 md:py-36 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
 
           {/* ── Section Header ── */}
           <div className="max-w-6xl mx-auto px-6 mb-16 md:mb-20 text-center flex flex-col items-center relative z-10">
@@ -996,15 +960,8 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Features — Standardized Background */}
-        <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white border-t border-slate-100">
-          {/* Section Glow Overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-60"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
+        {/* Features */}
+        <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Platform Features</span>
@@ -1054,15 +1011,8 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Reviews — Standardized Background */}
-        <section id="reviews" className="relative py-24 md:py-36 px-0 bg-slate-50 border-t border-slate-100 overflow-hidden">
-          {/* Section Glow Overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-60"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
+        {/* Reviews */}
+        <section id="reviews" className="relative py-24 md:py-36 px-0 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
@@ -1076,15 +1026,8 @@ export default function Landing() {
 
         <Pricing />
 
-        {/* Final CTA — Standardized Background */}
-        <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50 border-t border-slate-100 overflow-hidden">
-          {/* Section Glow Overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-80"
-            style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-            }}
-          />
+        {/* Final CTA */}
+        <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Get Started</span>

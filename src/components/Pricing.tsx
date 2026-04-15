@@ -184,15 +184,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
   }
 
   return (
-    <section id="pricing" className="relative py-24 md:py-36 px-4 bg-slate-50 overflow-hidden border-t border-slate-100">
-
-      {/* Background glow */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
-        }}
-      />
+    <section id="pricing" className="relative py-24 md:py-36 px-4 bg-white/70 backdrop-blur-sm overflow-hidden border-t border-slate-100">
 
       <div className="relative z-10 max-w-7xl mx-auto">
 
