@@ -28,32 +28,33 @@ type Brand = {
   id: string
   label: string
   path: string
+  color: string   // Official brand hex color
   scale?: number
 }
 
 const BRANDS: Brand[] = [
-  { id: 'bmw',     label: 'BMW',        path: siBmw.path,        scale: 1.05 },
-  { id: 'audi',    label: 'Audi',       path: siAudi.path,       scale: 1.1  },
-  { id: 'vw',      label: 'Volkswagen', path: siVolkswagen.path, scale: 1.0  },
-  { id: 'toyota',  label: 'Toyota',     path: siToyota.path,     scale: 1.0  },
-  { id: 'ford',    label: 'Ford',       path: siFord.path,       scale: 1.0  },
-  { id: 'hyundai', label: 'Hyundai',    path: siHyundai.path,    scale: 1.1  },
-  { id: 'kia',     label: 'Kia',        path: siKia.path,        scale: 0.95 },
-  { id: 'renault', label: 'Renault',    path: siRenault.path,    scale: 0.95 },
-  { id: 'peugeot', label: 'Peugeot',    path: siPeugeot.path,    scale: 1.0  },
-  { id: 'nissan',  label: 'Nissan',     path: siNissan.path,     scale: 1.0  },
-  { id: 'dacia',   label: 'Dacia',      path: siDacia.path,      scale: 1.0  },
-  { id: 'volvo',   label: 'Volvo',      path: siVolvo.path,      scale: 1.0  },
-  { id: 'fiat',    label: 'Fiat',       path: siFiat.path,       scale: 1.0  },
-  { id: 'skoda',   label: 'Škoda',      path: siSkoda.path,      scale: 1.0  },
-  { id: 'seat',    label: 'SEAT',       path: siSeat.path,       scale: 1.0  },
-  { id: 'opel',    label: 'Opel',       path: siOpel.path,       scale: 1.0  },
-  { id: 'citroen', label: 'Citroën',    path: siCitroen.path,    scale: 1.0  },
+  { id: 'bmw',     label: 'BMW',        path: siBmw.path,        color: '#0066B1', scale: 1.05 },
+  { id: 'audi',    label: 'Audi',       path: siAudi.path,       color: '#BB0A30', scale: 1.1  },
+  { id: 'vw',      label: 'Volkswagen', path: siVolkswagen.path, color: '#151F5D', scale: 1.0  },
+  { id: 'toyota',  label: 'Toyota',     path: siToyota.path,     color: '#EB0A1E', scale: 1.0  },
+  { id: 'ford',    label: 'Ford',       path: siFord.path,       color: '#003478', scale: 1.0  },
+  { id: 'hyundai', label: 'Hyundai',    path: siHyundai.path,    color: '#002C5E', scale: 1.1  },
+  { id: 'kia',     label: 'Kia',        path: siKia.path,        color: '#05141F', scale: 0.95 },
+  { id: 'renault', label: 'Renault',    path: siRenault.path,    color: '#FFCC33', scale: 0.95 },
+  { id: 'peugeot', label: 'Peugeot',    path: siPeugeot.path,    color: '#1a1a1a', scale: 1.0  },
+  { id: 'nissan',  label: 'Nissan',     path: siNissan.path,     color: '#C3002F', scale: 1.0  },
+  { id: 'dacia',   label: 'Dacia',      path: siDacia.path,      color: '#646B52', scale: 1.0  },
+  { id: 'volvo',   label: 'Volvo',      path: siVolvo.path,      color: '#003057', scale: 1.0  },
+  { id: 'fiat',    label: 'Fiat',       path: siFiat.path,       color: '#941711', scale: 1.0  },
+  { id: 'skoda',   label: 'Škoda',      path: siSkoda.path,      color: '#0E3A2F', scale: 1.0  },
+  { id: 'seat',    label: 'SEAT',       path: siSeat.path,       color: '#33302E', scale: 1.0  },
+  { id: 'opel',    label: 'Opel',       path: siOpel.path,       color: '#929292', scale: 1.0  },
+  { id: 'citroen', label: 'Citroën',    path: siCitroen.path,    color: '#DA291C', scale: 1.0  },
 ]
 
-const BASE_SIZE = 32
+const BASE_SIZE = 34
 
-function BrandLogo({ id, label, path, scale = 1 }: Brand) {
+function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
   const size = Math.round(BASE_SIZE * scale)
   return (
     <div
@@ -62,18 +63,17 @@ function BrandLogo({ id, label, path, scale = 1 }: Brand) {
       aria-label={label}
       className="
         flex-shrink-0 flex items-center justify-center
-        text-slate-300
-        opacity-60 hover:opacity-100
-        hover:text-[#0070E0]
+        opacity-70 hover:opacity-100
         transition-all duration-500 ease-out
         cursor-default select-none
+        hover:scale-110
       "
       style={{ width: size, height: size }}
     >
       <svg
         role="img"
         viewBox="0 0 24 24"
-        fill="currentColor"
+        fill={color}
         width={size}
         height={size}
         aria-label={label}
