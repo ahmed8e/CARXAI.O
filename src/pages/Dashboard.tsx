@@ -147,15 +147,15 @@ export default function Dashboard() {
       {/* 4. Compact Vehicle Card */}
       <div className="mb-10">
         {!defaultVehicle && !loadingVehicle ? (
-          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-navy/[0.03] dark:bg-surface-high/40 border border-dashed border-overlay p-4 rounded-3xl transition-all hover:border-navy/30">
-            <div className="w-10 h-10 rounded-full bg-surface dark:bg-surface-high/40 border border-overlay flex items-center justify-center shadow-sm">
-              <Plus className="w-5 h-5 text-navy" />
+          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-white border border-slate-100 p-5 rounded-[28px] transition-all hover:shadow-lg hover:shadow-slate-200/50 shadow-sm shadow-slate-200/20">
+            <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:border-blue-100">
+              <Plus className="w-5 h-5 text-blue-600" />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-black text-on-surface uppercase tracking-tight">Add your vehicle</p>
-              <p className="text-[10px] text-muted font-medium">Unlock precise AI help for your specific car.</p>
+              <p className="text-xs font-display font-black text-slate-900 uppercase tracking-widest mb-0.5">Add your vehicle</p>
+              <p className="text-[10px] text-slate-400 font-medium">Unlock precise AI help for your specific car.</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500 transition-all" />
           </Link>
         ) : defaultVehicle ? (
           <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-surface dark:bg-surface-low/80 border border-overlay p-4 rounded-3xl shadow-sm hover:shadow-md transition-all group">

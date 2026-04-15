@@ -11,7 +11,6 @@ interface StoryModalProps {
 const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll while modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -21,7 +20,6 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Close on Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -38,147 +36,255 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[200] bg-[#0E3882]/40 backdrop-blur-md"
             onClick={onClose}
           />
 
           {/* Modal Panel */}
           <motion.div
             key="story-modal"
-            initial={{ opacity: 0, y: 32, scale: 0.97 }}
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28, mass: 0.9 }}
-            className="fixed inset-x-4 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-[201] w-auto md:w-full md:max-w-xl"
+            exit={{ opacity: 0, y: 28, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 32, mass: 1 }}
+            className="fixed inset-x-4 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-[201] w-auto md:w-full md:max-w-lg"
           >
-            <div className="relative w-full bg-white rounded-t-[32px] md:rounded-[32px] shadow-[0_40px_100px_rgba(0,112,224,0.18)] overflow-hidden max-h-[90vh] md:max-h-[82vh] flex flex-col">
-
-              {/* Top shimmer line */}
-              <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[#0070E0]/30 to-transparent" />
+            <div
+              className="relative w-full rounded-t-[36px] md:rounded-[32px] overflow-hidden max-h-[92vh] md:max-h-[86vh] flex flex-col"
+              style={{
+                background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
+                boxShadow: '0 0 0 1px rgba(0,112,224,0.08), 0 32px 80px -12px rgba(14,56,130,0.22), 0 8px 20px rgba(0,0,0,0.06)',
+              }}
+            >
+              {/* Ambient top glow line */}
+              <div
+                className="absolute top-0 inset-x-0 h-px"
+                style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(0,112,224,0.4) 40%, rgba(0,112,224,0.4) 60%, transparent 95%)' }}
+              />
 
               {/* Header */}
-              <div className="flex items-start justify-between px-7 pt-7 pb-4 shrink-0 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#0070E0] flex items-center justify-center shadow-md shadow-[#0070E0]/30">
-                    <Zap size={18} fill="white" className="text-white" />
+              <div className="px-7 pt-7 pb-5 shrink-0">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    {/* Icon */}
+                    <div
+                      className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-lg"
+                      style={{
+                        background: 'linear-gradient(135deg, #0070E0 0%, #0050C4 100%)',
+                        boxShadow: '0 8px 20px rgba(0,112,224,0.3), 0 1px 0 rgba(255,255,255,0.15) inset',
+                      }}
+                    >
+                      <Zap size={18} fill="white" className="text-white" />
+                    </div>
+                    <div>
+                      <p
+                        className="text-[10px] font-black uppercase tracking-[0.22em] mb-0.5"
+                        style={{ color: '#0070E0' }}
+                      >
+                        The Origin Story
+                      </p>
+                      <h3
+                        className="text-[18px] font-display font-black leading-tight tracking-tight"
+                        style={{ color: '#0E1628' }}
+                      >
+                        How CarxAI Was Born
+                      </h3>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0070E0] mb-0.5">The Idea Behind CarxAI</p>
-                    <h3 className="text-lg font-display font-bold text-slate-900 leading-tight tracking-tight">How CarxAI began</h3>
-                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    onClick={onClose}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 mt-0.5 group"
+                    style={{ background: 'rgba(14,56,130,0.05)', border: '1px solid rgba(14,56,130,0.08)' }}
+                    aria-label="Close"
+                  >
+                    <X size={15} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+                  </button>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors group shrink-0 mt-0.5"
-                  aria-label="Close"
-                >
-                  <X size={16} className="text-slate-500 group-hover:text-slate-700 transition-colors" />
-                </button>
+
+                {/* Separator */}
+                <div className="mt-5 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,112,224,0.12) 0%, rgba(0,112,224,0.04) 100%)' }} />
               </div>
 
-              {/* Scrollable Story Content */}
+              {/* Scrollable Content */}
               <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto px-7 py-6 scroll-smooth"
+                className="flex-1 overflow-y-auto px-7 pb-6 scroll-smooth"
                 style={{ WebkitOverflowScrolling: 'touch' }}
               >
-                {/* Decorative accent line */}
-                <div className="w-12 h-1 bg-gradient-to-r from-[#0070E0] to-[#005BB5] rounded-full mb-6" />
-
-                <div className="prose prose-slate max-w-none space-y-5 text-[15px] leading-[1.75] text-slate-600 font-medium">
-                  <p>
+                {/* Opening — Editorial typography */}
+                <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
+                  <p style={{ color: '#374151' }}>
                     CarxAI did not begin with code.
-                    <br />
+                  </p>
+                  <p>
                     It began with a feeling I saw too often in real life — that moment when a driver knows something is wrong,
                     but has no clear idea what the car is trying to say.
                   </p>
+                </div>
 
-                  <div className="pl-4 border-l-2 border-[#0070E0]/30 space-y-1.5 text-slate-500 text-[14px] italic">
-                    <p>A warning light comes on.</p>
-                    <p>The engine sounds different.</p>
-                    <p>The car loses power.</p>
-                    <p>And before any repair even starts, stress takes over.</p>
-                  </div>
-
-                  <p>
-                    As a mechanic, I saw that moment again and again.
-                    Not just the fault itself — but the uncertainty around it.
-                    People were trying to decide whether to keep driving, whether to stop,
-                    whether it was serious, or whether they were about to make it worse.
-                  </p>
-
-                  <div className="bg-[#F0F7FF] rounded-2xl px-5 py-4 border border-[#0070E0]/12">
-                    <p className="font-bold text-slate-800 text-[15px] leading-relaxed m-0">
-                      That moment matters more than most people realize.
+                {/* Italic Pull Quote */}
+                <div
+                  className="my-6 px-5 py-4 rounded-2xl space-y-2"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0,112,224,0.04) 0%, rgba(0,80,196,0.06) 100%)',
+                    border: '1px solid rgba(0,112,224,0.10)',
+                  }}
+                >
+                  {[
+                    'A warning light comes on.',
+                    'The engine sounds different.',
+                    'The car loses power.',
+                    'And before any repair even starts — stress takes over.',
+                  ].map((line, i) => (
+                    <p
+                      key={i}
+                      className="text-[13.5px] italic leading-relaxed"
+                      style={{ color: i === 3 ? '#0E3882' : '#64748b', fontWeight: i === 3 ? 600 : 500 }}
+                    >
+                      {line}
                     </p>
-                  </div>
+                  ))}
+                </div>
 
+                <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    Because when a car changes, the first thing a driver needs is not noise.
-                    Not vague advice. Not ten different opinions.
-                    They need clarity. They need logic.
-                    They need someone to narrow the problem down the right way.
+                    As a mechanic, I saw that moment again and again. Not just the fault itself — but the uncertainty around it.
+                    People were trying to decide whether to keep driving, whether it was serious, or whether they were about to make it worse.
                   </p>
+                </div>
 
-                  <p className="font-semibold text-slate-700">That is where CarxAI came from.</p>
+                {/* Emphasis Block */}
+                <div
+                  className="my-6 px-6 py-5 rounded-2xl relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%)',
+                    border: '1px solid rgba(0,112,224,0.14)',
+                  }}
+                >
+                  <div
+                    className="absolute top-0 left-6 right-6 h-px"
+                    style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.25), transparent)' }}
+                  />
+                  <p
+                    className="text-[15px] font-bold leading-relaxed"
+                    style={{ color: '#0E3882' }}
+                  >
+                    That moment matters more than most people realise.
+                  </p>
+                  <p
+                    className="mt-1.5 text-[13.5px] leading-relaxed font-medium"
+                    style={{ color: '#4B6EA8' }}
+                  >
+                    When a car changes, the first thing a driver needs is not noise — they need clarity.
+                  </p>
+                </div>
 
+                <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    The idea was never to build another generic AI tool.
-                    It was to take the way a real mechanic thinks — symptom by symptom, risk by risk, step by step —
-                    and turn that into guidance people could access the moment they needed it.
+                    The idea was never to build another generic AI tool. It was to take the way a real mechanic thinks —
+                    symptom by symptom, risk by risk, step by step — and turn that into guidance people could access the moment they needed it.
                   </p>
+                </div>
 
-                  <div className="pl-4 border-l-2 border-[#0070E0]/30 space-y-1.5 text-slate-500 text-[14px]">
-                    <p>Something calmer.</p>
-                    <p>Something more useful.</p>
-                    <p>Something built around the real questions drivers ask when the situation feels uncertain.</p>
-                  </div>
+                {/* Pillars */}
+                <div
+                  className="my-4 py-3 space-y-2"
+                  style={{ borderLeft: '2px solid rgba(0,112,224,0.2)', paddingLeft: '16px' }}
+                >
+                  {[
+                    'Something calmer.',
+                    'Something more useful.',
+                    'Something built around the real questions drivers ask.',
+                  ].map((line, i) => (
+                    <p
+                      key={i}
+                      className="text-[13.5px] italic leading-relaxed font-medium"
+                      style={{ color: '#64748b' }}
+                    >
+                      {line}
+                    </p>
+                  ))}
+                </div>
 
+                <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
                     CarxAI was shaped from real patterns, repeated problems, and the kind of practical reasoning
                     that only becomes valuable when trust is on the line.
-                    It was built to help people understand what may be happening, how urgent it might be,
-                    and what the safest next step should be.
                   </p>
+                </div>
 
-                  {/* Trust Badges */}
-                  <div className="grid grid-cols-2 gap-3 my-6">
-                    {[
-                      { icon: Wrench, label: 'Real mechanic reasoning', },
-                      { icon: ShieldCheck, label: 'Urgency-first guidance', },
-                    ].map(({ icon: Icon, label }) => (
-                      <div key={label} className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3.5 py-3 border border-slate-100">
-                        <div className="w-7 h-7 rounded-lg bg-[#0070E0]/10 flex items-center justify-center shrink-0">
-                          <Icon size={14} className="text-[#0070E0]" />
-                        </div>
-                        <span className="text-[12px] font-bold text-slate-700 leading-snug">{label}</span>
+                {/* Trust Badges */}
+                <div className="grid grid-cols-2 gap-3 my-6">
+                  {[
+                    { icon: Wrench, label: 'Real mechanic reasoning', desc: 'Trained on real diagnostic patterns' },
+                    { icon: ShieldCheck, label: 'Urgency-first guidance', desc: 'Prioritises your safety above all' },
+                  ].map(({ icon: Icon, label, desc }) => (
+                    <div
+                      key={label}
+                      className="flex flex-col gap-2 px-3.5 py-3.5 rounded-2xl"
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid rgba(0,112,224,0.10)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                      }}
+                    >
+                      <div
+                        className="w-7 h-7 rounded-xl flex items-center justify-center"
+                        style={{ background: 'rgba(0,112,224,0.08)' }}
+                      >
+                        <Icon size={14} className="text-[#0070E0]" />
                       </div>
-                    ))}
-                  </div>
+                      <div>
+                        <p className="text-[11.5px] font-black text-slate-700 leading-snug mb-0.5">{label}</p>
+                        <p className="text-[10.5px] font-medium text-slate-400 leading-snug">{desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
+                {/* Closing */}
+                <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
                     Because when a car problem begins, trust is not earned by sounding intelligent.
                     It is earned by helping someone feel more clear, more grounded, and less alone in the decision they have to make next.
                   </p>
-
-                  <p className="font-semibold text-slate-700 text-[15px]">
+                  <p style={{ color: '#1e3a5f', fontWeight: 700 }}>
                     That is what CarxAI was built to do.
                   </p>
                 </div>
               </div>
 
               {/* CTA Footer */}
-              <div className="px-7 py-5 border-t border-slate-100 shrink-0 bg-white">
-                <button
-                  onClick={() => { onClose(); onCTAClick?.(); }}
-                  className="w-full py-4 rounded-2xl bg-[#0070E0] text-white font-black text-[15px] flex items-center justify-center gap-2.5 shadow-[0_8px_24px_rgba(0,112,224,0.25)] hover:brightness-110 hover:-translate-y-0.5 transition-all group"
-                >
-                  See how CarxAI thinks
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
+              <div
+                className="px-7 py-5 shrink-0 relative"
+                style={{ borderTop: '1px solid rgba(0,112,224,0.07)', background: 'linear-gradient(180deg, rgba(248,251,255,0) 0%, rgba(240,247,255,0.5) 100%)' }}
+              >
+                {/* Top fade */}
+                <div className="absolute -top-6 inset-x-0 h-6 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, rgba(248,251,255,0.95))' }} />
 
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => { onClose(); onCTAClick?.(); }}
+                  className="w-full py-4 rounded-2xl text-white font-black text-[15px] flex items-center justify-center gap-2.5 relative overflow-hidden group"
+                  style={{
+                    background: 'linear-gradient(135deg, #0E3882 0%, #0050C4 60%, #0070E0 100%)',
+                    boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 16px 40px -8px rgba(14,56,130,0.5)',
+                  }}
+                >
+                  {/* Shimmer line */}
+                  <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                  See how CarxAI thinks
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform shrink-0" />
+                </motion.button>
+
+                <p className="text-center text-[11px] text-slate-400 font-medium mt-3 tracking-wide">
+                  Start free · No credit card required
+                </p>
+              </div>
             </div>
           </motion.div>
         </>

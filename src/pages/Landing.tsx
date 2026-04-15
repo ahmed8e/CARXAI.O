@@ -452,18 +452,21 @@ export default function Landing() {
         {/* Immersive Scroll Hero Section - Light SaaS Aesthetic */}
         <section ref={heroRef} className="relative h-[160vh] bg-white">
           <div className="sticky top-0 h-screen w-full flex items-start md:items-center justify-center px-6 overflow-hidden">
-            {/* Light SaaS Background Elements */}
-            <div className="absolute inset-0 z-0">
-               {/* Subtle Dot Grid */}
-               <div className="absolute inset-0 opacity-[0.4]" 
+             {/* Light SaaS Background Elements */}
+            <div className="absolute inset-0 z-0 bg-white">
+               {/* Subtle Dot Grid — Refined for unification */}
+               <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
                  style={{ 
                    backgroundImage: 'radial-gradient(circle, #0070E0 0.5px, transparent 0.5px)', 
-                   backgroundSize: '32px 32px' 
+                   backgroundSize: '48px 48px' 
                  }} 
                />
-               {/* Soft Blue Glows */}
-               <div className="absolute top-0 left-1/4 w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60" />
-               <div className="absolute bottom-0 right-1/4 w-[30%] h-[30%] bg-indigo-50 rounded-full blur-[100px] opacity-40" />
+               {/* Soft Blue Glow — Identical to Pricing for unification */}
+               <div className="absolute inset-0 z-0"
+                 style={{
+                   background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.06) 0%, transparent 80%)',
+                 }}
+               />
             </div>
 
             <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
@@ -570,9 +573,16 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Problem Section */}
-        <section id="problem" className="pt-12 pb-6 md:pt-20 md:pb-10 px-6 bg-[#F8FAFC] dark:bg-surface-low">
-          <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+        {/* Problem Section — Standardized Background */}
+        <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50 overflow-hidden border-t border-slate-100">
+          {/* Section Glow Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-60"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">The Problem</span>
             </div>
@@ -583,13 +593,13 @@ export default function Landing() {
                 { title: 'Expensive diagnostics', desc: 'Simple answers cost too much', icon: DollarSign },
                 { title: 'Hard to find help', desc: 'You lose time when it matters', icon: Clock }
               ].map((prob, i) => (
-                <div key={i} className="group p-6 rounded-[32px] bg-surface dark:bg-surface-high/40 border border-overlay shadow-sm hover:border-navy/20 hover:shadow-xl transition-all text-left flex flex-col items-start gap-4 h-full">
-                  <div className="w-12 h-12 rounded-2xl bg-navy/10 flex items-center justify-center border border-navy/20 group-hover:bg-navy group-hover:text-white transition-all duration-300">
-                    <prob.icon className="w-6 h-6 text-navy group-hover:text-white" />
+                <div key={i} className="group p-6 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all text-left flex flex-col items-start gap-4 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#0070E0]/5 flex items-center justify-center border border-[#0070E0]/10 group-hover:bg-[#0070E0] group-hover:text-white transition-all duration-300">
+                    <prob.icon className="w-6 h-6 text-[#0070E0] group-hover:text-white" />
                   </div>
                   <div>
-                    <div className="text-on-surface font-bold text-lg leading-tight mb-1">{prob.title}</div>
-                    <div className="text-sm text-muted font-medium">{prob.desc}</div>
+                    <div className="text-slate-900 font-bold text-lg leading-tight mb-1">{prob.title}</div>
+                    <div className="text-sm text-slate-500 font-medium">{prob.desc}</div>
                   </div>
                 </div>
               ))}
@@ -598,9 +608,16 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section id="how-it-works" className="pt-12 pb-12 md:pt-20 md:pb-24 px-0 overflow-hidden bg-white dark:bg-surface">
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
+        {/* How It Works — Standardized Background */}
+        <section id="how-it-works" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white border-t border-slate-100">
+          {/* Section Glow Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-40"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
             </div>
@@ -692,144 +709,57 @@ export default function Landing() {
                     setActiveIndex(i);
                     resetTimer();
                   }}
-                  className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-navy' : 'w-4 bg-navy/10'}`}
+                  className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-[#0070E0]' : 'w-4 bg-[#0070E0]/10'}`}
                 />
               ))}
             </div>
           </div>
         </section>
 
-        {/* Product Proof & Capabilities Section */}
-        <section className="py-16 md:py-32 px-6 overflow-hidden bg-slate-50 dark:bg-surface-high/20 border-y border-overlay">
-          {/* Extracted Centered Header */}
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Real world proof</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">See how carx.ai helps in a real situation</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto">A clear example of how AI diagnosis, urgency guidance, and next-step recommendations work together.</p>
-          </div>
 
-          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
-            {/* Left Col: Text & Capabilities */}
-            <div className="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start">
-              
-              {/* Trust / Capability Metrics */}
-              <div className="w-full">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-navy mb-6">Built for real car problems</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                  {[
-                    { title: 'Warning lights guidance', icon: ShieldAlert },
-                    { title: 'No-start issue support', icon: Zap },
-                    { title: 'Smoke & overheating analysis', icon: Activity },
-                    { title: 'Nearby help discovery', icon: MapPin },
-                  ].map((capability, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-4 bg-surface rounded-2xl border border-[#0070E0]/20 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="w-10 h-10 rounded-xl bg-navy/5 flex items-center justify-center text-navy shrink-0 border border-navy/10">
-                        <capability.icon className="w-5 h-5 text-navy" strokeWidth={2} />
-                      </div>
-                      <span className="text-[13px] md:text-sm font-bold text-on-surface leading-snug">{capability.title}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Right Col: The Realistic AI Diagnosis Example Card */}
-            <div className="flex-1 w-full max-w-lg relative">
-              {/* Behind glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0070E0]/20 to-[#005BB5]/20 blur-[100px] scale-90 -z-10 rounded-full" />
-              
-              <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="bg-surface rounded-[32px] p-6 md:p-8 shadow-[0_24px_80px_rgba(0,112,224,0.12)] border border-overlay relative"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-navy/10 flex items-center justify-center border border-navy/20">
-                      <Bot className="w-5 h-5 text-navy" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted mb-[2px]">AI Mechanic</h4>
-                      <p className="font-bold text-on-surface text-sm leading-none">Diagnosis Complete</p>
-                    </div>
-                  </div>
-                  <div className="px-3 py-1.5 bg-[#0070E0]/10 text-[#0070E0] border border-[#0070E0]/30 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
-                    <ShieldAlert className="w-3 h-3" />
-                    High Urgency
-                  </div>
-                </div>
-
-                <div className="space-y-3 md:space-y-4">
-                  <div className="p-4 rounded-[20px] bg-surface-low border border-overlay/60">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Likely Issue</p>
-                    <p className="font-bold text-on-surface text-lg">Excessive exhaust smoke</p>
-                  </div>
-
-                  <div className="p-4 rounded-[20px] bg-[#005BB5]/5 border border-[#005BB5]/20">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#0070E0] mb-1">Driving Advice</p>
-                    <p className="font-bold text-[#005BB5] text-[15px]">Stop safely. Not recommended to continue driving.</p>
-                  </div>
-
-                  <div className="p-4 rounded-[20px] bg-surface-low border border-overlay/60">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Likely Cause</p>
-                    <p className="font-medium text-slate-600 text-sm">Possible oil burning or incomplete combustion.</p>
-                  </div>
-
-                  <div className="pt-4 mt-2 border-t border-overlay/50">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 text-center">Best Next Steps</p>
-                    <div className="flex flex-col gap-2.5">
-                       <button disabled className="w-full py-3.5 rounded-xl bg-navy text-white font-bold text-sm shadow-md shadow-navy/20 flex items-center justify-center gap-2 opacity-100 cursor-default">
-                         <Truck className="w-4 h-4" /> Towing recommended
-                       </button>
-                       <button disabled className="w-full py-3.5 rounded-xl bg-surface border border-overlay text-on-surface font-bold text-sm flex items-center justify-center gap-2 opacity-100 cursor-default">
-                         <Users className="w-4 h-4 text-muted" /> Find mechanic
-                       </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
         
-        {/* Built Like a Mechanic Thinks — Trust Section */}
-        <section className="py-12 md:py-32 bg-white dark:bg-surface relative overflow-hidden">
-          {/* Subtle Background Pattern */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0E3882 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          
-          {/* Centered Header */}
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
-            <motion.div 
+        {/* ── Expert Trust Section ─────────────────────────────────── */}
+        <section className="relative py-24 md:py-36 bg-slate-50 border-t border-slate-100 overflow-hidden">
+          {/* Section Glow */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0070E0 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+
+          {/* ── Section Header ── */}
+          <div className="max-w-6xl mx-auto px-6 mb-16 md:mb-20 text-center flex flex-col items-center relative z-10">
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+              style={{ background: 'rgba(0,112,224,0.06)', border: '1px solid rgba(0,112,224,0.12)' }}
             >
-              <ShieldCheck className="w-3 h-3 text-navy" />
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted diagnostic logic</span>
+              <ShieldCheck className="w-3 h-3 text-[#0070E0]" />
+              <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">Trusted Diagnostic Logic</span>
             </motion.div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface"
+              className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A]"
             >
               Built with the mindset of <br className="md:hidden" />
               <span className="text-[#0070E0]">an experienced mechanic</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6"
+              className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6 leading-relaxed"
             >
-              carx.ai was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step faster and with more confidence.
+              CarxAI was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
             </motion.p>
 
             {/* Story Trigger */}
@@ -839,164 +769,156 @@ export default function Landing() {
               viewport={{ once: true }}
               transition={{ delay: 0.35 }}
               onClick={() => setStoryOpen(true)}
-              className="mt-8 group inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white border border-[#0070E0]/20 hover:border-[#0070E0]/50 hover:bg-[#F0F7FF] text-[#0070E0] font-bold text-sm shadow-sm hover:shadow-md transition-all"
+              className="mt-10 group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white font-black text-sm transition-all duration-300"
+              style={{
+                border: '1px solid rgba(0,112,224,0.12)',
+                color: '#0E3882',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
             >
-              <Zap size={14} className="text-[#0070E0] shrink-0" fill="currentColor" />
-              Why I built CarxAI
-              <ChevronRight size={14} className="text-[#0070E0]/60 group-hover:translate-x-1 transition-transform" />
+              <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
+              How CarxAI Was Born
+              <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
+              <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
             </motion.button>
           </div>
 
+          {/* ── Two-Column Content ── */}
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
-              
+            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-start">
+
               {/* Left Column: Trust Value Propositions */}
               <div className="flex flex-col items-start text-left">
-
-                {/* Trust Points */}
-                <div className="space-y-4 md:space-y-8 mb-8 md:mb-12">
+                <div className="space-y-6 md:space-y-8">
                   {[
-                    { 
-                      icon: Bot, 
-                      title: 'Symptom-first thinking', 
-                      desc: 'Logic-based symptom assessment.' 
+                    {
+                      icon: Bot,
+                      title: 'Symptom-first thinking',
+                      desc: 'Logic-based symptom assessment, not keyword matching.',
                     },
-                    { 
-                      icon: ShieldAlert, 
-                      title: 'Urgency guidance', 
-                      desc: 'Differentiates critical vs minor issues.' 
+                    {
+                      icon: ShieldAlert,
+                      title: 'Urgency guidance',
+                      desc: 'Differentiates critical situations from minor issues.',
                     },
-                    { 
-                      icon: CheckCircle2, 
-                      title: 'Clear next steps', 
-                      desc: 'Simple, actionable guidance.' 
-                    }
+                    {
+                      icon: CheckCircle2,
+                      title: 'Clear next steps',
+                      desc: 'Actionable guidance you can follow immediately.',
+                    },
                   ].map((pt, i) => (
-                    <motion.div 
+                    <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: 0.3 + (i * 0.1) }}
+                      transition={{ delay: 0.2 + i * 0.1 }}
                       className="flex items-start gap-4 md:gap-5 group"
                     >
-                      <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-navy/5 border border-navy/10 flex items-center justify-center shrink-0 transition-all duration-500 group-hover:bg-navy group-hover:text-white">
-                        <pt.icon className="w-4 h-4 md:w-6 md:h-6 text-navy group-hover:text-white" />
+                      <div
+                        className="w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 group-hover:scale-105"
+                        style={{
+                          background: 'rgba(0,112,224,0.06)',
+                          border: '1px solid rgba(0,112,224,0.10)',
+                        }}
+                      >
+                        <pt.icon className="w-5 h-5 md:w-5.5 md:h-5.5 text-[#0070E0]" />
                       </div>
                       <div>
-                        <h4 className="text-[15px] md:text-lg font-black text-navy mb-0.5 tracking-tight">{pt.title}</h4>
-                        <p className="text-muted font-medium text-[12px] md:text-[15px]">{pt.desc}</p>
+                        <h4 className="text-[15px] md:text-[17px] font-black text-[#0F172A] mb-1 tracking-tight">{pt.title}</h4>
+                        <p className="text-[#64748B] font-medium text-[13px] md:text-[14.5px] leading-relaxed">{pt.desc}</p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
-
-                <motion.button 
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate('/auth')}
-                  className="relative overflow-hidden rounded-2xl group w-full sm:w-auto"
-                >
-                  <div
-                    className="relative px-10 py-5 flex items-center justify-center gap-3 font-black text-[15px] text-white transition-all duration-300"
-                    style={{
-                      background: 'linear-gradient(135deg, #0E3882 0%, #0050C4 60%, #0070E0 100%)',
-                      boxShadow: '0 1px 0 0 rgba(255,255,255,0.12) inset, 0 24px 56px -10px rgba(14,56,130,0.5)',
-                    }}
-                  >
-                    <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                    Ask Carx AI Now
-                    <Zap className="w-4 h-4 text-cyan-300 shrink-0" fill="currentColor" />
-                  </div>
-                </motion.button>
               </div>
 
-              {/* Right Column: Premium Profile Card */}
-              <div className="relative mt-8 md:mt-0">
-                {/* Decorative Elements */}
-                <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#0070E0]/10 rounded-full blur-3xl opacity-60" />
-                <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-[#005BB5]/10 rounded-full blur-3xl opacity-40" />
-                
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.92, y: 30 }}
+              {/* Right Column: Expert Profile Card */}
+              <div className="relative mt-4 md:mt-0">
+                {/* Ambient glow behind card */}
+                <div className="absolute -top-10 -right-10 w-56 h-56 rounded-full blur-3xl opacity-50 pointer-events-none" style={{ background: 'rgba(0,112,224,0.10)' }} />
+                <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full blur-3xl opacity-30 pointer-events-none" style={{ background: 'rgba(0,91,181,0.08)' }} />
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.94, y: 24 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative group overflow-hidden"
+                  className="relative overflow-hidden"
                   style={{
-                    borderRadius: '32px',
-                    background: 'linear-gradient(160deg, rgba(255,255,255,0.98) 0%, rgba(240,247,255,0.95) 100%)',
-                    border: '1px solid rgba(0,112,224,0.1)',
-                    boxShadow: '0 2px 0 0 rgba(255,255,255,0.9) inset, 0 40px 80px -20px rgba(0,80,196,0.14), 0 0 0 1px rgba(0,112,224,0.06)',
+                    borderRadius: '28px',
+                    background: 'linear-gradient(165deg, #ffffff 0%, #f8fbff 100%)',
+                    border: '1px solid rgba(0,112,224,0.10)',
+                    boxShadow: '0 0 0 1px rgba(0,112,224,0.04), 0 24px 60px -16px rgba(0,80,196,0.14), 0 4px 12px rgba(0,0,0,0.04)',
                   }}
                 >
-                  {/* Top shimmer line */}
-                  <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[#0070E0]/25 to-transparent" />
+                  {/* Top shimmer */}
+                  <div className="absolute top-0 left-8 right-8 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.20), transparent)' }} />
 
-                  <div className="p-6 md:p-10">
+                  <div className="p-6 md:p-8">
                     {/* Profile Header */}
-                    <div className="flex flex-row items-center gap-4 md:gap-7 mb-5 md:mb-8 pb-5 md:pb-8 border-b border-[#0070E0]/8">
+                    <div className="flex flex-row items-center gap-4 md:gap-5 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(0,112,224,0.08)' }}>
                       <div className="relative shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#0070E0] to-[#0050C4] rounded-full blur-[14px] opacity-25" />
-                        <div className="w-16 h-16 md:w-28 md:h-28 rounded-full border-[2.5px] md:border-[3px] border-white shadow-xl relative z-10 overflow-hidden"
-                          style={{ boxShadow: '0 0 0 3px rgba(0,112,224,0.1), 0 8px 24px rgba(0,80,196,0.2)' }}
+                        <div className="absolute inset-0 bg-[#0070E0] rounded-full blur-[12px] opacity-20" />
+                        <div
+                          className="w-16 h-16 md:w-20 md:h-20 rounded-full border-[2.5px] border-white relative z-10 overflow-hidden"
+                          style={{ boxShadow: '0 0 0 3px rgba(0,112,224,0.08), 0 6px 20px rgba(0,80,196,0.16)' }}
                         >
-                          <img 
-                            src="/lukas_mechanic_avatar.png" 
-                            alt="Lukas Schneider" 
+                          <img
+                            src="/lukas_mechanic_avatar.png"
+                            alt="Lukas Schneider"
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div
-                          className="absolute -bottom-1 -right-1 w-6 h-6 md:w-9 md:h-9 rounded-full border-2 md:border-[2.5px] border-white flex items-center justify-center shadow-lg z-20"
-                          style={{ background: 'linear-gradient(135deg, #0070E0, #0050C4)' }}
+                          className="absolute -bottom-0.5 -right-0.5 w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center z-20"
+                          style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.3)' }}
                         >
-                          <BadgeCheck className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                          <BadgeCheck className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" />
                         </div>
                       </div>
 
                       <div className="text-left flex-1 min-w-0">
                         <div
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.12em] mb-1.5 shadow-sm"
-                          style={{ background: 'linear-gradient(135deg, #0E3882, #0070E0)' }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.14em] mb-1.5"
+                          style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.2)' }}
                         >
                           Lead Expert
                         </div>
-                        <h3 className="text-xl md:text-2xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">Lukas Schneider</h3>
+                        <h3 className="text-lg md:text-xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">Lukas Schneider</h3>
                         <p className="text-[#0070E0] font-bold uppercase tracking-[0.12em] text-[9px] md:text-[10px]">Senior Diagnostic Specialist</p>
                       </div>
                     </div>
 
-                    {/* Profile Metrics */}
-                    <div className="grid grid-cols-2 gap-3 mb-5 md:mb-7">
+                    {/* Metrics */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
                       {[{ label: 'Experience', value: '14+ Years' }, { label: 'Cases', value: '5,200+' }].map(({ label, value }) => (
                         <div
                           key={label}
-                          className="relative overflow-hidden p-3.5 md:p-5 rounded-2xl"
+                          className="relative overflow-hidden p-3.5 md:p-4 rounded-2xl"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(0,112,224,0.05) 0%, rgba(0,80,196,0.08) 100%)',
-                            border: '1px solid rgba(0,112,224,0.1)',
+                            background: 'rgba(0,112,224,0.04)',
+                            border: '1px solid rgba(0,112,224,0.08)',
                           }}
                         >
-                          <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-[#0070E0]/20 to-transparent" />
-                          <p className="text-[8px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400 font-black mb-1">{label}</p>
-                          <p className="text-lg md:text-xl font-black" style={{ color: '#0E3882' }}>{value}</p>
+                          <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-1">{label}</p>
+                          <p className="text-lg md:text-xl font-black text-[#0E3882]">{value}</p>
                         </div>
                       ))}
                     </div>
 
                     {/* Specialties */}
-                    <div className="space-y-4 md:space-y-5 text-left">
+                    <div className="space-y-4 text-left">
                       <div>
-                        <p className="text-[8px] md:text-[10px] uppercase tracking-[0.14em] text-slate-400 font-black mb-2.5">Core Specialties</p>
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">Core Specialties</p>
                         <div className="flex flex-wrap gap-2">
                           {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
                             <span
                               key={idx}
-                              className="px-3 py-1.5 rounded-xl text-[10px] md:text-[11px] font-bold whitespace-nowrap inline-flex"
+                              className="px-3 py-1.5 rounded-xl text-[10px] md:text-[11px] font-bold whitespace-nowrap"
                               style={{
-                                background: 'rgba(0,112,224,0.06)',
-                                border: '1px solid rgba(0,112,224,0.15)',
+                                background: 'rgba(0,112,224,0.05)',
+                                border: '1px solid rgba(0,112,224,0.12)',
                                 color: '#0E3882',
                               }}
                             >
@@ -1007,8 +929,8 @@ export default function Landing() {
                       </div>
 
                       <blockquote
-                        className="pl-3 md:pl-4 text-[12px] md:text-[13px] text-slate-500 font-medium leading-relaxed italic"
-                        style={{ borderLeft: '2px solid rgba(0,112,224,0.2)' }}
+                        className="pl-4 text-[12.5px] md:text-[13px] text-[#64748B] font-medium leading-relaxed italic"
+                        style={{ borderLeft: '2px solid rgba(0,112,224,0.18)' }}
                       >
                         "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms."
                       </blockquote>
@@ -1016,38 +938,74 @@ export default function Landing() {
                   </div>
                 </motion.div>
 
-
-                {/* Floating Micro Badge */}
-                <motion.div 
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  className="absolute -top-4 -left-4 md:-top-5 md:-left-5 z-20"
+                {/* Floating Badge */}
+                <motion.div
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+                  className="absolute -top-3 -left-3 md:-top-4 md:-left-4 z-20"
                 >
                   <div
-                    className="px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-2.5 border border-white/20"
+                    className="px-3 py-2 md:px-3.5 md:py-2.5 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-2.5"
                     style={{
-                      background: 'linear-gradient(135deg, #3B4FD8 0%, #5B21B6 100%)',
-                      boxShadow: '0 8px 24px rgba(91,33,182,0.35), 0 1px 0 rgba(255,255,255,0.15) inset',
+                      background: 'linear-gradient(135deg, #0070E0 0%, #005BB5 100%)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      boxShadow: '0 8px 24px rgba(0,112,224,0.30), 0 1px 0 rgba(255,255,255,0.12) inset',
                     }}
                   >
-                    <div className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" />
+                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 text-white" />
                     </div>
                     <div className="text-left">
-                      <p className="text-white font-black text-[8px] md:text-[10px] leading-tight uppercase tracking-wider">Expert Verified</p>
-                      <p className="text-white/55 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
+                      <p className="text-white font-black text-[8px] md:text-[9px] leading-tight uppercase tracking-wider">Expert Verified</p>
+                      <p className="text-white/50 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
                     </div>
                   </div>
                 </motion.div>
               </div>
 
             </div>
+
+            {/* ── Section CTA — Anchored at bottom ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-16 md:mt-24 flex flex-col items-center text-center relative z-10"
+            >
+              <motion.button
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/auth')}
+                className="relative overflow-hidden rounded-2xl group"
+              >
+                <div
+                  className="relative px-10 py-5 flex items-center justify-center gap-3 font-black text-[15px] text-white transition-all duration-300"
+                  style={{
+                    background: 'linear-gradient(135deg, #0070E0 0%, #005BB5 100%)',
+                    boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 20px 48px -8px rgba(0,112,224,0.40)',
+                  }}
+                >
+                  <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                  Experience CarxAI Diagnostics
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                </div>
+              </motion.button>
+              <p className="text-[12px] text-[#64748B] font-medium mt-4 tracking-wide">Start free · No credit card required</p>
+            </motion.div>
           </div>
         </section>
 
-        {/* Features Carousel */}
-        <section id="features" className="py-12 md:py-20 px-0 overflow-hidden">
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center">
+        {/* Features — Standardized Background */}
+        <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white border-t border-slate-100">
+          {/* Section Glow Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-60"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Platform Features</span>
             </div>
@@ -1083,22 +1041,29 @@ export default function Landing() {
               {[...features, ...features, ...features].map((feature, i) => (
                 <div 
                   key={i} 
-                  className="flex-shrink-0 w-[280px] p-10 rounded-[32px] bg-surface-low dark:bg-surface-high/40 border border-overlay shadow-sm hover:bg-surface hover:border-navy/20 hover:shadow-xl transition-all group"
+                  className="flex-shrink-0 w-[280px] p-10 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all group"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-surface dark:bg-surface-low flex items-center justify-center mb-8 border border-overlay group-hover:bg-navy group-hover:text-white transition-all shadow-sm">
-                    <feature.icon className="w-7 h-7" />
+                  <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 border border-slate-100 group-hover:bg-[#0070E0] group-hover:text-white transition-all shadow-sm">
+                    <feature.icon className="w-7 h-7 text-[#0070E0] group-hover:text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-on-surface">{feature.title}</h3>
-                  <p className="text-sm text-muted font-medium leading-relaxed">{feature.desc}</p>
+                  <h3 className="text-xl font-bold mb-2 text-slate-900">{feature.title}</h3>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
                 </div>
               ))}
             </motion.div>
           </div>
         </section>
 
-        {/* Reviews Section */}
-        <section id="reviews" className="py-16 md:py-32 px-0 bg-[#F8FAFC] dark:bg-surface-low border-t border-overlay">
-          <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center">
+        {/* Reviews — Standardized Background */}
+        <section id="reviews" className="relative py-24 md:py-36 px-0 bg-slate-50 border-t border-slate-100 overflow-hidden">
+          {/* Section Glow Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-60"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
             </div>
@@ -1111,9 +1076,16 @@ export default function Landing() {
 
         <Pricing />
 
-        {/* Final CTA */}
-        <section className="relative py-16 md:py-32 px-6 text-center flex flex-col items-center">
-          <div className="max-w-4xl mx-auto flex flex-col items-center">
+        {/* Final CTA — Standardized Background */}
+        <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50 border-t border-slate-100 overflow-hidden">
+          {/* Section Glow Overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-80"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,112,224,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Get Started</span>
             </div>
@@ -1136,8 +1108,8 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-12 md:py-24 px-6 bg-surface-low dark:bg-surface-low border-t border-overlay/80 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
+        {/* Footer — Standardized Background */}
+        <footer className="py-12 md:py-24 px-6 bg-white border-t border-slate-100 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-12 md:mb-16">
               {/* Brand Col */}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import NumberFlow from '@number-flow/react'
 import {
   Check, Sparkles, ShieldCheck, Lock, MessageSquare,
@@ -173,13 +173,13 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
   }
 
   // Card animation variants
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 24, filter: 'blur(8px)' },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      transition: { delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+      transition: { delay: i * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
     }),
   }
 
@@ -379,23 +379,31 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
-          className="mt-16 pt-10 border-t border-slate-100 flex flex-col items-center gap-6"
+          className="mt-16 pt-10 border-t border-slate-100 flex flex-col items-center gap-8 md:gap-10"
         >
-          <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-            Start free · Upgrade anytime via WhatsApp
-          </p>
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+          {/* Primary Row: Separated for hierarchy */}
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.3em] text-center">
+              Start free · Upgrade anytime via WhatsApp
+            </p>
+            <div className="w-12 h-px bg-slate-100" />
+          </div>
+
+          {/* Trust Grid: 2 columns on mobile, flex on desktop */}
+          <div className="grid grid-cols-2 md:flex md:items-center justify-center gap-x-8 gap-y-6 md:gap-12 w-full max-w-2xl px-4">
             {[
               { title: 'Cancel anytime', icon: ShieldCheck },
               { title: 'No hidden fees', icon: Lock },
-              { title: 'Clear plan limits', icon: Check },
-              { title: 'Instant activation', icon: Sparkles },
+              { title: 'Clear limits', icon: Check },
+              { title: 'Instant access', icon: Sparkles },
             ].map((trust, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-slate-500">
-                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+              <div key={idx} className="flex items-center gap-3 text-slate-500 justify-center md:justify-start">
+                <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
                   <trust.icon className="w-3.5 h-3.5 text-slate-400" />
                 </div>
-                <span className="text-[11px] font-black uppercase tracking-widest leading-none">{trust.title}</span>
+                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest leading-tight">
+                  {trust.title}
+                </span>
               </div>
             ))}
           </div>

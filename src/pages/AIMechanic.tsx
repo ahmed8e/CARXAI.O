@@ -1712,9 +1712,9 @@ ${diagnosticHistory}
         </AnimatePresence>
 
         {/* ── Layer 2: Floating Composer ────────────────────────────── */}
-        <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
+        <div className="absolute bottom-16 md:bottom-0 inset-x-0 z-30 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
           {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-[-64px] h-56 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/95 to-transparent pointer-events-none" />
 
           <div className="max-w-3xl mx-auto px-4 relative z-10 pointer-events-auto">
             {/* Hidden file pickers */}
@@ -1791,7 +1791,7 @@ ${diagnosticHistory}
               </motion.div>
             )}
 
-            <div className="relative flex items-end gap-2 bg-white border border-slate-200/60 rounded-[32px] p-2 pr-3 focus-within:shadow-[0_8px_30px_rgba(0,18,51,0.06)] transition-all duration-500">
+            <div className="relative flex items-end gap-2.5 bg-white border border-slate-100 rounded-[28px] p-2.5 pr-4 shadow-[0_4px_24px_rgba(15,23,42,0.02)] focus-within:shadow-[0_8px_32px_rgba(15,23,42,0.06)] transition-all duration-500">
               {/* Left: Camera */}
               <div className="flex items-center self-center pl-1">
                 <button
@@ -1799,7 +1799,7 @@ ${diagnosticHistory}
                   disabled={loading || isGated || isImageGated || isImageProcessing}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
                 >
-                  <Aperture className="w-[22px] h-[22px]" />
+                  <Aperture className="w-[20px] h-[20px]" />
                 </button>
               </div>
 
@@ -1828,7 +1828,7 @@ ${diagnosticHistory}
                           style={{ height: 16, transformOrigin: 'center' }}
                         />
                       ))}
-                      <span className="ml-3 text-[10px] font-black text-blue-600 uppercase tracking-widest italic animate-pulse">Listening...</span>
+                      <span className="ml-3 text-[10px] font-display font-black text-blue-600 uppercase tracking-widest italic animate-pulse">Listening...</span>
                     </motion.div>
                   ) : (
                     <motion.textarea
@@ -1847,12 +1847,12 @@ ${diagnosticHistory}
                           sendMessage(input)
                         }
                       }}
-                      placeholder="Ask anything about your car..."
+                      placeholder="Describe your issue or ask a question..."
                       rows={1}
                       style={{ minHeight: 24, maxHeight: 200 }}
                       className="w-full bg-transparent outline-none resize-none
-                               text-[16px] font-bold leading-[1.4]
-                               text-slate-900 placeholder:text-slate-400"
+                               text-[15px] font-medium leading-relaxed
+                               text-slate-900 placeholder:text-slate-400/80"
                       disabled={loading || isGated}
                     />
                   )}
@@ -1871,9 +1871,9 @@ ${diagnosticHistory}
                       fileInputRef.current?.click()
                     }}
                     disabled={loading || isImageProcessing}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
                   >
-                    <ImagePlus className="w-[20px] h-[20px]" />
+                    <ImagePlus className="w-[18px] h-[18px]" />
                   </button>
                 )}
 
@@ -1892,12 +1892,12 @@ ${diagnosticHistory}
                         toggleListening()
                       }}
                       disabled={loading || isProcessing}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 relative"
                       whileTap={{ scale: 0.9 }}
                     >
                       {isProcessing
-                        ? <RefreshCw className="w-5 h-5 animate-spin" />
-                        : (<><Mic className="w-5 h-5" />{!isPaid && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-100 rounded-full flex items-center justify-center border border-white shadow-sm"><Lock className="w-2 h-2 text-amber-600" /></div>}</>)}
+                        ? <RefreshCw className="w-4 h-4 animate-spin" />
+                        : (<><Mic className="w-4 h-4" />{!isPaid && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-50 rounded-full flex items-center justify-center border border-white shadow-sm"><Lock className="w-2 h-2 text-amber-600" /></div>}</>)}
                     </motion.button>
                   ) : (
                     <motion.button
@@ -1908,19 +1908,19 @@ ${diagnosticHistory}
                       onClick={() => isListening ? toggleListening() : sendMessage(input)}
                       disabled={loading || (!input.trim() && !attachedImage && !isListening)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${isListening
-                        ? 'bg-red-500 text-white shadow-xl shadow-red-500/20'
+                        ? 'bg-red-500 text-white shadow-lg shadow-red-500/20'
                         : (input.trim() || attachedImage) && !loading
-                          ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 active:scale-95'
-                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95'
+                          : 'bg-slate-100 text-slate-300 cursor-not-allowed'
                         }`}
                       whileTap={{ scale: 0.9 }}
                     >
                       {loading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                       ) : isListening ? (
                         <CheckCircle className="w-5 h-5" />
                       ) : (
-                        <Send className="w-5 h-5 translate-x-[1px]" />
+                        <Send className="w-4 h-4 translate-x-[1px]" />
                       )}
                     </motion.button>
                   )}

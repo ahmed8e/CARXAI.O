@@ -32,6 +32,9 @@ export function FuturisticNav() {
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
 
+  // Detect if we are in the chat screen to apply "Secondary" styling
+  const isChat = location.pathname.includes("/dashboard/ai-mechanic");
+
   // Sync active state with route
   useEffect(() => {
     const currentIndex = items.findIndex(item => {
@@ -47,18 +50,34 @@ export function FuturisticNav() {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-full max-w-sm px-4 pointer-events-none">
-      <div className="relative flex items-center justify-between gap-1 bg-white/95 backdrop-blur-2xl rounded-[24px] px-3 py-2 shadow-[0_8px_40px_rgba(0,0,0,0.04)] border border-slate-200/60 pointer-events-auto overflow-hidden">
+    <motion.div 
+      initial={false}
+      animate={{ 
+        y: isChat ? 8 : 0,
+        scale: isChat ? 0.94 : 1,
+        opacity: isChat ? 0.9 : 1
+      }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-full max-w-[320px] px-4 pointer-events-none"
+    >
+      <div className={cn(
+        "relative flex items-center justify-between gap-1 bg-white/95 backdrop-blur-2xl rounded-[22px] px-2 transition-all duration-500 pointer-events-auto overflow-hidden",
+        isChat 
+          ? "py-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-slate-200/30" 
+          : "py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border-slate-200/50 border"
+      )}>
         
-        {/* Subtle Active Indicator Pillar (Simplified from flashy glow) */}
+        {/* Subtle Active Indicator Pillar */}
         <motion.div
           layoutId="active-indicator"
-          className="absolute w-12 h-1 bg-[#0070E0] rounded-full bottom-1"
+          className={cn(
+            "absolute bg-[#0070E0] rounded-full bottom-1",
+            isChat ? "w-8 h-[1.5px]" : "w-10 h-0.5"
+          )}
           animate={{
             left: `calc(${(active * (100 / items.length)) + (100 / items.length / 2)}%)`,
             translateX: "-50%",
           }}
-          transition={{ type: "spring", stiffness: 380, damping: 35 }}
+          transition={{ type: "spring", stiffness: 380, damping: 40 }}
         />
 
         {items.map((item, index) => {
@@ -71,26 +90,27 @@ export function FuturisticNav() {
                 onClick={() => handleNavigate(item.path, index)}
                 whileTap={{ scale: 0.95 }}
                 animate={{ 
-                  scale: isActive ? 1.1 : 1,
+                  scale: isActive ? (isChat ? 1.05 : 1.1) : 1,
                 }}
                 className={cn(
-                  "flex items-center justify-center w-11 h-11 rounded-2xl transition-all relative z-10",
+                  "flex items-center justify-center rounded-xl transition-all relative z-10",
+                  isChat ? "w-8 h-8" : "w-10 h-10",
                   isActive 
                     ? "text-[#0070E0]" 
-                    : "text-slate-400 hover:text-slate-600"
+                    : isChat ? "text-slate-300 hover:text-slate-400" : "text-slate-400 hover:text-slate-500"
                 )}
               >
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon size={isChat ? 18 : 20} strokeWidth={isActive ? 2.5 : 2} />
               </motion.button>
 
-              {/* Minimal Text Label (Only shows on active or hover) */}
+              {/* Minimal Text Label - Hidden in Chat Mode */}
               <AnimatePresence>
-                {isActive && (
+                {isActive && !isChat && (
                   <motion.span 
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
-                    className="absolute -bottom-1 text-[8px] font-black uppercase tracking-[0.1em] text-[#0070E0] pointer-events-none"
+                    className="absolute -bottom-1.5 text-[7px] font-black uppercase tracking-[0.2em] text-[#0070E0] pointer-events-none"
                   >
                     {item.label}
                   </motion.span>
@@ -100,6 +120,6 @@ export function FuturisticNav() {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }
