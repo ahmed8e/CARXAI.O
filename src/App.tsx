@@ -56,6 +56,7 @@ import NearbyMap from './pages/NearbyMap'
 import MyAccount from './pages/MyAccount'
 import Vehicles from './pages/Vehicles'
 import ChoosePlan from './pages/ChoosePlan'
+import LocationOnboarding from './pages/LocationOnboarding'
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -92,6 +93,11 @@ export default function App() {
             <Route path="/choose-plan" element={
               <ProtectedRoute>
                 <ChoosePlan />
+              </ProtectedRoute>
+            } />
+            <Route path="/onboarding-location" element={
+              <ProtectedRoute>
+                <LocationOnboarding />
               </ProtectedRoute>
             } />
             <Route path="/dashboard" element={

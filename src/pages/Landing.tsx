@@ -8,6 +8,7 @@ import Pricing from '../components/Pricing'
 import ReviewsSlider from '../components/ReviewsSlider'
 import StoryModal from '../components/StoryModal'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
+import { BrandSlider } from '../components/BrandSlider'
 import { 
   Bot, 
   Users, 
@@ -21,8 +22,9 @@ import {
   ImagePlus, ShieldAlert,
   MessageSquare, Sparkles,
   UserCircle, X, ChevronRight, 
-  DollarSign, LayoutDashboard, User, LogOut, Cpu, ShieldCheck, BadgeCheck, Send
+  DollarSign, LayoutDashboard, User, LogOut, Cpu, ShieldCheck, BadgeCheck, Send, Heart
 } from 'lucide-react'
+import { useStoryReactions } from '../hooks/useStoryReactions'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IMMERSIVE SCROLL DEMO COMPONENTS
@@ -327,6 +329,7 @@ export default function Landing() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [storyOpen, setStoryOpen] = useState(false)
   const timerRef = useRef<any>(null)
+  const { totalEngaged, counts } = useStoryReactions('carxai-origin')
 
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current)
@@ -377,7 +380,11 @@ export default function Landing() {
       <div className="relative z-10">
         <ScrollProgress variant="carx" size="sm" showPercentage={false} />
         
-        <Navbar showNavLinks onMenuClick={() => setMobileMenuOpen(true)} />
+        <Navbar 
+          showNavLinks 
+          onMenuClick={() => setMobileMenuOpen(true)} 
+          onStoryClick={() => setStoryOpen(true)} 
+        />
 
         {/* Mobile Menu */}
         <AnimatePresence>
@@ -559,6 +566,9 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* Brand Compatibility Slider */}
+        <BrandSlider />
+
         {/* Problem Section */}
         <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
@@ -726,25 +736,127 @@ export default function Landing() {
               CarxAI was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
             </motion.p>
 
-            {/* Story Trigger */}
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.35 }}
-              onClick={() => setStoryOpen(true)}
-              className="mt-10 group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white font-black text-sm transition-all duration-300"
-              style={{
-                border: '1px solid rgba(0,112,224,0.12)',
-                color: '#0E3882',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}
-            >
-              <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
-              How CarxAI Was Born
-              <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
-              <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
-            </motion.button>
+            {/* Story Trigger & Social Proof */}
+            <div className="flex flex-col items-center">
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.35 }}
+                onClick={() => setStoryOpen(true)}
+                className="mt-10 group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white font-black text-sm transition-all duration-300"
+                style={{
+                  border: '1px solid rgba(0,112,224,0.12)',
+                  color: '#0E3882',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                }}
+              >
+                <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
+                How CarxAI Was Born
+                <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
+                <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
+              </motion.button>
+
+              {/* Premium Social Proof Strip */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-9 flex flex-col items-center gap-5"
+              >
+                {/* Section Label — Premium Uppercase Whisper */}
+                <p
+                  className="flex items-center gap-2.5 text-[9px] font-semibold uppercase tracking-[0.3em] select-none"
+                  style={{ color: 'rgba(14,56,130,0.4)', letterSpacing: '0.3em' }}
+                >
+                  <span
+                    className="block h-[1px] w-5"
+                    style={{ background: 'linear-gradient(to right, transparent, rgba(14,56,130,0.12))' }}
+                  />
+                  Voices from real drivers
+                  <span
+                    className="block h-[1px] w-5"
+                    style={{ background: 'linear-gradient(to left, transparent, rgba(14,56,130,0.12))' }}
+                  />
+                </p>
+
+                {/* Reaction Pills — Apple-level micro-components */}
+                <div className="flex items-center justify-center gap-2">
+                  {Object.entries(counts)
+                    .filter(([type, count]) => count > 0 && ['relate', 'respect', 'powerful'].includes(type))
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([type, count], idx) => {
+                      const Icon = type === 'relate' ? Heart : type === 'powerful' ? Zap : ShieldCheck;
+                      const label = type === 'relate' ? 'I relate' : type === 'powerful' ? 'Powerful' : 'Respect';
+                      const isTop = idx === 0;
+                      const formatted = count >= 1000 ? (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(count);
+
+                      return (
+                        <div
+                          key={type}
+                          className="group flex items-center gap-1.5 transition-all duration-500"
+                          style={{
+                            padding: '5px 12px 5px 10px',
+                            borderRadius: '99px',
+                            background: isTop ? 'rgba(0,112,224,0.05)' : 'rgba(248,250,252,0.8)',
+                            border: isTop ? '1px solid rgba(0,112,224,0.14)' : '1px solid rgba(0,0,0,0.05)',
+                            boxShadow: isTop
+                              ? '0 1px 8px rgba(0,112,224,0.07), inset 0 1px 0 rgba(255,255,255,0.6)'
+                              : '0 1px 4px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)',
+                            backdropFilter: 'blur(12px)',
+                          }}
+                        >
+                          <Icon
+                            size={10}
+                            style={{ color: '#0070E0', flexShrink: 0 }}
+                            fill={type === 'powerful' ? '#0070E0' : 'none'}
+                            strokeWidth={2.2}
+                          />
+                          <span
+                            className="whitespace-nowrap"
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              color: isTop ? '#0E3882' : '#475569',
+                              letterSpacing: '-0.01em',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {label}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '9px',
+                              fontWeight: 500,
+                              color: isTop ? 'rgba(14,56,130,0.45)' : '#94A3B8',
+                              letterSpacing: '0.01em',
+                              lineHeight: 1,
+                              paddingLeft: '2px',
+                            }}
+                          >
+                            {formatted}
+                          </span>
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {/* Credibility Footer */}
+                {totalEngaged > 0 && (
+                  <p
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 450,
+                      color: '#94A3B8',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {totalEngaged.toLocaleString()} drivers connected with this story
+                  </p>
+                )}
+              </motion.div>
+            </div>
           </div>
 
           {/* ── Two-Column Content ── */}

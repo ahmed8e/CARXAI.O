@@ -13,7 +13,7 @@ interface AuthContextType {
   signOutAll: () => Promise<{ error: Error | null }>
   signInWithOAuth: (provider: 'google' | 'apple') => Promise<{ error: Error | null }>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
-  updateProfile: (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string }) => Promise<{ error: Error | null }>
+  updateProfile: (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number }) => Promise<{ error: Error | null }>
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
   isAdmin: boolean
   isRoleVerified: boolean
@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error }
   }
 
-  const updateProfile = async (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string }) => {
+  const updateProfile = async (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number }) => {
     if (!user) return { error: new Error('User not logged in') }
 
     // 1. Update Auth Metadata (for immediate UI response using user_metadata)
@@ -171,7 +171,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .upsert({
         id: user.id,
         full_name: updates.fullName || null,
-        email: user.email || ''
+        email: user.email || '',
+        city: updates.city,
+        latitude: updates.latitude,
+        longitude: updates.longitude,
       })
 
     if (dbError) console.error('Database Profile Error:', dbError)

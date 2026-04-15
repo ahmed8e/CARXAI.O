@@ -323,6 +323,47 @@ export type Database = {
           submitted_at?: string
         }
         Update: Partial<Database['public']['Tables']['mechanic_leads']['Insert']>
+      },
+      story_reactions: {
+        Row: {
+          id: string
+          story_id: string
+          reaction_type: string
+          user_id: string | null
+          session_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          story_id: string
+          reaction_type: string
+          user_id?: string | null
+          session_id?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['story_reactions']['Insert']>
+      },
+      story_reaction_baselines: {
+        Row: {
+          story_id: string
+          reaction_type: string
+          count: number
+        }
+        Insert: {
+          story_id: string
+          reaction_type: string
+          count?: number
+        }
+        Update: Partial<Database['public']['Tables']['story_reaction_baselines']['Insert']>
+      }
+    }
+    Views: {
+      view_story_reaction_totals: {
+        Row: {
+          story_id: string
+          reaction_type: string
+          total_count: number
+        }
       }
     }
   }

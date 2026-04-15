@@ -55,6 +55,16 @@
 }
 
 @layer base {
+  :root {
+    --gradient-color: #0070E0;
+    --sparkles-color: #0070E0;
+  }
+
+  .dark {
+    --gradient-color: #0070E0;
+    --sparkles-color: #ffffff;
+  }
+
   * {
     box-sizing: border-box;
   }

@@ -32,7 +32,7 @@ export default function Auth() {
           navigate('/dashboard', { replace: true })
         } else {
           sessionStorage.removeItem('newly_signed_up')
-          navigate('/choose-plan')
+          navigate('/onboarding-location')
         }
       } else {
         navigate(from, { replace: true })
@@ -105,7 +105,7 @@ export default function Auth() {
         if (data?.session) {
           // If session is present, they are logged in (likely email confirm is OFF)
           sessionStorage.setItem('newly_signed_up', 'true')
-          navigate('/choose-plan')
+          navigate('/onboarding-location')
         } else {
           // No session usually means email confirmation is sent
           setIsSuccess(true)

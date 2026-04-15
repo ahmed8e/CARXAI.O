@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
-import { Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react'
+import { Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown, Heart } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
 interface NavbarProps {
   onMenuClick?: () => void
+  onStoryClick?: () => void
   showNavLinks?: boolean
   transparent?: boolean
 }
 
-export default function Navbar({ onMenuClick, showNavLinks = false, transparent = false }: NavbarProps) {
+export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false, transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
@@ -37,6 +38,19 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           car<span className="text-navy">x</span>ai
         </span>
       </Link>
+
+      {/* Story Link (Subtle Trust Signal) - Only on Desktop Landing */}
+      {!user && showNavLinks && (
+        <button 
+          onClick={onStoryClick}
+          className="hidden lg:flex items-center gap-2 ml-4 px-3 py-1.5 rounded-full hover:bg-navy/5 transition-all group"
+        >
+          <Heart size={11} className="text-navy/40 group-hover:text-navy transition-all" />
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted group-hover:text-navy transition-colors mt-0.5">
+            How CarxAI Began
+          </span>
+        </button>
+      )}
 
       {/* Center Nav Links (Desktop Landing only) */}
       {showNavLinks && (

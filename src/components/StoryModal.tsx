@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Zap, Wrench, ShieldCheck } from 'lucide-react';
+import { X, ArrowRight, Zap, Wrench, ShieldCheck, Heart } from 'lucide-react';
+import { useStoryReactions, type ReactionType } from '../hooks/useStoryReactions';
 
 interface StoryModalProps {
   isOpen: boolean;
@@ -10,6 +11,13 @@ interface StoryModalProps {
 
 const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { counts, userReaction, submitReaction, totalEngaged } = useStoryReactions('carxai-origin');
+
+  const reactions: { type: ReactionType; label: string; icon: any }[] = [
+    { type: 'relate', label: 'I relate', icon: Heart },
+    { type: 'powerful', label: 'Powerful', icon: Zap },
+    { type: 'respect', label: 'Respect', icon: ShieldCheck },
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -254,6 +262,46 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                   <p style={{ color: '#1e3a5f', fontWeight: 700 }}>
                     That is what CarxAI was built to do.
                   </p>
+                </div>
+
+                {/* Reactions Section */}
+                <div className="mt-8 pt-6 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                      How does this resonate?
+                    </p>
+                    {totalEngaged > 0 && (
+                      <span className="text-[10px] font-bold text-[#0E3882]/60 bg-[#0E3882]/5 px-2 py-0.5 rounded-full">
+                        {totalEngaged.toLocaleString()} {totalEngaged === 1 ? 'reaction' : 'reactions'}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {reactions.map(({ type, label, icon: Icon }) => (
+                      <button
+                        key={type}
+                        onClick={() => submitReaction(type)}
+                        className={`flex-1 min-w-[100px] flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl text-[12px] font-bold transition-all duration-300 ${
+                          userReaction === type
+                            ? 'bg-[#0E3882] text-white shadow-lg shadow-blue-900/20 scale-[0.98]'
+                            : 'bg-white border border-slate-100 text-slate-600 hover:border-[#0E3882]/20 hover:bg-slate-50'
+                        }`}
+                      >
+                        <Icon 
+                          size={14} 
+                          className={userReaction === type ? 'text-white' : 'text-[#0070E0]'} 
+                          fill={userReaction === type ? 'currentColor' : 'none'}
+                        />
+                        {label}
+                        {counts[type] > 0 && (
+                          <span className={`ml-auto text-[10px] font-black ${userReaction === type ? 'text-white/60' : 'text-slate-300'}`}>
+                            {counts[type]}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
