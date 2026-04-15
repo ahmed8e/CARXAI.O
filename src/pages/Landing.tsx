@@ -512,7 +512,7 @@ export default function Landing() {
                       >
                         {/* Shimmer line */}
                         <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                        Start 3 Days Free
+                        Start Free
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>

@@ -1712,7 +1712,7 @@ ${diagnosticHistory}
         </AnimatePresence>
 
         {/* ── Layer 2: Floating Composer ────────────────────────────── */}
-        <div className="absolute bottom-16 md:bottom-0 inset-x-0 z-30 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
+        <div className="absolute bottom-0 inset-x-0 z-30 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8 pointer-events-none">
           {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
           <div className="absolute inset-x-0 bottom-[-64px] h-56 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/95 to-transparent pointer-events-none" />
 
@@ -1761,35 +1761,7 @@ ${diagnosticHistory}
               ) : null}
             </AnimatePresence>
 
-            {/* ══ Advanced Mode Selector ══ */}
-            {isAdvanced && !loading && messages.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex justify-center mb-6"
-              >
-                <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 p-1 rounded-full flex items-center gap-1 shadow-sm">
-                  <button
-                    onClick={() => setResponseMode('fast_answer')}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'fast_answer'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-slate-400 hover:text-slate-600'
-                      }`}
-                  >
-                    Fast Answer
-                  </button>
-                  <button
-                    onClick={() => setResponseMode('expert_answer')}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${responseMode === 'expert_answer'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-slate-400 hover:text-slate-600'
-                      }`}
-                  >
-                    Expert Diagnosis
-                  </button>
-                </div>
-              </motion.div>
-            )}
+
 
             <div className="relative flex items-end gap-2.5 bg-white border border-slate-100 rounded-[28px] p-2.5 pr-4 shadow-[0_4px_24px_rgba(15,23,42,0.02)] focus-within:shadow-[0_8px_32px_rgba(15,23,42,0.06)] transition-all duration-500">
               {/* Left: Camera */}

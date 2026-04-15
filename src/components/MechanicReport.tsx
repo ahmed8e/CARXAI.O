@@ -12,6 +12,7 @@ import type { Message, DiagnosticResult, Database } from '../lib/types'
 import { getUrgencyBadge } from '../lib/utils'
 import { useSubscription } from '../hooks/useSubscription'
 import ListenButton from './ui/ListenButton'
+import { AILoader } from './ui/ai-loader'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
@@ -314,9 +315,8 @@ export default function MechanicReport({
           {/* Report Content */}
           <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-12 pb-24 bg-white">
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 text-[#0070E0] animate-spin" />
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Assembling Report Data...</p>
+              <div className="flex flex-col items-center justify-center py-24">
+                <AILoader text="Assembling Report" />
               </div>
             ) : (
               <>
