@@ -63,7 +63,7 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
       aria-label={label}
       className="
         flex-shrink-0 flex items-center justify-center
-        opacity-70 hover:opacity-100
+        opacity-[0.85] hover:opacity-100
         transition-all duration-500 ease-out
         cursor-default select-none
         hover:scale-110
@@ -161,12 +161,12 @@ export function BrandSlider() {
         <div style={{ borderTop: '1px solid rgba(0,112,224,0.07)' }} />
 
         <div
-          className="relative py-8"
+          className="relative py-6 md:py-8"
           style={{ background: 'linear-gradient(90deg, rgba(248,250,252,0.9), rgba(255,255,255,0.95) 30%, rgba(255,255,255,0.95) 70%, rgba(248,250,252,0.9))' }}
         >
           <InfiniteSlider
-            gap={72}
-            duration={60}
+            gap={48}
+            duration={50}
             durationOnHover={180}
             className="flex items-center"
           >
@@ -175,15 +175,15 @@ export function BrandSlider() {
             ))}
           </InfiniteSlider>
 
-          {/* Fade edges — same white as section background */}
+          {/* Fade edges — significantly narrower on mobile to preserve central clarity */}
           <ProgressiveBlur
-            blurIntensity={1.6}
-            className="pointer-events-none absolute top-0 left-0 h-full w-[180px] z-10"
+            blurIntensity={1.4}
+            className="pointer-events-none absolute top-0 left-0 h-full w-[40px] md:w-[180px] z-10"
             direction="left"
           />
           <ProgressiveBlur
-            blurIntensity={1.6}
-            className="pointer-events-none absolute top-0 right-0 h-full w-[180px] z-10"
+            blurIntensity={1.4}
+            className="pointer-events-none absolute top-0 right-0 h-full w-[40px] md:w-[180px] z-10"
             direction="right"
           />
         </div>
