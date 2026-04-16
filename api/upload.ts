@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'node:crypto';
 import busboy from 'busboy';
-import { logger } from './utils/logger';
+import { logger } from './utils/logger.js';
 
 export const config = {
   api: {
