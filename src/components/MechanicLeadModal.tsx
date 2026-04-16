@@ -58,18 +58,21 @@ export default function MechanicLeadModal({ sharedLinkId, isOpen, onClose }: Mec
     console.groupEnd()
 
     try {
-      console.log('[Carxai Lead Capture] Proceeding with Supabase insert...')
-      const { error: insertError } = await supabase
-        .from('mechanic_leads')
-        .insert([payload] as any)
+      console.log('[Carxai Lead Capture] Proceeding with API submission...')
+      
+      const { data: { session } } = await supabase.auth.getSession()
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+        },
+        body: JSON.stringify(payload)
+      })
 
-      if (insertError) {
-        console.error('[Carxai Lead Capture] Supabase insert failed', {
-          code: insertError.code,
-          message: insertError.message,
-          details: insertError.details
-        })
-        throw insertError
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.error || 'Submission failed')
       }
 
       console.log('[Carxai Lead Capture] Submission Successful')

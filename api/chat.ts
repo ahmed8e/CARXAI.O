@@ -1,5 +1,6 @@
-// @ts-nocheck
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { logger } from './utils/logger';
+import { assertRateLimit } from './utils/rate-limit';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers
@@ -38,7 +39,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
   if (authError || !user) {
+    logger.warn({ event: 'chat_auth_failed', error: authError?.message || 'Invalid token' });
     return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+
+  // Rate Limiting (10 requests per minute per user)
+  const rateLimitStatus = await assertRateLimit(user.id, 'chat', 10, '1 m');
+  if (!rateLimitStatus.success) {
+    logger.warn({ event: 'chat_rate_limit_exceeded', userId: user.id });
+    return res.status(429).json({ error: 'Rate limit exceeded for chat requests. Try again later.' });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
@@ -211,8 +220,7 @@ JSON SCHEMA:
 
     const rawText = await response.text();
 
-    console.log('[API Chat] OpenAI status:', response.status);
-    console.log('[API Chat] Raw response preview:', rawText.slice(0, 1000));
+    logger.info({ event: 'openai_chat_response', status: response.status, rawPreview: rawText.slice(0, 500) });
 
     if (!response.ok) {
       let parsedError: any = null;
@@ -222,7 +230,7 @@ JSON SCHEMA:
         parsedError = { error: rawText || 'Unknown OpenAI error' };
       }
 
-      console.error('[API Chat] OpenAI Error:', parsedError);
+      logger.error({ event: 'openai_chat_error', parsedError });
       return res.status(response.status).json(parsedError);
     }
 
@@ -230,7 +238,7 @@ JSON SCHEMA:
     try {
       data = JSON.parse(rawText);
     } catch (parseErr: any) {
-      console.error('[API Chat] Failed to parse OpenAI raw response:', parseErr?.message || parseErr);
+      logger.error({ event: 'chat_parse_error_raw' }, parseErr);
 
       return res.status(502).json({
         error: 'Invalid JSON returned from OpenAI proxy layer',
@@ -242,7 +250,7 @@ JSON SCHEMA:
     const finalContent = data?.choices?.[0]?.message?.content;
 
     if (!finalContent) {
-      console.error('[API Chat] Missing assistant content:', data);
+      logger.error({ event: 'chat_missing_content', data });
       return res.status(502).json({
         error: 'Missing assistant content from OpenAI response',
       });
@@ -255,7 +263,7 @@ JSON SCHEMA:
         ? JSON.parse(finalContent)
         : finalContent;
     } catch (contentErr: any) {
-      console.error('[API Chat] Assistant content is not valid JSON:', finalContent);
+      logger.error({ event: 'chat_invalid_assistant_json', finalContent });
 
       return res.status(502).json({
         error: 'Assistant content was not valid JSON',
@@ -263,11 +271,12 @@ JSON SCHEMA:
       });
     }
 
+    logger.info({ event: 'chat_success', userId: user.id });
     return res.status(200).json({
       content: validatedContent
     });
   } catch (error: any) {
-    console.error('[API Chat] Proxy Error:', error);
+    logger.error({ event: 'chat_proxy_error', errorMsg: error.message }, error);
 
     if (!res.writableEnded) {
       return res.status(500).json({

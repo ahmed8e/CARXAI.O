@@ -1,5 +1,6 @@
-// @ts-nocheck
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { logger } from './utils/logger';
+import { assertRateLimit } from './utils/rate-limit';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers
@@ -42,7 +43,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
   if (authError || !user) {
+    logger.warn({ event: 'speech_auth_failed', error: authError?.message || 'Invalid token' });
     return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+
+  // Rate Limiting (20 requests per minute per user)
+  const rateLimitStatus = await assertRateLimit(user.id, 'speech', 20, '1 m');
+  if (!rateLimitStatus.success) {
+    logger.warn({ event: 'speech_rate_limit_exceeded', userId: user.id });
+    return res.status(429).json({ error: 'Rate limit exceeded for speech requests.' });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
@@ -72,14 +81,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const error = await response.json();
+      logger.error({ event: 'openai_speech_error', status: response.status, error });
       return res.status(response.status).json(error);
     }
 
     const arrayBuffer = await response.arrayBuffer();
+    
+    logger.info({ event: 'speech_success', userId: user.id, textPreview: text.substring(0, 50) });
+    
     res.setHeader('Content-Type', 'audio/mpeg');
     res.send(Buffer.from(arrayBuffer));
   } catch (error: any) {
-    console.error('Speech Proxy Error:', error);
+    logger.error({ event: 'speech_proxy_error' }, error);
     res.status(500).json({ error: error.message });
   }
 }

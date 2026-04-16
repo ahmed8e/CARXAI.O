@@ -53,8 +53,14 @@ export default function Vehicles() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to remove this vehicle?')) return
     try {
-      const { error } = await (supabase as any).from('vehicles').delete().eq('id', id)
-      if (error) throw error
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`/api/vehicles?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to delete vehicle');
       fetchVehicles()
     } catch (err) {
       console.error('Error deleting vehicle:', err)
@@ -63,8 +69,19 @@ export default function Vehicles() {
 
   const handleSetDefault = async (v: Vehicle) => {
     try {
-      await (supabase as any).from('vehicles').update({ is_default: false }).eq('user_id', user?.id)
-      await (supabase as any).from('vehicles').update({ is_default: true }).eq('id', v.id)
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          action: 'set_default',
+          id: v.id
+        })
+      });
+      if (!response.ok) throw new Error('Failed to set default vehicle');
       fetchVehicles()
     } catch (err) {
       console.error('Error setting default:', err)

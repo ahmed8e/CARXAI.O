@@ -146,23 +146,30 @@ export default function MyAccount() {
       const file = e.target.files?.[0]
       if (!file || !user) return
       
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${user.id}-${Math.random()}.${fileExt}`
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append('file', file);
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
+      const response = await fetch('/api/upload?type=avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: formData
+      });
 
-      if (uploadError) throw uploadError
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to upload photo');
+      }
 
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
+      const { url } = await response.json();
       
       await supabase.auth.updateUser({
-        data: { avatar_url: data.publicUrl }
+        data: { avatar_url: url }
       })
 
       setFeedback({ type: 'success', message: 'Profile photo updated successfully!' })
-      // Auto-reload to refresh the auth context
       setTimeout(() => window.location.reload(), 1000)
       
     } catch (error: any) {
@@ -283,30 +290,24 @@ export default function MyAccount() {
     if (!user?.id) return
 
     try {
-      // 1. Update profiles table (full_name)
-      const { error: profileError } = await (supabase as any)
-        .from('profiles')
-        .update({ full_name: profileData.fullName })
-        .eq('id', user.id)
-      
-      if (profileError) throw profileError
-
-      // 2. Update user_settings table (phone_number, preferred_language)
-      // Note: We use upsert because the row might not exist yet
-      const { error: settingsError } = await (supabase as any)
-        .from('user_settings')
-        .upsert({ 
-          user_id: user.id, 
-          phone_number: profileData.phoneNumber,
-          preferred_language: profileData.preferredLanguage
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          fullName: profileData.fullName,
+          phoneNumber: profileData.phoneNumber,
+          preferredLanguage: profileData.preferredLanguage
         })
+      });
 
-      if (settingsError) throw settingsError
-
-      // 3. Optional: Sync to auth metadata so Navbar/Sidebar updates immediately
-      await supabase.auth.updateUser({
-        data: { full_name: profileData.fullName }
-      })
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to update profile');
+      }
 
       setFeedback({ type: 'success', message: 'Profile updated successfully!' })
       setTimeout(() => window.location.reload(), 1500)

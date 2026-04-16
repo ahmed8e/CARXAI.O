@@ -537,18 +537,24 @@ export default function AIMechanic() {
 
     // Specific symptom / danger keywords → NOT vague, proceed to full diagnosis
     const specificKeywords = [
-      'noise', 'grinding', 'squeak', 'rattle', 'vibrat',
-      'smoke', 'burning', 'smell', 'steam', 'overheat',
-      'leak', 'fluid', 'drip', 'oil',
-      'light', 'warning', 'check engine', 'dashboard', 'abs', 'airbag',
-      'brake', 'steering', 'suspension', 'tire', 'flat',
-      'battery', 'won\'t start', 'dead', 'stall', 'misfire',
-      'accident', 'crash', 'damage', 'dent',
-      'transmission', 'clutch', 'gear', 'shift',
-      'error', 'code', 'p0', 'dtc', 'obd',
-      'ac', 'heat', 'coolant', 'radiator', 'fan',
-      'exhaust', 'catalytic', 'turbo', 'boost',
-      'pull', 'drift', 'alignment', 'wobble',
+      // Sounds & Noises
+      'noise', 'grinding', 'squeak', 'rattle', 'clunk', 'thump', 'click', 'knock', 'whistle', 'hiss', 'hum', 'whine',
+      // Visual & Smells
+      'smoke', 'burning', 'smell', 'steam', 'overheat', 'leak', 'fluid', 'drip', 'oil', 'coolant', 'puddle',
+      // Vibrations & Movement
+      'vibrat', 'shak', 'wobble', 'pull', 'drift', 'alignment', 'shimmer', 'shudder', 'jerk', 'jump',
+      // Dashboard & Electronics
+      'light', 'warning', 'check engine', 'dashboard', 'abs', 'airbag', 'esp', 'traction', 'battery', 'charge', 'alternator',
+      // Starting & Engine Performance
+      'start', 'stall', 'misfire', 'dead', 'die', 'hesitat', 'rough idle', 'power', 'limp mode', 'acceleration',
+      // Safety & Critical Parts
+      'brake', 'steering', 'suspension', 'tire', 'flat', 'wheel', 'bearing', 'axle', 'belt', 'chain',
+      // Specific Systems
+      'transmission', 'clutch', 'gear', 'shift', 'ac', 'heat', 'radiator', 'fan', 'exhaust', 'muffler', 'catalytic', 'turbo',
+      // Tech/Errors
+      'error', 'code', 'p0', 'dtc', 'obd', 'scanner',
+      // Incident related
+      'accident', 'crash', 'damage', 'dent', 'hit'
     ]
 
     for (const kw of specificKeywords) {
@@ -910,17 +916,27 @@ ${diagnosticHistory}
         // The user must click "Generate Detailed Report" manually.
         if (issueData && !issueData.needs_followup) {
           setReportDiagnosis(issueData)
-        }
-        if (user && issueData) {
-          console.log('[Carxai AI] Saving diagnostic to history...');
-          // Note: the prompt mentioned ai_response was missing. 
-          // We'll align with the code, but if it fails we check the alternate column mapping.
-          // @ts-ignore
-          const { data: rawInsertedChat, error: chatError } = await supabase.from('ai_chats').insert({
-            user_id: user.id,
-            issue_name: issueData.issueName || issueData.issue_title,
-            urgency_level: issueData.severity || 'medium',
-          }).select('id').maybeSingle()
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+          const response = await fetch('/api/reports', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`
+            },
+            body: JSON.stringify({
+              issue_name: issueData.issueName || issueData.issue_title,
+              urgency_level: issueData.severity || 'medium',
+              diagnostic_data: issueData
+            })
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || 'Failed to save report');
+          }
+
+          const rawInsertedChat = await response.json();
 
           const insertedChat = rawInsertedChat as { id: string } | null;
 
@@ -941,13 +957,14 @@ ${diagnosticHistory}
             ))
 
             // Also update the active reportDiagnosis state if the user opened the report modal before saving finished!
-            setReportDiagnosis(prev => {
-              if (prev && prev.issueName === issueData.issueName) {
-                return { ...prev, report_id: chatId }
-              }
-              return prev
-            })
-          } else if (chatError) {
+              setReportDiagnosis(prev => {
+                if (prev && prev.issueName === issueData.issueName) {
+                  return { ...prev, report_id: chatId }
+                }
+                return prev
+              })
+            }
+          } catch (chatError) {
             console.error('[Carxai AI] Failed to save chat to DB:', chatError)
           }
 
@@ -983,13 +1000,32 @@ ${diagnosticHistory}
 
   const handleFileUpload = async (file: File) => {
       setIsImageProcessing(true)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64 = reader.result as string
-        setAttachedImage(base64)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const sessionResp = await supabase.auth.getSession()
+        const token = sessionResp.data.session?.access_token
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          body: formData,
+        })
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => null)
+          throw new Error(errData?.error || 'Failed to upload image')
+        }
+
+        const { url } = await res.json()
+        setAttachedImage(url)
+      } catch (err: any) {
+        console.error('[Carxai AI] Image upload failed:', err)
+        alert(err.message || 'Image upload failed. Please try a different photo and ensure it is under 5MB.')
+      } finally {
         setIsImageProcessing(false)
       }
-      reader.readAsDataURL(file)
     }
 
     const toggleListening = () => {
