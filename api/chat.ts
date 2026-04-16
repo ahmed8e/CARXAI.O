@@ -1,7 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { VercelRequest, VercelResponse } from '@vercel/node';
 import { logger } from './utils/logger';
 import { assertRateLimit } from './utils/rate-limit';
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Safe environment validation with fallback support
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -58,14 +57,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    
+
     // Explicitly check for successful initialization
     if (!supabase || !supabase.auth) {
-        throw new Error('Supabase client failed to initialize');
+      throw new Error('Supabase client failed to initialize');
     }
 
     const { data, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !data?.user) {
       logger.warn({ event: 'chat_auth_failed', error: authError?.message || 'User not found' });
       return res.status(401).json({ error: 'Unauthorized: Session expired or invalid.' });
@@ -76,16 +75,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Failed to verify user session.', diagnosticCode: 'AUTH_VERIFICATION_FAILED', details: err.message });
   }
 
-  // Rate Limiting (10 requests per minute per user)
-  const rateLimitStatus = await assertRateLimit(user.id, 'chat', 10, '1 m');
-  if (!rateLimitStatus.success) {
-    logger.warn({ event: 'chat_rate_limit_exceeded', userId: user.id });
-    return res.status(429).json({ error: 'Rate limit exceeded. Try again in one minute.', diagnosticCode: 'RATE_LIMIT_EXCEEDED' });
-  }
-
   // Safety check for req.body
   if (!req.body) {
-      return res.status(400).json({ error: 'Request body is missing.', diagnosticCode: 'EMPTY_BODY' });
+    return res.status(400).json({ error: 'Request body is missing.', diagnosticCode: 'EMPTY_BODY' });
   }
 
   const { plan, response_mode, followup_context, is_retry, ...openAiPayload } = req.body;

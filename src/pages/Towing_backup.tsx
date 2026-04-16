@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -126,7 +126,22 @@ function ProviderImage({ src, size }: { src: string | null; size: 'sm' | 'lg' })
   return <img src={src} alt="" className={cls} onError={() => setFailed(true)} />
 }
 
-// â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”// â”€â”€ MapChooser sheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Skeleton ─────────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-3xl border border-overlay p-4 animate-pulse">
+      <div className="flex gap-4">
+        <div className="w-14 h-14 bg-gray-100 rounded-2xl shrink-0" />
+        <div className="flex-1 space-y-3 py-1">
+          <div className="h-4 bg-gray-100 rounded-full w-3/4" />
+          <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── MapChooser sheet ─────────────────────────────────────────────────────────
 function MapChooser({ provider, onClose }: {
   provider: TowingProvider
   onClose: () => void
@@ -214,29 +229,7 @@ function MapChooser({ provider, onClose }: {
     </motion.div>
   )
 }
-full flex items-center justify-between p-5 rounded-2xl bg-gray-50 border border-overlay text-on-surface group transition-all active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-on-surface/60">
-                  <Copy className="w-5 h-5" />
-                </div>
-                <span className="font-bold text-[15px]">Copy Address</span>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-40" />
-            </button>
-          </div>
 
-          <button
-            onClick={onClose}
-            className="w-full mt-6 py-4 text-sm font-bold text-muted uppercase tracking-widest hover:text-on-surface transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
 
 // â”€â”€ ContactChooser sheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ContactChooser({ provider, onClose }: {
