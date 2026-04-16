@@ -73,19 +73,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     user = data.user;
   } catch (err: any) {
     logger.error({ event: 'chat_supabase_init_failed', error: err.message });
-    return res.status(500).json({ error: 'Failed to verify user session.', details: err.message });
+    return res.status(500).json({ error: 'Failed to verify user session.', diagnosticCode: 'AUTH_VERIFICATION_FAILED', details: err.message });
   }
 
   // Rate Limiting (10 requests per minute per user)
   const rateLimitStatus = await assertRateLimit(user.id, 'chat', 10, '1 m');
   if (!rateLimitStatus.success) {
     logger.warn({ event: 'chat_rate_limit_exceeded', userId: user.id });
-    return res.status(429).json({ error: 'Rate limit exceeded. Try again in one minute.' });
+    return res.status(429).json({ error: 'Rate limit exceeded. Try again in one minute.', diagnosticCode: 'RATE_LIMIT_EXCEEDED' });
   }
 
   // Safety check for req.body
   if (!req.body) {
-      return res.status(400).json({ error: 'Request body is missing.' });
+      return res.status(400).json({ error: 'Request body is missing.', diagnosticCode: 'EMPTY_BODY' });
   }
 
   const { plan, response_mode, followup_context, is_retry, ...openAiPayload } = req.body;
@@ -123,6 +123,7 @@ Example explanation:
 
 Return this exact schema:
 {
+  "mode": "standard",
   "analysis_mode": "dashboard" | "visual_issue" | "symptom_based" | "mixed",
   "issue_title": string,
   "severity": "low" | "medium" | "high",
@@ -243,7 +244,7 @@ JSON SCHEMA:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${openaiKey}`,
       },
       body: JSON.stringify({
         ...openAiPayload,
@@ -314,6 +315,7 @@ JSON SCHEMA:
     if (!res.writableEnded) {
       return res.status(500).json({
         error: error.message || 'Unknown proxy error',
+        diagnosticCode: 'FETCH_INVOCATION_FAILED',
         details: 'Expert diagnostic engine encountered an internal issue.'
       });
     }

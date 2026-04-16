@@ -64,9 +64,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   let user = null;
+  let supabase = null;
+
   try {
     const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Explicitly check for successful initialization
     if (!supabase || !supabase.auth) {
@@ -90,7 +92,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const rateLimitStatus = await assertRateLimit(identifier, 'upload', 5, '1 m');
   
   if (!rateLimitStatus.success) {
-    return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.', diagnosticCode: 'RATE_LIMIT_EXCEEDED' });
+  }
+
+  // PRE-FLIGHT BUCKET CHECK
+  const uploadType = req.query.type || 'report';
+  const bucketName = uploadType === 'avatar' ? 'avatars' : 'user_uploads';
+  
+  try {
+    const { data: buckets, error: bucketErr } = await supabase.storage.listBuckets();
+    if (bucketErr) throw bucketErr;
+    if (!buckets.find(b => b.name === bucketName)) {
+      logger.error({ event: 'upload_bucket_missing', bucket: bucketName });
+      return res.status(500).json({ 
+        error: `Storage bucket '${bucketName}' not found.`, 
+        diagnosticCode: 'STORAGE_BUCKET_MISSING',
+        details: 'Check Supabase dashboard storage settings.'
+      });
+    }
+  } catch (err: any) {
+    logger.error({ event: 'upload_bucket_check_failed', error: err.message });
+    return res.status(500).json({ error: 'Failed to verify storage configuration.', diagnosticCode: 'BUCKET_VERIFICATION_FAILED', details: err.message });
   }
 
   // Multipart parsing
@@ -100,7 +122,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       bb = busboy({ headers: req.headers, limits: { fileSize: MAX_FILE_SIZE } });
     } catch (err) {
       logger.error({ event: 'upload_busboy_init_fail' }, err);
-      return res.status(400).json({ error: 'Invalid content type' });
+      return res.status(400).json({ error: 'Invalid content type', diagnosticCode: 'BUSBOY_INIT_FAILED' });
     }
 
     let fileBuffer: Buffer | null = null;
@@ -124,21 +146,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     bb.on('close', async () => {
       if (fileTooLarge) {
         logger.warn({ event: 'upload_rejected_size', userId: user.id });
-        return resolve(res.status(413).json({ error: 'File size exceeds 5MB limit' }));
+        return resolve(res.status(413).json({ error: 'File size exceeds 5MB limit', diagnosticCode: 'FILE_TOO_LARGE' }));
       }
 
       if (!fileBuffer) {
         logger.warn({ event: 'upload_rejected_no_file', userId: user.id });
-        return resolve(res.status(400).json({ error: 'No file uploaded' }));
+        return resolve(res.status(400).json({ error: 'No file uploaded', diagnosticCode: 'NO_FILE_UPLOADED' }));
       }
 
       // Check Magic Mime Type Server-side (Ignores extension spoofing)
       let fileType;
       try {
         fileType = await fileTypeFromBuffer(fileBuffer);
-      } catch (e) {
+      } catch (e: any) {
         logger.error({ event: 'upload_filetype_check_failed', userId: user.id }, e);
-        return resolve(res.status(500).json({ error: 'Internal server error checking file' }));
+        return resolve(res.status(500).json({ error: 'Internal server error checking file', diagnosticCode: 'FILETYPE_CHECK_FAILED', details: e.message }));
       }
 
       if (!fileType || !ALLOWED_MIME_TYPES.includes(fileType.mime)) {

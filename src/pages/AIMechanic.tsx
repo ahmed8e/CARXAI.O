@@ -638,7 +638,7 @@ ${diagnosticHistory}
           },
           body: JSON.stringify({
             model: 'gpt-4o',
-            stream: true,
+            stream: false,
             plan: isAdvanced ? 'advanced' : isPro ? 'pro' : 'free',
             response_mode: responseMode,
             followup_context: customContext || null,
