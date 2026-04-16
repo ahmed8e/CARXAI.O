@@ -1,7 +1,6 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import { logger } from './logger';
-
+import { logger } from './logger.js';
 let redis: Redis | null = null;
 let ratelimitCache = new Map<string, Ratelimit>();
 
@@ -29,12 +28,12 @@ function getRedis() {
 
 // 10 requests per 10 seconds is just an example default, pass specific limit parameters
 export async function assertRateLimit(
-  identifier: string, 
+  identifier: string,
   route: string,
   limit: number = 10,
   windowTime: `${number} s` | `${number} m` | `${number} h` = '1 m'
 ): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
-  
+
   const currentRedis = getRedis();
 
   if (!currentRedis) {
@@ -43,13 +42,13 @@ export async function assertRateLimit(
   }
 
   const cacheKey = `${route}_${limit}_${windowTime}`;
-  
+
   let ratelimit = ratelimitCache.get(cacheKey);
   if (!ratelimit) {
     ratelimit = new Ratelimit({
-      redis: redis,
+      redis: currentRedis,
       limiter: Ratelimit.slidingWindow(limit, windowTime),
-      ephemeralCache: new Map(),
+      ephemeralCache: new Map<string, number>(),
     });
     ratelimitCache.set(cacheKey, ratelimit);
   }
@@ -73,3 +72,6 @@ export async function assertRateLimit(
     return { success: true, limit, remaining: limit, reset: 0 };
   }
 }
+
+// Alias for structural compatibility with any legacy lookups
+export const rateLimit = assertRateLimit;

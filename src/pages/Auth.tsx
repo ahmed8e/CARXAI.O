@@ -213,7 +213,7 @@ export default function Auth() {
                 <div className="flex justify-between items-center ml-1">
                   <label className="text-[13px] font-bold text-slate-700">Password</label>
                   {mode === 'login' && (
-                    <Link to="/forgot-password" size="sm" className="text-[12px] text-navy font-bold hover:underline">
+                    <Link to="/forgot-password" className="text-[12px] text-navy font-bold hover:underline">
                       Forgot?
                     </Link>
                   )}

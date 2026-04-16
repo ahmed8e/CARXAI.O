@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   User, Mail, Shield, 
   ShieldAlert, LogOut,
-  CheckCircle2, Globe, 
+  Globe, 
   HelpCircle, Camera,
   History, X, Loader2, Navigation, Wrench, ChevronRight,
   CreditCard, Info, Zap
