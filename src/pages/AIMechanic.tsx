@@ -1712,9 +1712,9 @@ ${diagnosticHistory}
         </AnimatePresence>
 
         {/* ── Layer 2: Floating Composer ────────────────────────────── */}
-        <div className="absolute bottom-0 inset-x-0 z-30 pb-[env(safe-area-inset-bottom)] pt-8 pointer-events-none">
+        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 pb-[env(safe-area-inset-bottom)] pt-8 pointer-events-none">
           {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb]/95 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb] to-transparent pointer-events-none" />
 
           <div className="max-w-3xl mx-auto px-4 pb-3 relative z-10 pointer-events-auto">
             {/* Hidden file pickers */}
