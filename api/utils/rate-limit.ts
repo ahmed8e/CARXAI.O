@@ -5,29 +5,26 @@ import { logger } from './logger';
 let redis: Redis | null = null;
 let ratelimitCache = new Map<string, Ratelimit>();
 
-try {
-  const hasRedisUrl = !!process.env.UPSTASH_REDIS_REST_URL;
-  const hasRedisToken = !!process.env.UPSTASH_REDIS_REST_TOKEN;
+// Internal helper for lazy-loading Redis
+function getRedis() {
+  if (redis !== null) return redis;
 
-  logger.info({ 
-    event: 'rate_limit_init_check', 
-    hasUrl: hasRedisUrl, 
-    hasToken: hasRedisToken 
-  });
+  try {
+    const hasRedisUrl = !!process.env.UPSTASH_REDIS_REST_URL;
+    const hasRedisToken = !!process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (hasRedisUrl && hasRedisToken) {
-    redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    });
-  } else {
-    logger.warn({ 
-      event: 'rate_limit_redis_missing', 
-      details: 'Upstash Redis configuration incomplete. Rate limiting is bypassed (fail-open).' 
-    });
+    if (hasRedisUrl && hasRedisToken) {
+      redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL!,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      });
+      return redis;
+    }
+  } catch (error) {
+    // Top-level initialization error shouldn't crash the utility
+    console.error('[RateLimit Init Error]', error);
   }
-} catch (error) {
-  logger.error({ event: 'rate_limit_init_error', details: 'Failed to initialize Upstash Redis' }, error);
+  return null;
 }
 
 // 10 requests per 10 seconds is just an example default, pass specific limit parameters
@@ -37,8 +34,10 @@ export async function assertRateLimit(
   limit: number = 10,
   windowTime: `${number} s` | `${number} m` | `${number} h` = '1 m'
 ): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
-    
-  if (!redis) {
+  
+  const currentRedis = getRedis();
+
+  if (!currentRedis) {
     // Fail open if Redis is not configured, so we don't break the app
     return { success: true, limit, remaining: limit, reset: 0 };
   }

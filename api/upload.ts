@@ -1,9 +1,7 @@
-// @ts-nocheck
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 import busboy from 'busboy';
 import { fileTypeFromBuffer } from 'file-type';
-import { v4 as uuidv4 } from 'crypto';
 import { logger } from './utils/logger';
 import { assertRateLimit } from './utils/rate-limit';
 
@@ -17,6 +15,20 @@ const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Safe environment validation with fallback support
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Initial debug log (Boolean only - NEVER log actual secrets)
+  logger.info({
+    event: 'api_upload_received',
+    hasAuth: !!req.headers.authorization,
+    envStatus: {
+      hasUrl: !!supabaseUrl,
+      hasServiceKey: !!supabaseServiceKey
+    }
+  });
+
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,34 +46,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Basic env validation - Return JSON error early
+  if (!supabaseUrl || !supabaseServiceKey) {
+    logger.error({ event: 'upload_env_missing', details: 'SUPABASE_URL or SERVICE_ROLE_KEY not found' });
+    return res.status(500).json({ error: 'Storage configuration missing on server.', code: 'ENV_CONFIG_MISSING' });
+  }
+
   // Auth processing
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    logger.warn({ event: 'upload_unauthorized_missing_header' });
-    return res.status(401).json({ error: 'Missing Authorization header' });
+    return res.status(401).json({ error: 'Authentication required. Please sign in again.' });
   }
 
   const token = authHeader.split(' ').pop()?.trim();
   if (!token) {
-    return res.status(401).json({ error: 'Invalid Authorization header format' });
+    return res.status(401).json({ error: 'Invalid authentication token format.' });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  // Use Service Role Key because we are securely uploading into a private user folder 
-  // bypassing client-side RLS which simplifies bucket setup.
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  let user = null;
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Explicitly check for successful initialization
+    if (!supabase || !supabase.auth) {
+        throw new Error('Supabase client failed to initialize');
+    }
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    logger.error({ event: 'upload_config_error', details: 'Missing Supabase vars' });
-    return res.status(500).json({ error: 'Server configuration missing' });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-  if (authError || !user) {
-    logger.warn({ event: 'upload_unauthorized_invalid_token' });
-    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+    const { data, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !data?.user) {
+      logger.warn({ event: 'upload_auth_failed', error: authError?.message || 'User not found' });
+      return res.status(401).json({ error: 'Unauthorized: Session expired or invalid.' });
+    }
+    user = data.user;
+  } catch (err: any) {
+    logger.error({ event: 'upload_supabase_init_failed', error: err.message });
+    return res.status(500).json({ error: 'Failed to verify user session for upload.', details: err.message });
   }
 
   // Rate Limiting
@@ -130,7 +151,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const ext = fileType.ext === 'jpg' ? 'jpeg' : fileType.ext;
-      const fileId = uuidv4();
+      const fileId = crypto.randomUUID();
       const uploadType = req.query.type || 'report';
       const bucketName = uploadType === 'avatar' ? 'avatars' : 'user_uploads';
       const filePath = `${user.id}/${fileId}.${ext}`;
