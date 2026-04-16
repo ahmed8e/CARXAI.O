@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { logger } from './utils/logger';
+import { logger } from './utils/logger.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const diagnostics: any = {

@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { logger } from './utils/logger';
+import { logger } from './utils/logger.js';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Safe environment validation with fallback support
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
