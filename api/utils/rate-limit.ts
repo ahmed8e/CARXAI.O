@@ -6,13 +6,25 @@ let redis: Redis | null = null;
 let ratelimitCache = new Map<string, Ratelimit>();
 
 try {
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const hasRedisUrl = !!process.env.UPSTASH_REDIS_REST_URL;
+  const hasRedisToken = !!process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  logger.info({ 
+    event: 'rate_limit_init_check', 
+    hasUrl: hasRedisUrl, 
+    hasToken: hasRedisToken 
+  });
+
+  if (hasRedisUrl && hasRedisToken) {
     redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
     });
   } else {
-    logger.warn({ event: 'rate_limit_redis_missing', details: 'UPSTASH_REDIS_REST_URL or TOKEN is missing. Rate limiting is currently bypassed.' });
+    logger.warn({ 
+      event: 'rate_limit_redis_missing', 
+      details: 'Upstash Redis configuration incomplete. Rate limiting is bypassed (fail-open).' 
+    });
   }
 } catch (error) {
   logger.error({ event: 'rate_limit_init_error', details: 'Failed to initialize Upstash Redis' }, error);

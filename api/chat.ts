@@ -3,7 +3,23 @@ import { logger } from './utils/logger';
 import { assertRateLimit } from './utils/rate-limit';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Add CORS headers
+  // Safe environment validation with fallback support
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+
+  // Initial debug log (Boolean only - NEVER log actual secrets)
+  logger.info({
+    event: 'api_chat_received',
+    hasAuth: !!req.headers.authorization,
+    envStatus: {
+      hasUrl: !!supabaseUrl,
+      hasAnonKey: !!supabaseAnonKey,
+      hasOpenAI: !!openaiKey
+    }
+  });
+
+  // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -17,42 +33,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  // Basic env validation - Return JSON error early
+  if (!supabaseUrl || !supabaseAnonKey) {
+    logger.error({ event: 'chat_env_missing', details: 'SUPABASE_URL or ANON_KEY not found' });
+    return res.status(500).json({ error: 'Database configuration missing on server.', code: 'ENV_CONFIG_MISSING' });
+  }
+
+  if (!openaiKey) {
+    logger.error({ event: 'chat_env_missing_openai' });
+    return res.status(500).json({ error: 'AI engine API key not configured on server.', code: 'ENV_OPENAI_MISSING' });
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.status(401).json({ error: 'Missing Authorization header' });
+    return res.status(401).json({ error: 'Authentication required. Please sign in again.' });
   }
 
   const token = authHeader.split(' ').pop()?.trim();
   if (!token) {
-    return res.status(401).json({ error: 'Invalid Authorization header format' });
-  }
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(500).json({ error: 'Supabase configuration missing on server' });
+    return res.status(401).json({ error: 'Invalid authentication token format.' });
   }
 
-  const { createClient } = await import('@supabase/supabase-js');
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  let user = null;
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    
+    // Explicitly check for successful initialization
+    if (!supabase || !supabase.auth) {
+        throw new Error('Supabase client failed to initialize');
+    }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-  if (authError || !user) {
-    logger.warn({ event: 'chat_auth_failed', error: authError?.message || 'Invalid token' });
-    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+    const { data, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !data?.user) {
+      logger.warn({ event: 'chat_auth_failed', error: authError?.message || 'User not found' });
+      return res.status(401).json({ error: 'Unauthorized: Session expired or invalid.' });
+    }
+    user = data.user;
+  } catch (err: any) {
+    logger.error({ event: 'chat_supabase_init_failed', error: err.message });
+    return res.status(500).json({ error: 'Failed to verify user session.', details: err.message });
   }
 
   // Rate Limiting (10 requests per minute per user)
   const rateLimitStatus = await assertRateLimit(user.id, 'chat', 10, '1 m');
   if (!rateLimitStatus.success) {
     logger.warn({ event: 'chat_rate_limit_exceeded', userId: user.id });
-    return res.status(429).json({ error: 'Rate limit exceeded for chat requests. Try again later.' });
+    return res.status(429).json({ error: 'Rate limit exceeded. Try again in one minute.' });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'OpenAI API key not configured on server' });
+  // Safety check for req.body
+  if (!req.body) {
+      return res.status(400).json({ error: 'Request body is missing.' });
   }
 
   const { plan, response_mode, followup_context, is_retry, ...openAiPayload } = req.body;
