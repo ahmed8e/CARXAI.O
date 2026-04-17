@@ -87,7 +87,7 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
 
 // ── Section ───────────────────────────────────────────────────────────────
 
-export function BrandSlider() {
+export default function BrandSlider() {
   return (
     <section
       className="relative w-full py-16 md:py-28 overflow-hidden"

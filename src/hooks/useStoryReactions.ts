@@ -33,6 +33,12 @@ export function useStoryReactions(storyId: string) {
 
   const fetchReactions = useCallback(async () => {
     try {
+      // Guard against missing Supabase credentials or initialization failure
+      if (!supabase || (supabase as any).supabaseUrl?.includes('placeholder')) {
+        setLoading(false);
+        return;
+      }
+
       // 1. Fetch aggregated reaction counts from the unified view (baseline + real)
       const { data: totalsData, error: totalsError } = await supabase
         .from('view_story_reaction_totals' as any)
