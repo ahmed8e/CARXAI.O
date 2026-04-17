@@ -107,7 +107,6 @@ const GuideDetail: React.FC = () => {
                     <Link to="/auth" className="px-12 py-5 rounded-2xl bg-navy text-white font-black text-[12px] uppercase tracking-widest hover:bg-slate-800 hover:-translate-y-1 transition-all text-center shadow-xl shadow-navy/10">
                       Full Diagnostic Analysis
                     </Link>
-                    <p className="text-[10px] text-center font-black uppercase tracking-widest text-slate-300">Fast AI-Logic Identification</p>
                   </div>
                 </div>
               )}
@@ -180,14 +179,14 @@ const GuideDetail: React.FC = () => {
               {/* Cost Section (Integrated) */}
               {guide.repairCosts && (
                 <section className="pt-12 border-t border-slate-100">
-                  <h2 className="text-3xl font-display font-black text-navy mb-8">Estimated Repair Costs</h2>
+                  <h2 className="text-3xl font-display font-black text-navy mb-8">Typical Repair Cost Ranges</h2>
                   <div className="max-w-3xl">
                     <RepairCostBox costs={guide.repairCosts} />
                   </div>
                   <div className="mt-8 flex items-start gap-3 text-[14px] text-slate-400 italic leading-relaxed">
                     <Wrench className="w-5 h-5 shrink-0 mt-0.5 opacity-40" />
                     <p>
-                      Disclaimer: Costs vary by vehicle make, model, and local labor rates. These figures are averages and should be used as a general guide only.
+                      Costs vary by vehicle, brake design, labor rates, and whether the problem is limited to pads and rotors or involves calipers, ABS components, or front-end parts.
                     </p>
                   </div>
                 </section>
