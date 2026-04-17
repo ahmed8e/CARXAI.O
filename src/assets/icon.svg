@@ -1,9 +1,16 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Carxai Premium Symbol -->
-  <!-- Smart Assistant 'C' Outer Ring -->
-  <path d="M720 820C620 900 480 940 340 920C120 890 -40 700 -10 480C20 260 210 100 430 130C570 150 680 230 750 340L880 210C770 60 590 -20 380 -50C100 -90 -130 110 -170 390C-210 670 -10 930 270 980C480 1020 680 950 820 820L720 820Z" fill="#0070E0" transform="translate(100, 50)"/>
-  <!-- Integrated Sleek Car Wedge -->
-  <path d="M220 540C220 540 320 420 540 420C760 420 900 540 900 540V640H220V540Z" fill="#0070E0" transform="translate(40, 20)"/>
-  <!-- AI Spark Pulse -->
-  <path d="M840 280L920 200L1000 280L920 360L840 280Z" fill="#0070E0"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Premium Rounded Square (SaaS Icon Style) -->
+    <rect width="512" height="512" rx="115" fill="#0070E0"/>
+    
+    <!-- Ultra-Bold "C" synced with favicon.svg / icon-192.png -->
+    <path 
+      d="M 415 178 A 165 165 0 1 0 415 334" 
+      stroke="#FFFFFF" 
+      stroke-width="145" 
+      stroke-linecap="round" 
+      fill="none"
+    />
+    
+    <!-- Prominent Centered Dot -->
+    <circle cx="256" cy="256" r="105" fill="#FFFFFF"/>
 </svg>
