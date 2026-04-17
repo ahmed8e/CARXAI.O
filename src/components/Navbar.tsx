@@ -35,18 +35,7 @@ export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false
         <BrandLockup size="lg" className="group-hover:scale-[1.02] transition-transform" />
       </Link>
 
-      {/* Story Link (Subtle Trust Signal) - Only on Desktop Landing */}
-      {!user && showNavLinks && (
-        <button 
-          onClick={onStoryClick}
-          className="hidden lg:flex items-center gap-2 ml-4 px-3 py-1.5 rounded-full hover:bg-navy/5 transition-all group"
-        >
-          <Heart size={11} className="text-navy/40 group-hover:text-navy transition-all" />
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted group-hover:text-navy transition-colors mt-0.5">
-            How CarxAI Began
-          </span>
-        </button>
-      )}
+      {/* Story Link placeholder if needed later */}
 
       {/* Center Nav Links (Desktop Landing only) */}
       {showNavLinks && (

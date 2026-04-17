@@ -247,7 +247,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main content */}
       <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0 pb-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))] pb-28 lg:pb-0'}`}>
-        <main className="flex-1 overflow-y-auto relative">
+        <main className={`flex-1 relative ${isAIMechanic ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {subLoading ? (
             <div className="absolute inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-sm z-[100]">
               <div className="flex flex-col items-center gap-4">

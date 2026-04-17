@@ -494,17 +494,9 @@ export default function Landing() {
                     {/* Primary CTA — Premium Gradient */}
                     <button 
                       onClick={() => navigate('/auth?mode=register')} 
-                      className="relative w-full sm:w-auto overflow-hidden rounded-2xl group"
+                      className="w-full sm:w-auto relative group"
                     >
-                      <div
-                        className="relative px-8 py-4 md:py-5 flex items-center justify-center gap-2.5 font-black text-[15px] text-white transition-all duration-300 group-hover:-translate-y-0.5"
-                        style={{
-                          background: 'linear-gradient(135deg, #0070E0 0%, #0050C4 100%)',
-                          boxShadow: '0 1px 0 0 rgba(255,255,255,0.15) inset, 0 20px 48px -8px rgba(0,112,224,0.45)',
-                        }}
-                      >
-                        {/* Shimmer line */}
-                        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                      <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
                         Start Free Diagnosis
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
@@ -689,7 +681,7 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
               <button 
                 onClick={() => navigate('/auth')}
-                className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-navy text-white text-base font-black shadow-[0_20px_40px_rgba(0,112,224,0.25)] hover:translate-y-[-4px] hover:brightness-110 transition-all"
+                className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
                 Get Started Now
               </button>

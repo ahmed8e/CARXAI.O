@@ -1083,12 +1083,11 @@ ${diagnosticHistory}
         </div>
 
         {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
-        <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6">
-
-          <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-36 relative z-10">
+        <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6 overscroll-contain">
+          <div className="max-w-2xl mx-auto pt-[calc(10rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
             {/* Welcome State when empty */}
             {messages.length === 0 && !loading && (
-              <div className="flex flex-col items-center justify-center pt-8 pb-10">
+              <div className="flex flex-col items-center justify-center pt-10 pb-10">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -1123,9 +1122,9 @@ ${diagnosticHistory}
 
                     <button
                       onClick={() => setResponseMode('fast_answer')}
-                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0070E0]' : 'text-slate-500 hover:text-navy/70'}`}
+                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-500 hover:text-navy/70'}`}
                     >
-                      <Zap className={`w-4 h-4 ${responseMode === 'fast_answer' ? 'text-[#0070E0]' : 'text-slate-400'}`} />
+                      <Zap className={`w-4 h-4 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-400'}`} />
                       Fast Answer
                     </button>
                     <button
@@ -1140,7 +1139,7 @@ ${diagnosticHistory}
                     >
                       <Activity className={`w-4 h-4 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-400'}`} />
                       Expert
-                      {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0070E0]/10 text-[#0070E0] text-[8px] font-black md:inline-block">PRO</div>}
+                      {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0073e7]/10 text-[#0073e7] text-[8px] font-black md:inline-block">PRO</div>}
                     </button>
                   </div>
                 </div>
@@ -1193,14 +1192,14 @@ ${diagnosticHistory}
                         className="w-full relative overflow-hidden rounded-[32px] bg-white border border-slate-200/60 p-6 flex flex-col items-start shadow-[0_15px_40px_-10px_rgba(0,18,51,0.03)] transition-all duration-500"
                       >
                         <div className="flex items-center gap-5 w-full mb-5">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0070E0] to-[#004A99] flex items-center justify-center shadow-lg shadow-blue-500/20 relative overflow-hidden shrink-0">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0073e7] to-[#004A99] flex items-center justify-center shadow-lg shadow-blue-500/20 relative overflow-hidden shrink-0">
                             <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:10px_10px] opacity-20" />
                             <CarFront className="w-6 h-6 text-white relative z-10" />
                           </div>
                           
                           <div className="text-left flex-1">
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#0070E0]">Diagnostic Target</span>
+                              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#0073e7]">Diagnostic Target</span>
                               <div className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 border border-emerald-100 flex items-center justify-center">
                                 <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Active</span>
                               </div>
@@ -1369,18 +1368,18 @@ ${diagnosticHistory}
                                           sendMessage("Analyze this in deeper detail with manual investigation steps.", undefined, undefined, { previous_diagnosis: msg.issueData });
                                         }, 50);
                                       }}
-                                      className="text-[10px] font-black uppercase tracking-widest text-[#0070E0] opacity-40 hover:opacity-100 transition-opacity"
+                                      className="text-[10px] font-black uppercase tracking-widest text-[#0073e7] opacity-40 hover:opacity-100 transition-opacity"
                                     >
                                       Switch to Expert mode
                                     </button>
                                   </div>
                                 </div>
                               ) : (
-                                <div className={`p-6 md:p-8 space-y-8 relative ${msg.issueData.mode === 'expert_answer' ? 'bg-gradient-to-br from-[#0070E0]/5 to-white border-t-4 border-[#0070E0]' : ''}`}>
+                                <div className={`p-6 md:p-8 space-y-8 relative ${msg.issueData.mode === 'expert_answer' ? 'bg-gradient-to-br from-[#0073e7]/5 to-white border-t-4 border-[#0073e7]' : ''}`}>
                                   {/* 1. Header & Priority */}
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="pr-2">
-                                      <span className={`text-[10px] font-black uppercase tracking-[0.2em] block mb-2 ${msg.issueData.mode === 'expert_answer' ? 'text-[#0070E0] flex items-center gap-1.5' : 'text-navy/30'}`}>
+                                      <span className={`text-[10px] font-black uppercase tracking-[0.2em] block mb-2 ${msg.issueData.mode === 'expert_answer' ? 'text-[#0073e7] flex items-center gap-1.5' : 'text-navy/30'}`}>
                                         {msg.issueData.mode === 'expert_answer' && <Activity className="w-3.5 h-3.5" />}
                                         {msg.issueData.mode === 'expert_answer' ? 'Master Technician Analysis' : 'AI Diagnostic Analysis'}
                                       </span>
@@ -1473,7 +1472,7 @@ ${diagnosticHistory}
                                         setReportDiagnosis(msg.issueData!);
                                         setShowReport(true);
                                       }}
-                                      className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
+                                      className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
                                     >
                                       <FileText className="w-5.5 h-5.5 text-white/90" />
                                       <span className="font-display">Generate Detailed Report</span>
@@ -1514,7 +1513,7 @@ ${diagnosticHistory}
                                                 whileHover={{ y: -2, scale: 1.02 }}
                                                 whileTap={{ scale: 0.96 }}
                                                 onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
                                               >
                                                 <MapPin className="w-4 h-4 text-white/90" />
                                                 Find Mechanic
@@ -1537,7 +1536,7 @@ ${diagnosticHistory}
                                                 whileHover={{ y: -2, scale: 1.02 }}
                                                 whileTap={{ scale: 0.96 }}
                                                 onClick={() => sendMessage("How should I best monitor this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
+                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
                                               >
                                                 <Activity className="w-4 h-4 text-white/90" />
                                                 Monitor Issue
@@ -1567,11 +1566,11 @@ ${diagnosticHistory}
                                 </div>
                               )
                             ) : (
-                              <div className={`px-6 py-5 relative ${isAdvanced ? 'border border-[#0070E0]/10 bg-gradient-to-br from-[#0070E0]/5 to-white shadow-lg shadow-[#0070E0]/5 assistant-card-bubble' : 'text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble'}`}>
+                              <div className={`px-6 py-5 relative ${isAdvanced ? 'border border-[#0073e7]/10 bg-gradient-to-br from-[#0073e7]/5 to-white shadow-lg shadow-[#0073e7]/5 assistant-card-bubble' : 'text-[15px] font-medium text-slate-700 leading-relaxed assistant-card-bubble'}`}>
                                 {isAdvanced && (
                                   <div className="flex items-center gap-2 mb-3">
-                                    <Activity className="w-4 h-4 text-[#0070E0]" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0070E0]">Diagnostic Interrogation</span>
+                                    <Activity className="w-4 h-4 text-[#0073e7]" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0073e7]">Diagnostic Interrogation</span>
                                   </div>
                                 )}
                                 <div className="space-y-3">
@@ -1595,7 +1594,7 @@ ${diagnosticHistory}
                                     return (
                                       <div key={qIdx} className="mt-4">
                                         {questionText && (
-                                          <p className="text-[14px] font-bold text-[#0070E0] mb-3">
+                                          <p className="text-[14px] font-bold text-[#0073e7] mb-3">
                                             {questionText}
                                           </p>
                                         )}
@@ -1604,7 +1603,7 @@ ${diagnosticHistory}
                                             {optionsList.map((opt: string, optIdx: number) => (
                                               <motion.button
                                                 key={optIdx}
-                                                whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0070E0', color: '#fff' }}
+                                                whileHover={{ y: -2, scale: 1.02, backgroundColor: '#0073e7', color: '#fff' }}
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => sendMessage(opt, undefined, undefined, {
                                                   original_issue: messages.find(m => m.role === 'user')?.content,
@@ -1612,7 +1611,7 @@ ${diagnosticHistory}
                                                   selected_option: opt,
                                                   finalize: true
                                                 })}
-                                                className={`px-4 py-3 rounded-2xl border transition-all shadow-sm w-full text-center ${isAdvanced ? 'bg-white border-[#0070E0]/20 text-[#0070E0] text-[13px] font-bold hover:shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700 text-[13px] font-bold'}`}
+                                                className={`px-4 py-3 rounded-2xl border transition-all shadow-sm w-full text-center ${isAdvanced ? 'bg-white border-[#0073e7]/20 text-[#0073e7] text-[13px] font-bold hover:shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700 text-[13px] font-bold'}`}
                                               >
                                                 {opt}
                                               </motion.button>
@@ -1713,12 +1712,9 @@ ${diagnosticHistory}
           )}
         </AnimatePresence>
 
-        {/* ── Layer 2: Floating Composer ────────────────────────────── */}
-        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 pb-[env(safe-area-inset-bottom)] pt-8 pointer-events-none">
-          {/* Subtle fade-out behind composer to ensure legibility when text passes under */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f8f9fb] via-[#f8f9fb] to-transparent pointer-events-none" />
-
-          <div className="max-w-3xl mx-auto px-4 pb-3 relative z-10 pointer-events-auto">
+        {/* ── Layer 2: Fixed Composer ────────────────────────────── */}
+        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 bg-mesh border-t border-slate-100/50 backdrop-blur-xl">
+          <div className="max-w-3xl mx-auto px-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))] pt-4 relative z-10">
             {/* Hidden file pickers */}
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
