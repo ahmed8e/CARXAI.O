@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'fra
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import { Logo, Wordmark, BrandLockup } from '../components/ui/Brand'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
 
@@ -12,14 +13,14 @@ const Pricing = lazy(() => import('../components/Pricing'))
 const ReviewsSlider = lazy(() => import('../components/ReviewsSlider'))
 const BrandSlider = lazy(() => import('../components/BrandSlider'))
 const StoryModal = lazy(() => import('../components/StoryModal'))
-const GuidesHub = lazy(() => import('../components/GuidesHub'))
+const SymptomCarousel = lazy(() => import('../components/ui/SymptomCarousel'))
 const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
   Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
   Aperture, MapPin, Mic, ImagePlus, ShieldAlert, MessageSquare, Sparkles, 
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
-  Cpu, ShieldCheck, BadgeCheck, Send, Heart, ArrowRight, AlertTriangle
+  Cpu, Send
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -310,12 +311,6 @@ const reviews = [
   { name: 'Ryan K.', car: 'Peugeot 208 • Strange Noise', rating: 5, text: 'I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
 ]
 
-const steps = [
-  { num: '01', title: 'Describe the issue', desc: 'Use text, voice, or a photo to explain the problem.', icon: MessageSquare },
-  { num: '02', title: 'Get AI diagnosis', desc: 'Receive instant analysis and digital guidance.', icon: Cpu },
-  { num: '03', title: 'Understand urgency', desc: 'Know how severe it is and see clear next steps.', icon: ShieldAlert },
-  { num: '04', title: 'Explore options', desc: 'Discover nearby mechanic and towing providers if needed.', icon: MapPin },
-]
 
 export default function Landing() {
   const { user, signOut } = useAuth()
@@ -328,7 +323,6 @@ export default function Landing() {
   }
 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [storyOpen, setStoryOpen] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -349,11 +343,6 @@ export default function Landing() {
   const phoneScale = useTransform(scrollProgress, [0, 0.5], [1, 1.08]);
   const phoneY = useTransform(scrollProgress, [0, 0.5, 0.95, 1], [0, -180, -185, -260]); 
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
 
 
@@ -480,9 +469,19 @@ export default function Landing() {
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
                     transition={{ delay: 0.2 }}
-                    className="text-slate-500 text-base md:text-xl lg:text-2xl mb-6 md:mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-4 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    Experience how CarxAI guides you from a warning light to a reliable fix, instantly. Scroll to see the demo.
+                    Experience how CarxAI guides you from a warning light to a reliable fix, instantly. Scroll to see the demo, an AI car diagnosis for warning lights, no-start issues, and breakdown symptoms.
+                  </motion.p>
+
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ opacity: initialFadeOut }}
+                    transition={{ delay: 0.25 }}
+                    className="text-slate-400 text-sm md:text-base lg:text-lg mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                  >
+                    Get instant car diagnosis, know if you need a mechanic or towing, and discover the best nearby help in seconds.
                   </motion.p>
 
                   <motion.div 
@@ -506,7 +505,7 @@ export default function Landing() {
                       >
                         {/* Shimmer line */}
                         <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                        Start Free
+                        Start Free Diagnosis
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -581,10 +580,24 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Lazy loaded sections */}
-        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
-          <GuidesHub />
-        </Suspense>
+        {/* Symptom Library Carousel */}
+        <section id="guides" className="relative py-24 md:py-36 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+          <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
+               <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
+               <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Symptom Library</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A] mb-6">
+              Common problems we help <span className="text-[#0070E0]">diagnose.</span>
+            </h2>
+            <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
+              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how CarxAI can help.
+            </p>
+          </div>
+          <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
+            <SymptomCarousel />
+          </Suspense>
+        </section>
 
         <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
           <TrustSection onStoryClick={() => setStoryOpen(true)} />
@@ -690,113 +703,8 @@ export default function Landing() {
           </div>
         </section>
         </main>
-
         {/* Footer */}
-        <footer className="py-12 md:py-24 px-6 bg-white border-t border-slate-100 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-12 md:mb-16">
-              {/* Brand Col */}
-              <div className="flex flex-col items-start gap-5 max-w-xs">
-                <Link to="/" className="group">
-                  <BrandLockup size="xl" className="group-hover:scale-[1.02] transition-transform" />
-                </Link>
-                <p className="text-[15px] font-medium text-muted leading-relaxed">
-                  Your personal AI mechanic for clear diagnostics, nearby help, and smarter next steps.
-                </p>
-              </div>
-
-              {/* Links Cols */}
-              <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Platform</h4>
-                  {[
-                    { name: 'Features', id: 'features' },
-                    { name: 'How It Works', id: 'problem' },
-                    { name: 'Pricing', id: 'pricing' }
-                  ].map((item) => (
-                    <a 
-                      key={item.id} 
-                      href={`/#${item.id}`} 
-                      onClick={(e) => {
-                        const el = document.getElementById(item.id);
-                        if (el) {
-                          e.preventDefault();
-                          el.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                      className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
-                    >
-                      {item.name}
-                    </a>
-                  ))}
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Company</h4>
-                  <a 
-                    href="/#reviews" 
-                    onClick={(e) => {
-                      const el = document.getElementById('reviews');
-                      if (el) {
-                        e.preventDefault();
-                        el.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                    className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
-                  >
-                    Reviews
-                  </a>
-                  <a 
-                    href="/#contact" 
-                    onClick={(e) => {
-                      const el = document.getElementById('contact');
-                      if (el) {
-                        e.preventDefault();
-                        el.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                    className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit"
-                  >
-                    Contact
-                  </a>
-                  <button 
-                    onClick={() => setStoryOpen(true)}
-                    className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit text-left"
-                  >
-                    How CarxAI Began
-                  </button>
-                  <div className="h-px w-8 bg-slate-100 my-1" />
-                  <a 
-                    href="https://wa.me/447907357259" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[15px] font-bold text-navy hover:translate-x-1 transition-all w-fit flex items-center gap-2"
-                  >
-                    <MessageSquare size={14} />
-                    Support & WhatsApp
-                  </a>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Legal</h4>
-                  <Link to="/privacy" className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit">Privacy Policy</Link>
-                  <Link to="/terms" className="text-[15px] font-medium text-muted hover:text-navy hover:translate-x-1 transition-all w-fit">Terms of Service</Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center gap-6 pt-10 border-t border-overlay mb-6">
-              <p className="text-muted/70 text-[11px] font-medium tracking-wide max-w-3xl">
-                CarxAI provides digital diagnostics, guidance, and nearby support discovery. Repair, towing, and offline services are handled directly by independent third-party providers.
-              </p>
-            </div>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-overlay/50">
-              <p className="text-muted/80 text-[13px] font-medium tracking-wide">
-                © 2026 CarxAI. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer onStoryClick={() => setStoryOpen(true)} />
       </div>
 
       {/* Premium Story Modal */}

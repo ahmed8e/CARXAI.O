@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@googlemaps/react-wrapper": "^1.2.0",
+    "@hugeicons/core-free-icons": "^4.1.1",
+    "@hugeicons/react": "^1.1.6",
     "@number-flow/react": "^0.6.0",
     "@paypal/react-paypal-js": "^9.1.1",
     "@supabase/supabase-js": "^2.99.3",
