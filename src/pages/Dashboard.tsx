@@ -10,12 +10,14 @@ import {
   Navigation, Car,
   Zap, Plus, Thermometer, Battery, Activity
 } from 'lucide-react'
+import DevelopmentModal from '../components/DevelopmentModal'
 
 export default function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [defaultVehicle, setDefaultVehicle] = useState<any>(null)
   const [loadingVehicle, setLoadingVehicle] = useState(true)
+  const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
 
@@ -128,6 +130,12 @@ export default function Dashboard() {
           <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
             <Link 
               to={mod.to} 
+              onClick={(e) => {
+                if (mod.to === '/dashboard/map') {
+                  e.preventDefault()
+                  setIsDevModalOpen(true)
+                }
+              }}
               className="relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all"
             >
               <div className="flex flex-col h-full">
@@ -224,6 +232,11 @@ export default function Dashboard() {
         </div>
       </div>
       <InstallPrompt />
+      
+      <DevelopmentModal 
+        isOpen={isDevModalOpen} 
+        onClose={() => setIsDevModalOpen(false)} 
+      />
     </div>
   )
 }

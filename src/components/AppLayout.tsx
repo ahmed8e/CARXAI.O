@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
+import DevelopmentModal from './DevelopmentModal'
 import { useSubscription } from '../hooks/useSubscription'
 
 // ── Navigation groups ────────────────────────────────────────────────
@@ -49,6 +50,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation()
   const isAIMechanic = location.pathname === '/dashboard/ai-mechanic'
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isDevModalOpen, setIsDevModalOpen] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
@@ -117,7 +119,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     key={item.to}
                     to={item.to}
                     end={'end' in item ? item.end : false}
-                    onClick={() => setSidebarOpen(false)}
+                    onClick={(e) => {
+                      if (item.to === '/dashboard/map') {
+                        e.preventDefault()
+                        setIsDevModalOpen(true)
+                      } else {
+                        setSidebarOpen(false)
+                      }
+                    }}
                     className={({ isActive }) => [
                       'flex items-center gap-2.5 pr-3 pl-2 py-2.5 rounded-2xl font-semibold text-[13.5px]',
                       'transition-all duration-150 group relative overflow-hidden',
@@ -269,6 +278,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <InteractiveMenu items={BOTTOM_NAV_ITEMS} />
         </div>
       )}
+      <DevelopmentModal 
+        isOpen={isDevModalOpen} 
+        onClose={() => setIsDevModalOpen(false)} 
+      />
     </div>
   )
 }
