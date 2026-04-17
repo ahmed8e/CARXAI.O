@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Download, Share, PlusSquare, Zap, Smartphone } from 'lucide-react'
+import { X, Download, Share, PlusSquare, Smartphone } from 'lucide-react'
+import { BrandLockup } from './ui/Brand'
 import { usePWAInstall } from '../hooks/usePWAInstall'
 
 const DISMISS_KEY = 'carxai_install_prompt_dismissed'
@@ -73,14 +74,12 @@ export default function InstallPrompt() {
           </button>
 
           <div className="flex gap-4 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-6 h-6 text-navy" fill="currentColor" />
-            </div>
-            <div>
-              <h3 className="text-lg font-display font-black text-on-surface italic tracking-tight">
+            <BrandLockup size="md" />
+            <div className="flex-1">
+              <h3 className="text-lg font-display font-black text-on-surface italic tracking-tight sr-only">
                 {isIOS ? 'Add Carxai to Home' : 'Install Carxai'}
               </h3>
-              <p className="text-sm text-muted font-medium leading-relaxed">
+              <p className="text-sm text-muted font-medium leading-relaxed mt-1">
                 {isIOS 
                   ? 'Use Carxai like an app for faster access and a better mobile experience.' 
                   : 'Install our app for instant access and a smoother experience.'}

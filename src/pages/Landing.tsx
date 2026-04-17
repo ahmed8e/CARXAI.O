@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'fra
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
+import { Logo, Wordmark, BrandLockup } from '../components/ui/Brand'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
 
 // Lazy loaded components for bundle optimization
@@ -237,13 +238,13 @@ const ScrollChatDemo = () => {
 
           {/* Messenger-Like Header */}
           <div className="pt-11 pb-3 px-5 flex items-center justify-between border-b border-slate-50/80 bg-white/95 backdrop-blur-md z-20">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#0084FF] to-[#00C6FF] flex items-center justify-center text-white shadow-md">
-                <Zap size={13} fill="currentColor" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-[25%] overflow-hidden shadow-md">
+                <Logo size="100%" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-display font-black text-xs tracking-tight text-[#0F172A] leading-none mb-0.5">CarxAI Mechanic</span>
-                <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-wider leading-none">Live Replay</span>
+              <div className="flex flex-col leading-none">
+                <Wordmark size="sm" className="mb-0.5" />
+                <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-wider">Live Replay</span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -696,14 +697,9 @@ export default function Landing() {
             <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-12 md:mb-16">
               {/* Brand Col */}
               <div className="flex flex-col items-start gap-5 max-w-xs">
-                <div className="flex items-center gap-3 group">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                    <Zap size={24} className="group-hover:scale-110 transition-transform" />
-                  </div>
-                  <span className="font-display font-black text-3xl tracking-tighter text-on-surface -ml-1">
-                    car<span className="text-navy">x</span>ai
-                  </span>
-                </div>
+                <Link to="/" className="group">
+                  <BrandLockup size="xl" className="group-hover:scale-[1.02] transition-transform" />
+                </Link>
                 <p className="text-[15px] font-medium text-muted leading-relaxed">
                   Your personal AI mechanic for clear diagnostics, nearby help, and smarter next steps.
                 </p>

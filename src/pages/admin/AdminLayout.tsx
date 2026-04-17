@@ -7,6 +7,7 @@ import {
   ChevronRight, Shield, Menu, X, Wrench
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Logo from '../../components/ui/Logo'
 
 const NAV_ITEMS = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
@@ -59,8 +60,8 @@ export default function AdminLayout() {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-overlay ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center shrink-0 shadow-md shadow-navy/25">
-          <Wrench className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-md shadow-navy/25">
+          <Logo size="100%" />
         </div>
         {!collapsed && (
           <div>

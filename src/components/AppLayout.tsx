@@ -11,6 +11,7 @@ import Navbar from './Navbar'
 import Paywall from './Paywall'
 import DevelopmentModal from './DevelopmentModal'
 import { useSubscription } from '../hooks/useSubscription'
+import { Logo, BrandLockup } from './ui/Brand'
 
 // ── Navigation groups ────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -75,21 +76,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between">
             <Link
               to="/dashboard"
-              className="flex items-center gap-3.5 group"
+              className="flex items-center group overflow-hidden"
               onClick={() => setSidebarOpen(false)}
             >
-              <div className="w-9 h-9 rounded-[14px] bg-navy flex items-center justify-center
-                              shadow-[0_4px_12px_rgba(0,112,224,0.35)] group-hover:scale-105 transition-transform flex-shrink-0">
-                <Zap className="w-4 h-4 text-white" fill="currentColor" />
-              </div>
-              <div className="leading-none">
-                <p className="font-display font-black text-[16px] tracking-[-0.04em] text-on-surface">
-                  car<span className="text-navy">x</span>ai
-                </p>
-                <p className="text-[10px] font-medium text-muted/70 mt-[4px] tracking-normal">
-                  AI Mechanic Suite
-                </p>
-              </div>
+              <BrandLockup size="md" className="group-hover:scale-[1.02] transition-transform" />
             </Link>
 
             {mobile && (

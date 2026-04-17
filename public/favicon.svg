@@ -1,4 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#0070E0" />
-  <path d="M17 3L7 17h9l-1 12 10-14h-9l1-10z" fill="#FFFFFF" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- App Icon Base (Brand Blue) -->
+    <rect width="512" height="512" rx="115" fill="#0070E0"/>
+    
+    <!-- Bold C with a visibly more open gap -->
+    <path 
+      d="M 397 191 A 155 155 0 1 0 397 321" 
+      stroke="#FFFFFF" 
+      stroke-width="110" 
+      stroke-linecap="round" 
+      fill="none"
+    />
+    
+    <!-- Larger Centered Dot filling the space -->
+    <circle cx="256" cy="256" r="82" fill="#FFFFFF"/>
 </svg>

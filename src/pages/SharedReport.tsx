@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
   Car, ShieldAlert, ShieldCheck, Truck, 
-  CheckCircle, Zap, Loader2, ArrowRight
+  CheckCircle, Loader2, ArrowRight
 } from 'lucide-react'
+import { BrandLockup } from '../components/ui/Brand'
 import { supabase } from '../lib/supabase'
 import { getUrgencyBadge } from '../lib/utils'
 import MechanicLeadModal from '../components/MechanicLeadModal'
@@ -95,12 +96,8 @@ export default function SharedReport() {
         {/* Premium Navbar */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/50">
           <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex justify-between items-center">
-            <div className="flex items-center gap-3 relative z-10 group cursor-pointer" onClick={() => window.location.href = '/'}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0E3882] to-[#0070E0] flex flex-col items-center justify-center shadow-lg shadow-[#0070E0]/20 overflow-hidden relative">
-                <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                <Zap className="w-5 h-5 text-white animate-[pulse-slow_3s_ease-in-out_infinite]" fill="currentColor" />
-              </div>
-              <span className="text-2xl font-display font-bold tracking-tight text-[#0E1B39]">Carxai</span>
+            <div className="relative z-10 group cursor-pointer" onClick={() => window.location.href = '/'}>
+              <BrandLockup size="lg" />
             </div>
 
             <Link

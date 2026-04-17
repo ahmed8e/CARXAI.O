@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Zap, ShieldCheck, CreditCard } from 'lucide-react'
+import { ShieldCheck, CreditCard } from 'lucide-react'
+import { BrandLockup } from '../components/ui/Brand'
 import Pricing from '../components/Pricing'
 import { useSubscription } from '../hooks/useSubscription'
 
@@ -25,13 +26,8 @@ export default function ChoosePlan() {
       {/* Premium Minimal Header */}
       <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 border-b border-slate-50 bg-white/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#0070E0] shadow-lg shadow-[#0070E0]/20 group-hover:scale-105 transition-transform">
-              <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
-            </div>
-            <span className="font-display font-black text-xl tracking-tighter text-slate-900">
-              car<span className="text-[#0070E0]">x</span>ai
-            </span>
+          <Link to="/" className="group inline-block">
+            <BrandLockup size="xl" />
           </Link>
           
           <div className="flex items-center gap-6">

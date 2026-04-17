@@ -2,6 +2,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Eye, EyeOff, CheckCircle, Zap, Star, Quote } from 'lucide-react'
+import { BrandLockup } from '../components/ui/Brand'
 import { useAuth } from '../contexts/AuthContext'
 
 const reviews = [
@@ -117,13 +118,8 @@ export default function Auth() {
         
         {/* Logo */}
         <div className="mb-12 lg:mb-20">
-          <Link to="/" className="flex items-center gap-2 group w-fit">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 text-white" fill="currentColor" />
-            </div>
-            <span className="font-display font-black text-2xl tracking-tighter text-on-surface">
-              car<span className="text-navy">x</span>ai
-            </span>
+          <Link to="/" className="group w-fit">
+            <BrandLockup size="xl" className="group-hover:scale-[1.02] transition-transform" />
           </Link>
         </div>
 

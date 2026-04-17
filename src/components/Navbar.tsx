@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown, Heart } from 'lucide-react'
+import { Logo, BrandLockup } from './ui/Brand'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
@@ -30,13 +31,8 @@ export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false
 
   return (
     <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-2.5 ${transparent ? 'bg-surface/20 dark:bg-black/40' : 'bg-surface/90 dark:bg-surface-low/90'} backdrop-blur-2xl border border-overlay rounded-full shadow-lg transition-all duration-300`}>
-      <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 group shrink-0">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-navy shadow-lg shadow-navy/20 group-hover:scale-105 transition-transform">
-          <Zap className="w-4.5 h-4.5 text-white" fill="currentColor" />
-        </div>
-        <span className="font-display font-black text-xl tracking-tighter text-on-surface flex items-center">
-          car<span className="text-navy">x</span>ai
-        </span>
+      <Link to={user ? "/dashboard" : "/"} className="group shrink-0">
+        <BrandLockup size="lg" className="group-hover:scale-[1.02] transition-transform" />
       </Link>
 
       {/* Story Link (Subtle Trust Signal) - Only on Desktop Landing */}

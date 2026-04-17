@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, CheckCircle, Mail, Phone, ArrowRight, Zap } from 'lucide-react'
+import { X, CheckCircle, Mail, Phone, ArrowRight } from 'lucide-react'
+import { Logo } from './ui/Brand'
 import { supabase } from '../lib/supabase'
 
 interface MechanicLeadModalProps {
@@ -148,10 +149,12 @@ export default function MechanicLeadModal({ sharedLinkId, isOpen, onClose }: Mec
                     exit={{ opacity: 0 }}
                   >
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E3882]/5 border border-[#0E3882]/10 mb-8">
-                       <Zap className="w-3 h-3 text-[#0E3882]" fill="currentColor" />
-                      <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#0E3882]">Mechanic Network</span>
-                    </div>
+                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-navy/5 border border-navy/10 mb-8">
+                        <div className="w-5 h-5 rounded-[25%] overflow-hidden shadow-sm">
+                          <Logo size="100%" />
+                        </div>
+                       <span className="text-[10px] uppercase tracking-[0.2em] font-black text-navy">Mechanic Network</span>
+                     </div>
 
                     <h2 className="text-[32px] leading-[1.1] font-display font-black text-[#0E1B39] tracking-tight mb-5">
                       Get more local repair opportunities

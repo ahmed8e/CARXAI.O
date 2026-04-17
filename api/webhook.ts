@@ -10,7 +10,7 @@ export const config = {
 };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-01-27.acacia' // Use the most recent stable version needed
+  apiVersion: '2026-03-25.dahlia' // Use the most recent stable version needed
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err: any) {
-    logger.warn({ event: 'webhook_signature_verification_failed' }, err);
+    logger.warn({ event: 'webhook_signature_verification_failed', error: err.message });
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
