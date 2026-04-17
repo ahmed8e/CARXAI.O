@@ -48,13 +48,13 @@ export const Logo: React.FC<LogoProps> = ({
       
       <g filter={variant === 'gradient' ? "url(#softShadow)" : undefined}>
         <path 
-          d="M 397 191 A 155 155 0 1 0 397 321" 
+          d="M 410 185 A 160 160 0 1 0 410 327" 
           stroke="#FFFFFF" 
-          strokeWidth="110" 
+          strokeWidth="125" 
           strokeLinecap="round" 
           fill="none"
         />
-        <circle cx="256" cy="256" r="82" fill="#FFFFFF"/>
+        <circle cx="256" cy="256" r="95" fill="#FFFFFF"/>
       </g>
     </svg>
   );

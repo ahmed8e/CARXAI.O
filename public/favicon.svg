@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-    <!-- App Icon Base (Brand Blue) -->
+    <!-- Premium Rounded Square (SaaS Icon Style) -->
     <rect width="512" height="512" rx="115" fill="#0070E0"/>
     
-    <!-- Bold C with a visibly more open gap -->
+    <!-- Ultra-Bold "C" optimized for 16px/32px legibility -->
     <path 
-      d="M 397 191 A 155 155 0 1 0 397 321" 
+      d="M 410 185 A 160 160 0 1 0 410 327" 
       stroke="#FFFFFF" 
-      stroke-width="110" 
+      stroke-width="125" 
       stroke-linecap="round" 
       fill="none"
     />
     
-    <!-- Larger Centered Dot filling the space -->
-    <circle cx="256" cy="256" r="82" fill="#FFFFFF"/>
+    <!-- Prominent Centered Dot to anchor the mark -->
+    <circle cx="256" cy="256" r="95" fill="#FFFFFF"/>
 </svg>
