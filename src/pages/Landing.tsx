@@ -1,30 +1,25 @@
-import { useState, useEffect, useRef } from 'react'
+import { lazy, Suspense, useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
-import Pricing from '../components/Pricing'
-import ReviewsSlider from '../components/ReviewsSlider'
-import StoryModal from '../components/StoryModal'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
-import { BrandSlider } from '../components/BrandSlider'
+
+// Lazy loaded components for bundle optimization
+const Pricing = lazy(() => import('../components/Pricing'))
+const ReviewsSlider = lazy(() => import('../components/ReviewsSlider'))
+const BrandSlider = lazy(() => import('../components/BrandSlider'))
+const StoryModal = lazy(() => import('../components/StoryModal'))
+const GuidesHub = lazy(() => import('../components/GuidesHub'))
+const TrustSection = lazy(() => import('../components/TrustSection'))
+
 import { 
-  Bot, 
-  Users, 
-  Truck, 
-  CheckCircle2, 
-  Zap,
-  Clock,
-  CheckCircle, Activity,
-  Aperture,
-  MapPin, Mic,
-  ImagePlus, ShieldAlert,
-  MessageSquare, Sparkles,
-  UserCircle, X, ChevronRight, 
-  DollarSign, LayoutDashboard, User, LogOut, Cpu, ShieldCheck, BadgeCheck, Send, Heart
+  Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
+  Aperture, MapPin, Mic, ImagePlus, ShieldAlert, MessageSquare, Sparkles, 
+  UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
+  Cpu, ShieldCheck, BadgeCheck, Send, Heart, ArrowRight, AlertTriangle
 } from 'lucide-react'
-import { useStoryReactions } from '../hooks/useStoryReactions'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IMMERSIVE SCROLL DEMO COMPONENTS
@@ -93,11 +88,18 @@ const UserBubble = ({ msg }: { msg: any }) => (
     transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
     className="flex flex-col items-end gap-2"
   >
-    {msg.image && (
-      <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md">
-        <img src={msg.image} alt="Dashboard scan" className="w-full h-auto object-cover max-h-[130px]" />
-      </div>
-    )}
+      {msg.image && (
+        <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md aspect-video bg-slate-100">
+          <img 
+            src={msg.image.replace('.png', '.webp')} 
+            alt="Dashboard scan" 
+            className="w-full h-auto object-cover max-h-[130px]" 
+            width={340}
+            height={130}
+            fetchPriority="high"
+          />
+        </div>
+      )}
     <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-[4px] bg-[#0084FF] text-white text-[11px] font-medium leading-relaxed shadow-sm">
       {msg.content}
     </div>
@@ -325,19 +327,8 @@ export default function Landing() {
   }
 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
-  const [activeIndex, setActiveIndex] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [storyOpen, setStoryOpen] = useState(false)
-  const timerRef = useRef<any>(null)
-  const { totalEngaged, counts } = useStoryReactions('carxai-origin')
-
-  const resetTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current)
-    timerRef.current = setInterval(() => {
-      setActiveIndex(prev => (prev + 1) % steps.length)
-    }, 5000)
-  }
-
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -351,8 +342,6 @@ export default function Landing() {
   });
 
   // Natural Hero - Scroll-Driven Focus
-  // Initial state is a clean, composed layout (y:0, scale:1)
-  // Scroll drives the phone upward into a full-focus focal point
   const textY = useTransform(scrollProgress, [0, 0.5], [0, -50]);
   const initialFadeOut = useTransform(scrollProgress, [0, 0.4], [1, 0]);
   const phoneRotate = useTransform(scrollProgress, [0, 0.5, 1], [0, -3, 0]);
@@ -364,11 +353,6 @@ export default function Landing() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
-  useEffect(() => {
-    resetTimer()
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [isMobile])
 
 
 
@@ -385,6 +369,8 @@ export default function Landing() {
           onMenuClick={() => setMobileMenuOpen(true)} 
           onStoryClick={() => setStoryOpen(true)} 
         />
+
+        <main id="main-content">
 
         {/* Mobile Menu */}
         <AnimatePresence>
@@ -594,483 +580,19 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section id="how-it-works" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
-          <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">From breakdown to backup</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-xl mx-auto mt-4">Four steps. Minutes, not hours.</p>
-          </div>
+        {/* Lazy loaded sections */}
+        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
+          <GuidesHub />
+        </Suspense>
 
-          {/* Steps Grid / Carousel */}
-          <div className="relative overflow-hidden md:overflow-visible py-4">
-            <motion.div 
-              className="flex md:grid md:grid-cols-4 gap-6 px-6 md:px-0 md:max-w-6xl md:mx-auto"
-              drag={isMobile ? "x" : false}
-              dragConstraints={{ 
-                right: 0, 
-                left: isMobile ? -(steps.length - 1) * (window.innerWidth - 24) : 0 
-              }}
-              animate={{ x: isMobile ? -activeIndex * (window.innerWidth - 24) : 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              onDragEnd={(_, info) => {
-                resetTimer();
-                const shift = info.offset.x;
-                if (shift < -50 && activeIndex < steps.length - 1) setActiveIndex(prev => prev + 1);
-                if (shift > 50 && activeIndex > 0) setActiveIndex(prev => prev - 1);
-              }}
-            >
-              {/* Connector line — desktop only */}
-              <div className="hidden md:block absolute top-[52px] left-[calc(12.5%+28px)] right-[calc(12.5%+28px)] h-px z-0"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.2) 15%, rgba(0,112,224,0.2) 85%, transparent)' }}
-              />
-
-              {steps.map((step, i) => (
-                <motion.div
-                  key={i}
-                  transition={{ duration: 0.5 }}
-                  className={`flex-shrink-0 w-[calc(100vw-48px)] md:w-auto relative group transition-all duration-700 ${isMobile && activeIndex === i ? 'scale-100 opacity-100' : isMobile ? 'scale-95 opacity-40 blur-[1px]' : ''}`}
-                >
-                  {/* Numbered Badge */}
-                  <div className="flex justify-center mb-5 relative z-10">
-                    <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center font-display font-black text-lg text-white shadow-lg"
-                      style={{
-                        background: 'linear-gradient(135deg, #0070E0, #0055b3)',
-                        boxShadow: '0 8px 20px rgba(0,112,224,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
-                      }}
-                    >
-                      {step.num}
-                    </div>
-                  </div>
-
-                  {/* Card */}
-                  <div
-                    className="relative overflow-hidden rounded-[28px] p-8 flex flex-col gap-4 transition-all duration-300"
-                    style={{
-                      background: 'linear-gradient(160deg, rgba(255,255,255,0.9) 0%, rgba(248,250,255,0.95) 100%)',
-                      border: '1.5px solid rgba(0,112,224,0.1)',
-                      boxShadow: activeIndex === i ? "0 20px 40px rgba(0,112,224,0.12)" : "0 4px 24px rgba(0,0,0,0.06)",
-                    }}
-                  >
-                    {/* Top shimmer line */}
-                    <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
-
-                    {/* Icon */}
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: 'rgba(0,112,224,0.07)',
-                        border: '1px solid rgba(0,112,224,0.15)',
-                      }}
-                    >
-                      <step.icon className="w-6 h-6 text-navy" strokeWidth={1.75} />
-                    </div>
-
-                    {/* Text */}
-                    <div>
-                      <h3 className="font-display font-black text-lg text-on-surface leading-tight tracking-tight mb-2">{step.title}</h3>
-                      <p className="text-base text-muted font-medium leading-relaxed">{step.desc}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Pagination Dots (Mobile Only) */}
-            <div className="flex md:hidden justify-center items-center gap-3 mt-10">
-              {steps.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setActiveIndex(i);
-                    resetTimer();
-                  }}
-                  className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-[#0070E0]' : 'w-4 bg-[#0070E0]/10'}`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-
-        
-        {/* ── Expert Trust Section ─────────────────────────────────── */}
-        <section className="relative py-24 md:py-36 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
-
-          {/* ── Section Header ── */}
-          <div className="max-w-6xl mx-auto px-6 mb-16 md:mb-20 text-center flex flex-col items-center relative z-10">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-              style={{ background: 'rgba(0,112,224,0.06)', border: '1px solid rgba(0,112,224,0.12)' }}
-            >
-              <ShieldCheck className="w-3 h-3 text-[#0070E0]" />
-              <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">Trusted Diagnostic Logic</span>
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A]"
-            >
-              Built with the mindset of <br className="md:hidden" />
-              <span className="text-[#0070E0]">an experienced mechanic</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6 leading-relaxed"
-            >
-              CarxAI was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
-            </motion.p>
-
-            {/* Story Trigger & Social Proof */}
-            <div className="flex flex-col items-center">
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.35 }}
-                onClick={() => setStoryOpen(true)}
-                className="mt-10 group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white font-black text-sm transition-all duration-300"
-                style={{
-                  border: '1px solid rgba(0,112,224,0.12)',
-                  color: '#0E3882',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                }}
-              >
-                <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
-                How CarxAI Was Born
-                <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
-                <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
-              </motion.button>
-
-              {/* Premium Social Proof Strip */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="mt-9 flex flex-col items-center gap-5"
-              >
-                {/* Section Label — Premium Uppercase Whisper */}
-                <p
-                  className="flex items-center gap-2.5 text-[9px] font-semibold uppercase tracking-[0.3em] select-none"
-                  style={{ color: 'rgba(14,56,130,0.4)', letterSpacing: '0.3em' }}
-                >
-                  <span
-                    className="block h-[1px] w-5"
-                    style={{ background: 'linear-gradient(to right, transparent, rgba(14,56,130,0.12))' }}
-                  />
-                  Voices from real drivers
-                  <span
-                    className="block h-[1px] w-5"
-                    style={{ background: 'linear-gradient(to left, transparent, rgba(14,56,130,0.12))' }}
-                  />
-                </p>
-
-                {/* Reaction Pills — Apple-level micro-components */}
-                <div className="flex items-center justify-center gap-2">
-                  {Object.entries(counts)
-                    .filter(([type, count]) => count > 0 && ['relate', 'respect', 'powerful'].includes(type))
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([type, count], idx) => {
-                      const Icon = type === 'relate' ? Heart : type === 'powerful' ? Zap : ShieldCheck;
-                      const label = type === 'relate' ? 'I relate' : type === 'powerful' ? 'Powerful' : 'Respect';
-                      const isTop = idx === 0;
-                      const formatted = count >= 1000 ? (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(count);
-
-                      return (
-                        <div
-                          key={type}
-                          className="group flex items-center gap-1.5 transition-all duration-500"
-                          style={{
-                            padding: '5px 12px 5px 10px',
-                            borderRadius: '99px',
-                            background: isTop ? 'rgba(0,112,224,0.05)' : 'rgba(248,250,252,0.8)',
-                            border: isTop ? '1px solid rgba(0,112,224,0.14)' : '1px solid rgba(0,0,0,0.05)',
-                            boxShadow: isTop
-                              ? '0 1px 8px rgba(0,112,224,0.07), inset 0 1px 0 rgba(255,255,255,0.6)'
-                              : '0 1px 4px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)',
-                            backdropFilter: 'blur(12px)',
-                          }}
-                        >
-                          <Icon
-                            size={10}
-                            style={{ color: '#0070E0', flexShrink: 0 }}
-                            fill={type === 'powerful' ? '#0070E0' : 'none'}
-                            strokeWidth={2.2}
-                          />
-                          <span
-                            className="whitespace-nowrap"
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 600,
-                              color: isTop ? '#0E3882' : '#475569',
-                              letterSpacing: '-0.01em',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {label}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '9px',
-                              fontWeight: 500,
-                              color: isTop ? 'rgba(14,56,130,0.45)' : '#94A3B8',
-                              letterSpacing: '0.01em',
-                              lineHeight: 1,
-                              paddingLeft: '2px',
-                            }}
-                          >
-                            {formatted}
-                          </span>
-                        </div>
-                      );
-                    })}
-                </div>
-
-                {/* Credibility Footer */}
-                {totalEngaged > 0 && (
-                  <p
-                    style={{
-                      fontSize: '9px',
-                      fontWeight: 450,
-                      color: '#94A3B8',
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    {totalEngaged.toLocaleString()} drivers connected with this story
-                  </p>
-                )}
-              </motion.div>
-            </div>
-          </div>
-
-          {/* ── Two-Column Content ── */}
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-start">
-
-              {/* Left Column: Trust Value Propositions */}
-              <div className="flex flex-col items-start text-left">
-                <div className="space-y-6 md:space-y-8">
-                  {[
-                    {
-                      icon: Bot,
-                      title: 'Symptom-first thinking',
-                      desc: 'Logic-based symptom assessment, not keyword matching.',
-                    },
-                    {
-                      icon: ShieldAlert,
-                      title: 'Urgency guidance',
-                      desc: 'Differentiates critical situations from minor issues.',
-                    },
-                    {
-                      icon: CheckCircle2,
-                      title: 'Clear next steps',
-                      desc: 'Actionable guidance you can follow immediately.',
-                    },
-                  ].map((pt, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.2 + i * 0.1 }}
-                      className="flex items-start gap-4 md:gap-5 group"
-                    >
-                      <div
-                        className="w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 group-hover:scale-105"
-                        style={{
-                          background: 'rgba(0,112,224,0.06)',
-                          border: '1px solid rgba(0,112,224,0.10)',
-                        }}
-                      >
-                        <pt.icon className="w-5 h-5 md:w-5.5 md:h-5.5 text-[#0070E0]" />
-                      </div>
-                      <div>
-                        <h4 className="text-[15px] md:text-[17px] font-black text-[#0F172A] mb-1 tracking-tight">{pt.title}</h4>
-                        <p className="text-[#64748B] font-medium text-[13px] md:text-[14.5px] leading-relaxed">{pt.desc}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Expert Profile Card */}
-              <div className="relative mt-4 md:mt-0">
-                {/* Ambient glow behind card */}
-                <div className="absolute -top-10 -right-10 w-56 h-56 rounded-full blur-3xl opacity-50 pointer-events-none" style={{ background: 'rgba(0,112,224,0.10)' }} />
-                <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full blur-3xl opacity-30 pointer-events-none" style={{ background: 'rgba(0,91,181,0.08)' }} />
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.94, y: 24 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative overflow-hidden"
-                  style={{
-                    borderRadius: '28px',
-                    background: 'linear-gradient(165deg, #ffffff 0%, #f8fbff 100%)',
-                    border: '1px solid rgba(0,112,224,0.10)',
-                    boxShadow: '0 0 0 1px rgba(0,112,224,0.04), 0 24px 60px -16px rgba(0,80,196,0.14), 0 4px 12px rgba(0,0,0,0.04)',
-                  }}
-                >
-                  {/* Top shimmer */}
-                  <div className="absolute top-0 left-8 right-8 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(0,112,224,0.20), transparent)' }} />
-
-                  <div className="p-6 md:p-8">
-                    {/* Profile Header */}
-                    <div className="flex flex-row items-center gap-4 md:gap-5 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(0,112,224,0.08)' }}>
-                      <div className="relative shrink-0">
-                        <div className="absolute inset-0 bg-[#0070E0] rounded-full blur-[12px] opacity-20" />
-                        <div
-                          className="w-16 h-16 md:w-20 md:h-20 rounded-full border-[2.5px] border-white relative z-10 overflow-hidden"
-                          style={{ boxShadow: '0 0 0 3px rgba(0,112,224,0.08), 0 6px 20px rgba(0,80,196,0.16)' }}
-                        >
-                          <img
-                            src="/lukas_mechanic_avatar.png"
-                            alt="Lukas Schneider"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div
-                          className="absolute -bottom-0.5 -right-0.5 w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center z-20"
-                          style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.3)' }}
-                        >
-                          <BadgeCheck className="w-3 h-3 md:w-3.5 md:h-3.5 text-white" />
-                        </div>
-                      </div>
-
-                      <div className="text-left flex-1 min-w-0">
-                        <div
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.14em] mb-1.5"
-                          style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.2)' }}
-                        >
-                          Lead Expert
-                        </div>
-                        <h3 className="text-lg md:text-xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">Lukas Schneider</h3>
-                        <p className="text-[#0070E0] font-bold uppercase tracking-[0.12em] text-[9px] md:text-[10px]">Senior Diagnostic Specialist</p>
-                      </div>
-                    </div>
-
-                    {/* Metrics */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      {[{ label: 'Experience', value: '14+ Years' }, { label: 'Cases', value: '5,200+' }].map(({ label, value }) => (
-                        <div
-                          key={label}
-                          className="relative overflow-hidden p-3.5 md:p-4 rounded-2xl"
-                          style={{
-                            background: 'rgba(0,112,224,0.04)',
-                            border: '1px solid rgba(0,112,224,0.08)',
-                          }}
-                        >
-                          <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-1">{label}</p>
-                          <p className="text-lg md:text-xl font-black text-[#0E3882]">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Specialties */}
-                    <div className="space-y-4 text-left">
-                      <div>
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">Core Specialties</p>
-                        <div className="flex flex-wrap gap-2">
-                          {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1.5 rounded-xl text-[10px] md:text-[11px] font-bold whitespace-nowrap"
-                              style={{
-                                background: 'rgba(0,112,224,0.05)',
-                                border: '1px solid rgba(0,112,224,0.12)',
-                                color: '#0E3882',
-                              }}
-                            >
-                              {spec}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <blockquote
-                        className="pl-4 text-[12.5px] md:text-[13px] text-[#64748B] font-medium leading-relaxed italic"
-                        style={{ borderLeft: '2px solid rgba(0,112,224,0.18)' }}
-                      >
-                        "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms."
-                      </blockquote>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Floating Badge */}
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-                  className="absolute -top-3 -left-3 md:-top-4 md:-left-4 z-20"
-                >
-                  <div
-                    className="px-3 py-2 md:px-3.5 md:py-2.5 rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-2.5"
-                    style={{
-                      background: 'linear-gradient(135deg, #0070E0 0%, #005BB5 100%)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      boxShadow: '0 8px 24px rgba(0,112,224,0.30), 0 1px 0 rgba(255,255,255,0.12) inset',
-                    }}
-                  >
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-white font-black text-[8px] md:text-[9px] leading-tight uppercase tracking-wider">Expert Verified</p>
-                      <p className="text-white/50 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-
-            </div>
-
-            {/* ── Section CTA — Anchored at bottom ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-16 md:mt-24 flex flex-col items-center text-center relative z-10"
-            >
-              <motion.button
-                whileHover={{ y: -3 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate('/auth')}
-                className="relative overflow-hidden rounded-2xl group"
-              >
-                <div
-                  className="relative px-10 py-5 flex items-center justify-center gap-3 font-black text-[15px] text-white transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, #0070E0 0%, #005BB5 100%)',
-                    boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 20px 48px -8px rgba(0,112,224,0.40)',
-                  }}
-                >
-                  <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-                  Experience CarxAI Diagnostics
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
-                </div>
-              </motion.button>
-              <p className="text-[12px] text-[#64748B] font-medium mt-4 tracking-wide">Start free · No credit card required</p>
-            </motion.div>
-          </div>
-        </section>
+        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
+          <TrustSection onStoryClick={() => setStoryOpen(true)} />
+        </Suspense>
 
         {/* Brand Compatibility Slider */}
-        <BrandSlider />
+        <Suspense fallback={<div className="h-32 w-full animate-pulse-slow" />}>
+          <BrandSlider />
+        </Suspense>
 
         {/* Features */}
         <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
@@ -1108,7 +630,7 @@ export default function Landing() {
               style={{ width: "fit-content" }}
             >
               {[...features, ...features, ...features].map((feature, i) => (
-                <div 
+                <article 
                   key={i} 
                   className="flex-shrink-0 w-[280px] p-10 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all group"
                 >
@@ -1117,7 +639,7 @@ export default function Landing() {
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-slate-900">{feature.title}</h3>
                   <p className="text-sm text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
-                </div>
+                </article>
               ))}
             </motion.div>
           </div>
@@ -1133,10 +655,14 @@ export default function Landing() {
             <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community of supported drivers.</p>
           </div>
 
-          <ReviewsSlider reviews={reviews} />
+          <Suspense fallback={<div className="h-96 w-full animate-pulse-slow" />}>
+            <ReviewsSlider reviews={reviews} />
+          </Suspense>
         </section>
 
-        <Pricing />
+        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow" />}>
+          <Pricing />
+        </Suspense>
 
         {/* Final CTA */}
         <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
@@ -1154,7 +680,7 @@ export default function Landing() {
                 Get Started Now
               </button>
                <button 
-                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
               >
                 Learn More
@@ -1162,8 +688,9 @@ export default function Landing() {
             </div>
           </div>
         </section>
+        </main>
 
-        {/* Footer — Standardized Background */}
+        {/* Footer */}
         <footer className="py-12 md:py-24 px-6 bg-white border-t border-slate-100 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-12 md:mb-16">
@@ -1188,7 +715,7 @@ export default function Landing() {
                   <h4 className="text-[13px] font-black uppercase tracking-widest text-on-surface/80 mb-1">Platform</h4>
                   {[
                     { name: 'Features', id: 'features' },
-                    { name: 'How It Works', id: 'how-it-works' },
+                    { name: 'How It Works', id: 'problem' },
                     { name: 'Pricing', id: 'pricing' }
                   ].map((item) => (
                     <a 
@@ -1277,11 +804,13 @@ export default function Landing() {
       </div>
 
       {/* Premium Story Modal */}
-      <StoryModal
-        isOpen={storyOpen}
-        onClose={() => setStoryOpen(false)}
-        onCTAClick={() => navigate('/auth?mode=register')}
-      />
+      <Suspense fallback={null}>
+        <StoryModal
+          isOpen={storyOpen}
+          onClose={() => setStoryOpen(false)}
+          onCTAClick={() => navigate('/auth?mode=register')}
+        />
+      </Suspense>
     </div>
   )
 }

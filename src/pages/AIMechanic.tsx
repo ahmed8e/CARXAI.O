@@ -11,7 +11,7 @@ import {
   Loader2, CheckCircle, Bot, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
   MapPin, AudioLines, Send, Mic, RefreshCw,
-  ImagePlus, Lock, ShieldAlert, CarFront
+  ImagePlus, Lock, CarFront
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
@@ -1265,147 +1265,113 @@ ${diagnosticHistory}
                           <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[32px] overflow-hidden assistant-card-bubble">
                             {msg.issueData && !msg.issueData.needs_followup ? (
                               msg.issueData.mode === 'fast_answer' ? (
-                                <div className="p-5 md:p-6 space-y-5 relative">
+                                <div className="p-5 md:p-8 space-y-6 relative bg-white">
                                   {/* 1. Badge & Title */}
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="pr-2">
                                       <div className="flex items-center gap-1.5 mb-2">
-                                        <Zap className="w-3.5 h-3.5 text-blue-500 fill-blue-500" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500">Fast Guidance</span>
+                                        <Zap className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Fast Diagnostic</span>
                                       </div>
-                                      <h3 className="text-[20px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
+                                      <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">
+                                        {msg.issueData.normalized_issue || msg.issueData.issueName}
+                                      </h3>
                                     </div>
                                   </div>
 
-                                  {/* 2. Structured Compact Data */}
-                                  <div className="grid grid-cols-2 gap-3">
-                                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Severity</p>
-                                      <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${getUrgencyColor((msg.issueData.severity || msg.issueData.urgencyLevel) as string).replace('bg-', 'bg-').replace('text-', '').replace('border-', '').split(' ')[0]}`} />
-                                        <p className="text-[12px] font-bold text-navy capitalize tracking-wide">{msg.issueData.severity || msg.issueData.urgencyLevel}</p>
+                                  {/* 2. Structured Status Banner */}
+                                  <div className={`p-5 rounded-[28px] border-2 transition-all shadow-sm ${msg.issueData.can_drive
+                                    ? 'bg-emerald-50/50 border-emerald-100 text-emerald-700'
+                                    : 'bg-rose-50/50 border-rose-100 text-rose-700'
+                                    }`}>
+                                    <div className="flex items-center gap-4">
+                                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${msg.issueData.can_drive
+                                        ? 'bg-white border-emerald-200 text-emerald-600'
+                                        : 'bg-white border-rose-200 text-rose-600'
+                                        }`}>
+                                        {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                                       </div>
-                                    </div>
-                                    <div className={`p-3.5 rounded-2xl border flex flex-col justify-center ${msg.issueData.can_drive ? 'bg-emerald-50/50 border-emerald-100/50' : 'bg-rose-50/50 border-rose-100/50'}`}>
-                                      <p className={`text-[9px] font-black uppercase tracking-widest mb-1.5 ${msg.issueData.can_drive ? 'text-emerald-600/50' : 'text-rose-600/50'}`}>Driveable?</p>
-                                      <div className="flex items-center gap-1.5">
-                                        {msg.issueData.can_drive ? <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> : <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />}
-                                        <p className={`text-[12px] font-bold tracking-wide ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
-                                          {msg.issueData.can_drive ? 'Be cautious' : 'Stop safely'}
+                                      <div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Safety Status</p>
+                                        <p className="text-[18px] font-black leading-none uppercase tracking-tight">
+                                          {msg.issueData.can_drive ? 'Drive with Caution' : 'Stop Immediately'}
                                         </p>
                                       </div>
                                     </div>
                                   </div>
 
-                                  {/* 3. Short Explanation */}
-                                  <div className="px-1 py-1">
-                                    <p className="text-[14px] font-medium text-slate-600 leading-relaxed tracking-tight">
+                                  {/* 3. AI Analysis Content */}
+                                  <div className="px-1 prose prose-slate">
+                                    <p className="text-[15px] md:text-[16px] font-medium text-slate-700 leading-relaxed whitespace-pre-line">
                                       {msg.issueData.explanation}
                                     </p>
                                   </div>
 
-                                  {/* 4. Action Recommendation */}
-                                  <div className="p-4.5 rounded-[20px] bg-gradient-to-br from-slate-50 to-white shadow-sm border border-slate-200/60">
-                                    <div className="flex items-center gap-2 mb-2 text-navy/40">
-                                      <Wrench className="w-3.5 h-3.5" />
-                                      <span className="text-[9px] font-black uppercase tracking-[0.15em]">Next Step</span>
+                                  {/* 4. Action Grid */}
+                                  <div className="pt-2 space-y-3">
+                                    <motion.button
+                                      whileHover={{ y: -2, scale: 1.01 }}
+                                      whileTap={{ scale: 0.98 }}
+                                      onClick={() => {
+                                        setReportDiagnosis(msg.issueData!);
+                                        setShowReport(true);
+                                      }}
+                                      className="w-full flex items-center justify-center gap-3 px-6 py-5 rounded-[22px] bg-navy text-white text-[13px] font-black uppercase tracking-[0.15em] shadow-xl shadow-navy/20 border border-white/10"
+                                    >
+                                      <FileText className="w-5 h-5 text-white/70" />
+                                      Generate Official Report
+                                    </motion.button>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <motion.button
+                                        whileHover={{ y: -2 }}
+                                        onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                        className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
+                                      >
+                                        <MapPin className="w-4 h-4 text-navy/30" />
+                                        Find Repair
+                                      </motion.button>
+
+                                      {(!msg.issueData.can_drive || msg.issueData.severity === 'high') ? (
+                                        <motion.button
+                                          whileHover={{ y: -2 }}
+                                          onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
+                                          className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-red-50 border border-red-100 text-red-600 text-[11px]"
+                                        >
+                                          <Zap className="w-4 h-4" />
+                                          Get Towing
+                                        </motion.button>
+                                      ) : (
+                                        <motion.button
+                                          whileHover={{ y: -2 }}
+                                          onClick={() => sendMessage("What are the estimated repair costs for this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                          className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
+                                        >
+                                          <RefreshCw className="w-4 h-4 text-navy/30" />
+                                          Check Costs
+                                        </motion.button>
+                                      )}
                                     </div>
-                                    <p className="text-[13px] font-bold text-navy leading-snug">
-                                      {msg.issueData.next_step}
-                                    </p>
+                                    
+                                    <div className="flex justify-center pt-2">
+                                      <ListenButton
+                                        currentAudioRef={currentAudioRef}
+                                        text={msg.issueData.explanation || ''}
+                                      />
+                                    </div>
                                   </div>
 
-                                  {/* 5. Dynamic Smart Actions */}
-                                  <div className="pt-2 flex flex-col gap-3">
-                                    {(() => {
-                                      const severity = msg.issueData!.severity || msg.issueData!.urgencyLevel || 'medium';
-                                      
-                                      return (
-                                        <div className="grid grid-cols-2 gap-2.5 w-full">
-                                          {severity === 'high' && (
-                                            <>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[11px] shadow-lg shadow-red-500/30 border border-white/20 order-1"
-                                              >
-                                                <ShieldAlert className="w-3.5 h-3.5 text-white/90" />
-                                                Towing
-                                              </motion.button>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
-                                              >
-                                                <MapPin className="w-3.5 h-3.5 text-navy/40" />
-                                                Find Mechanic
-                                              </motion.button>
-                                            </>
-                                          )}
-                                          
-                                          {severity === 'medium' && (
-                                            <>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1"
-                                              >
-                                                <MapPin className="w-3.5 h-3.5 text-white/90" />
-                                                Find Mechanic
-                                              </motion.button>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => sendMessage("I will continue driving with caution. Are there any specific signs I should watch out for?", undefined, undefined, { previous_diagnosis: msg.issueData })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
-                                              >
-                                                <Activity className="w-3.5 h-3.5 text-navy/40" />
-                                                Drive w/ Caution
-                                              </motion.button>
-                                            </>
-                                          )}
-
-                                          {(!severity || severity === 'low') && (
-                                            <>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => sendMessage("How should I best monitor this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0070E0] via-[#005BB5] to-[#004A99] text-white text-[11px] shadow-lg shadow-blue-500/30 border border-white/20 order-1"
-                                              >
-                                                <Activity className="w-3.5 h-3.5 text-white/90" />
-                                                Monitor Issue
-                                              </motion.button>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2 px-3 py-3.5 rounded-[16px] font-black uppercase tracking-wider transition-all bg-slate-50 border border-slate-200 text-navy text-[10px] shadow-sm order-2"
-                                              >
-                                                <MapPin className="w-3.5 h-3.5 text-navy/40" />
-                                                Find Mechanic
-                                              </motion.button>
-                                            </>
-                                          )}
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-
-                                  {/* 6. Upgrade / CTA */}
-                                  <div className="pt-2 border-t border-slate-100 flex justify-center">
-                                    <button onClick={() => {
-                                      setResponseMode('expert_answer');
-                                      setTimeout(() => {
-                                        const prompt = 'I would like a deeper, expert-level diagnostic report on this.';
-                                        sendMessage(prompt, undefined, undefined, { previous_diagnosis: msg.issueData });
-                                      }, 50);
-                                    }} className="flex items-center gap-1.5 py-2 px-4 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0070E0] hover:bg-[#0070E0]/5 transition-colors">
-                                      <Activity className="w-3.5 h-3.5" />
-                                      Switch to Expert Answer
+                                  <div className="pt-4 border-t border-slate-50 flex justify-center">
+                                    <button 
+                                      onClick={() => {
+                                        setResponseMode('expert_answer');
+                                        setTimeout(() => {
+                                          sendMessage("Analyze this in deeper detail with manual investigation steps.", undefined, undefined, { previous_diagnosis: msg.issueData });
+                                        }, 50);
+                                      }}
+                                      className="text-[10px] font-black uppercase tracking-widest text-[#0070E0] opacity-40 hover:opacity-100 transition-opacity"
+                                    >
+                                      Switch to Expert mode
                                     </button>
                                   </div>
                                 </div>

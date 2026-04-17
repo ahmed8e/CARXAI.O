@@ -58,14 +58,15 @@ export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false
           {[
             { name: 'Features', id: 'features' },
             { name: 'How it Works', id: 'how-it-works' },
+            { name: 'Guides', id: 'guides', path: '/guides' },
             { name: 'Reviews', id: 'reviews' },
             { name: 'Pricing', id: 'pricing' },
           ].map((link) => (
-            <a 
+            <Link 
               key={link.id}
-              href={`/#${link.id}`} 
+              to={link.path || `/#${link.id}`} 
               onClick={(e) => { 
-                if (window.location.pathname === '/') {
+                if (!link.path && window.location.pathname === '/') {
                   e.preventDefault(); 
                   document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth' }); 
                 }
@@ -73,7 +74,7 @@ export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false
               className="text-xs font-bold text-muted hover:text-navy transition-colors uppercase tracking-widest"
             >
               {link.name}
-            </a>
+            </Link>
           ))}
         </div>
       )}

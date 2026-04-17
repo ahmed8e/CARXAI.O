@@ -57,6 +57,8 @@ import MyAccount from './pages/MyAccount'
 import Vehicles from './pages/Vehicles'
 import ChoosePlan from './pages/ChoosePlan'
 import LocationOnboarding from './pages/LocationOnboarding'
+import GuidesIndex from './pages/GuidesIndex'
+import GuideDetail from './pages/GuideDetail'
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -88,6 +90,11 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/report/:shareId" element={<SharedReport />} />
             <Route path="/shared-report/:token" element={<SharedReport />} />
+            
+            {/* Guides SEO Section */}
+            <Route path="/guides" element={<GuidesIndex />} />
+            <Route path="/guides/:category/:slug" element={<GuideDetail />} />
+            <Route path="/guides/:slug" element={<GuideDetail />} />
 
             {/* Protected app routes */}
             <Route path="/choose-plan" element={
