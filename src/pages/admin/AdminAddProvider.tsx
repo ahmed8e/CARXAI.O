@@ -123,21 +123,30 @@ export default function AdminAddProvider() {
       Review: form.Review ? parseInt(form.Review) : null,
     }
 
-    let err
-    if (isEditing) {
-      const res = await (supabase as any).from('service_providers_raw').update(payload).eq('id', editId!)
-      err = res.error
-    } else {
-      const res = await (supabase as any).from('service_providers_raw').insert(payload)
-      err = res.error
-    }
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const response = await fetch('/api/admin-providers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          action: isEditing ? 'update' : 'insert',
+          id: editId,
+          provider: payload
+        })
+      })
 
-    setSaving(false)
-    if (err) {
-      setError(err.message)
-    } else {
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to save provider')
+
       setSaved(true)
       setTimeout(() => { navigate('/admin/providers') }, 1500)
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setSaving(false)
     }
   }
 

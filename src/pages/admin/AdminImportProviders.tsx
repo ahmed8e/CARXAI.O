@@ -114,14 +114,21 @@ export default function AdminImportProviders() {
         assigned_user_id: selectedUserId,
       })).filter(r => r.Business_name)
 
-      const BATCH = 50
-      let success = 0; let failed = 0
-      for (let i = 0; i < cleaned.length; i += BATCH) {
-        const { error } = await (supabase as any).from('service_providers_raw').insert(cleaned.slice(i, i + BATCH))
-        if (error) failed += Math.min(BATCH, cleaned.length - i)
-        else success += Math.min(BATCH, cleaned.length - i)
-      }
-      setResult({ success, failed })
+      // Call the secure backend API instead of direct supabase insert
+      const { data: { session } } = await supabase.auth.getSession()
+      const response = await fetch('/api/admin-providers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ providers: cleaned })
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Import failed')
+
+      setResult({ success: data.added, failed: data.failed })
     } catch (e: any) {
       setResult({ error: e.message })
     } finally {

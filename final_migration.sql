@@ -47,12 +47,19 @@ FOR SELECT USING (
   )
 );
 
--- Separate Admin Manage Policy
+-- Separate Admin Manage Policy (Includes ALL actions)
 CREATE POLICY "Admins can manage all providers" ON public.service_providers_raw
-FOR ALL USING (
+FOR ALL 
+USING (
   EXISTS (
     SELECT 1 FROM public.profiles 
-    WHERE id = auth.uid() AND (role = 'admin' OR subscription_tier = 'Admin')
+    WHERE id = auth.uid() AND (role = 'admin' OR subscription_tier = 'Admin' OR email LIKE '%@carx.ai')
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND (role = 'admin' OR subscription_tier = 'Admin' OR email LIKE '%@carx.ai')
   )
 );
 
