@@ -13,7 +13,7 @@ import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
-import { getSavedUserLocation } from '../lib/location'
+import { getSavedUserLocation, isLocationValid } from '../lib/location'
 
 // ── Strict mechanic / garage / repair category whitelist ─────────────
 // Only true automotive workshop / repair / inspection providers
@@ -333,13 +333,14 @@ function ContactChooser({ provider, onClose }: {
 // ── Main component ────────────────────────────────────────────────────
 export default function HumanMechanic() {
   const routeLocation = useLocation()
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [rawProviders, setRawProviders] = useState<MechanicProvider[]>([])
   const [providers, setProviders] = useState<MechanicProvider[]>([])
   const [loading, setLoading] = useState(true)
   const [locating, setLocating] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(getSavedUserLocation())
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [hasInitializedCoords, setHasInitializedCoords] = useState(false)
   const [locationDenied, setLocationDenied] = useState(false)
   const [searchQuery, setSearchQuery] = useState(routeLocation.state?.initialSearch || '')
   const [activeFilter, setActiveFilter] = useState('All')
@@ -350,14 +351,25 @@ export default function HumanMechanic() {
   const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   
+  // ── Sync Coords from Metadata/Storage on Load ──────────────────
+  useEffect(() => {
+    if (user && !hasInitializedCoords) {
+      const saved = getSavedUserLocation(user.user_metadata)
+      if (saved) {
+        setUserCoords({ lat: saved.lat, lng: saved.lng })
+      }
+      setHasInitializedCoords(true)
+    }
+  }, [user, hasInitializedCoords])
+  
   const navigate = useNavigate()
   const { isPaid, isFree, loading: subLoading } = useSubscription()
 
   // ── Proactive Prompt Sequencing ────────────────────────────────
   useEffect(() => {
-    if (subLoading || loading || locating) return
+    if (subLoading || loading || locating || !hasInitializedCoords) return
 
-    // THE CORE OVERRIDE: If assigned providers already exist, skip the sequencing messages
+    // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
     if (rawProviders.length > 0) {
       setShowLocationPrompt(false)
       setShowQualityPrompt(false)
@@ -372,18 +384,19 @@ export default function HumanMechanic() {
       }
 
       // 2. Information sequencing for paid users
-      const hasLocation = userCoords || user?.user_metadata?.latitude || user?.user_metadata?.city
+      // Check if we have a valid location from metadata or local state
+      const hasValidLocation = (userCoords !== null) || 
+                               (user?.user_metadata?.latitude && isLocationValid(user?.user_metadata?.location_timestamp))
       
-      // If we already have a location (saved or in profile), skip location prompt
-      if (!hasLocation) {
+      if (!hasValidLocation) {
         setShowLocationPrompt(true)
       } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
-        // If we have location but haven't seen the quality prompt, show it
+        // If we have location but haven't seen the quality refinement message, show it
         setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaid, loading, locating, rawProviders])
+  }, [user, isPaid, loading, locating, rawProviders, userCoords, hasInitializedCoords])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {
@@ -400,10 +413,24 @@ export default function HumanMechanic() {
     }
     
     setLocating(true)
-    getUserLocation()
-      .then(pos => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }))
-      .catch(() => setLocationDenied(true))
-      .finally(() => setLocating(false))
+    const run = async () => {
+      try {
+        const pos = await getUserLocation()
+        const now = Date.now()
+        const { error } = await updateProfile({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          location_timestamp: now
+        })
+        if (error) console.error('Error updating location profile:', error)
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      } catch {
+        setLocationDenied(true)
+      } finally {
+        setLocating(false)
+      }
+    }
+    run()
   }, [])
 
   // ── Step 2: Fetch after geo resolves ─────────────────────────────

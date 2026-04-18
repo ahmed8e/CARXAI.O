@@ -20,14 +20,17 @@ export default function LocationOnboarding() {
 
   const handleCitySubmit = async (selectedCity: string) => {
     if (!selectedCity) return
-    setLoading(true)
-    const { error: updateError } = await updateProfile({ city: selectedCity })
+    const now = Date.now()
+    const { error: updateError } = await updateProfile({ 
+      city: selectedCity,
+      location_timestamp: now
+    })
     if (updateError) {
       setError(updateError.message || 'Failed to save city. Please try again.')
       setLoading(false)
     } else {
-      // Save for 24h persistence (null coordinates but city name)
-      saveUserLocation({ lat: 0, lng: 0 }, selectedCity)
+      // Save for 24h persistence locally
+      saveUserLocation({ lat: 0, lng: 0 }, selectedCity, now)
       navigate('/choose-plan')
     }
   }
@@ -37,15 +40,17 @@ export default function LocationOnboarding() {
     setError(null)
     try {
       const pos = await getUserLocation()
+      const now = Date.now()
       const { error: updateError } = await updateProfile({
         latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude
+        longitude: pos.coords.longitude,
+        location_timestamp: now
       })
       if (updateError) {
         setError(updateError.message || 'Failed to save location.')
       } else {
-        // Save for 24h persistence
-        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        // Save for 24h persistence locally
+        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }, undefined, now)
         navigate('/choose-plan')
       }
     } catch (err) {

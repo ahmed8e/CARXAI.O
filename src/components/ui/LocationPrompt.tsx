@@ -22,15 +22,17 @@ export default function LocationPrompt({ isOpen, onClose }: LocationPromptProps)
     setError(null)
     try {
       const pos = await getUserLocation()
+      const now = Date.now()
       const { error: updateError } = await updateProfile({
         latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude
+        longitude: pos.coords.longitude,
+        location_timestamp: now
       })
       if (updateError) {
         setError(updateError.message || 'Failed to save location.')
       } else {
-        // Use the new centralized utility for 24h persistence
-        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        // Update both local storage and metadata context
+        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }, undefined, now)
         onClose()
       }
     } catch (err) {

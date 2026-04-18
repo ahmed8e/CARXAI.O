@@ -13,7 +13,7 @@ import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
-import { getSavedUserLocation } from '../lib/location'
+import { getSavedUserLocation, isLocationValid, saveUserLocation } from '../lib/location'
 
 // ── Types ────────────────────────────────────────────────────────────
 const trustFallback = (id: string) => {
@@ -267,19 +267,31 @@ export default function Towing() {
   const [mapChooserProvider, setMapChooserProvider] = useState<TowingProvider | null>(null)
   const [contactChooserProvider, setContactChooserProvider] = useState<TowingProvider | null>(null)
   
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(getSavedUserLocation())
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [hasInitializedCoords, setHasInitializedCoords] = useState(false)
   
   const navigate = useNavigate()
   const { isPaid, isFree, loading: subLoading } = useSubscription()
 
+  // ── Sync Coords from Metadata/Storage on Load ──────────────────
   useEffect(() => {
-    if (subLoading || loading) return
+    if (user && !hasInitializedCoords) {
+      const saved = getSavedUserLocation(user.user_metadata)
+      if (saved) {
+        setUserCoords({ lat: saved.lat, lng: saved.lng })
+      }
+      setHasInitializedCoords(true)
+    }
+  }, [user, hasInitializedCoords])
 
-    // THE CORE OVERRIDE: If assigned providers already exist, skip the sequencing messages
+  useEffect(() => {
+    if (subLoading || loading || !hasInitializedCoords) return
+
+    // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
     if (providers.length > 0) {
       setShowLocationPrompt(false)
       setShowQualityPrompt(false)
@@ -294,16 +306,18 @@ export default function Towing() {
       }
 
       // 2. Proactive informational sequencing for paid users
-      const hasLocation = userCoords || user?.user_metadata?.latitude || user?.user_metadata?.city
+      // Check if we have a valid location from metadata or local state
+      const hasValidLocation = (userCoords !== null) || 
+                               (user?.user_metadata?.latitude && isLocationValid(user?.user_metadata?.location_timestamp))
       
-      if (!hasLocation) {
+      if (!hasValidLocation) {
         setShowLocationPrompt(true)
       } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
         setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaid, loading, providers, userCoords])
+  }, [user, isPaid, loading, providers, userCoords, hasInitializedCoords])
 
   useEffect(() => {
     const loadProviders = async () => {
@@ -320,8 +334,18 @@ export default function Towing() {
         if (!userLoc) {
           try {
             const pos = await getUserLocation()
+            const now = Date.now()
             userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }
             setUserCoords(userLoc)
+            
+            // Persist to DB/Metadata for 24h shared use
+            updateProfile({
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              location_timestamp: now
+            }).then(({ error }) => {
+              if (!error) saveUserLocation(userLoc!, undefined, now)
+            })
           } catch (e) {
             console.warn('Location access denied')
           }

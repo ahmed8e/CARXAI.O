@@ -13,7 +13,7 @@ interface AuthContextType {
   signOutAll: () => Promise<{ error: Error | null }>
   signInWithOAuth: (provider: 'google' | 'apple') => Promise<{ error: Error | null }>
   resetPassword: (email: string) => Promise<{ error: Error | null }>
-  updateProfile: (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number }) => Promise<{ error: Error | null }>
+  updateProfile: (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number, location_timestamp?: number }) => Promise<{ error: Error | null }>
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
   isAdmin: boolean
   isRoleVerified: boolean
@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error }
   }
 
-  const updateProfile = async (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number }) => {
+  const updateProfile = async (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number, location_timestamp?: number }) => {
     if (!user) return { error: new Error('User not logged in') }
 
     // 1. Update Auth Metadata (for immediate UI response using user_metadata)
@@ -159,7 +159,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: {
         full_name: updates.fullName,
         phone_number: updates.phoneNumber,
-        preferred_language: updates.preferredLanguage
+        preferred_language: updates.preferredLanguage,
+        city: updates.city,
+        latitude: updates.latitude,
+        longitude: updates.longitude,
+        location_timestamp: updates.location_timestamp
       }
     })
 
@@ -175,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         city: updates.city,
         latitude: updates.latitude,
         longitude: updates.longitude,
+        location_timestamp: updates.location_timestamp,
       })
 
     if (dbError) {
