@@ -46,6 +46,7 @@ import SharedReport from './pages/SharedReport'
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import Dashboard from './pages/Dashboard'
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
             <Route path="/register" element={<Navigate to="/auth?mode=register" replace />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/report/:shareId" element={<SharedReport />} />

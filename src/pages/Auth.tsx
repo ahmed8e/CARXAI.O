@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Eye, EyeOff, CheckCircle, Zap, Star, Quote } from 'lucide-react'
 import { BrandLockup } from '../components/ui/Brand'
 import { useAuth } from '../contexts/AuthContext'
+import { PasswordRequirement } from '../components/ui/PasswordRequirement'
 
 const reviews = [
   { name: 'Jason M.', car: 'Toyota RAV4', text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', role: 'Daily Driver' },
@@ -49,6 +50,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -59,6 +61,7 @@ export default function Auth() {
 
   useEffect(() => {
     setError('')
+    setConfirmPassword('')
   }, [mode])
 
   useEffect(() => {
@@ -76,9 +79,15 @@ export default function Auth() {
     e.preventDefault()
     setError('')
     
-    if (mode === 'register' && password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
+    if (mode === 'register') {
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters')
+        return
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match')
+        return
+      }
     }
 
     setLoading(true)
@@ -231,7 +240,34 @@ export default function Auth() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                
+                {mode === 'register' && password.length > 0 && (
+                  <PasswordRequirement password={password} />
+                )}
               </div>
+
+              <AnimatePresence mode="wait">
+                {mode === 'register' && (
+                  <motion.div
+                    key="confirm-password"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-1.5"
+                  >
+                    <label className="text-[13px] font-bold text-slate-700 ml-1">Confirm Password</label>
+                    <input
+                      type="password"
+                      className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      required={mode === 'register'}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {mode === 'login' && (
                 <label className="flex items-center gap-3 cursor-pointer group py-1 w-fit">

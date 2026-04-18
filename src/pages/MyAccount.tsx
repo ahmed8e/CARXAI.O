@@ -12,6 +12,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useSubscription } from '../hooks/useSubscription'
+import { PasswordRequirement } from '../components/ui/PasswordRequirement'
+
 
 type Section = 'profile' | 'security' | 'preferences' | 'billing' | 'activity' | 'support'
 
@@ -325,8 +327,8 @@ export default function MyAccount() {
       setFeedback({ type: 'error', message: 'Passwords do not match.' })
       return
     }
-    if (passFields.newPassword.length < 6) {
-      setFeedback({ type: 'error', message: 'Password must be at least 6 characters.' })
+    if (passFields.newPassword.length < 8) {
+      setFeedback({ type: 'error', message: 'Password must be at least 8 characters.' })
       return
     }
 
@@ -706,7 +708,10 @@ export default function MyAccount() {
                        <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm border border-blue-100 flex-shrink-0">
                           <Shield className="w-4 h-4 text-blue-600" />
                        </div>
-                       <p className="text-xs text-blue-600 font-bold leading-relaxed">For your security, use a password at least 6 characters long with numbers.</p>
+                       <div className="flex-1">
+                          <p className="text-[11px] text-blue-600 font-bold leading-relaxed mb-3 pt-1">Enhance your account security with a strong password.</p>
+                          <PasswordRequirement password={passFields.newPassword} />
+                       </div>
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">New Password</label>
