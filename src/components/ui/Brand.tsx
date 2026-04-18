@@ -3,7 +3,6 @@ import React from 'react';
 interface LogoProps {
   size?: number | string;
   className?: string;
-  variant?: 'flat' | 'gradient' | 'symbol';
   showBackground?: boolean;
 }
 
@@ -13,7 +12,6 @@ interface LogoProps {
 export const Logo: React.FC<LogoProps> = ({ 
   size = 32, 
   className = "", 
-  variant = 'flat',
   showBackground = true
 }) => {
   return (
@@ -86,7 +84,6 @@ interface LockupProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   light?: boolean;
-  variant?: 'flat' | 'gradient';
 }
 
 /**
@@ -95,8 +92,7 @@ interface LockupProps {
 export const BrandLockup: React.FC<LockupProps> = ({ 
   size = 'md', 
   className = "",
-  light = false,
-  variant = 'flat'
+  light = false
 }) => {
   const logoSizes = {
     sm: 24,
@@ -108,7 +104,7 @@ export const BrandLockup: React.FC<LockupProps> = ({
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <div className={`rounded-[25%] overflow-hidden shadow-lg shadow-navy/10`}>
-        <Logo size={logoSizes[size]} variant={variant} />
+        <Logo size={logoSizes[size]} />
       </div>
       <Wordmark size={size} light={light} />
     </div>

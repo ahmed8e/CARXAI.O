@@ -1083,11 +1083,11 @@ ${diagnosticHistory}
         </div>
 
         {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
-        <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6 overscroll-contain">
-          <div className="max-w-2xl mx-auto pt-[calc(10rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
+        <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6 overscroll-contain bg-transparent">
+          <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
             {/* Welcome State when empty */}
             {messages.length === 0 && !loading && (
-              <div className="flex flex-col items-center justify-center pt-10 pb-10">
+              <div className="flex flex-col items-center justify-center pt-16 pb-12">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -1233,8 +1233,9 @@ ${diagnosticHistory}
             {/* ── Message Thread ────────────────────────────────── */}
             <div className="space-y-6">
               {messages.map((msg, idx) => {
-                // Optionally skip greeting if empty state handles it
-                if (messages.length === 1 && idx === 0 && msg.id === '0') return null;
+                // Optionally skip items if needed, but ensure first message is visible
+                const isGreeting = messages.length === 1 && idx === 0 && msg.id === '0';
+                if (isGreeting) return null;
 
                 return (
                   <motion.div
