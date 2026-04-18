@@ -112,7 +112,50 @@ create table if not exists user_settings (
 alter table user_settings enable row level security;
 create policy "Users can CRUD own settings" on user_settings using (auth.uid() = user_id);
 
--- Storage bucket for car photos
+-- STORAGE
 insert into storage.buckets (id, name, public) values ('car-photos', 'car-photos', true) on conflict do nothing;
 create policy "Users can upload own photos" on storage.objects for insert with check (auth.uid()::text = (storage.foldername(name))[1]);
 create policy "Car photos are public" on storage.objects for select using (bucket_id = 'car-photos');
+
+-- SERVICE PROVIDERS (RAW NETWORK DATA)
+create table if not exists service_providers_raw (
+  id bigint primary key generated always as identity,
+  "Category" text,
+  "Business_name" text,
+  "Address" text,
+  "City" text,
+  "State" text,
+  "PostalCode" text,
+  "Country" text,
+  "Phone" text,
+  "Fax" text,
+  "Website_url" text,
+  "Email" text,
+  "MapLink" text,
+  "DetailsLink" text,
+  "Rating" text,
+  "Review" text,
+  "image1" text,
+  "Lat" text,
+  "Long" text,
+  "ClosingHour" text,
+  "Facebookprofile" text,
+  "Twitterprofile" text,
+  "linkedinprofile" text,
+  "instagramprofile" text,
+  "BusinessDescription" text,
+  "Working_hour" text,
+  "assigned_user_id" uuid references auth.users(id) on delete set null,
+  "created_at" timestamptz default now()
+);
+
+alter table service_providers_raw enable row level security;
+
+create policy "Users can view assigned providers" on service_providers_raw
+  for select using (auth.uid() = assigned_user_id);
+
+create policy "Admins can manage all providers" on service_providers_raw
+  for all using (
+    (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
+    or (auth.jwt() -> 'raw_user_meta_data' ->> 'role') = 'admin'
+  );

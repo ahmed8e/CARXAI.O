@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import {
-  Search, Filter, Plus, Trash2, Edit3,
-  MapPin, Star, ChevronDown, RefreshCw
+  MapPin, ChevronDown, RefreshCw, Plus, Search, Filter, Edit3, Trash2
 } from 'lucide-react'
 
 interface Provider {
@@ -19,6 +18,7 @@ interface Provider {
   Lat: string | null
   Long: string | null
   Website_url: string | null
+  assigned_user_id: string | null
   created_at: string | null
 }
 
@@ -72,7 +72,7 @@ export default function AdminProviders() {
   const loadProviders = useCallback(async () => {
     const { data } = await supabase
       .from('service_providers_raw')
-      .select('id, Business_name, Category, Address, City, Phone, Rating, Review, Lat, Long, Website_url, created_at')
+      .select('id, Business_name, Category, Address, City, Phone, Rating, Review, Lat, Long, Website_url, assigned_user_id, created_at')
       .order('Business_name', { ascending: true })
     
     const all = data ?? []
@@ -176,7 +176,7 @@ export default function AdminProviders() {
             <table className="w-full">
               <thead className="border-b border-overlay">
                 <tr>
-                  {['Provider', 'Category', 'City', 'Phone', 'Rating', 'Actions'].map(h => (
+                  {['Provider', 'Category', 'City', 'Phone', 'Status', 'Actions'].map(h => (
                     <th key={h} className="px-5 py-3.5 text-left text-[10px] font-black uppercase tracking-widest text-muted">{h}</th>
                   ))}
                 </tr>
@@ -203,13 +203,11 @@ export default function AdminProviders() {
                       ) : <span className="text-sm text-muted">—</span>}
                     </td>
                     <td className="px-5 py-4">
-                      {p.Rating ? (
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-bold text-on-surface">{p.Rating}</span>
-                          {p.Review && <span className="text-xs text-muted">({p.Review})</span>}
-                        </div>
-                      ) : <span className="text-sm text-muted">—</span>}
+                      {p.assigned_user_id ? (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 text-emerald-600">Assigned</span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-50 border border-slate-100 text-slate-400">Available</span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5">

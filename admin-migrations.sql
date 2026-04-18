@@ -397,3 +397,42 @@ END $$;
 -- ── Done ──────────────────────────────────────────────────────────────
 -- After running this, visit /admin in the app — all pages should show real data.
 
+-- ── 8. FIX: Service Providers assigned_user_id ───────────────────────
+-- Fix for 'Could not find the assigned_user_id column of service_providers_raw'
+DO $$ 
+BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='service_providers_raw' AND column_name='assigned_user_id') THEN
+    ALTER TABLE public.service_providers_raw ADD COLUMN assigned_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+-- Enable RLS for service_providers_raw if not already enabled
+ALTER TABLE public.service_providers_raw ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can view providers assigned to them
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'service_providers_raw'
+      AND policyname = 'Users can view assigned providers'
+  ) THEN
+    CREATE POLICY "Users can view assigned providers" ON public.service_providers_raw
+      FOR SELECT USING (auth.uid() = assigned_user_id);
+  END IF;
+  
+  -- Policy: Admins can manage all providers
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'service_providers_raw'
+      AND policyname = 'Admins can manage all providers'
+  ) THEN
+    EXECUTE '
+      CREATE POLICY "Admins can manage all providers" ON public.service_providers_raw
+        FOR ALL
+        USING (
+          (auth.jwt() -> ''user_metadata'' ->> ''role'') = ''admin''
+          OR (auth.jwt() -> ''raw_user_meta_data'' ->> ''role'') = ''admin''
+        )
+    ';
+  END IF;
+END $$;
+

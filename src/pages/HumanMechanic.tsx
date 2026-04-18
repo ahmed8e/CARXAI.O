@@ -9,7 +9,7 @@ import {
   ChevronRight, MessageCircle, Copy
 } from 'lucide-react'
 import LocationPrompt from '../components/ui/LocationPrompt'
-import QualityPrompt from '../components/ui/QualityPrompt'
+import ProviderWaitingState from '../components/ui/ProviderWaitingState'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
@@ -348,7 +348,6 @@ export default function HumanMechanic() {
   const [mapChooserProvider, setMapChooserProvider] = useState<MechanicProvider | null>(null)
   const [contactChooserProvider, setContactChooserProvider] = useState<MechanicProvider | null>(null)
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
-  const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   
   // ── Sync Coords from Metadata/Storage on Load ──────────────────
@@ -372,7 +371,7 @@ export default function HumanMechanic() {
     // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
     if (rawProviders.length > 0) {
       setShowLocationPrompt(false)
-      setShowQualityPrompt(false)
+      // No need for quality prompt seen logic if providers are already there
       return
     }
 
@@ -390,10 +389,8 @@ export default function HumanMechanic() {
       
       if (!hasValidLocation) {
         setShowLocationPrompt(true)
-      } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
-        // If we have location but haven't seen the quality refinement message, show it
-        setShowQualityPrompt(true)
       }
+      // Note: QualityPrompt removed as modal, handled inline in the return
     }, 1500)
     return () => clearTimeout(timer)
   }, [user, isPaid, loading, locating, rawProviders, userCoords, hasInitializedCoords])
@@ -595,12 +592,23 @@ export default function HumanMechanic() {
         {isLoadingData ? (
           <div className="space-y-3">{[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}</div>
         ) : filteredProviders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 rounded-full bg-surface-low border border-overlay flex items-center justify-center mb-5">
-              <Wrench className="w-9 h-9 text-muted/30" />
+          <div className="space-y-6">
+            {/* Inline 24h waiting state for when location is known but no providers assigned yet */}
+            {userCoords && (
+              <ProviderWaitingState />
+            )}
+
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-20 h-20 rounded-full bg-surface-low border border-overlay flex items-center justify-center mb-5">
+                <Wrench className="w-9 h-9 text-muted/30" />
+              </div>
+              <h3 className="text-base font-bold text-on-surface mb-1">No mechanics assigned yet</h3>
+              <p className="text-sm text-muted max-w-[260px]">
+                {userCoords 
+                  ? "We're matching you with the best nearby mechanics. Please check back soon."
+                  : "Try a different city name or adjust filters."}
+              </p>
             </div>
-            <h3 className="text-base font-bold text-on-surface mb-1">No mechanics found</h3>
-            <p className="text-sm text-muted max-w-[260px]">Try a different city name or adjust filters.</p>
           </div>
         ) : (
           <>
@@ -830,19 +838,7 @@ export default function HumanMechanic() {
 
       <LocationPrompt 
         isOpen={showLocationPrompt} 
-        onClose={() => {
-          setShowLocationPrompt(false)
-          // Sequence into quality prompt if not seen
-          if (!localStorage.getItem('carxai_quality_prompt_seen')) {
-            setTimeout(() => setShowQualityPrompt(true), 600)
-          }
-        }} 
-      />
-
-      <QualityPrompt 
-        isOpen={showQualityPrompt}
-        onClose={() => setShowQualityPrompt(false)}
-        onContinue={() => setShowQualityPrompt(false)}
+        onClose={() => setShowLocationPrompt(false)} 
       />
 
       <UpgradePrompt 

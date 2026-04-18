@@ -9,7 +9,7 @@ import { getUserLocation, formatDistance, isIOS, getMapLinks } from '../lib/util
 import type { TowingProvider } from '../lib/types'
 import { useAuth } from '../contexts/AuthContext'
 import LocationPrompt from '../components/ui/LocationPrompt'
-import QualityPrompt from '../components/ui/QualityPrompt'
+import ProviderWaitingState from '../components/ui/ProviderWaitingState'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
@@ -269,7 +269,6 @@ export default function Towing() {
   
   const { user, updateProfile } = useAuth()
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
-  const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [hasInitializedCoords, setHasInitializedCoords] = useState(false)
@@ -294,7 +293,6 @@ export default function Towing() {
     // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
     if (providers.length > 0) {
       setShowLocationPrompt(false)
-      setShowQualityPrompt(false)
       return
     }
 
@@ -312,8 +310,6 @@ export default function Towing() {
       
       if (!hasValidLocation) {
         setShowLocationPrompt(true)
-      } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
-        setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
@@ -443,12 +439,23 @@ export default function Towing() {
             {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center">
-            <div className="w-16 h-16 rounded-full bg-surface-low flex items-center justify-center mx-auto mb-6">
-              <Truck className="w-8 h-8 text-muted/20" />
+          <div className="space-y-6">
+            {/* Inline 24h waiting state for when location is known but no providers assigned yet */}
+            {userCoords && (
+              <ProviderWaitingState />
+            )}
+            
+            <div className="py-20 text-center">
+              <div className="w-16 h-16 rounded-full bg-surface-low flex items-center justify-center mx-auto mb-6">
+                <Truck className="w-8 h-8 text-muted/20" />
+              </div>
+              <p className="text-lg font-display font-bold text-on-surface">No towing providers assigned yet</p>
+              <p className="text-sm text-muted mt-1">
+                {userCoords 
+                  ? "We're matching you with the best recovery experts in your area. Please check back soon."
+                  : "Try a different city or check your internet connection."}
+              </p>
             </div>
-            <p className="text-lg font-display font-bold text-on-surface">No providers found</p>
-            <p className="text-sm text-muted mt-1">Try a different city or check your internet connection.</p>
           </div>
         ) : (
           <>
@@ -673,19 +680,7 @@ export default function Towing() {
 
       <LocationPrompt 
         isOpen={showLocationPrompt} 
-        onClose={() => {
-          setShowLocationPrompt(false)
-          // Sequence to QualityPrompt if not seen
-          if (!localStorage.getItem('carxai_quality_prompt_seen')) {
-            setTimeout(() => setShowQualityPrompt(true), 600)
-          }
-        }} 
-      />
-
-      <QualityPrompt
-        isOpen={showQualityPrompt}
-        onClose={() => setShowQualityPrompt(false)}
-        onContinue={() => setShowQualityPrompt(false)}
+        onClose={() => setShowLocationPrompt(false)} 
       />
 
       <UpgradePrompt 
