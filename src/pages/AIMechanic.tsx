@@ -1695,9 +1695,10 @@ ${diagnosticHistory}
             )}
             <div ref={messagesEndRef} className="h-40" />
           </div>
-        </div>
-      </div>
     </div>
+  </div>
+</div>
+</div>
 
         {/* Premium Voice Activity Indicator */}
         <AnimatePresence>
