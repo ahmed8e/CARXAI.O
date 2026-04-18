@@ -1072,7 +1072,7 @@ ${diagnosticHistory}
     }
 
     return (
-      <div className="h-full relative overflow-hidden">
+      <div className="h-full relative flex flex-col overflow-hidden bg-mesh">
         {/* ── Layer 0: Global Background Decoration ──────────────────── */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/[0.03] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 animate-pulse-slow" />
@@ -1082,9 +1082,13 @@ ${diagnosticHistory}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
         </div>
 
-        {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
-        <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6 overscroll-contain bg-transparent">
-          <div className="max-w-2xl mx-auto pt-[calc(6rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
+        {/* ── Main Content Column ────────────────────────────────────── */}
+        {/* This container accounts for the fixed Navbar from AppLayout */}
+        <div className="flex-1 flex flex-col min-h-0 pt-[calc(4.5rem_+_env(safe-area-inset-top))] relative z-10">
+          
+          {/* ── Scrollable Body Area ──────────────────────────────── */}
+          <div className="flex-1 overflow-y-auto overscroll-contain scroll-smooth px-4 md:px-6">
+            <div className="max-w-2xl mx-auto pb-40">
             {/* ── Persistent Header Section (Hero + Mode Switch) ── */}
             <div className="flex flex-col items-center justify-center pt-8 pb-10">
               <motion.div
@@ -1686,7 +1690,8 @@ ${diagnosticHistory}
             )}
           </div>
 
-          <div ref={messagesEndRef} className="h-8" />
+            <div ref={messagesEndRef} className="h-8" />
+          </div>
         </div>
       </div>
 
@@ -1717,8 +1722,8 @@ ${diagnosticHistory}
         </AnimatePresence>
 
         {/* ── Layer 2: Fixed Composer ────────────────────────────── */}
-        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 bg-mesh border-t border-slate-100/50 backdrop-blur-xl">
-          <div className="max-w-3xl mx-auto px-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))] pt-4 relative z-10">
+        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 bg-mesh/80 border-t border-slate-100/50 backdrop-blur-xl">
+          <div className="max-w-3xl mx-auto px-4 pb-[calc(1.25rem_+_env(safe-area-inset-bottom))] pt-3 relative z-10">
             {/* Hidden file pickers */}
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
