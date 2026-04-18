@@ -22,7 +22,7 @@ export default function LocationOnboarding() {
     setLoading(true)
     const { error: updateError } = await updateProfile({ city: selectedCity })
     if (updateError) {
-      setError('Failed to save city. Please try again.')
+      setError(updateError.message || 'Failed to save city. Please try again.')
       setLoading(false)
     } else {
       navigate('/choose-plan')
@@ -39,7 +39,7 @@ export default function LocationOnboarding() {
         longitude: pos.coords.longitude
       })
       if (updateError) {
-        setError('Failed to save location.')
+        setError(updateError.message || 'Failed to save location.')
       } else {
         navigate('/choose-plan')
       }

@@ -26,7 +26,7 @@ export default function LocationPrompt({ isOpen, onClose }: LocationPromptProps)
         longitude: pos.coords.longitude
       })
       if (updateError) {
-        setError('Failed to save location.')
+        setError(updateError.message || 'Failed to save location.')
       } else {
         // Mark as seen in localStorage to avoid prompt for 30 days
         localStorage.setItem('carxai_location_prompt_seen', Date.now().toString())

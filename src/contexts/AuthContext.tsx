@@ -177,7 +177,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         longitude: updates.longitude,
       })
 
-    if (dbError) console.error('Database Profile Error:', dbError)
+    if (dbError) {
+      console.error('Database Profile Error:', dbError);
+      return { error: new Error(`Database Error: ${dbError.message || dbError.details || 'Unknown error'}`) };
+    }
 
     // 3. Update User Settings table
     const { error: settingsError } = await (supabase as any)
@@ -188,9 +191,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone_number: updates.phoneNumber || null
       })
 
-    if (settingsError) console.error('Database Settings Error:', settingsError)
+    if (settingsError) {
+      console.error('Database Settings Error:', settingsError);
+      return { error: new Error(`Settings Error: ${settingsError.message || settingsError.details || 'Unknown error'}`) };
+    }
     
-    return { error: dbError || settingsError || null }
+    return { error: null }
   }
 
   const updatePassword = async (newPassword: string) => {
