@@ -594,21 +594,19 @@ export default function HumanMechanic() {
         ) : filteredProviders.length === 0 ? (
           <div className="space-y-6">
             {/* Inline 24h waiting state for when location is known but no providers assigned yet */}
-            {userCoords && (
+            {userCoords ? (
               <ProviderWaitingState />
-            )}
-
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-20 h-20 rounded-full bg-surface-low border border-overlay flex items-center justify-center mb-5">
-                <Wrench className="w-9 h-9 text-muted/30" />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-20 h-20 rounded-full bg-surface-low border border-overlay flex items-center justify-center mb-5">
+                  <Wrench className="w-9 h-9 text-muted/30" />
+                </div>
+                <h3 className="text-base font-bold text-on-surface mb-1">No mechanics assigned yet</h3>
+                <p className="text-sm text-muted max-w-[260px]">
+                  Try a different city name or adjust filters.
+                </p>
               </div>
-              <h3 className="text-base font-bold text-on-surface mb-1">No mechanics assigned yet</h3>
-              <p className="text-sm text-muted max-w-[260px]">
-                {userCoords 
-                  ? "We're matching you with the best nearby mechanics. Please check back soon."
-                  : "Try a different city name or adjust filters."}
-              </p>
-            </div>
+            )}
           </div>
         ) : (
           <>

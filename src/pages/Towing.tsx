@@ -441,21 +441,19 @@ export default function Towing() {
         ) : filtered.length === 0 ? (
           <div className="space-y-6">
             {/* Inline 24h waiting state for when location is known but no providers assigned yet */}
-            {userCoords && (
+            {userCoords ? (
               <ProviderWaitingState />
-            )}
-            
-            <div className="py-20 text-center">
-              <div className="w-16 h-16 rounded-full bg-surface-low flex items-center justify-center mx-auto mb-6">
-                <Truck className="w-8 h-8 text-muted/20" />
+            ) : (
+              <div className="py-20 text-center">
+                <div className="w-16 h-16 rounded-full bg-surface-low flex items-center justify-center mx-auto mb-6">
+                  <Truck className="w-8 h-8 text-muted/20" />
+                </div>
+                <p className="text-lg font-display font-bold text-on-surface">No towing providers assigned yet</p>
+                <p className="text-sm text-muted mt-1">
+                  Try a different city or check your internet connection.
+                </p>
               </div>
-              <p className="text-lg font-display font-bold text-on-surface">No towing providers assigned yet</p>
-              <p className="text-sm text-muted mt-1">
-                {userCoords 
-                  ? "We're matching you with the best recovery experts in your area. Please check back soon."
-                  : "Try a different city or check your internet connection."}
-              </p>
-            </div>
+            )}
           </div>
         ) : (
           <>
