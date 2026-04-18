@@ -1946,8 +1946,8 @@ ${diagnosticHistory}
           isLimitReached={!canShareReport}
         />
       )}
-    </div> {/* Closes root div 1076 */}
-    </> {/* Closes root fragment 1075 */}
+    </div>
+    </>
   )
 }
 
