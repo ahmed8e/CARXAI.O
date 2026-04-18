@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MapPin, Search, Navigation, ArrowRight, ShieldCheck, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { getUserLocation } from '../lib/utils'
+import { saveUserLocation } from '../lib/location'
 
 const SUGGESTED_CITIES = [
   'London', 'New York', 'Paris', 'Berlin', 'Tokyo', 'Sydney'
@@ -25,6 +26,8 @@ export default function LocationOnboarding() {
       setError(updateError.message || 'Failed to save city. Please try again.')
       setLoading(false)
     } else {
+      // Save for 24h persistence (null coordinates but city name)
+      saveUserLocation({ lat: 0, lng: 0 }, selectedCity)
       navigate('/choose-plan')
     }
   }
@@ -41,6 +44,8 @@ export default function LocationOnboarding() {
       if (updateError) {
         setError(updateError.message || 'Failed to save location.')
       } else {
+        // Save for 24h persistence
+        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         navigate('/choose-plan')
       }
     } catch (err) {

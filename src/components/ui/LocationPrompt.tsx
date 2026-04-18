@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { getUserLocation } from '../../lib/utils'
 import { useAuth } from '../../contexts/AuthContext'
 import { useState } from 'react'
+import { saveUserLocation } from '../../lib/location'
 
 interface LocationPromptProps {
   isOpen: boolean
@@ -28,8 +29,8 @@ export default function LocationPrompt({ isOpen, onClose }: LocationPromptProps)
       if (updateError) {
         setError(updateError.message || 'Failed to save location.')
       } else {
-        // Mark as seen in localStorage to avoid prompt for 30 days
-        localStorage.setItem('carxai_location_prompt_seen', Date.now().toString())
+        // Use the new centralized utility for 24h persistence
+        saveUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         onClose()
       }
     } catch (err) {

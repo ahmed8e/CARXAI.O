@@ -13,6 +13,7 @@ import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
+import { getSavedUserLocation } from '../lib/location'
 
 // ── Types ────────────────────────────────────────────────────────────
 const trustFallback = (id: string) => {
@@ -270,14 +271,21 @@ export default function Towing() {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(getSavedUserLocation())
   
   const navigate = useNavigate()
   const { isPaid, isFree, loading: subLoading } = useSubscription()
 
   useEffect(() => {
-    if (subLoading) return
+    if (subLoading || loading) return
 
-    // Proactive prompt sequencing
+    // THE CORE OVERRIDE: If assigned providers already exist, skip the sequencing messages
+    if (providers.length > 0) {
+      setShowLocationPrompt(false)
+      setShowQualityPrompt(false)
+      return
+    }
+
     const timer = setTimeout(() => {
       // 1. Check for Plan Gating
       if (isFree) {
@@ -286,22 +294,16 @@ export default function Towing() {
       }
 
       // 2. Proactive informational sequencing for paid users
-      const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
-      const lastLocSeen = localStorage.getItem('carxai_location_prompt_seen')
-      const lastQualSeen = localStorage.getItem('carxai_quality_prompt_seen')
-      const now = Date.now()
+      const hasLocation = userCoords || user?.user_metadata?.latitude || user?.user_metadata?.city
       
-      const locActive = !hasLocation && (!lastLocSeen || now - parseInt(lastLocSeen) > 24 * 60 * 60 * 1000)
-      const qualActive = !lastQualSeen
-
-      if (locActive) {
+      if (!hasLocation) {
         setShowLocationPrompt(true)
-      } else if (qualActive) {
+      } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
         setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaid])
+  }, [user, isPaid, loading, providers, userCoords])
 
   useEffect(() => {
     const loadProviders = async () => {
@@ -314,12 +316,15 @@ export default function Towing() {
         
         if (fetchError) throw fetchError
 
-        let userLoc: { lat: number, lng: number } | null = null
-        try {
-          const pos = await getUserLocation()
-          userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-        } catch (e) {
-          console.warn('Location access denied')
+        let userLoc = userCoords
+        if (!userLoc) {
+          try {
+            const pos = await getUserLocation()
+            userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+            setUserCoords(userLoc)
+          } catch (e) {
+            console.warn('Location access denied')
+          }
         }
 
         const mapped: TowingProvider[] = (data || []).map((p: any) => {

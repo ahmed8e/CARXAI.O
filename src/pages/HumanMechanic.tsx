@@ -13,6 +13,7 @@ import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
+import { getSavedUserLocation } from '../lib/location'
 
 // ── Strict mechanic / garage / repair category whitelist ─────────────
 // Only true automotive workshop / repair / inspection providers
@@ -338,7 +339,7 @@ export default function HumanMechanic() {
   const [loading, setLoading] = useState(true)
   const [locating, setLocating] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(getSavedUserLocation())
   const [locationDenied, setLocationDenied] = useState(false)
   const [searchQuery, setSearchQuery] = useState(routeLocation.state?.initialSearch || '')
   const [activeFilter, setActiveFilter] = useState('All')
@@ -354,7 +355,14 @@ export default function HumanMechanic() {
 
   // ── Proactive Prompt Sequencing ────────────────────────────────
   useEffect(() => {
-    if (subLoading) return
+    if (subLoading || loading || locating) return
+
+    // THE CORE OVERRIDE: If assigned providers already exist, skip the sequencing messages
+    if (rawProviders.length > 0) {
+      setShowLocationPrompt(false)
+      setShowQualityPrompt(false)
+      return
+    }
 
     const timer = setTimeout(() => {
       // 1. Plan Gating check
@@ -364,22 +372,18 @@ export default function HumanMechanic() {
       }
 
       // 2. Information sequencing for paid users
-      const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
-      const lastLocSeen = localStorage.getItem('carxai_location_prompt_seen')
-      const lastQualSeen = localStorage.getItem('carxai_quality_prompt_seen')
-      const now = Date.now()
+      const hasLocation = userCoords || user?.user_metadata?.latitude || user?.user_metadata?.city
       
-      const locActive = !hasLocation && (!lastLocSeen || now - parseInt(lastLocSeen) > 24 * 60 * 60 * 1000)
-      const qualActive = !lastQualSeen
-
-      if (locActive) {
+      // If we already have a location (saved or in profile), skip location prompt
+      if (!hasLocation) {
         setShowLocationPrompt(true)
-      } else if (qualActive) {
+      } else if (!localStorage.getItem('carxai_quality_prompt_seen')) {
+        // If we have location but haven't seen the quality prompt, show it
         setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaid])
+  }, [user, isPaid, loading, locating, rawProviders])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {
@@ -389,6 +393,12 @@ export default function HumanMechanic() {
 
   // ── Step 1: Geo first ────────────────────────────────────────────
   useEffect(() => {
+    // Only auto-locate if we don't already have coordinates
+    if (userCoords) {
+      setLocating(false)
+      return
+    }
+    
     setLocating(true)
     getUserLocation()
       .then(pos => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }))
