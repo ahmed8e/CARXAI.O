@@ -479,7 +479,7 @@ export default function Towing() {
                     <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white">
                       <Star className="w-3 h-3" /> Nearest help
                     </span>
-                    <div className="h-px flex-1 bg-white/10 ml-4 max-w-[40px]" />
+
                   </div>
 
                   <div className="flex items-start gap-4">
