@@ -25,13 +25,17 @@ export default function ListenButton({ text, currentAudioRef }: ListenButtonProp
   const cleanText = useMemo(() => stripMarkdown(text), [text])
 
   const handleClick = async () => {
+    console.log('[ListenButton] Clicked. Current status:', status)
     if (status === 'idle' || status === 'error') {
+      console.log('[ListenButton] Initiating new play...')
       const { data: sessionData } = await supabase.auth.getSession()
       const token = sessionData.session?.access_token
       play(cleanText, token)
     } else if (status === 'playing') {
+      console.log('[ListenButton] Pausing...')
       pause()
     } else if (status === 'paused') {
+      console.log('[ListenButton] Resuming...')
       resume()
     }
   }

@@ -1694,7 +1694,7 @@ ${diagnosticHistory}
             )}
           </div>
 
-            <div ref={messagesEndRef} className="h-8" />
+            <div ref={messagesEndRef} className="h-32" />
           </div>
         </div>
       </div>
@@ -1725,9 +1725,14 @@ ${diagnosticHistory}
           )}
         </AnimatePresence>
 
-        {/* ── Layer 2: Fixed Composer ────────────────────────────── */}
-        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 bg-mesh/80 border-t border-slate-100/50 backdrop-blur-xl">
-          <div className="max-w-3xl mx-auto px-4 pb-[calc(1.25rem_+_env(safe-area-inset-bottom))] pt-3 relative z-10">
+        {/* ── Layer 2: ChatGPT-Style Composer ──────────────────────── */}
+        <div className="fixed bottom-0 left-0 lg:left-[232px] right-0 z-30 pointer-events-none">
+          {/* Subtle top mask for scrolling text fade */}
+          <div className="h-16 bg-gradient-to-t from-soft via-soft/90 to-transparent" />
+
+          {/* Solid base container for the input */}
+          <div className="bg-soft pb-[calc(1rem_+_env(safe-area-inset-bottom))] pointer-events-auto">
+            <div className="max-w-3xl mx-auto px-4 relative z-10">
             {/* Hidden file pickers */}
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])} />
@@ -1774,7 +1779,7 @@ ${diagnosticHistory}
 
 
 
-            <div className="relative flex items-end gap-2.5 bg-white border border-slate-100 rounded-[28px] p-2.5 pr-4 shadow-[0_4px_24px_rgba(15,23,42,0.02)] focus-within:shadow-[0_8px_32px_rgba(15,23,42,0.06)] transition-all duration-500">
+            <div className="relative flex items-end gap-2.5 bg-white border border-slate-200/60 rounded-[28px] p-2.5 pr-4 shadow-[0_8px_32px_rgba(15,23,42,0.08)] focus-within:shadow-[0_12px_48px_rgba(15,23,42,0.12)] transition-all duration-500">
               {/* Left: Camera */}
               <div className="flex items-center self-center pl-1">
                 <button
@@ -1908,10 +1913,10 @@ ${diagnosticHistory}
                     </motion.button>
                   )}
                 </AnimatePresence>
-              </div>
             </div>
           </div>
         </div>
+      </div>
 
       <UpgradeGate
         isOpen={!!isGated}
