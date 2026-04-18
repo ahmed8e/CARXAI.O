@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext'
 import LocationPrompt from '../components/ui/LocationPrompt'
 import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
+import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -271,7 +272,7 @@ export default function Towing() {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   
   const navigate = useNavigate()
-  const { isFree, loading: subLoading } = useSubscription()
+  const { isPaid, isFree, loading: subLoading } = useSubscription()
 
   useEffect(() => {
     if (subLoading) return
@@ -300,17 +301,18 @@ export default function Towing() {
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaidUser])
+  }, [user, isPaid])
 
   useEffect(() => {
     const loadProviders = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error: fetchError } = await supabase
           .from('service_providers_raw')
           .select('*')
           .ilike('Category', '%remorquage%')
+          .eq('assigned_user_id', user?.id || '')
         
-        if (error) throw error
+        if (fetchError) throw fetchError
 
         let userLoc: { lat: number, lng: number } | null = null
         try {

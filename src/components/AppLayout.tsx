@@ -4,14 +4,14 @@ import { useAuth } from '../contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Users, LogOut,
-  Wrench, Car, Zap, ChevronRight, Settings, X,
+  Wrench, Car, ChevronRight, Settings, X,
   CircuitBoard, MapPin, Sparkles
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
 import DevelopmentModal from './DevelopmentModal'
 import { useSubscription } from '../hooks/useSubscription'
-import { Logo, BrandLockup } from './ui/Brand'
+import { BrandLockup } from './ui/Brand'
 
 // ── Navigation groups ────────────────────────────────────────────────
 const NAV_GROUPS = [

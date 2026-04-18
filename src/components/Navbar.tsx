@@ -1,18 +1,17 @@
 import { Link } from 'react-router-dom'
-import { Zap, Menu, User, LayoutDashboard, LogOut, ChevronDown, Heart } from 'lucide-react'
-import { Logo, BrandLockup } from './ui/Brand'
+import { Menu, User, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react'
+import { BrandLockup } from './ui/Brand'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
 interface NavbarProps {
   onMenuClick?: () => void
-  onStoryClick?: () => void
   showNavLinks?: boolean
   transparent?: boolean
 }
 
-export default function Navbar({ onMenuClick, onStoryClick, showNavLinks = false, transparent = false }: NavbarProps) {
+export default function Navbar({ onMenuClick, showNavLinks = false, transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)

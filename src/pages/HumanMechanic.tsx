@@ -350,7 +350,7 @@ export default function HumanMechanic() {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   
   const navigate = useNavigate()
-  const { isFree, loading: subLoading } = useSubscription()
+  const { isPaid, isFree, loading: subLoading } = useSubscription()
 
   // ── Proactive Prompt Sequencing ────────────────────────────────
   useEffect(() => {
@@ -379,7 +379,7 @@ export default function HumanMechanic() {
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user, isPaidUser])
+  }, [user, isPaid])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {
@@ -404,7 +404,10 @@ export default function HumanMechanic() {
       setLoading(true)
       setError(null)
       try {
-        const { data, error: fetchError } = await supabase.from('service_providers_raw').select('*')
+        const { data, error: fetchError } = await supabase
+          .from('service_providers_raw')
+          .select('*')
+          .eq('assigned_user_id', user?.id || '')
         if (fetchError) throw fetchError
         if (!data || data.length === 0) { setLoading(false); return }
 

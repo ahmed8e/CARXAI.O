@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
+import UserSelect from '../../components/admin/UserSelect'
 import {
   Upload, FileJson, FileText, CheckCircle2, AlertCircle,
   ArrowLeft, Eye, Loader2, Download
@@ -42,6 +43,7 @@ export default function AdminImportProviders() {
   const [rawContent, setRawContent] = useState('')
   const [importing, setImporting] = useState(false)
   const [result, setResult] = useState<{ success?: number; failed?: number; error?: string } | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
 
   const handleFile = (file: File) => {
     const isJson = file.name.endsWith('.json')
@@ -109,6 +111,7 @@ export default function AdminImportProviders() {
         image1: r.image1 || null,
         BusinessDescription: r.BusinessDescription || null,
         Working_hour: r.Working_hour || null,
+        assigned_user_id: selectedUserId,
       })).filter(r => r.Business_name)
 
       const BATCH = 50
@@ -226,11 +229,27 @@ export default function AdminImportProviders() {
               </table>
             </div>
 
-            <button onClick={handleImport} disabled={importing}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-navy text-white text-sm font-bold shadow-sm shadow-navy/20 hover:bg-navy/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-              {importing && <Loader2 className="w-4 h-4 animate-spin" />}
-              {importing ? 'Importing…' : `Import ${rawContent ? `All` : preview.length} Providers`}
-            </button>
+            <div className="bg-white p-6 rounded-2xl border border-overlay shadow-sm space-y-4">
+              <h3 className="text-sm font-black text-on-surface uppercase tracking-widest">Import Settings</h3>
+              <UserSelect
+                selectedUserId={selectedUserId}
+                onSelect={setSelectedUserId}
+                label="Assign these providers to:"
+              />
+              
+              <button 
+                onClick={handleImport} 
+                disabled={importing || !selectedUserId}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-navy text-white text-sm font-bold shadow-sm shadow-navy/20 hover:bg-navy/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                {importing && <Loader2 className="w-4 h-4 animate-spin" />}
+                {importing ? 'Importing…' : `Import ${rawContent ? 'All' : preview.length} Providers to Selected User`}
+              </button>
+              {!selectedUserId && (
+                <p className="text-[10px] text-red-500 font-bold text-center italic">
+                  * Please select a target user before importing
+                </p>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

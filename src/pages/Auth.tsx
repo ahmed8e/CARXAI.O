@@ -1,7 +1,7 @@
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { Eye, EyeOff, CheckCircle, Zap, Star, Quote } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle, Star, Quote } from 'lucide-react'
 import { BrandLockup } from '../components/ui/Brand'
 import { useAuth } from '../contexts/AuthContext'
 import { PasswordRequirement } from '../components/ui/PasswordRequirement'

@@ -243,6 +243,7 @@ export type Database = {
           instagramprofile: string | null
           BusinessDescription: string | null
           Working_hour: string | null
+          assigned_user_id: string | null
           created_at: string
         }
         Insert: {
@@ -272,6 +273,7 @@ export type Database = {
           instagramprofile?: string | null
           BusinessDescription?: string | null
           Working_hour?: string | null
+          assigned_user_id?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['service_providers_raw']['Insert']>

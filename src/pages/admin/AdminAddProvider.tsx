@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
+import UserSelect from '../../components/admin/UserSelect'
 import { Save, ArrowLeft, Loader2, CheckCircle2, AlertCircle, MapPin } from 'lucide-react'
 
 interface ProviderForm {
@@ -20,15 +21,17 @@ interface ProviderForm {
   image1: string
   Lat: string
   Long: string
-  BusinessDescription: string
-  Working_hour: string
-  MapLink: string
-}
-
+   BusinessDescription: string
+   Working_hour: string
+   MapLink: string
+   assigned_user_id: string | null
+ }
+ 
 const INITIAL: ProviderForm = {
   Business_name: '', Category: 'Mécanicien', Address: '', City: '', State: '', PostalCode: '',
   Country: 'Morocco', Phone: '', Website_url: '', Email: '', Rating: '', Review: '',
-  image1: '', Lat: '', Long: '', BusinessDescription: '', Working_hour: '', MapLink: ''
+  image1: '', Lat: '', Long: '', BusinessDescription: '', Working_hour: '', MapLink: '',
+  assigned_user_id: null
 }
 
 const CATEGORIES = [
@@ -94,6 +97,7 @@ export default function AdminAddProvider() {
           BusinessDescription: data.BusinessDescription ?? '',
           Working_hour: data.Working_hour ?? '',
           MapLink: data.MapLink ?? '',
+          assigned_user_id: data.assigned_user_id ?? null,
         })
       }
       setLoading(false)
@@ -180,6 +184,11 @@ export default function AdminAddProvider() {
           <Field label="Business Description" name="BusinessDescription" value={form.BusinessDescription} onChange={handleChange} placeholder="Short description of services offered" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Working Hours" name="Working_hour" value={form.Working_hour} onChange={handleChange} placeholder="Mon–Fri 8am–6pm" />
+            <UserSelect
+              selectedUserId={form.assigned_user_id}
+              onSelect={(uid) => setForm(f => ({ ...f, assigned_user_id: uid }))}
+              label="Assigned User"
+            />
           </div>
         </div>
 

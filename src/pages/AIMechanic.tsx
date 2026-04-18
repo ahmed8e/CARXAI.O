@@ -16,7 +16,7 @@ import {
 import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
 import UpgradeGate from '../components/chat/UpgradeGate'
-import { useSubscription } from '../hooks/useSubscription'
+import { useSubscription, type PlanType } from '../hooks/useSubscription'
 import type { Database } from '../lib/types'
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
@@ -1072,7 +1072,8 @@ ${diagnosticHistory}
     }
 
     return (
-      <div className="h-full relative flex flex-col overflow-hidden bg-mesh">
+      <>
+        <div className="h-full relative flex flex-col overflow-hidden bg-mesh">
         {/* ── Layer 0: Global Background Decoration ──────────────────── */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/[0.03] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 animate-pulse-slow" />
@@ -1692,12 +1693,11 @@ ${diagnosticHistory}
                 </div>
               </div>
             )}
-          </div>
-
-            <div ref={messagesEndRef} className="h-32" />
+            <div ref={messagesEndRef} className="h-40" />
           </div>
         </div>
       </div>
+    </div>
 
         {/* Premium Voice Activity Indicator */}
         <AnimatePresence>
@@ -1784,7 +1784,7 @@ ${diagnosticHistory}
               <div className="flex items-center self-center pl-1">
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  disabled={loading || isGated || isImageGated || isImageProcessing}
+                  disabled={loading || !!isGated || isImageGated || isImageProcessing}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 disabled:opacity-50"
                 >
                   <Aperture className="w-[20px] h-[20px]" />
@@ -1913,6 +1913,7 @@ ${diagnosticHistory}
                     </motion.button>
                   )}
                 </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -1920,7 +1921,7 @@ ${diagnosticHistory}
 
       <UpgradeGate
         isOpen={!!isGated}
-        targetPlan={isGated || 'pro'}
+        targetPlan={(isGated === 'free' ? 'pro' : isGated) || 'pro'}
         onClose={() => setIsGated(null)}
       />
 
@@ -1945,7 +1946,7 @@ ${diagnosticHistory}
           isLimitReached={!canShareReport}
         />
       )}
-    </div>
+    </>
   )
 }
 
