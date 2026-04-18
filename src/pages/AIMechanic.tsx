@@ -1688,9 +1688,7 @@ ${diagnosticHistory}
 
           <div ref={messagesEndRef} className="h-8" />
         </div>
-
-
-
+      </div>
 
         {/* Premium Voice Activity Indicator */}
         <AnimatePresence>
@@ -1906,36 +1904,33 @@ ${diagnosticHistory}
           </div>
         </div>
 
-        {/* Upgrade Popup Gate */}
-        <UpgradeGate
-          isOpen={isGated}
-          onClose={() => setIsGated(false)}
-        />
+      <UpgradeGate
+        isOpen={isGated}
+        onClose={() => setIsGated(false)}
+      />
 
-        {/* Vehicle Add Modal — opened from header or onboarding card */}
-        <VehicleAddModal
-          isOpen={showVehicleModal}
-          onClose={() => setShowVehicleModal(false)}
-          onSaved={(vehicle) => {
-            setActiveVehicle(vehicle)
-            setShowVehicleModal(false)
-          }}
-        />
+      <VehicleAddModal
+        isOpen={showVehicleModal}
+        onClose={() => setShowVehicleModal(false)}
+        onSaved={(vehicle) => {
+          setActiveVehicle(vehicle)
+          setShowVehicleModal(false)
+        }}
+      />
 
-        {/* Mechanic Report Modal — Stage 2 Actions inside */}
-        {reportDiagnosis && (
-          <MechanicReport
-            isOpen={showReport}
-            onClose={() => setShowReport(false)}
-            user={user}
-            diagnosis={reportDiagnosis!}
-            messages={messages}
-            activeVehicle={activeVehicle}
-            currentAudioRef={currentAudioRef}
-            isLimitReached={!canShareReport}
-          />
-        )}
-      </div>
-    )
-  }
+      {reportDiagnosis && (
+        <MechanicReport
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          user={user}
+          diagnosis={reportDiagnosis!}
+          messages={messages}
+          activeVehicle={activeVehicle}
+          currentAudioRef={currentAudioRef}
+          isLimitReached={!canShareReport}
+        />
+      )}
+    </div>
+  )
+}
 

@@ -5,7 +5,7 @@ import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { Logo, Wordmark, BrandLockup } from '../components/ui/Brand'
+import { Logo, Wordmark } from '../components/ui/Brand'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
 
 // Lazy loaded components for bundle optimization
@@ -18,9 +18,9 @@ const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
   Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
-  Aperture, MapPin, Mic, ImagePlus, ShieldAlert, MessageSquare, Sparkles, 
+  Aperture, MapPin, Mic, ImagePlus, ShieldAlert, Sparkles, 
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
-  Cpu, Send
+  Send
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
