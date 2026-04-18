@@ -1388,9 +1388,9 @@ ${diagnosticHistory}
                                       Switch to Expert mode
                                     </button>
                                   </div>
-                                </div>
-                              ) : (
-                                <div className={`p-6 md:p-8 space-y-8 relative ${msg.issueData.mode === 'expert_answer' ? 'bg-gradient-to-br from-[#0073e7]/5 to-white border-t-4 border-[#0073e7]' : ''}`}>
+                                  </div>
+                                ) : (
+                                  <div className={`p-6 md:p-8 space-y-8 relative ${msg.issueData.mode === 'expert_answer' ? 'bg-gradient-to-br from-[#0073e7]/5 to-white border-t-4 border-[#0073e7]' : ''}`}>
                                   {/* 1. Header & Priority */}
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="pr-2">
@@ -1698,7 +1698,6 @@ ${diagnosticHistory}
     </div>
   </div>
 </div>
-</div>
 
         {/* Premium Voice Activity Indicator */}
         <AnimatePresence>
@@ -1947,6 +1946,14 @@ ${diagnosticHistory}
           isLimitReached={!canShareReport}
         />
       )}
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
     </>
   )
 }
