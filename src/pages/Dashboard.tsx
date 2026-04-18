@@ -11,6 +11,7 @@ import {
   Zap, Plus, Thermometer, Battery, Activity
 } from 'lucide-react'
 import DevelopmentModal from '../components/DevelopmentModal'
+import UpgradePrompt from '../components/ui/UpgradePrompt'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [defaultVehicle, setDefaultVehicle] = useState<any>(null)
   const [loadingVehicle, setLoadingVehicle] = useState(true)
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
 
@@ -134,6 +136,15 @@ export default function Dashboard() {
                 if (mod.to === '/dashboard/map') {
                   e.preventDefault()
                   setIsDevModalOpen(true)
+                  return
+                }
+
+                // Plan Gating for Mechanic & Towing
+                const userPlan = user?.user_metadata?.plan || 'Free'
+                const isPaidUser = userPlan === 'Pro' || userPlan === 'Advance'
+                if ((mod.to === '/dashboard/mechanic' || mod.to === '/dashboard/towing') && !isPaidUser) {
+                  e.preventDefault()
+                  setShowUpgradePrompt(true)
                 }
               }}
               className="relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all"
@@ -236,6 +247,11 @@ export default function Dashboard() {
       <DevelopmentModal 
         isOpen={isDevModalOpen} 
         onClose={() => setIsDevModalOpen(false)} 
+      />
+
+      <UpgradePrompt 
+        isOpen={showUpgradePrompt}
+        onClose={() => setShowUpgradePrompt(false)}
       />
     </div>
   )

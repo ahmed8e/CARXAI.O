@@ -10,6 +10,8 @@ import {
   ChevronRight, MessageCircle, Copy
 } from 'lucide-react'
 import LocationPrompt from '../components/ui/LocationPrompt'
+import QualityPrompt from '../components/ui/QualityPrompt'
+import UpgradePrompt from '../components/ui/UpgradePrompt'
 
 // ── Strict mechanic / garage / repair category whitelist ─────────────
 // Only true automotive workshop / repair / inspection providers
@@ -343,21 +345,38 @@ export default function HumanMechanic() {
   const [mapChooserProvider, setMapChooserProvider] = useState<MechanicProvider | null>(null)
   const [contactChooserProvider, setContactChooserProvider] = useState<MechanicProvider | null>(null)
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
+  const [showQualityPrompt, setShowQualityPrompt] = useState(false)
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  // ── Proactive Location Prompt ───────────────────────────────────
+  const userPlan = user?.user_metadata?.plan || 'Free'
+  const isPaidUser = userPlan === 'Pro' || userPlan === 'Advance'
+
+  // ── Proactive Prompt Sequencing ────────────────────────────────
   useEffect(() => {
     const timer = setTimeout(() => {
+      // 1. Plan Gating check
+      if (!isPaidUser) {
+        setShowUpgradePrompt(true)
+        return
+      }
+
+      // 2. Information sequencing for paid users
       const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
-      const lastSeen = localStorage.getItem('carxai_location_prompt_seen')
+      const lastLocSeen = localStorage.getItem('carxai_location_prompt_seen')
+      const lastQualSeen = localStorage.getItem('carxai_quality_prompt_seen')
       const now = Date.now()
       
-      // Show if no location and hasn't been dismissed in the last 24h
-      if (!hasLocation && (!lastSeen || now - parseInt(lastSeen) > 24 * 60 * 60 * 1000)) {
+      const locActive = !hasLocation && (!lastLocSeen || now - parseInt(lastLocSeen) > 24 * 60 * 60 * 1000)
+      const qualActive = !lastQualSeen
+
+      if (locActive) {
         setShowLocationPrompt(true)
+      } else if (qualActive) {
+        setShowQualityPrompt(true)
       }
     }, 1500)
     return () => clearTimeout(timer)
-  }, [user])
+  }, [user, isPaidUser])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {
@@ -768,7 +787,24 @@ export default function HumanMechanic() {
 
       <LocationPrompt 
         isOpen={showLocationPrompt} 
-        onClose={() => setShowLocationPrompt(false)} 
+        onClose={() => {
+          setShowLocationPrompt(false)
+          // Sequence into quality prompt if not seen
+          if (!localStorage.getItem('carxai_quality_prompt_seen')) {
+            setTimeout(() => setShowQualityPrompt(true), 600)
+          }
+        }} 
+      />
+
+      <QualityPrompt 
+        isOpen={showQualityPrompt}
+        onClose={() => setShowQualityPrompt(false)}
+        onContinue={() => setShowQualityPrompt(false)}
+      />
+
+      <UpgradePrompt 
+        isOpen={showUpgradePrompt}
+        onClose={() => setShowUpgradePrompt(false)}
       />
     </div>
   )

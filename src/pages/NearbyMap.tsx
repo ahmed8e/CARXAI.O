@@ -3,6 +3,8 @@ import { getUserLocation, formatDistance, formatRating } from '../lib/utils'
 import { loadGoogleMaps, GOOGLE_MAPS_STYLE } from '../lib/maps'
 import type { NearbyPlace } from '../lib/types'
 import { Map as MapIcon, Users, Truck, Wrench, MapPin, Star, Loader2, AlertCircle, ChevronRight } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import LocationPrompt from '../components/ui/LocationPrompt'
 
 const MAP_FILTERS = ['All', 'Mechanics', 'Garages', 'Towing', 'Open Now', 'Top Rated']
 
@@ -26,6 +28,24 @@ export default function NearbyMap() {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
+  
+  const { user } = useAuth()
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false)
+
+  useEffect(() => {
+    // Proactive prompt for location if missing
+    const timer = setTimeout(() => {
+      const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
+      const lastSeen = localStorage.getItem('carxai_location_prompt_seen')
+      const now = Date.now()
+      
+      // Show if no location and hasn't been dismissed in the last 24h
+      if (!hasLocation && (!lastSeen || now - parseInt(lastSeen) > 24 * 60 * 60 * 1000)) {
+        setShowLocationPrompt(true)
+      }
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [user])
 
   useEffect(() => {
     const apiKey = import.meta.env.GOOGLE_MAPS_API_KEY
@@ -255,6 +275,11 @@ export default function NearbyMap() {
           )}
         </div>
       </div>
+
+      <LocationPrompt 
+        isOpen={showLocationPrompt} 
+        onClose={() => setShowLocationPrompt(false)} 
+      />
     </div>
   )
 }
