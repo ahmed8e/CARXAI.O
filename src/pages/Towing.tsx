@@ -274,7 +274,7 @@ export default function Towing() {
   const [hasInitializedCoords, setHasInitializedCoords] = useState(false)
   
   const navigate = useNavigate()
-  const { isPaid, isFree, loading: subLoading } = useSubscription()
+  const { isAdvanced, isFree, loading: subLoading, isResolved } = useSubscription()
 
   // ── Sync Coords from Metadata/Storage on Load ──────────────────
   useEffect(() => {
@@ -287,33 +287,38 @@ export default function Towing() {
     }
   }, [user, hasInitializedCoords])
 
+  // ── Stable Gating Logic ────────────────────────────────────────
   useEffect(() => {
-    if (subLoading || loading || !hasInitializedCoords) return
+    // 1. Wait until everything is resolved
+    if (!isResolved || subLoading || loading || !hasInitializedCoords) return
 
-    // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
+    // 2. High-priority override: if user HAS providers, bypass prompts entirely
     if (providers.length > 0) {
       setShowLocationPrompt(false)
+      setShowUpgradePrompt(false)
       return
     }
 
     const timer = setTimeout(() => {
-      // 1. Check for Plan Gating
-      if (isFree) {
+      // 3. Strict Plan Gating: Advanced users NEVER see the prompt
+      if (isAdvanced) {
+        setShowUpgradePrompt(false)
+      } else if (isFree) {
         setShowUpgradePrompt(true)
         return
       }
 
-      // 2. Proactive informational sequencing for paid users
-      // Check if we have a valid location from metadata or local state
+      // 4. Location Prompt for paid (but not assigned) users
       const hasValidLocation = (userCoords !== null) || 
                                (user?.user_metadata?.latitude && isLocationValid(user?.user_metadata?.location_timestamp))
       
-      if (!hasValidLocation) {
+      if (!hasValidLocation && !isFree) {
         setShowLocationPrompt(true)
       }
     }, 1500)
+
     return () => clearTimeout(timer)
-  }, [user, isPaid, loading, providers, userCoords, hasInitializedCoords])
+  }, [user, isAdvanced, isFree, isResolved, subLoading, loading, providers, userCoords, hasInitializedCoords])
 
   useEffect(() => {
     const loadProviders = async () => {

@@ -362,38 +362,40 @@ export default function HumanMechanic() {
   }, [user, hasInitializedCoords])
   
   const navigate = useNavigate()
-  const { isPaid, isFree, loading: subLoading } = useSubscription()
+  const { isAdvanced, isFree, loading: subLoading, isResolved } = useSubscription()
 
-  // ── Proactive Prompt Sequencing ────────────────────────────────
+  // ── Stable Gating Logic ────────────────────────────────────────
   useEffect(() => {
-    if (subLoading || loading || locating || !hasInitializedCoords) return
+    // 1. Wait until everything is resolved
+    if (!isResolved || subLoading || loading || locating || !hasInitializedCoords) return
 
-    // THE CORE OVERRIDE: If assigned providers already exist for THIS user, skip all flow messages
+    // 2. High-priority override: if user HAS providers, bypass prompts entirely
     if (rawProviders.length > 0) {
       setShowLocationPrompt(false)
-      // No need for quality prompt seen logic if providers are already there
+      setShowUpgradePrompt(false)
       return
     }
 
     const timer = setTimeout(() => {
-      // 1. Plan Gating check
-      if (isFree) {
+      // 3. Strict Plan Gating: Advanced users NEVER see the prompt
+      if (isAdvanced) {
+        setShowUpgradePrompt(false)
+      } else if (isFree) {
         setShowUpgradePrompt(true)
         return
       }
 
-      // 2. Information sequencing for paid users
-      // Check if we have a valid location from metadata or local state
+      // 4. Location Prompt for paid (but not assigned) users
       const hasValidLocation = (userCoords !== null) || 
                                (user?.user_metadata?.latitude && isLocationValid(user?.user_metadata?.location_timestamp))
       
-      if (!hasValidLocation) {
+      if (!hasValidLocation && !isFree) {
         setShowLocationPrompt(true)
       }
-      // Note: QualityPrompt removed as modal, handled inline in the return
     }, 1500)
+
     return () => clearTimeout(timer)
-  }, [user, isPaid, loading, locating, rawProviders, userCoords, hasInitializedCoords])
+  }, [user, isAdvanced, isFree, isResolved, subLoading, loading, locating, rawProviders, userCoords, hasInitializedCoords])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {

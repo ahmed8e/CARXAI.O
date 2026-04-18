@@ -15,14 +15,16 @@ interface Subscription {
 }
 
 export function useSubscription() {
-  const { user } = useAuth()
+  const { user, subscriptionTier: profileTier } = useAuth()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isResolved, setIsResolved] = useState(false)
 
   const fetchSubscription = async () => {
     if (!user) {
       setSubscription(null)
       setLoading(false)
+      setIsResolved(true)
       return
     }
 
@@ -48,10 +50,12 @@ export function useSubscription() {
           endDate: subData.ends_at
         })
       } else {
+        // Fallback: Check the profiles tier we already have from AuthContext
+        const tier = profileTier?.toLowerCase() || 'free'
         setSubscription({
-          id: 'free',
-          status: 'none',
-          planType: 'free',
+          id: 'deferred',
+          status: tier !== 'free' ? 'active' : 'none',
+          planType: (tier === 'advanced' || tier === 'pro' ? tier : 'free') as PlanType,
           billingCycle: 'none',
           startDate: null,
           endDate: null
@@ -61,6 +65,7 @@ export function useSubscription() {
       console.error('[useSubscription] Catch Error:', err)
     } finally {
       setLoading(false)
+      setIsResolved(true)
     }
   }
 
@@ -68,14 +73,20 @@ export function useSubscription() {
     fetchSubscription()
   }, [user])
 
+  // Entitlement Resolution: A user is Paid if they have an active subscription record 
+  // OR if their profile explicitly marks them as Pro/Advanced.
   const isPaid = (subscription?.status === 'active' || subscription?.status === 'trialing') && subscription?.planType !== 'free'
-  const isFree = subscription?.planType === 'free' || !subscription || !isPaid
+  
+  // Strict Gating: isFree is ONLY true if we have finished loading and no paid state is found.
+  const isFree = isResolved && !isPaid
+  
   const isPro = isPaid && subscription?.planType === 'pro'
   const isAdvanced = isPaid && subscription?.planType === 'advanced'
 
   return {
     subscription,
     loading,
+    isResolved,
     isPaid,
     isFree,
     isPro,

@@ -17,6 +17,7 @@ interface AuthContextType {
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
   isAdmin: boolean
   isRoleVerified: boolean
+  subscriptionTier: string | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isRoleVerified, setIsRoleVerified] = useState(false)
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null)
 
   const checkAdminStatus = async (user: User | null) => {
     if (!user) {
@@ -36,16 +38,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // First check local metadata
-    const role = user.user_metadata?.role ?? user.app_metadata?.role ?? null
+    const metadata = user.user_metadata || {}
+    const role = metadata.role ?? user.app_metadata?.role ?? null
+    setSubscriptionTier(metadata.subscription_tier || metadata.plan || 'Free')
+
     if (role === 'admin') {
       setIsAdmin(true)
       setIsRoleVerified(true)
       return
     }
 
-    // Role verification: Admin state is primarily driven by metadata for performance and avoiding loops.
-    // If a manual refresh is needed, it should be triggered by specific user actions, not on every event.
-    setIsAdmin(role === 'admin')
+    // Secondary check: verify against profiles table
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('role, subscription_tier')
+        .eq('id', user.id)
+        .single()
+      
+      if (data) {
+        const profileData = data as any
+        if (profileData.role === 'admin') setIsAdmin(true)
+        if (profileData.subscription_tier) setSubscriptionTier(profileData.subscription_tier)
+      }
+    } catch (e) {
+      console.warn('[AuthContext] Profile fetch error:', e)
+    }
+
     setIsRoleVerified(true)
   }
 
@@ -198,7 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, session, loading, isAdmin, isRoleVerified,
+      user, session, loading, isAdmin, isRoleVerified, subscriptionTier,
       signIn, signUp, signOut, signOutAll, signInWithOAuth,
       resetPassword, updateProfile, updatePassword
     }}>
