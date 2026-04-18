@@ -1,15 +1,12 @@
 import { useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import NumberFlow from '@number-flow/react'
-import {
-  Check, Sparkles, ShieldCheck, Lock, MessageSquare,
-  Zap, Brain, ImageIcon, Mic, MessageCircle, Activity,
-  FileText, MapPin, Star
-} from 'lucide-react'
+import { Check, Zap, Sparkles, MessageSquare, ShieldCheck, Lock } from 'lucide-react'
 import { Card, CardContent, CardHeader } from './ui/card'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import type { PlanType } from '../hooks/useSubscription'
+import { SaaSAnalytics } from '../lib/analytics'
+
 
 type BillingCycleType = 'monthly' | 'yearly'
 
@@ -64,7 +61,9 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
   const navigate = useNavigate()
 
   const handleGetStarted = (plan: typeof plans[0]) => {
+    SaaSAnalytics.upgradeClick(plan.name)
     if (!user) {
+
       navigate('/auth?redirect=choose-plan')
       return
     }

@@ -17,7 +17,9 @@ import VehicleAddModal from '../components/VehicleAddModal'
 import MechanicReport from '../components/MechanicReport'
 import UpgradeGate from '../components/chat/UpgradeGate'
 import { useSubscription, type PlanType } from '../hooks/useSubscription'
+import { SaaSAnalytics } from '../lib/analytics'
 import type { Database } from '../lib/types'
+
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
@@ -103,6 +105,11 @@ export default function AIMechanic() {
       fetchActiveVehicle()
     }
   }, [user])
+
+  useEffect(() => {
+    SaaSAnalytics.openChat()
+  }, [])
+
 
   useEffect(() => {
     if (user && !subLoading) {
@@ -575,7 +582,13 @@ export default function AIMechanic() {
 
     if (!content.trim() && !finalImageUrl) return
 
+    // Track start_diagnosis if this is the first message
+    if (messages.length === 0) {
+      SaaSAnalytics.startDiagnosis()
+    }
+
     // ── Vague First-Message Intercept ──
+
     // Calm, reassuring local response — no API call, no usage counted.
     if (isVagueFirstMessage(content, !!finalImageUrl) && !chipLabel) {
       stop()
@@ -916,6 +929,11 @@ ${diagnosticHistory}
         // The user must click "Generate Detailed Report" manually.
         if (issueData && !issueData.needs_followup) {
           setReportDiagnosis(issueData)
+          setShowReport(true)
+          
+          // Track complete_diagnosis
+          SaaSAnalytics.completeDiagnosis(issueData.issueName || 'Unknown Issue')
+
           try {
             const { data: { session } } = await supabase.auth.getSession();
           const response = await fetch('/api/reports', {

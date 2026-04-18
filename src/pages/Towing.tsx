@@ -14,6 +14,8 @@ import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
 import { getSavedUserLocation, isLocationValid, saveUserLocation } from '../lib/location'
+import { SaaSAnalytics } from '../lib/analytics'
+
 
 // ── Types ────────────────────────────────────────────────────────────
 const trustFallback = (id: string) => {
@@ -211,7 +213,9 @@ function ContactChooser({ provider, onClose }: {
             <a
               href={`tel:${provider.phone}`}
               className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-navy/20 hover:shadow-xl hover:shadow-navy/5"
+              onClick={() => SaaSAnalytics.callMechanic(provider.name)}
             >
+
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-navy flex items-center justify-center text-white shadow-xl shadow-navy/20 transition-transform group-hover:scale-105">
                   <PhoneCall className="w-6 h-6" />
@@ -230,7 +234,9 @@ function ContactChooser({ provider, onClose }: {
               href={`https://wa.me/${provider.phone?.replace(/\D/g, '')}`}
               target="_blank" rel="noreferrer"
               className="w-full flex items-center justify-between p-6 rounded-[28px] bg-white border border-slate-100 group transition-all active:scale-[0.98] shadow-sm hover:border-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/5"
+              onClick={() => SaaSAnalytics.callMechanic(provider.name)}
             >
+
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-[#25D366] flex items-center justify-center text-white shadow-xl shadow-[#25D366]/20 transition-transform group-hover:scale-105">
                   <MessageCircle className="w-6 h-6" />
@@ -468,8 +474,9 @@ export default function Towing() {
                 initial={{ opacity: 0, y: 12 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 className="mb-5 cursor-pointer outline-none"
-                onClick={() => setSelectedProvider(featured)}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedProvider(featured) }}
+                onClick={() => { setSelectedProvider(featured); SaaSAnalytics.viewProvider(featured.name) }}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { setSelectedProvider(featured); SaaSAnalytics.viewProvider(featured.name) } }}
+
                 role="button"
                 tabIndex={0}
               >
@@ -543,8 +550,9 @@ export default function Towing() {
                   transition={{ delay: idx * 0.025 }}
                 >
                   <button
-                    onClick={() => setSelectedProvider(p)}
+                    onClick={() => { setSelectedProvider(p); SaaSAnalytics.viewProvider(p.name) }}
                     className="w-full text-left p-4 rounded-2xl bg-white border border-overlay hover:border-[#0070e0]/30 hover:shadow-xl hover:shadow-navy/5 transition-all duration-300 group"
+
                   >
                     <div className="flex items-center gap-4">
                       <ProviderImage src={p.imageUrl} size="sm" />

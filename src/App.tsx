@@ -4,6 +4,10 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
+import { trackPageView, setUserId, setUserProperties } from './lib/analytics'
+import { useAuth } from './contexts/AuthContext'
+import { useSubscription } from './hooks/useSubscription'
+
 
 // ── SPA Path Persistence ───────────────────────────────────────────────────
 function PathTracker() {
@@ -24,19 +28,31 @@ function PathTracker() {
   return null
 }
 
-// ── SPA GTM Tracking ─────────────────────────────────────────────────────────
-function GTMTracker() {
+// ── SPA GA4 Tracking ────────────────────────────────────────────────────────
+function GA4Tracker() {
   const location = useLocation()
   
   useEffect(() => {
-    // Push SPA navigation events to GTM dataLayer
-    if (typeof window !== 'undefined' && (window as any).dataLayer) {
-      (window as any).dataLayer.push({
-        event: 'pageview',
-        page: location.pathname + location.search
+    trackPageView(location.pathname + location.search)
+  }, [location])
+
+  return null
+}
+
+// ── User Identity Tracking ──────────────────────────────────────────────────
+function UserIdentityTracker() {
+  const { user } = useAuth()
+  const { subscription } = useSubscription()
+
+  useEffect(() => {
+    if (user) {
+      setUserId(user.id)
+      setUserProperties({
+        plan: subscription?.planType || 'Free',
+        email: user.email
       })
     }
-  }, [location])
+  }, [user, subscription])
 
   return null
 }
@@ -79,7 +95,9 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <PathTracker />
-          <GTMTracker />
+          <GA4Tracker />
+          <UserIdentityTracker />
+
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />

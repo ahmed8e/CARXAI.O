@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 interface NavbarProps {
   onMenuClick?: () => void
+  onStoryClick?: () => void
   showNavLinks?: boolean
   transparent?: boolean
 }
