@@ -26,21 +26,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const adminClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
     
-    // 1. STICKY ADMIN CHECK: Check the profiles table for admin role or @carx.ai email
+    // 1. ROBUST ADMIN CHECK
+    // Check multiple sources to verify admin status:
+    // a) JWT User Metadata (fastest, standard Supabase)
+    // b) Profiles Table (canonical DB state)
+    // c) Email Domain (fallback for CarxAI staff)
+    
+    const jwtMetadata = user.user_metadata || {};
+    const jwtRole = jwtMetadata.role;
+
     const { data: profile, error: profileError } = await adminClient
       .from('profiles')
       .select('role, subscription_tier, email')
       .eq('id', user.id)
       .single();
 
-    const isAuthorized = 
-      profile?.role === 'admin' || 
-      profile?.subscription_tier === 'Admin' || 
-      profile?.email?.endsWith('@carx.ai');
+    if (profileError) {
+      logger.error({ event: 'admin_profile_fetch_error', userId: user.id, error: profileError.message });
+    }
+
+    const { role: dbRole, subscription_tier: dbTier, email: dbEmail } = profile || {};
+    
+    // Authorization logic: any match is enough
+    const isAdminRole = (jwtRole === 'admin') || (dbRole === 'admin');
+    const isAdminTier = (dbTier === 'Admin');
+    const isStaffEmail = (user.email?.endsWith('@carx.ai')) || (dbEmail?.endsWith('@carx.ai'));
+
+    const isAuthorized = isAdminRole || isAdminTier || isStaffEmail;
 
     if (!isAuthorized) {
-      logger.warn({ event: 'admin_access_denied', userId: user.id });
-      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+      logger.warn({ 
+        event: 'admin_access_denied', 
+        userId: user.id,
+        diagnostics: {
+          jwtRole,
+          dbRole,
+          dbTier,
+          email: user.email,
+          hasProfile: !!profile
+        }
+      });
+
+      return res.status(403).json({ 
+        error: 'Forbidden: Admin access required',
+        details: {
+          message: 'Your account does not have administrative privileges.',
+          hint: 'Ensure your role is set to "admin" or you are using an @carx.ai email.'
+        }
+      });
     }
 
     const { providers, provider, id, action = 'insert' } = req.body;

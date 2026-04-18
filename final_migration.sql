@@ -22,6 +22,11 @@ SET
 FROM public.user_settings s
 WHERE p.id = s.user_id;
 
+-- 2.5 PROMOTE STAFF TO ADMIN (Optional but helpful)
+UPDATE public.profiles 
+SET role = 'admin', subscription_tier = 'Admin'
+WHERE email LIKE '%@carx.ai';
+
 -- 3. FIX SERVICE_PROVIDERS_RAW
 -- Ensure assigned_user_id exists and references auth.users
 DO $$ 
