@@ -401,6 +401,13 @@ END $$;
 -- Fix for 'Could not find the assigned_user_id column of service_providers_raw'
 DO $$ 
 BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='location_timestamp') THEN
+    ALTER TABLE public.profiles ADD COLUMN location_timestamp bigint;
+  END IF;
+END $$;
+
+DO $$ 
+BEGIN 
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='service_providers_raw' AND column_name='assigned_user_id') THEN
     ALTER TABLE public.service_providers_raw ADD COLUMN assigned_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
   END IF;

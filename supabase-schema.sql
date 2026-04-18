@@ -12,6 +12,7 @@ create table if not exists profiles (
   city text,
   latitude double precision,
   longitude double precision,
+  location_timestamp bigint,
   created_at timestamptz default now()
 );
 create policy "Users can view own profile" on profiles for select using (auth.uid() = id);
