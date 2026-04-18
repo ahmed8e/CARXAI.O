@@ -9,6 +9,7 @@ import {
   AlertTriangle, PhoneCall, Wrench, X,
   ChevronRight, MessageCircle, Copy
 } from 'lucide-react'
+import LocationPrompt from '../components/ui/LocationPrompt'
 
 // ── Strict mechanic / garage / repair category whitelist ─────────────
 // Only true automotive workshop / repair / inspection providers
@@ -341,6 +342,22 @@ export default function HumanMechanic() {
   const [selectedProvider, setSelectedProvider] = useState<MechanicProvider | null>(null)
   const [mapChooserProvider, setMapChooserProvider] = useState<MechanicProvider | null>(null)
   const [contactChooserProvider, setContactChooserProvider] = useState<MechanicProvider | null>(null)
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false)
+
+  // ── Proactive Location Prompt ───────────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
+      const lastSeen = localStorage.getItem('carxai_location_prompt_seen')
+      const now = Date.now()
+      
+      // Show if no location and hasn't been dismissed in the last 24h
+      if (!hasLocation && (!lastSeen || now - parseInt(lastSeen) > 24 * 60 * 60 * 1000)) {
+        setShowLocationPrompt(true)
+      }
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [user])
 
   /** Fire-and-forget analytics event — never blocks UI */
   const trackEvent = (type: string, metadata?: object) => {
@@ -748,6 +765,11 @@ export default function HumanMechanic() {
           <ContactChooser provider={contactChooserProvider} onClose={() => setContactChooserProvider(null)} />
         )}
       </AnimatePresence>
+
+      <LocationPrompt 
+        isOpen={showLocationPrompt} 
+        onClose={() => setShowLocationPrompt(false)} 
+      />
     </div>
   )
 }

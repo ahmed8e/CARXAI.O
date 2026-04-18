@@ -1084,65 +1084,69 @@ ${diagnosticHistory}
 
         {/* ── Layer 1: Full-Screen Chat Thread ──────────────────────── */}
         <div className="absolute inset-0 overflow-y-auto scroll-smooth z-10 px-4 md:px-6 overscroll-contain bg-transparent">
-          <div className="max-w-2xl mx-auto pt-[calc(6.5rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
-            {/* Welcome State when empty */}
-            {messages.length === 0 && !loading && (
-              <div className="flex flex-col items-center justify-center pt-16 pb-12">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center mb-10 w-full px-6"
-                >
-                  <div className="relative w-20 h-20 mx-auto mb-6">
-                    <div className="absolute inset-0 rounded-3xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
-                      <div className="absolute inset-0 bg-navy/[0.02] rounded-3xl" />
-                      <Bot className="w-9 h-9 text-navy relative z-20" />
-                    </div>
-                  </div>
-                  <h2 className="text-4xl font-display font-[900] text-navy tracking-tight mb-4">AI Mechanic</h2>
-                  <div className="w-12 h-1 bg-gradient-to-r from-transparent via-navy/10 to-transparent mx-auto mb-6" />
-                  <p className="text-[17px] font-semibold text-slate-500 max-w-[320px] mx-auto leading-relaxed tracking-tight">
-                    High-fidelity diagnostic intelligence. <br />
-                    <span className="text-navy/40 text-[13px] font-black uppercase tracking-[0.2em]">Ready for analysis</span>
-                  </p>
-                </motion.div>
-
-                {/* Mode Selector Segmented Control */}
-                <div className="w-full max-w-sm mx-auto mb-10 px-4">
-                  <div className="p-1.5 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 shadow-inner flex relative">
-                   <motion.div
-                      layout
-                      className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-sm border border-slate-200/50 z-0"
-                      initial={false}
-                      animate={{
-                        left: responseMode === 'fast_answer' ? '6px' : 'calc(50%)'
-                      }}
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
-
-                    <button
-                      onClick={() => setResponseMode('fast_answer')}
-                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-500 hover:text-navy/70'}`}
-                    >
-                      <Zap className={`w-4 h-4 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-400'}`} />
-                      Fast Answer
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!isAdvanced) {
-                          setIsGated(true)
-                          return
-                        }
-                        setResponseMode('expert_answer')
-                      }}
-                      className={`relative z-10 flex-1 py-3 text-[12px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-500 hover:text-navy/70'}`}
-                    >
-                      <Activity className={`w-4 h-4 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-400'}`} />
-                      Expert
-                      {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0073e7]/10 text-[#0073e7] text-[8px] font-black md:inline-block">PRO</div>}
-                    </button>
+          <div className="max-w-2xl mx-auto pt-[calc(6rem_+_env(safe-area-inset-top))] pb-40 relative z-10">
+            {/* ── Persistent Header Section (Hero + Mode Switch) ── */}
+            <div className="flex flex-col items-center justify-center pt-8 pb-10">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center mb-8 w-full px-6"
+              >
+                <div className="relative w-16 h-16 mx-auto mb-5">
+                  <div className="absolute inset-0 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
+                    <div className="absolute inset-0 bg-navy/[0.02] rounded-2xl" />
+                    <Bot className="w-8 h-8 text-navy relative z-20" />
                   </div>
                 </div>
+                <h2 className="text-3xl font-display font-[900] text-navy tracking-tight mb-3">AI Mechanic</h2>
+                <div className="w-10 h-1 bg-gradient-to-r from-transparent via-navy/10 to-transparent mx-auto mb-4" />
+                <p className="text-[15px] font-semibold text-slate-500 max-w-[280px] mx-auto leading-relaxed tracking-tight">
+                  High-fidelity diagnostic intelligence. <br />
+                  <span className="text-navy/40 text-[11px] font-black uppercase tracking-[0.2em]">Ready for analysis</span>
+                </p>
+              </motion.div>
+
+              {/* Mode Selector Segmented Control */}
+              <div className="w-full max-w-sm mx-auto mb-8 px-4">
+                <div className="p-1.5 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 shadow-inner flex relative">
+                  <motion.div
+                    layout
+                    className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-sm border border-slate-200/50 z-0"
+                    initial={false}
+                    animate={{
+                      left: responseMode === 'fast_answer' ? '6px' : 'calc(50%)'
+                    }}
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+
+                  <button
+                    onClick={() => setResponseMode('fast_answer')}
+                    className={`relative z-10 flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-500 hover:text-navy/70'}`}
+                  >
+                    <Zap className={`w-3.5 h-3.5 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-400'}`} />
+                    Fast Answer
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!isAdvanced) {
+                        setIsGated(true)
+                        return
+                      }
+                      setResponseMode('expert_answer')
+                    }}
+                    className={`relative z-10 flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-500 hover:text-navy/70'}`}
+                  >
+                    <Activity className={`w-3.5 h-3.5 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-400'}`} />
+                    Expert
+                    {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0073e7]/10 text-[#0073e7] text-[7px] font-black md:inline-block">PRO</div>}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Welcome State / Onboarding elements when empty */}
+            {messages.length === 0 && !loading && (
+              <div className="flex flex-col items-center justify-center pb-12">
 
                 {!loadingVehicle && (
                   <div className="w-full max-w-xl px-4">
@@ -1230,7 +1234,8 @@ ${diagnosticHistory}
               </div>
             )}
 
-            {/* ── Message Thread ────────────────────────────────── */}
+            {/* ── Chat Content Boundary ── */}
+            <div className={`mt-4 ${messages.length > 0 ? 'pt-4 border-t border-navy/[0.03]' : ''}`}>
             <div className="space-y-6">
               {messages.map((msg, idx) => {
                 // Optionally skip items if needed, but ensure first message is visible
