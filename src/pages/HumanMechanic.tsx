@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { getUserLocation, haversineDistance, formatDistance, isIOS, getMapLinks } from '../lib/utils'
@@ -12,6 +11,8 @@ import {
 import LocationPrompt from '../components/ui/LocationPrompt'
 import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useSubscription } from '../hooks/useSubscription'
 
 // ── Strict mechanic / garage / repair category whitelist ─────────────
 // Only true automotive workshop / repair / inspection providers
@@ -347,15 +348,17 @@ export default function HumanMechanic() {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-
-  const userPlan = user?.user_metadata?.plan || 'Free'
-  const isPaidUser = userPlan === 'Pro' || userPlan === 'Advance'
+  
+  const navigate = useNavigate()
+  const { isFree, loading: subLoading } = useSubscription()
 
   // ── Proactive Prompt Sequencing ────────────────────────────────
   useEffect(() => {
+    if (subLoading) return
+
     const timer = setTimeout(() => {
       // 1. Plan Gating check
-      if (!isPaidUser) {
+      if (isFree) {
         setShowUpgradePrompt(true)
         return
       }
@@ -804,7 +807,10 @@ export default function HumanMechanic() {
 
       <UpgradePrompt 
         isOpen={showUpgradePrompt}
-        onClose={() => setShowUpgradePrompt(false)}
+        onClose={() => {
+          setShowUpgradePrompt(false)
+          if (isFree) navigate('/dashboard')
+        }}
       />
     </div>
   )

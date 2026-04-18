@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import DevelopmentModal from '../components/DevelopmentModal'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
+import { useSubscription } from '../hooks/useSubscription'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [loadingVehicle, setLoadingVehicle] = useState(true)
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+  const { isFree } = useSubscription()
   
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
 
@@ -140,9 +142,7 @@ export default function Dashboard() {
                 }
 
                 // Plan Gating for Mechanic & Towing
-                const userPlan = user?.user_metadata?.plan || 'Free'
-                const isPaidUser = userPlan === 'Pro' || userPlan === 'Advance'
-                if ((mod.to === '/dashboard/mechanic' || mod.to === '/dashboard/towing') && !isPaidUser) {
+                if ((mod.to === '/dashboard/mechanic' || mod.to === '/dashboard/towing') && isFree) {
                   e.preventDefault()
                   setShowUpgradePrompt(true)
                 }

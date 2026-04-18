@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext'
 import LocationPrompt from '../components/ui/LocationPrompt'
 import QualityPrompt from '../components/ui/QualityPrompt'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
+import { useSubscription } from '../hooks/useSubscription'
 
 // ── Types ────────────────────────────────────────────────────────────
 const trustFallback = (id: string) => {
@@ -268,15 +269,17 @@ export default function Towing() {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [showQualityPrompt, setShowQualityPrompt] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-
-  const userPlan = user?.user_metadata?.plan || 'Free'
-  const isPaidUser = userPlan === 'Pro' || userPlan === 'Advance'
+  
+  const navigate = useNavigate()
+  const { isFree, loading: subLoading } = useSubscription()
 
   useEffect(() => {
+    if (subLoading) return
+
     // Proactive prompt sequencing
     const timer = setTimeout(() => {
       // 1. Check for Plan Gating
-      if (!isPaidUser) {
+      if (isFree) {
         setShowUpgradePrompt(true)
         return
       }
@@ -656,7 +659,10 @@ export default function Towing() {
 
       <UpgradePrompt 
         isOpen={showUpgradePrompt}
-        onClose={() => setShowUpgradePrompt(false)}
+        onClose={() => {
+          setShowUpgradePrompt(false)
+          if (isFree) navigate('/dashboard')
+        }}
       />
     </div>
   )

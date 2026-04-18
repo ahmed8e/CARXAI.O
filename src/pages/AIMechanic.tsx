@@ -52,7 +52,7 @@ export default function AIMechanic() {
   const [isPreparingAudio, setIsPreparingAudio] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [reportDiagnosis, setReportDiagnosis] = useState<DiagnosticResult | null>(null)
-  const [isGated, setIsGated] = useState(false)
+  const [isGated, setIsGated] = useState<PlanType | null>(null)
   const [responseMode, setResponseMode] = useState<'fast_answer' | 'expert_answer'>('fast_answer')
   const [isLimitReached, setIsLimitReached] = useState(false)
   const [isImageGated, setIsImageGated] = useState(false)
@@ -107,7 +107,7 @@ export default function AIMechanic() {
   useEffect(() => {
     if (user && !subLoading) {
       if (isPaid) {
-        setIsGated(false)
+        setIsGated(null)
       } else {
         fetchUsageCount()
       }
@@ -145,7 +145,7 @@ export default function AIMechanic() {
       const usage = rawUsage as any;
       if (!usage) {
         await (supabase as any).from('plan_usage').insert({ user_id: user.id })
-        setIsGated(false)
+        setIsGated(null)
         setCanShareReport(true)
         return false
       }
@@ -183,7 +183,7 @@ export default function AIMechanic() {
         const imgGated = usage.image_count >= 1
 
         setIsLimitReached(chatGated)
-        setIsGated(chatGated)
+        setIsGated(chatGated ? 'pro' : null)
         setIsImageGated(imgGated)
         setCanShareReport(reportCount < 1) // Only 1 report per 5h
         return chatGated
@@ -200,7 +200,7 @@ export default function AIMechanic() {
           .eq('created_by', user.id)
           .gt('created_at', resetThresholdPro)
 
-        setIsGated(false)
+        setIsGated(null)
         setCanShareReport((monthlyReports || 0) < 15)
         return false
       }
@@ -567,7 +567,7 @@ export default function AIMechanic() {
   const sendMessage = async (content: string, imageUrl?: string, chipLabel?: string, customContext?: any) => {
     const currentlyGated = await fetchUsageCount()
     if (currentlyGated || isLimitReached) {
-      setIsGated(true)
+      setIsGated('pro')
       return
     }
 
@@ -1031,7 +1031,7 @@ ${diagnosticHistory}
     const toggleListening = () => {
       // 2. HARD MICROPHONE GUARD
       if (!isPaid) {
-        setIsGated(true)
+        setIsGated('pro')
         return
       }
 
@@ -1133,7 +1133,7 @@ ${diagnosticHistory}
                   <button
                     onClick={() => {
                       if (!isAdvanced) {
-                        setIsGated(true)
+                        setIsGated(isPro ? 'advanced' : 'pro')
                         return
                       }
                       setResponseMode('expert_answer')
@@ -1373,6 +1373,10 @@ ${diagnosticHistory}
                                   <div className="pt-4 border-t border-slate-50 flex justify-center">
                                     <button 
                                       onClick={() => {
+                                        if (!isAdvanced) {
+                                          setIsGated(isPro ? 'advanced' : 'pro')
+                                          return
+                                        }
                                         setResponseMode('expert_answer');
                                         setTimeout(() => {
                                           sendMessage("Analyze this in deeper detail with manual investigation steps.", undefined, undefined, { previous_diagnosis: msg.issueData });
@@ -1832,7 +1836,7 @@ ${diagnosticHistory}
                       className="w-full bg-transparent outline-none resize-none
                                text-[15px] font-medium leading-relaxed
                                text-slate-900 placeholder:text-slate-400/80"
-                      disabled={loading || isGated}
+                      disabled={loading || !!isGated}
                     />
                   )}
                 </AnimatePresence>
@@ -1844,7 +1848,7 @@ ${diagnosticHistory}
                   <button
                     onClick={() => {
                       if (isLimitReached || isImageGated) {
-                        setIsGated(true)
+                        setIsGated('pro')
                         return
                       }
                       fileInputRef.current?.click()
@@ -1865,7 +1869,7 @@ ${diagnosticHistory}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={() => {
                         if (!isPaid) {
-                          setIsGated(true)
+                          setIsGated('pro')
                           return
                         }
                         toggleListening()
@@ -1910,8 +1914,9 @@ ${diagnosticHistory}
         </div>
 
       <UpgradeGate
-        isOpen={isGated}
-        onClose={() => setIsGated(false)}
+        isOpen={!!isGated}
+        targetPlan={isGated || 'pro'}
+        onClose={() => setIsGated(null)}
       />
 
       <VehicleAddModal

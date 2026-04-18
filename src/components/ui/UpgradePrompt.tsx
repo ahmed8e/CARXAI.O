@@ -61,14 +61,14 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
               {/* Content Section */}
               <div className="text-center space-y-4 mb-10">
                 <h3 className="text-[26px] font-display font-black text-navy tracking-tight leading-tight italic uppercase">
-                  Unlock better <br />
+                  Unlock <br />
                   <span className="text-on-surface tracking-tighter not-italic font-black">local assistance</span>
                 </h3>
                 <p className="text-[14px] text-slate-500 font-medium leading-relaxed px-2">
-                  Upgrade your plan to access Mechanic and Towing options, with more relevant nearby support for your area.
+                  Upgrade your plan to access Mechanic and Towing options, with smarter nearby support and a better assistance experience.
                 </p>
                 <p className="text-[11px] font-black uppercase tracking-widest text-navy/40 italic">
-                  Premium plans give you access to smarter local assistance features and a better support experience.
+                  Premium plans give you access to more advanced local help features.
                 </p>
               </div>
 
