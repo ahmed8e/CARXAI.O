@@ -6,12 +6,28 @@ export type Database = {
           id: string
           email: string
           full_name: string | null
+          city: string | null
+          latitude: number | null
+          longitude: number | null
+          location_timestamp: number | null
+          phone_number: string | null
+          preferred_language: string | null
+          subscription_tier: string | null
+          role: string | null
           created_at: string
         }
         Insert: {
           id: string
           email: string
           full_name?: string | null
+          city?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          location_timestamp?: number | null
+          phone_number?: string | null
+          preferred_language?: string | null
+          subscription_tier?: string | null
+          role?: string | null
           created_at?: string
         }
         Update: {

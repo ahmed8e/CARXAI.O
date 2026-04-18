@@ -28,37 +28,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(429).json({ error: 'Too many profile updates. Please try again later.' });
   }
 
-  const { fullName, phoneNumber, preferredLanguage } = req.body;
+  const { fullName, phoneNumber, preferredLanguage, city, latitude, longitude, location_timestamp } = req.body;
 
   try {
     const adminClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
     
-    // Update profiles table
-    if (fullName !== undefined) {
-      await adminClient
-        .from('profiles')
-        .update({ full_name: fullName })
-        .eq('id', user.id);
-      
-      // Also update auth metadata for convenience
+    // 1. Unified UPSERT to profiles table (canonical source of truth)
+    const profileData: any = { id: user.id }
+    if (fullName !== undefined) profileData.full_name = fullName
+    if (phoneNumber !== undefined) profileData.phone_number = phoneNumber
+    if (preferredLanguage !== undefined) profileData.preferred_language = preferredLanguage
+    if (city !== undefined) profileData.city = city
+    if (latitude !== undefined) profileData.latitude = latitude
+    if (longitude !== undefined) profileData.longitude = longitude
+    if (location_timestamp !== undefined) profileData.location_timestamp = location_timestamp
+
+    const { error: dbError } = await adminClient
+      .from('profiles')
+      .upsert(profileData, { onConflict: 'id' })
+
+    if (dbError) throw dbError
+
+    // 2. Also update auth metadata for convenience/efficiency in AuthContext
+    if (fullName !== undefined || city !== undefined) {
       await adminClient.auth.admin.updateUserById(user.id, {
-        user_metadata: { full_name: fullName }
+        user_metadata: { 
+          full_name: fullName,
+          city: city,
+          latitude: latitude,
+          longitude: longitude
+        }
       });
     }
 
-    // Update user_settings table
-    if (phoneNumber !== undefined || preferredLanguage !== undefined) {
-      await adminClient
-        .from('user_settings')
-        .upsert({ 
-          user_id: user.id, 
-          phone_number: phoneNumber,
-          preferred_language: preferredLanguage
-        });
-    }
-
     logger.info({ event: 'profile_updated', userId: user.id });
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, profile: profileData });
   } catch (error: any) {
     logger.error({ event: 'profile_update_error', userId: user.id, error: error.message });
     return res.status(500).json({ error: 'Failed to update profile' });

@@ -151,57 +151,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error }
   }
 
-  const updateProfile = async (updates: { fullName?: string, phoneNumber?: string, preferredLanguage?: string, city?: string, latitude?: number, longitude?: number, location_timestamp?: number }) => {
+  const updateProfile = async (updates: { 
+    fullName?: string, 
+    phoneNumber?: string, 
+    preferredLanguage?: string, 
+    city?: string, 
+    latitude?: number, 
+    longitude?: number, 
+    location_timestamp?: number 
+  }) => {
     if (!user) return { error: new Error('User not logged in') }
 
-    // 1. Update Auth Metadata (for immediate UI response using user_metadata)
-    const { error: authError } = await supabase.auth.updateUser({
-      data: {
-        full_name: updates.fullName,
-        phone_number: updates.phoneNumber,
-        preferred_language: updates.preferredLanguage,
-        city: updates.city,
-        latitude: updates.latitude,
-        longitude: updates.longitude,
-        location_timestamp: updates.location_timestamp
+    try {
+      // 1. One canonical upsert to profiles table
+      // Note: We use type casting as any to avoid TS errors if the schema cache is stale
+      const { error: dbError } = await (supabase as any)
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email || '',
+          full_name: updates.fullName,
+          city: updates.city,
+          latitude: updates.latitude,
+          longitude: updates.longitude,
+          location_timestamp: updates.location_timestamp,
+          phone_number: updates.phoneNumber,
+          preferred_language: updates.preferredLanguage,
+        }, { onConflict: 'id' })
+
+      if (dbError) {
+        console.error('[AuthContext] Profile Update Error:', dbError)
+        return { error: dbError }
       }
-    })
 
-    if (authError) return { error: authError }
-
-    // 2. Update Profiles table (only valid columns)
-    const { error: dbError } = await (supabase as any)
-      .from('profiles')
-      .upsert({
-        id: user.id,
-        full_name: updates.fullName || null,
-        email: user.email || '',
-        city: updates.city,
-        latitude: updates.latitude,
-        longitude: updates.longitude,
-        location_timestamp: updates.location_timestamp,
-      })
-
-    if (dbError) {
-      console.error('Database Profile Error:', dbError);
-      return { error: new Error(`Database Error: ${dbError.message || dbError.details || 'Unknown error'}`) };
+      return { error: null }
+    } catch (error: any) {
+      console.error('[AuthContext] Unexpected Error:', error)
+      return { error }
     }
-
-    // 3. Update User Settings table
-    const { error: settingsError } = await (supabase as any)
-      .from('user_settings')
-      .upsert({
-        user_id: user.id,
-        preferred_language: updates.preferredLanguage || 'en',
-        phone_number: updates.phoneNumber || null
-      })
-
-    if (settingsError) {
-      console.error('Database Settings Error:', settingsError);
-      return { error: new Error(`Settings Error: ${settingsError.message || settingsError.details || 'Unknown error'}`) };
-    }
-    
-    return { error: null }
   }
 
   const updatePassword = async (newPassword: string) => {

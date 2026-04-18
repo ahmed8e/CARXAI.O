@@ -185,27 +185,20 @@ export default function MyAccount() {
   const fetchProfile = async () => {
     if (!user) return
     
-    // Check user metadata first
+    // Check user metadata first for fallback
     const metadata = user.user_metadata
     
-    // Fetch profile (for full_name)
+    // Fetch profile (the new canonical source for all fields)
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
 
-    // Fetch user_settings (for phone_number, preferred_language)
-    const { data: settings } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
-
     setProfileData({
       fullName: (profile as any)?.full_name || metadata?.full_name || user.email?.split('@')[0] || 'User',
-      phoneNumber: (settings as any)?.phone_number || metadata?.phone_number || '',
-      preferredLanguage: (settings as any)?.preferred_language || metadata?.preferred_language || 'English (US)'
+      phoneNumber: (profile as any)?.phone_number || metadata?.phone_number || '',
+      preferredLanguage: (profile as any)?.preferred_language || metadata?.preferred_language || 'English (US)'
     })
   }
 
