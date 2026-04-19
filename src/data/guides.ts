@@ -21,6 +21,8 @@ export interface Guide {
     stopIf: string;
   };
   repairCosts?: {
+    title?: string;
+    disclaimer?: string;
     low: string;
     lowDesc?: string;
     medium: string;
@@ -74,15 +76,15 @@ export const guides: Guide[] = [
     slug: 'car-shakes-when-braking',
     category: 'braking-problems',
     categoryDisplay: 'Brake System Diagnosis',
-    title: 'Why Your Car Shakes When Braking',
+    title: 'Car shakes when braking',
     lastUpdated: 'May 24, 2024',
     readingTime: '7 min read',
     shortAnswer: 'If your car shakes specifically when you brake, the problem more often comes from uneven braking force rather than a general driving vibration. In many cases, the cause is warped front rotors, uneven pad deposits, or a sticking caliper, but suspension or wheel-related problems can also make the symptom worse. A light shake may still allow a short drive, but strong vibration, pulling, or a soft pedal should be treated as a safety issue.',
     keyTakeaways: [
-      'Most common cause: Warped front brake rotors or uneven brake pad deposits.',
-      'Identification: Steering wheel shakes usually point to front brakes; pedal pulsation often points to rear brakes.',
-      'Safety: Driving with a light shake for a short distance may be possible, but stop driving if the car pulls hard or the pedal feels soft.',
-      'Next Steps: A visual inspection of the rotors and checking for sticking calipers should be your first priority.'
+      'More likely: Warped front brake rotors or uneven pad deposits.',
+      'Front-end check: Steering wheel shakes often point to front brake or suspension issues.',
+      'Pedal-only: Often points to rotor thickness variation or uneven deposits.',
+      'Warning: Strong vibration, pulling, or a soft pedal are safety issues.'
     ],
     severity: 'Medium',
     canDrive: 'Caution',
@@ -91,145 +93,130 @@ export const guides: Guide[] = [
       'Uneven Brake Pad Deposits',
       'Sticking Brake Caliper',
       'Worn Suspension Bushings',
-      'Loose Wheel Hub or Lug Nuts'
+      'Incorrect Wheel Torque'
     ],
     quickSummary: {
-      canYouDrive: 'Avoid high speeds; get inspected soon.',
-      urgency: 'Medium - Safety systems are compromised.',
+      canYouDrive: 'Caution - Use common sense on speed.',
+      urgency: 'Medium - Safety system may be compromised.',
       causes: ['Front Rotors', 'Brake Pads', 'Caliper Stick'],
-      stopIf: 'The pedal sinks, you hear grinding, or the car pulls to one side.'
+      stopIf: 'The pedal feels soft, you hear grinding, or the car pulls to one side.'
     },
     repairCosts: {
+      title: 'Typical Repair Cost Ranges',
+      disclaimer: 'Costs vary by vehicle, brake design, labor rates, and whether the problem is limited to pads and rotors or involves calipers, ABS components, or front-end parts.',
       low: '$150 - $300',
-      lowDesc: 'Single axle brake pad replacement.',
+      lowDesc: 'Brake pad replacement (single axle).',
       medium: '$400 - $750',
-      mediumDesc: 'Full front brake service (pads and high-quality rotors).',
+      mediumDesc: 'Standard front brake service (pads + rotors).',
       high: '$1,200+',
-      highDesc: 'Brake overhaul including calipers and hydraulic lines.'
+      highDesc: 'Full hydraulic/caliper overhaul.'
     },
     sections: [
       {
-        title: 'Common Reasons Your Car Shakes When Braking',
-        content: 'Understanding why your car is shaking starts with the mechanical components that actually do the stopping. When any part of the brake assembly loses its perfectly flat surface or smooth movement, you will feel it through the steering wheel or pedal.',
-        image: '/images/guides/brake-system-overview.png',
-        imageAlt: 'Diagram of a car disc brake system showing rotor, pads, and caliper assembly.',
+        title: 'Quick Answer',
+        content: 'If your car shakes specifically when you brake, the problem more often comes from uneven braking force rather than a general driving vibration. In many cases, the cause is warped front rotors, uneven pad deposits, or a sticking caliper, but suspension or wheel-related problems can also make the symptom worse. A light shake may still allow a short drive, but strong vibration, pulling, or a soft pedal should be treated as a safety issue.',
+        image: '/images/guides/brake-rotor-wear.png',
+        imageAlt: 'A used brake rotor showing heat spots and uneven wear patterns on the surface.'
+      },
+      {
+        title: 'How the vibration feels',
+        content: 'Identifying where you feel the vibration is the first step in a realistic diagnosis. The sensation often transfers through different parts of the car depending on which corner is failing.',
         subsections: [
           {
-            title: 'Warped Brake Rotors',
-            content: 'This is the most frequent culprit. Rotors warp when they get too hot—often from stop-and-go traffic or "riding" the brakes downhill. Instead of a flat surface for the pads to grip, the rotor develops a slight wavy shape. As the pads hit these "high spots," they bounce, creating the shaking sensation you feel.',
+            title: 'In the steering wheel',
+            content: 'If the steering wheel shakes more than the brake pedal, the issue more often points to the front brakes or front-end suspension, because front brake vibration is transferred directly into the steering system.',
+            clue: 'Vibration often increases at specific speeds.'
+          },
+          {
+            title: 'In the brake pedal',
+            content: 'Pedal-only vibration often points to rotor thickness variation, uneven pad deposits, or ABS-related pulsation, depending on when the vibration happens and whether it appears during normal braking or only during hard stops.',
+            clue: 'Felt most on light to medium braking.'
+          },
+          {
+            title: 'Whole car vibration',
+            content: 'If the entire chassis seems to shudder, the rear brakes or larger suspension components like control arm bushings are more likely the culprit.',
+            clue: 'Worse when there are passengers in the back.'
+          }
+        ]
+      },
+      {
+        title: 'Most likely causes (by situation)',
+        content: 'Don\'t just look at parts—look at when the shaking happens. Real-world symptoms often point to specific failure points.',
+        image: '/images/guides/mechanic-inspection.png',
+        imageAlt: 'A mechanic using a flashlight to inspect the condition of rotors and pads.',
+        subsections: [
+          {
+            title: 'If it happens at medium or high speed',
+            content: 'If the shake shows up mostly at medium or highway speed, rotor run-out or uneven rotor thickness becomes more likely, especially if the vibration is much weaker during low-speed stops.',
             severity: 'Medium'
           },
           {
-            title: 'Uneven Brake Pad Deposits',
-            content: 'Sometimes the rotor isn\'t actually bent, but "friction material" from the pads has melted onto the rotor surface unevenly. This usually happens if you make a very hard stop and then keep your foot pressed firmly on the brake while stationary. The heat can "stamp" the pad material onto the rotor.',
+            title: 'If it happens during light braking',
+            content: 'Often points to uneven pad deposits. The "friction material" from your pads may have melting onto the rotor surface in patches, causing the pads to catch and release.',
             severity: 'Low'
           },
           {
-            title: 'Sticking Brake Caliper',
-            content: 'If a caliper is stuck, it may keep the brake pads partially pressed against the rotor even when you aren\'t braking. This creates extreme heat, which eventually warps the rotor and causes the car to shake when you finally do apply the brakes.',
-            severity: 'High'
-          }
-        ]
-      },
-      {
-        title: 'How to Tell What the Shake Most Likely Means',
-        content: 'The location and timing of the vibration are your best clues for a quick diagnosis. Pay close attention to where you feel the sensation first.',
-        image: '/images/guides/vibration-clues.png',
-        imageAlt: 'Diagnostic visual showing hands on a shaking steering wheel vs a foot on a vibrating pedal.',
-        subsections: [
-          {
-            title: 'Steering wheel shakes when braking',
-            clue: 'Vibration felt primarily in your hands.',
-            content: 'If the steering wheel shakes more than the brake pedal, the issue more often points to the front brakes or front-end suspension, because front brake vibration is transferred directly into the steering system.',
-            safeToDrive: 'Short drive to a shop is likely safe.'
-          },
-          {
-            title: 'Brake pedal vibrates when braking',
-            clue: 'Pulsation felt through the sole of your foot.',
-            content: 'Pedal-only vibration often points to rotor thickness variation, uneven pad deposits, or ABS-related pulsation, depending on when the vibration happens and whether it appears during normal braking or only during hard stops.',
-            safeToDrive: 'Safe for moderate distances.'
-          },
-          {
-            title: 'Car shakes when braking at high speed',
-            clue: 'Shake appears at 50+ MPH but disappears at lower speeds.',
-            content: 'If the shake shows up mostly at medium or highway speed, rotor run-out or uneven rotor thickness becomes more likely, especially if the vibration is much weaker during low-speed stops.',
-            safeToDrive: 'Avoid highway speeds until repaired.'
-          },
-          {
-            title: 'Car pulls to one side when braking',
-            clue: 'Vehicle drifts or dives left or right when slowing down.',
+            title: 'If the steering wheel shakes violently',
             content: 'This is a more serious symptom that often points to a seized caliper, uneven braking force, or a brake hose problem causing one side to brake harder than the other.',
-            safeToDrive: 'Stop driving; this is a safety risk.'
+            severity: 'High'
           },
           {
-            title: 'Car shakes after brake replacement',
-            clue: 'Vibration started within 50 miles of a brake job.',
+            title: 'If it started soon after a brake job',
             content: 'If the vibration starts soon after a brake job, improper wheel torque, dirt or corrosion on the wheel hub, or rotor installation issues become more likely than normal rotor wear.',
-            safeToDrive: 'Return to the technician to check lug torque.'
+            severity: 'Medium'
           },
           {
-            title: 'ABS light on and car shakes when braking',
-            clue: 'Orange ABS light is illuminated on the dash.',
+            title: 'If the ABS light is on',
             content: 'When the ABS light is on, the system has detected a fault, and the vibration may be related to incorrect ABS modulation, a wheel speed sensor issue, or a damaged tone ring.',
-            safeToDrive: 'Caution: Anti-lock safety is disabled.'
+            severity: 'Medium'
           }
         ]
       },
       {
-        title: 'Can You Drive If Your Car Shakes When Braking?',
+        title: 'Can you drive?',
         content: 'A short drive may be possible if the shake is light, the car still brakes straight, and there is no grinding, burning smell, soft pedal, or warning light. You should stop driving if the vibration becomes strong, the car pulls to one side, or braking feels weaker than normal.',
-        image: '/images/guides/warped-rotor.png',
-        imageAlt: 'Technical diagram showing a warped rotor surface vs a healthy flat rotor.'
-      },
-      {
-        title: 'When It Becomes Dangerous',
-        image: '/images/guides/danger-signs.png',
-        imageAlt: 'Visual checklist of brake danger signs: ABS light, pulling, grinding, and soft pedal.',
-        content: 'You should stop driving immediately if you notice any of these "Red Flag" symptoms alongside the shaking. If braking distance increases, the steering becomes unstable, or the pedal feels inconsistent from one stop to the next, the problem should be treated as a safety issue rather than a comfort issue.',
+        image: '/images/guides/brake-assembly.png',
+        imageAlt: 'Detailed view of a wheel assembly with the rim removed, showing the caliper and rotor contact point.',
         subsections: [
-          { title: 'Soft or Spongy Pedal', content: 'If the pedal sinks significantly or feels like you\'re stepping on a sponge, you have a hydraulic issue.' },
-          { title: 'Grinding or Screeching', content: 'Metal-on-metal noise means your brake pads are completely gone, and you are damaging the rotors with every stop.' },
-          { title: 'Burning Smell', content: 'A thin, chemical burning scent from the wheel area indicates a sticking caliper that is overheating.' },
-          { title: 'Violent Pulling', content: 'If you have to fight the steering wheel to stay in your lane while slowing down.' }
-        ]
-      },
-      {
-        title: 'What To Check First',
-        content: 'If you want to look for the cause yourself, focus on these visual and physical checks before calling a professional.',
-        image: '/images/guides/precision-assembly.png',
-        imageAlt: 'Close-up of a technician cleaning a wheel hub and using a torque wrench.',
-        subsections: [
-          { title: 'Visual Rotor Inspection', content: 'Look through your wheel spokes at the circular rotor. Check for blue-ish discoloration (heat spots) or deep circular grooves.' },
-          { title: 'Wheel Hub Inspection', content: 'Check if any wheel is significantly hotter than the others after a typical drive. This often points to a sticking caliper.' },
-          { title: 'Lug Nut Check', content: 'Ensure your lug nuts are tight and haven\'t backed off, which can cause both a shake and a safety hazard.' }
+          {
+            title: 'Status: Safe for short trips',
+            content: 'The shake is light, the car still stops straight, and there is no noise or change in pedal pressure.',
+            safeToDrive: 'Short drive to a local shop may be possible.'
+          },
+          {
+            title: 'Status: Risky / Caution',
+            content: 'The shake is strong enough to feel it through the seat, or it only happens at highway speeds. Vibration often indicates building heat.',
+            safeToDrive: 'Avoid highways; get inspected as soon as possible.'
+          },
+          {
+            title: 'Status: Stop Driving',
+            content: 'The car pulls hard to one side when braking, the pedal feels soft or inconsistent, or you hear metal-on-metal grinding.',
+            safeToDrive: 'Stop immediately. Driving becomes a significant safety risk.'
+          }
         ]
       }
     ],
-    safetyAdvice: 'Brake vibration is a mechanical warning that one of your car\'s safety systems is failing. While it may start as a small vibration, it will eventually lead to longer stopping distances and potential loss of control. Always prioritize a brake inspection when you feel any change in your stopping performance.',
+    safetyAdvice: 'Brake vibration is often a mechanical warning that your safety systems are degrading. If braking distance increases, the steering becomes unstable, or the pedal feels inconsistent from one stop to the next, the problem should be treated as a safety issue rather than a comfort issue. While you may still be able to stop, your car will not react as predictably in a panic situation.',
     whatToCheck: [
       {
-        title: 'Quick Home Checks',
+        title: 'Immediate Checklist',
         items: [
-          'Confirm if the shake is in the steering wheel or pedal.',
-          'Note the speed where the vibration is most violent.',
-          'Visually inspect rotors for heat spots (blue/purple tint).',
-          'Check brake fluid level in the reservoir.'
+          'Verify if shake is in wheel or pedal',
+          'Check for raw fuel smell or burning brake smell',
+          'Visually inspect rotors for blue/purple heat spots',
+          'Note if vibration happens at specific speeds'
         ]
       }
     ],
     faqs: [
-      { question: 'Why does my car shake when I brake?', answer: 'It is most often due to warped brake rotors or uneven pad deposits creating a pulsing sensation as the brakes try to grip an uneven surface.' },
-      { question: 'Can I drive if my car shakes when braking?', answer: 'In the short term, yes, if the vibration is light. However, it will eventually damage your suspension and reduce your emergency stopping ability.' },
-      { question: 'Why does my car shake when braking at high speed?', answer: 'The high frequency of rotation makes even minor rotor imperfections much more noticeable at highway speeds (55+ MPH).' },
-      { question: 'How much does it cost to fix car shaking during braking?', answer: 'For most vehicles, a front brake job (pads and rotors) costs between $400 and $700 depending on the parts quality.' },
-      { question: 'Will a wheel alignment fix the shaking?', answer: 'No. Wheel alignments fix "pulling" while driving or constant shakes, but shaking ONLY during braking is almost always a brake system issue.' },
-      { question: 'Why does my steering wheel shake when braking?', answer: 'This almost always points to a problem with the front rotors or front suspension components like tie rods.' },
-      { question: 'What does a brake pedal pulsation mean?', answer: 'This is the physical feeling of the brake fluid being pushed back into the master cylinder as the pads try to climb over a high spot on a warped rotor.' },
-      { question: 'Does a vibrating brake pedal mean ABS is working?', answer: 'It can. If you are on a slippery surface, the ABS rapidly pulses the brakes. If it happens on dry pavement during normal stops, it is a sign of a fault.' }
+      { question: 'Why does my car shake when I brake?', answer: 'It is more likely due to warped front brake rotors or uneven pad deposits rather than a general driving vibration.' },
+      { question: 'Can I drive if my car shakes when braking?', answer: 'A short drive may be possible if the shake is light and the car brakes straight, but strong vibration should be treated as a safety issue.' },
+      { question: 'Will a wheel balance fix the shake?', answer: 'No. Shaking ONLY during braking usually points to a brake issue, while a bad balance usually causes a constant shake at certain speeds.' }
     ],
     metaTitle: 'Why Your Car Shakes When Braking: Causes, Safety & Fixes',
-    metaDescription: 'Why does your car shake when you hit the brakes? Learn about warped rotors, sticking calipers, and when it is safe to drive this diagnostic guide.'
+    metaDescription: 'Why does your car shake when you hit the brakes? Learn about warped rotors, sticking calipers, and when it is safe to drive in this diagnostic guide.'
   },
+
   {
     id: '2',
     slug: 'car-smells-like-gas',

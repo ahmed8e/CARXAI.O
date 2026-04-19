@@ -76,6 +76,7 @@ import ChoosePlan from './pages/ChoosePlan'
 import LocationOnboarding from './pages/LocationOnboarding'
 import GuidesIndex from './pages/GuidesIndex'
 import GuideDetail from './pages/GuideDetail'
+import DiagnosticGuideDetail from './pages/DiagnosticGuideDetail'
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -113,6 +114,8 @@ export default function App() {
             
             {/* Guides SEO Section */}
             <Route path="/guides" element={<GuidesIndex />} />
+            <Route path="/guides/:category/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
+            <Route path="/guides/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
             <Route path="/guides/:category/:slug" element={<GuideDetail />} />
             <Route path="/guides/:slug" element={<GuideDetail />} />
 
