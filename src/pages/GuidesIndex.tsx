@@ -135,26 +135,37 @@ const GuidesIndex: React.FC = () => {
                 <Link 
                   key={guide.id} 
                   to={`/guides/${guide.category}/${guide.slug}`}
-                  className="group flex flex-col p-8 rounded-[32px] bg-white border border-slate-50 shadow-ambient hover:shadow-card hover:border-navy/10 hover:-translate-y-1.5 transition-all duration-300"
+                  className="group flex flex-col p-4 rounded-[32px] bg-white border border-slate-50 shadow-ambient hover:shadow-card hover:border-navy/10 hover:-translate-y-1.5 transition-all duration-300"
                 >
-                  <div className="flex items-center justify-between mb-6">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      guide.severity === 'High' ? 'bg-red-50 text-red-600' : 
-                      guide.severity === 'Medium' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'
-                    }`}>
-                      {guide.severity} Severity
-                    </span>
-                    <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-navy group-hover:translate-x-1 transition-all" />
-                  </div>
-                  <h3 className="text-xl font-display font-bold text-on-surface mb-4 leading-tight group-hover:text-navy transition-colors">
-                    {guide.title}
-                  </h3>
-                  <p className="text-sm text-muted font-medium leading-relaxed mb-8 flex-1">
-                    {guide.shortAnswer}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.15em] text-navy pt-6 border-t border-slate-50">
-                    View Guide
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  {guide.cardImage && (
+                    <div className="relative w-full aspect-[16/10] overflow-hidden rounded-[24px] mb-6">
+                      <img 
+                        src={guide.cardImage} 
+                        alt={guide.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                  )}
+                  <div className="px-4 pb-4 flex flex-col h-full">
+                    <div className="flex items-center justify-between mb-6">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        guide.severity === 'High' ? 'bg-red-50 text-red-600' : 
+                        guide.severity === 'Medium' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'
+                      }`}>
+                        {guide.severity} Severity
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-navy group-hover:translate-x-1 transition-all" />
+                    </div>
+                    <h3 className="text-xl font-display font-bold text-on-surface mb-4 leading-tight group-hover:text-navy transition-colors">
+                      {guide.title}
+                    </h3>
+                    <p className="text-sm text-muted font-medium leading-relaxed mb-8 flex-1">
+                      {guide.shortAnswer}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.15em] text-navy pt-6 border-t border-slate-50">
+                      View Guide
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -182,17 +193,28 @@ const GuidesIndex: React.FC = () => {
                 >
                   <Link 
                     to={`/guides/${guide.category}/${guide.slug}`}
-                    className="flex flex-col p-6 rounded-[24px] bg-white border border-slate-50 shadow-ambient hover:shadow-lg hover:border-navy/10 transition-all group h-full"
+                    className="flex flex-col p-3 rounded-[24px] bg-white border border-slate-50 shadow-ambient hover:shadow-lg hover:border-navy/10 transition-all group h-full"
                   >
-                    <h4 className="text-lg font-display font-bold text-slate-800 mb-3 leading-tight group-hover:text-navy transition-colors">
-                      {guide.title}
-                    </h4>
-                    <p className="text-xs text-muted font-medium leading-relaxed mb-6 line-clamp-3">
-                      {guide.shortAnswer}
-                    </p>
-                    <div className="mt-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-navy pt-4 border-t border-slate-50">
-                      Learn More
-                      <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                    {guide.cardImage && (
+                      <div className="relative w-full aspect-[16/10] overflow-hidden rounded-[18px] mb-4">
+                        <img 
+                          src={guide.cardImage} 
+                          alt={guide.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+                    <div className="px-3 pb-3 flex flex-col h-full">
+                      <h4 className="text-lg font-display font-bold text-slate-800 mb-3 leading-tight group-hover:text-navy transition-colors">
+                        {guide.title}
+                      </h4>
+                      <p className="text-xs text-muted font-medium leading-relaxed mb-6 line-clamp-3">
+                        {guide.shortAnswer}
+                      </p>
+                      <div className="mt-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-navy pt-4 border-t border-slate-50">
+                        Learn More
+                        <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                      </div>
                     </div>
                   </Link>
                 </motion.div>

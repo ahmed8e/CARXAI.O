@@ -59,6 +59,7 @@ export interface Guide {
   brand?: string;
   expertQuote?: string;
   accuracyLabel?: string;
+  cardImage?: string;
 }
 
 export const GUIDE_CATEGORIES = [
@@ -79,6 +80,7 @@ export const guides: Guide[] = [
     title: 'Car shakes when braking',
     lastUpdated: 'May 24, 2024',
     readingTime: '7 min read',
+    cardImage: '/symptoms/Car shakes when braking.webp',
     shortAnswer: 'If your car shakes specifically when you brake, the problem more often comes from uneven braking force rather than a general driving vibration. In many cases, the cause is warped front rotors, uneven pad deposits, or a sticking caliper, but suspension or wheel-related problems can also make the symptom worse. A light shake may still allow a short drive, but strong vibration, pulling, or a soft pedal should be treated as a safety issue.',
     keyTakeaways: [
       'More likely: Warped front brake rotors or uneven pad deposits.',
@@ -223,6 +225,7 @@ export const guides: Guide[] = [
     category: 'symptoms',
     categoryDisplay: 'Engine & Fuel Systems',
     title: 'Why Does My Car Smell Like Gas?',
+    cardImage: '/symptoms/smell-gas.png',
     shortAnswer: 'A persistent gasoline smell is usually caused by a fuel leak, a faulty gas cap, or an issue with the evaporative emissions (EVAP) system. Because gasoline is highly flammable, any raw fuel smell should be treated as an emergency.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'June 10, 2024',
@@ -261,6 +264,7 @@ export const guides: Guide[] = [
     category: 'starting-battery',
     categoryDisplay: 'Starting & Electrical',
     title: 'Car Won’t Crank: Troubleshooting Start Issues',
+    cardImage: '/symptoms/wont-crank.webp',
     shortAnswer: 'If you turn the key and nothing happens (no sound), the problem is most likely a dead battery, a failed starter, or a bad ignition switch. This usually requires a battery test as the first diagnostic step.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'July 5, 2024',
@@ -299,6 +303,7 @@ export const guides: Guide[] = [
     category: 'starting-battery',
     categoryDisplay: 'Battery & Electronics',
     title: 'Car Won’t Start But Lights Come On',
+    cardImage: "/symptoms/lights-work-no-start.webp",
     shortAnswer: 'When your lights and dash work but the engine won\'t turn, the battery may have enough voltage for electronics but not enough amperage for the starter. This is a common source of confusion for drivers.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'August 12, 2024',
@@ -333,6 +338,7 @@ export const guides: Guide[] = [
     category: 'warning-lights',
     categoryDisplay: 'Safety Systems',
     title: 'ABS Light On: Meaning and Urgency',
+    cardImage: '/symptoms/ABS light is on.webp',
     shortAnswer: 'The ABS light indicates a fault in the Anti-lock Braking System. Your normal brakes will still work, but you won\'t have anti-lock capability in emergencies. This requires scanning the vehicle for a trouble code.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'September 2, 2024',
@@ -367,6 +373,7 @@ export const guides: Guide[] = [
     category: 'warning-lights',
     categoryDisplay: 'Critical Warnings',
     title: 'Oil Light On: Stop Immediately',
+    cardImage: '/symptoms/oil-light.webp',
     shortAnswer: 'A red oil can icon means your engine has lost oil pressure. This is a critical emergency that can destroy your engine in seconds. PULL OVER NOW.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'October 15, 2024',
