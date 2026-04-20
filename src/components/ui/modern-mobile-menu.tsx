@@ -32,25 +32,31 @@ export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentC
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
-    const setLineWidth = () => {
-      const activeTextElement = textRefs.current[activeIndex];
-      const activeItemElement = itemRefs.current[activeIndex];
+    // Precise layout measurement using requestAnimationFrame to avoid thrashing
+    const updateUnderline = () => {
+      requestAnimationFrame(() => {
+        const activeTextElement = textRefs.current[activeIndex];
+        const activeItemElement = itemRefs.current[activeIndex];
 
-      if (activeItemElement && activeTextElement) {
-        const textWidth = activeTextElement.offsetWidth;
-        activeItemElement.style.setProperty('--lineWidth', `${textWidth}px`);
-      }
+        if (activeItemElement && activeTextElement) {
+          const textWidth = activeTextElement.offsetWidth;
+          activeItemElement.style.setProperty('--lineWidth', `${textWidth}px`);
+        }
+      });
     };
 
-    setLineWidth();
+    updateUnderline();
 
-    // Small delay to ensure refs are populated after route change
-    const timer = setTimeout(setLineWidth, 50);
+    // ResizeObserver is more efficient than 'resize' event for layout stability
+    const observer = new ResizeObserver(() => {
+        updateUnderline();
+    });
 
-    window.addEventListener('resize', setLineWidth);
+    const activeText = textRefs.current[activeIndex];
+    if (activeText) observer.observe(activeText);
+
     return () => {
-      window.removeEventListener('resize', setLineWidth);
-      clearTimeout(timer);
+      observer.disconnect();
     };
   }, [activeIndex, items]);
 

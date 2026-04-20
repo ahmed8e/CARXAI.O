@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -7,7 +7,6 @@ import AppLayout from './components/AppLayout'
 import { trackPageView, setUserId, setUserProperties } from './lib/analytics'
 import { useAuth } from './contexts/AuthContext'
 import { useSubscription } from './hooks/useSubscription'
-
 
 // ── SPA Path Persistence ───────────────────────────────────────────────────
 function PathTracker() {
@@ -57,39 +56,47 @@ function UserIdentityTracker() {
   return null
 }
 
-import SharedReport from './pages/SharedReport'
-
-import Landing from './pages/Landing'
-import Auth from './pages/Auth'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
-import Privacy from './pages/Privacy'
-import Terms from './pages/Terms'
-import Dashboard from './pages/Dashboard'
-import AIMechanic from './pages/AIMechanic'
-import HumanMechanic from './pages/HumanMechanic'
-import Towing from './pages/Towing'
-import NearbyMap from './pages/NearbyMap'
-import MyAccount from './pages/MyAccount'
-import Vehicles from './pages/Vehicles'
-import ChoosePlan from './pages/ChoosePlan'
-import LocationOnboarding from './pages/LocationOnboarding'
-import GuidesIndex from './pages/GuidesIndex'
-import GuideDetail from './pages/GuideDetail'
-import DiagnosticGuideDetail from './pages/DiagnosticGuideDetail'
-import AbsLightGuide from './pages/AbsLightGuide'
+const SharedReport = lazy(() => import('./pages/SharedReport'))
+const Landing = lazy(() => import('./pages/Landing'))
+const Auth = lazy(() => import('./pages/Auth'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const Terms = lazy(() => import('./pages/Terms'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const AIMechanic = lazy(() => import('./pages/AIMechanic'))
+const HumanMechanic = lazy(() => import('./pages/HumanMechanic'))
+const Towing = lazy(() => import('./pages/Towing'))
+const NearbyMap = lazy(() => import('./pages/NearbyMap'))
+const MyAccount = lazy(() => import('./pages/MyAccount'))
+const Vehicles = lazy(() => import('./pages/Vehicles'))
+const ChoosePlan = lazy(() => import('./pages/ChoosePlan'))
+const LocationOnboarding = lazy(() => import('./pages/LocationOnboarding'))
+const GuidesIndex = lazy(() => import('./pages/GuidesIndex'))
+const GuideDetail = lazy(() => import('./pages/GuideDetail'))
+const DiagnosticGuideDetail = lazy(() => import('./pages/DiagnosticGuideDetail'))
+const AbsLightGuide = lazy(() => import('./pages/AbsLightGuide'))
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
-import AdminLayout from './pages/admin/AdminLayout'
-import AdminOverview from './pages/admin/AdminOverview'
-import AdminUsers from './pages/admin/AdminUsers'
-import AdminSubscriptions from './pages/admin/AdminSubscriptions'
-import AdminAnalytics from './pages/admin/AdminAnalytics'
-import AdminProviders from './pages/admin/AdminProviders'
-import AdminAddProvider from './pages/admin/AdminAddProvider'
-import AdminImportProviders from './pages/admin/AdminImportProviders'
-import AdminSettings from './pages/admin/AdminSettings'
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
+const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminSubscriptions = lazy(() => import('./pages/admin/AdminSubscriptions'))
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'))
+const AdminProviders = lazy(() => import('./pages/admin/AdminProviders'))
+const AdminAddProvider = lazy(() => import('./pages/admin/AdminAddProvider'))
+const AdminImportProviders = lazy(() => import('./pages/admin/AdminImportProviders'))
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-[3px] border-slate-100 border-t-navy rounded-full animate-spin" />
+      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Initializing Engine</span>
+    </div>
+  </div>
+);
 
 export default function App() {
   return (
@@ -100,103 +107,105 @@ export default function App() {
           <GA4Tracker />
           <UserIdentityTracker />
 
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
-            <Route path="/register" element={<Navigate to="/auth?mode=register" replace />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/report/:shareId" element={<SharedReport />} />
-            <Route path="/shared-report/:token" element={<SharedReport />} />
-            
-            {/* Guides SEO Section */}
-            <Route path="/guides" element={<GuidesIndex />} />
-            <Route path="/guides/:category/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
-            <Route path="/guides/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
-            <Route path="/guides/warning-lights/abs-light" element={<AbsLightGuide />} />
-            <Route path="/guides/:category/:slug" element={<GuideDetail />} />
-            <Route path="/guides/:slug" element={<GuideDetail />} />
-
-            {/* Protected app routes */}
-            <Route path="/choose-plan" element={
-              <ProtectedRoute>
-                <ChoosePlan />
-              </ProtectedRoute>
-            } />
-            <Route path="/onboarding-location" element={
-              <ProtectedRoute>
-                <LocationOnboarding />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Dashboard />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/ai-mechanic" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <AIMechanic />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/vehicles" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Vehicles />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/mechanic" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <HumanMechanic />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/towing" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Towing />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/map" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <NearbyMap />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/my-account" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <MyAccount />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-
-            {/* Admin routes — role-protected */}
-            <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-              <Route index element={<AdminOverview />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="subscriptions" element={<AdminSubscriptions />} />
-              <Route path="analytics" element={<AdminAnalytics />} />
-              <Route path="providers" element={<AdminProviders />} />
-              <Route path="providers/add" element={<AdminAddProvider />} />
-              <Route path="providers/import" element={<AdminImportProviders />} />
-              <Route path="settings" element={<AdminSettings />} />
-            </Route>
-
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
+              <Route path="/register" element={<Navigate to="/auth?mode=register" replace />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/report/:shareId" element={<SharedReport />} />
+              <Route path="/shared-report/:token" element={<SharedReport />} />
+              
+              {/* Guides SEO Section */}
+              <Route path="/guides" element={<GuidesIndex />} />
+              <Route path="/guides/:category/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
+              <Route path="/guides/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
+              <Route path="/guides/warning-lights/abs-light" element={<AbsLightGuide />} />
+              <Route path="/guides/:category/:slug" element={<GuideDetail />} />
+              <Route path="/guides/:slug" element={<GuideDetail />} />
+  
+              {/* Protected app routes */}
+              <Route path="/choose-plan" element={
+                <ProtectedRoute>
+                  <ChoosePlan />
+                </ProtectedRoute>
+              } />
+              <Route path="/onboarding-location" element={
+                <ProtectedRoute>
+                  <LocationOnboarding />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/ai-mechanic" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <AIMechanic />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/vehicles" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Vehicles />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/mechanic" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <HumanMechanic />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/towing" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Towing />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/map" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <NearbyMap />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/my-account" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <MyAccount />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+  
+              {/* Admin routes — role-protected */}
+              <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                <Route index element={<AdminOverview />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="subscriptions" element={<AdminSubscriptions />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="providers" element={<AdminProviders />} />
+                <Route path="providers/add" element={<AdminAddProvider />} />
+                <Route path="providers/import" element={<AdminImportProviders />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+  
+              {/* Catch all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

@@ -74,20 +74,23 @@ export default function AIMechanic() {
     if (!loading && messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg.role === 'assistant') {
-        // Find the actual DOM element for the last bubble
-        // Using a short timeout to ensure the card is fully rendered and the layout shifted
-        setTimeout(() => {
+        // Use requestAnimationFrame to avoid Layout Thrashing
+        // This ensures the browser has finished the layout pass for the new message
+        requestAnimationFrame(() => {
           const bubbles = document.querySelectorAll('.assistant-card-bubble');
-          const lastBubble = bubbles[bubbles.length - 1];
+          const lastBubble = bubbles[bubbles.length - 1] as HTMLElement;
+          
           if (lastBubble) {
-            // Precise alignment: target the top of the bubble sitting ~100px from screen top
-            const topOffset = 110;
-            const rect = lastBubble.getBoundingClientRect();
             const scrollContainer = lastBubble.closest('.overflow-y-auto');
-
             if (scrollContainer) {
-              const currentScroll = scrollContainer.scrollTop;
-              const targetScroll = currentScroll + rect.top - topOffset;
+              const topOffset = 110;
+              // getBoundingClientRect is still needed for viewport-relative calc
+              // but wrapping it in rAF and avoiding setTimeout(150) reduces jitter
+              const rect = lastBubble.getBoundingClientRect();
+              const containerRect = scrollContainer.getBoundingClientRect();
+              
+              const relativeTop = rect.top - containerRect.top;
+              const targetScroll = scrollContainer.scrollTop + relativeTop - topOffset;
 
               scrollContainer.scrollTo({
                 top: targetScroll,
@@ -95,7 +98,7 @@ export default function AIMechanic() {
               });
             }
           }
-        }, 150);
+        });
       }
     }
   }, [loading, messages.length])
