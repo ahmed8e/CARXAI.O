@@ -14,6 +14,15 @@ const gtag = (...args: any[]) => {
   }
 };
 
+// Safely access fbq from the window object
+const fbq = (...args: any[]) => {
+  if (typeof window !== 'undefined' && (window as any).fbq) {
+    (window as any).fbq(...args);
+  } else {
+    // fbq is expected to be deferred by 4 seconds
+  }
+};
+
 /**
  * Tracks a page view manually.
  * Recommended for Single Page Applications (SPAs).
@@ -23,6 +32,7 @@ export const trackPageView = (path: string) => {
   gtag('config', GA_TRACKING_ID, {
     page_path: path,
   });
+  fbq('track', 'PageView');
 };
 
 /**
@@ -67,7 +77,10 @@ export const SaaSAnalytics = {
   completeDiagnosis: (issueName: string) => trackEvent('complete_diagnosis', 'conversion', issueName),
   
   // Marketing / Interaction Events
-  upgradeClick: (planName: string) => trackEvent('upgrade_click', 'conversion', planName),
+  upgradeClick: (planName: string) => {
+    trackEvent('upgrade_click', 'conversion', planName);
+    fbq('track', 'Subscribe', { content_name: planName });
+  },
   callMechanic: (mechanicName: string) => trackEvent('call_mechanic', 'conversion', mechanicName),
   viewProvider: (providerName: string) => trackEvent('view_provider', 'engagement', providerName),
   openChat: () => trackEvent('open_chat', 'engagement'),
