@@ -225,7 +225,7 @@ export const guides: Guide[] = [
     category: 'symptoms',
     categoryDisplay: 'Engine & Fuel Systems',
     title: 'Why Does My Car Smell Like Gas?',
-    cardImage: '/symptoms/smell-gas.png',
+    cardImage: '/symptoms/smell-gas.webp',
     shortAnswer: 'A persistent gasoline smell is usually caused by a fuel leak, a faulty gas cap, or an issue with the evaporative emissions (EVAP) system. Because gasoline is highly flammable, any raw fuel smell should be treated as an emergency.',
     authorName: 'CarxAI Editorial Team',
     lastUpdated: 'June 10, 2024',

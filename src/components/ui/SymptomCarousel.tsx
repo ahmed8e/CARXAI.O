@@ -27,7 +27,7 @@ const SYMPTOMS = [
     id: "smell-gas",
     label: "Why does my car smell like gas?",
     icon: FuelStationIcon,
-    image: "/symptoms/smell-gas.png",
+    image: "/symptoms/smell-gas.webp",
     description: "A critical safety check for fuel leaks and more.",
     slug: "/guides/symptoms/car-smells-like-gas",
   },
