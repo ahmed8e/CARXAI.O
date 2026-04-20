@@ -227,7 +227,7 @@ const ScrollChatDemo = () => {
   }, [visibleCount]);
 
   return (
-    <div className="relative w-full max-w-[280px] md:max-w-[340px] aspect-[9/19] mx-auto scale-[0.91] md:scale-100 pb-12">
+    <div className="relative w-full max-w-[280px] md:max-w-[340px] aspect-[9/19] mx-auto scale-[0.82] md:scale-100 pb-12">
       <div className="absolute inset-0 bg-[#0F0F0F] rounded-[54px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.1)] ring-[6px] ring-[#1A1A1A] overflow-hidden">
         <div className="absolute inset-[10px] bg-white rounded-[44px] overflow-hidden flex flex-col">
           
@@ -427,7 +427,7 @@ export default function Landing() {
               ) : (
                 <div className="flex flex-col items-center gap-4 w-full px-10">
                   <Link to="/auth?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Your Free Diagnosis — 3 Days Free</Link>
+                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Free Trial</Link>
                 </div>
               )}
             </motion.div>
@@ -435,8 +435,8 @@ export default function Landing() {
         </AnimatePresence>
 
         {/* Immersive Scroll Hero Section */}
-        <section ref={heroRef} className="relative h-[160vh]">
-          <div className="sticky top-0 min-h-screen md:h-screen w-full flex items-start md:items-center justify-center px-6 md:overflow-hidden">
+        <section ref={heroRef} className="relative h-[200vh] md:h-[160vh] touch-action-pan-y">
+          <div className="sticky top-0 h-[100dvh] md:h-screen w-full flex items-start md:items-center justify-center px-6 md:overflow-hidden">
 
             <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
               <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
@@ -487,7 +487,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Start Your Free Diagnosis — 3 Days Free
+                        Start Free Trial
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -673,7 +673,7 @@ export default function Landing() {
                 onClick={() => navigate('/auth')}
                 className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
-                Start Your Free Diagnosis — 3 Days Free
+                Start Free Trial
               </button>
                <button 
                 onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}
