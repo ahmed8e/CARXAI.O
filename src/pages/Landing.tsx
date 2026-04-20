@@ -427,7 +427,7 @@ export default function Landing() {
               ) : (
                 <div className="flex flex-col items-center gap-4 w-full px-10">
                   <Link to="/auth?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
+                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Get Started — 3 Days Free</Link>
                 </div>
               )}
             </motion.div>
@@ -460,8 +460,8 @@ export default function Landing() {
                     transition={{ delay: 0.1 }}
                     className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
                   >
-                    Car trouble? <br />
-                    <span className="text-[#0070E0]">Find clarity fast.</span>
+                    Can You Keep Driving — <br />
+                    <span className="text-[#0070E0]">Or Should You Stop?</span>
                   </motion.h1>
 
                   <motion.p 
@@ -469,19 +469,9 @@ export default function Landing() {
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
                     transition={{ delay: 0.2 }}
-                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-4 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-12 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    Experience how CarxAI guides you from a warning light to a reliable fix, instantly. Scroll to see the demo, an AI car diagnosis for warning lights, no-start issues, and breakdown symptoms.
-                  </motion.p>
-
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.25 }}
-                    className="text-slate-400 text-sm md:text-base lg:text-lg mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
-                  >
-                    Get instant car diagnosis, know if you need a mechanic or towing, and discover the best nearby help in seconds.
+                    CarxAI looks at your car’s symptoms and gives you a clear answer: what it could be, how serious it is, and whether you should continue driving or get help nearby.
                   </motion.p>
 
                   <motion.div 
@@ -497,7 +487,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Start Free Diagnosis
+                        Start Free Diagnosis — 3 Days Free
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -683,7 +673,7 @@ export default function Landing() {
                 onClick={() => navigate('/auth')}
                 className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
-                Get Started Now
+                Get Started Now — 3 Days Free
               </button>
                <button 
                 onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}
