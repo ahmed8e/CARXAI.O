@@ -427,7 +427,7 @@ export default function Landing() {
               ) : (
                 <div className="flex flex-col items-center gap-4 w-full px-10">
                   <Link to="/auth?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Get Started — 3 Days Free</Link>
+                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Your Free Diagnosis — 3 Days Free</Link>
                 </div>
               )}
             </motion.div>
@@ -436,7 +436,7 @@ export default function Landing() {
 
         {/* Immersive Scroll Hero Section */}
         <section ref={heroRef} className="relative h-[160vh]">
-          <div className="sticky top-0 h-screen w-full flex items-start md:items-center justify-center px-6 overflow-hidden">
+          <div className="sticky top-0 min-h-screen md:h-screen w-full flex items-start md:items-center justify-center px-6 md:overflow-hidden">
 
             <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
               <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
@@ -460,8 +460,8 @@ export default function Landing() {
                     transition={{ delay: 0.1 }}
                     className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
                   >
-                    Can You Keep Driving — <br />
-                    <span className="text-[#0070E0]">Or Should You Stop?</span>
+                    Is It Just a Sensor, <br />
+                    <span className="text-[#0070E0]">or a Costly Repair? Carxai Knows.</span>
                   </motion.h1>
 
                   <motion.p 
@@ -487,7 +487,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Start Free Diagnosis — 3 Days Free
+                        Start Your Free Diagnosis — 3 Days Free
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -673,7 +673,7 @@ export default function Landing() {
                 onClick={() => navigate('/auth')}
                 className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
-                Get Started Now — 3 Days Free
+                Start Your Free Diagnosis — 3 Days Free
               </button>
                <button 
                 onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}
