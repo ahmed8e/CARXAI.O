@@ -30,9 +30,6 @@ const AuthorBox: React.FC = () => {
             </div>
             <span className="text-xs font-black uppercase tracking-widest whitespace-nowrap">Contact Expertise</span>
           </div>
-          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] italic">
-            Part of the CarxAI Diagnostic SaaS Editorial Series
-          </div>
         </div>
       </div>
     </div>
