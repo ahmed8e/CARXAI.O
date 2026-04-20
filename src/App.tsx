@@ -77,6 +77,7 @@ import LocationOnboarding from './pages/LocationOnboarding'
 import GuidesIndex from './pages/GuidesIndex'
 import GuideDetail from './pages/GuideDetail'
 import DiagnosticGuideDetail from './pages/DiagnosticGuideDetail'
+import AbsLightGuide from './pages/AbsLightGuide'
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -116,6 +117,7 @@ export default function App() {
             <Route path="/guides" element={<GuidesIndex />} />
             <Route path="/guides/:category/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
             <Route path="/guides/car-shakes-when-braking" element={<DiagnosticGuideDetail />} />
+            <Route path="/guides/warning-lights/abs-light" element={<AbsLightGuide />} />
             <Route path="/guides/:category/:slug" element={<GuideDetail />} />
             <Route path="/guides/:slug" element={<GuideDetail />} />
 

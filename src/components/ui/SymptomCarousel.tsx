@@ -45,7 +45,7 @@ const SYMPTOMS = [
     icon: Alert01Icon,
     image: "/symptoms/ABS light is on.webp",
     description: "Understanding anti-lock system failure and safety.",
-    slug: "/guides/warning-lights/abs-light-in-car",
+    slug: "/guides/warning-lights/abs-light",
   },
   {
     id: "oil-light",

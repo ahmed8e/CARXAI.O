@@ -334,7 +334,7 @@ export const guides: Guide[] = [
   },
   {
     id: '5',
-    slug: 'abs-light-in-car',
+    slug: 'abs-light',
     category: 'warning-lights',
     categoryDisplay: 'Safety Systems',
     title: 'ABS Light On: Meaning and Urgency',
