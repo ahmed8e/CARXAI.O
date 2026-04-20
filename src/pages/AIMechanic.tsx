@@ -932,7 +932,7 @@ ${diagnosticHistory}
         // The user must click "Generate Detailed Report" manually.
         if (issueData && !issueData.needs_followup) {
           setReportDiagnosis(issueData)
-          setShowReport(true)
+          setShowReport(false)
           
           // Track complete_diagnosis
           SaaSAnalytics.completeDiagnosis(issueData.issueName || 'Unknown Issue')

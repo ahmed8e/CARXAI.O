@@ -88,6 +88,7 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
@@ -103,6 +104,8 @@
     position: relative;
     min-height: 100vh;
     min-height: 100dvh;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   body::before {
