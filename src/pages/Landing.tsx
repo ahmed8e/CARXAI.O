@@ -562,25 +562,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Symptom Library Carousel */}
-        <section id="guides" className="relative py-24 md:py-36 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
-          <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
-               <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
-               <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Symptom Library</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A] mb-6">
-              Common problems we help <span className="text-[#0070E0]">diagnose.</span>
-            </h2>
-            <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
-              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how CarxAI can help.
-            </p>
-          </div>
-          <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
-            <SymptomCarousel />
-          </Suspense>
-        </section>
-
         <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
           <TrustSection onStoryClick={() => setStoryOpen(true)} />
         </Suspense>
@@ -639,6 +620,25 @@ export default function Landing() {
               ))}
             </motion.div>
           </div>
+        </section>
+
+        {/* Symptom Library Carousel */}
+        <section id="guides" className="relative py-24 md:py-36 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+          <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
+               <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
+               <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Symptom Library</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A] mb-6">
+              Common problems we help <span className="text-[#0070E0]">diagnose.</span>
+            </h2>
+            <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
+              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how CarxAI can help.
+            </p>
+          </div>
+          <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
+            <SymptomCarousel />
+          </Suspense>
         </section>
 
         {/* Reviews */}
