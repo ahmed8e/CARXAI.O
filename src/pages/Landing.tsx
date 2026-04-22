@@ -510,10 +510,8 @@ export default function Landing() {
         </AnimatePresence>
 
         {/* Immersive Scroll Hero Section */}
-        <section ref={heroRef} className="relative h-[200vh] md:h-[160vh] touch-action-pan-y">
-          <div className="sticky top-0 h-[100dvh] md:h-screen w-full flex items-start md:items-center justify-center px-6 md:overflow-hidden">
-
-            <div className="max-w-7xl mx-auto w-full relative z-10 pt-20 md:pt-0">
+        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-screen w-full flex items-start md:items-center justify-center pt-[120px] md:pt-0 pb-16 px-6 md:overflow-hidden touch-action-pan-y">
+          <div className="max-w-7xl mx-auto w-full relative z-10 mt-0 md:-mt-10">
               <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
                 
                 {/* Left Column: Fixed Headlines */}
@@ -606,7 +604,6 @@ export default function Landing() {
                 className="w-1 h-8 rounded-full bg-gradient-to-b from-[#0070E0] to-transparent"
               />
             </motion.div>
-          </div>
         </section>
 
         {/* Problem Section */}
@@ -634,6 +631,50 @@ export default function Landing() {
               ))}
             </div>
             <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carxai gives you immediate clarity and helps discover nearby options.</p>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section id="how-it-works" className="relative py-24 md:py-36 px-6 bg-white overflow-hidden border-t border-slate-100">
+          <div className="max-w-5xl mx-auto text-center flex flex-col items-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-bold mb-16 tracking-tight leading-tight text-on-surface">
+              From Confusion to Clarity — <br className="hidden md:block" />
+              <span className="text-[#0070E0]">in Seconds</span>
+            </h2>
+            
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12 w-full relative pl-4 pr-4">
+              {/* Connecting Line for desktop */}
+              <div className="hidden md:block absolute top-[40px] left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-transparent via-[#0070E0]/20 to-transparent" />
+              
+              {[
+                {
+                  step: "1",
+                  title: "Send a Photo or Sound",
+                  desc: "Show us the problem — we’ll handle the rest.",
+                },
+                {
+                  step: "2",
+                  title: "Get a Real Diagnosis",
+                  desc: "We identify the issue and show how dangerous it is.",
+                },
+                {
+                  step: "3",
+                  title: "Stay in Control",
+                  desc: "Know if you can keep driving — or need help now. Get matched with a top-rated mechanic you can trust.",
+                }
+              ].map((item, i) => (
+                <div key={i} className="relative z-10 flex flex-col items-center text-center group">
+                  <div className="w-20 h-20 rounded-3xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center mb-8 group-hover:bg-[#0070E0] group-hover:border-[#0070E0] transition-all duration-300">
+                    <span className="font-display font-black text-3xl text-slate-300 group-hover:text-white transition-colors">{item.step}</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4">{item.title}</h3>
+                  <p className="text-slate-500 text-base font-medium leading-relaxed max-w-[280px]">{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
