@@ -46,6 +46,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
             { name: 'Guides', id: 'guides', path: '/guides' },
             { name: 'Reviews', id: 'reviews' },
             { name: 'Pricing', id: 'pricing' },
+            { name: 'FAQ', id: 'faq' },
           ].map((link) => (
             <Link 
               key={link.id}

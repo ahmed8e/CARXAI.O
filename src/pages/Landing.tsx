@@ -20,7 +20,7 @@ import {
   Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
   Aperture, MapPin, Mic, ImagePlus, ShieldAlert, Sparkles, 
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
-  Send
+  Send, ChevronDown, HelpCircle
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -311,6 +311,79 @@ const reviews = [
   { name: 'Ryan K.', car: 'Peugeot 208 • Strange Noise', rating: 5, text: 'I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
 ]
 
+const faqData = [
+  {
+    question: "Is the diagnosis accurate?",
+    answer: "Our system provides highly accurate estimates based on real-world car issues and data. While it’s very reliable, we always recommend confirming with a professional mechanic."
+  },
+  {
+    question: "Is this service free?",
+    answer: "Yes, the basic diagnosis is completely free. Additional premium features may be added in the future."
+  },
+  {
+    question: "How long does it take?",
+    answer: "Less than 60 seconds. Just answer a few questions and get your results instantly."
+  },
+  {
+    question: "What types of cars are supported?",
+    answer: "We support most common car brands and models, including petrol, diesel, and hybrid vehicles."
+  },
+  {
+    question: "What should I do after getting the result?",
+    answer: "You’ll receive recommendations and next steps. You can either fix the issue yourself or contact a nearby mechanic."
+  },
+  {
+    question: "Can I find a mechanic through the platform?",
+    answer: "Yes, we help you connect with nearby trusted mechanics based on your location."
+  },
+  {
+    question: "Is my data safe?",
+    answer: "Yes, your information is secure and never shared with third parties without your consent."
+  },
+  {
+    question: "What if the diagnosis is wrong?",
+    answer: "Our system gives the most likely causes, but cars can be complex. Always confirm with a professional for final verification."
+  },
+  {
+    question: "Does it work on mobile?",
+    answer: "Absolutely. Our platform is fully optimized for mobile devices."
+  }
+]
+
+const FAQItem = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => (
+  <div className="border-b border-slate-100 last:border-0 px-6">
+    <button
+      onClick={onClick}
+      className="w-full py-6 flex items-center justify-between gap-4 text-left group"
+    >
+      <span className={`text-base md:text-lg font-bold transition-colors duration-300 ${isOpen ? 'text-[#0070E0]' : 'text-slate-900 group-hover:text-[#0070E0]'}`}>
+        {question}
+      </span>
+      <motion.div
+        animate={{ rotate: isOpen ? 180 : 0 }}
+        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors duration-300 flex-shrink-0 ${isOpen ? 'bg-[#0070E0] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100'}`}
+      >
+        <ChevronDown size={18} />
+      </motion.div>
+    </button>
+    <AnimatePresence initial={false}>
+      {isOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          className="overflow-hidden"
+        >
+          <div className="pb-6 text-sm md:text-base text-slate-500 font-medium leading-relaxed pr-8">
+            {answer}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+)
 
 export default function Landing() {
   const { user, signOut } = useAuth()
@@ -324,6 +397,7 @@ export default function Landing() {
 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
   const [storyOpen, setStoryOpen] = useState(false)
+  const [openFaqIndex, setOpenFaqIndex] = useState(-1)
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -383,6 +457,7 @@ export default function Landing() {
                 { name: 'How it works', id: 'how-it-works' },
                 { name: 'Pricing', id: 'pricing' },
                 { name: 'Reviews', id: 'reviews' },
+                { name: 'FAQ', id: 'faq' },
               ].map((link) => (
                 <a 
                   key={link.id}
@@ -656,9 +731,35 @@ export default function Landing() {
           </Suspense>
         </section>
 
-        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow" />}>
+        <Suspense fallback={<div className="h-96 w-full animate-pulse-slow bg-slate-50/50" />}>
           <Pricing />
         </Suspense>
+
+        {/* FAQ Section */}
+        <section id="faq" className="relative py-24 md:py-36 px-6 bg-white/70 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+          <div className="max-w-3xl mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
+                <HelpCircle className="w-3.5 h-3.5 text-navy" />
+                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Help Center</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">Common Questions</h2>
+              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about CarxAI.</p>
+            </div>
+
+            <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-2 md:p-4">
+              {faqData.map((faq, index) => (
+                <FAQItem 
+                  key={index}
+                  question={faq.question}
+                  answer={faq.answer}
+                  isOpen={openFaqIndex === index}
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? -1 : index)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Final CTA */}
         <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
