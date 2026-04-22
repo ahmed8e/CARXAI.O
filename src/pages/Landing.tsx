@@ -20,7 +20,7 @@ import {
   Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
   Aperture, MapPin, Mic, ImagePlus, ShieldAlert, Sparkles, 
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
-  Send, ChevronDown, HelpCircle
+  Send, ChevronDown, HelpCircle, Camera, AlertTriangle, Star
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -635,46 +635,133 @@ export default function Landing() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="relative py-24 md:py-36 px-6 bg-white overflow-hidden border-t border-slate-100">
-          <div className="max-w-5xl mx-auto text-center flex flex-col items-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
+        <section id="how-it-works" className="relative py-24 md:py-36 px-6 bg-gradient-to-b from-slate-50/50 to-white overflow-hidden border-t border-slate-100">
+          <div className="max-w-6xl mx-auto flex flex-col relative z-10">
+            <div className="text-center flex flex-col items-center mb-16">
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md"
+              >
+                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
+              </motion.div>
+              <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight leading-[1.1] text-slate-900 max-w-3xl">
+                From Confusion to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-[#0070E0]">Clarity</span> — <br className="hidden md:block" />
+                in Seconds
+              </h2>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold mb-16 tracking-tight leading-tight text-on-surface">
-              From Confusion to Clarity — <br className="hidden md:block" />
-              <span className="text-[#0070E0]">in Seconds</span>
-            </h2>
             
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12 w-full relative pl-4 pr-4">
-              {/* Connecting Line for desktop */}
-              <div className="hidden md:block absolute top-[40px] left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-transparent via-[#0070E0]/20 to-transparent" />
-              
-              {[
-                {
-                  step: "1",
-                  title: "Send a Photo or Sound",
-                  desc: "Show us the problem — we’ll handle the rest.",
-                },
-                {
-                  step: "2",
-                  title: "Get a Real Diagnosis",
-                  desc: "We identify the issue and show how dangerous it is.",
-                },
-                {
-                  step: "3",
-                  title: "Stay in Control",
-                  desc: "Know if you can keep driving — or need help now. Get matched with a top-rated mechanic you can trust.",
-                }
-              ].map((item, i) => (
-                <div key={i} className="relative z-10 flex flex-col items-center text-center group">
-                  <div className="w-20 h-20 rounded-3xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center mb-8 group-hover:bg-[#0070E0] group-hover:border-[#0070E0] transition-all duration-300">
-                    <span className="font-display font-black text-3xl text-slate-300 group-hover:text-white transition-colors">{item.step}</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-4">{item.title}</h3>
-                  <p className="text-slate-500 text-base font-medium leading-relaxed max-w-[280px]">{item.desc}</p>
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8 w-full relative">
+              {/* Card 1 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: 0.1 }}
+                className="group relative flex flex-col bg-white p-8 md:p-10 rounded-[28px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-400"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0070E0] mb-6 flex items-center justify-center border border-blue-100/50 group-hover:scale-110 transition-transform">
+                  <Camera className="w-6 h-6" />
                 </div>
-              ))}
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Upload a Photo <br/> or Sound</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">Show us the problem — no technical skills needed.</p>
+                <div className="mt-auto pt-6 border-t border-slate-50 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
+                    <Mic className="w-4 h-4 text-slate-500" />
+                  </div>
+                  <div className="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-full w-[60%] bg-[#0070E0] rounded-full animate-pulse" />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 2 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: 0.2 }}
+                className="group relative flex flex-col bg-white p-8 md:p-10 rounded-[28px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-400"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 mb-6 flex items-center justify-center border border-amber-100/50 group-hover:scale-110 transition-transform">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">See the Real Problem + Risk Level</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">We identify the issue exactly and show how serious it is right now.</p>
+                
+                <div className="mt-auto pt-6 border-t border-slate-50">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 rounded-full bg-emerald-500 opacity-20" />
+                    <div className="flex-1 h-2 rounded-full bg-amber-400 opacity-20" />
+                    <div className="flex-1 h-2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)]" />
+                  </div>
+                  <div className="flex justify-between mt-2.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
+                    <span>Safe</span>
+                    <span>Warning</span>
+                    <span className="text-red-500">Dangerous</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Card 3 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: 0.3 }}
+                className="group relative flex flex-col bg-white p-8 md:p-10 rounded-[28px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-400"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-6 flex items-center justify-center border border-emerald-100/50 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Know What <br/> to Do Next</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">See if you can keep driving, and get matched with a trusted mechanic.</p>
+                
+                <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-100">
+                    <div className="flex -space-x-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    </div>
+                    <span className="text-[11px] font-black text-slate-700">4.8</span>
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-100/50">Top-Rated</span>
+                </div>
+              </motion.div>
             </div>
+
+            {/* Bottom CTA Block */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              className="max-w-2xl mx-auto text-center mt-20 pt-10 border-t border-slate-200/60"
+            >
+              <p className="text-xl md:text-2xl font-bold text-slate-800 mb-10 leading-snug">
+                We don’t just detect the problem — we tell you <span className="text-[#0070E0]">how serious it is</span> and what to do next.
+              </p>
+              
+              <button 
+                onClick={() => navigate('/auth')} 
+                className="group relative inline-flex items-center justify-center gap-2.5 px-10 py-5 rounded-[20px] font-black uppercase tracking-widest text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-[0.98]"
+              >
+                Check Now
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span>Free</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                <span>60 Seconds</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                <span>No Sign-up</span>
+              </div>
+            </motion.div>
+
           </div>
         </section>
 
