@@ -520,10 +520,13 @@ export default function Landing() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 border border-blue-100 bg-blue-50/50 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 border border-[#0070E0]/20 bg-gradient-to-r from-[#0070E0]/5 to-transparent backdrop-blur-md shadow-[0_0_15px_rgba(0,112,224,0.1)] relative overflow-hidden group"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-[#0070E0]" />
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Interactive Product Tour</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    <div className="w-5 h-5 rounded-full bg-[#0070E0]/10 flex items-center justify-center">
+                      <Zap className="w-3 h-3 text-[#0070E0]" />
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#0070E0] to-[#004A99] font-black pr-1">Instant Car Diagnosis</span>
                   </motion.div>
 
                   <motion.h1 
