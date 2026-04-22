@@ -535,8 +535,8 @@ export default function Landing() {
                     transition={{ delay: 0.1 }}
                     className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
                   >
-                    Is It Just a Sensor, <br />
-                    <span className="text-[#0070E0]">or a Costly Repair? Carxai Knows.</span>
+                    Stop Overpaying for <br />
+                    <span className="text-[#0070E0]">Car Repairs.</span>
                   </motion.h1>
 
                   <motion.p 
@@ -546,7 +546,7 @@ export default function Landing() {
                     transition={{ delay: 0.2 }}
                     className="text-slate-500 text-base md:text-lg lg:text-xl mb-12 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    CarxAI looks at your car’s symptoms and gives you a clear answer: what it could be, how serious it is, and whether you should continue driving or get help nearby.
+                    Most drivers get overcharged because they don’t know the real problem. We give you the truth instantly.
                   </motion.p>
 
                   <motion.div 
@@ -562,7 +562,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Start Free Trial
+                        Check Now
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
