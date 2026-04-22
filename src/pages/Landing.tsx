@@ -18,7 +18,7 @@ const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
   Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
-  Aperture, MapPin, Mic, ImagePlus, ShieldAlert, Sparkles, 
+  Aperture, MapPin, Mic, ImagePlus, ShieldAlert,
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
   Send, ChevronDown, HelpCircle, Camera, AlertTriangle, Star
 } from 'lucide-react'
@@ -510,7 +510,7 @@ export default function Landing() {
         </AnimatePresence>
 
         {/* Immersive Scroll Hero Section */}
-        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-screen w-full flex items-start md:items-center justify-center pt-[120px] md:pt-0 pb-16 px-6 md:overflow-hidden touch-action-pan-y">
+        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-[85vh] w-full flex items-start md:items-center justify-center pt-[120px] md:pt-16 pb-16 px-6 md:overflow-hidden touch-action-pan-y">
           <div className="max-w-7xl mx-auto w-full relative z-10 mt-0 md:-mt-10">
               <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
                 
@@ -610,7 +610,7 @@ export default function Landing() {
         </section>
 
         {/* Problem Section */}
-        <section id="problem" className="relative py-20 md:py-32 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
+        <section id="problem" className="relative py-20 md:py-24 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">The Problem</span>
@@ -638,7 +638,7 @@ export default function Landing() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="relative py-24 md:py-36 px-6 bg-gradient-to-b from-slate-50/50 to-white overflow-hidden border-t border-slate-100">
+        <section id="how-it-works" className="relative py-24 md:py-28 px-6 bg-gradient-to-b from-slate-50/50 to-white overflow-hidden border-t border-slate-100">
           <div className="max-w-6xl mx-auto flex flex-col relative z-10">
             <div className="text-center flex flex-col items-center mb-16">
               <motion.div 
@@ -778,7 +778,7 @@ export default function Landing() {
         </Suspense>
 
         {/* Features */}
-        <section id="features" className="relative py-20 md:py-32 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
+        <section id="features" className="relative py-20 md:py-24 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Platform Features</span>
@@ -829,7 +829,7 @@ export default function Landing() {
         </section>
 
         {/* Symptom Library Carousel */}
-        <section id="guides" className="relative py-24 md:py-36 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+        <section id="guides" className="relative py-24 md:py-24 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
                <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
@@ -848,7 +848,7 @@ export default function Landing() {
         </section>
 
         {/* Reviews */}
-        <section id="reviews" className="relative py-24 md:py-36 px-0 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+        <section id="reviews" className="relative py-24 md:py-24 px-0 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
@@ -867,7 +867,7 @@ export default function Landing() {
         </Suspense>
 
         {/* FAQ Section */}
-        <section id="faq" className="relative py-24 md:py-36 px-6 bg-white/70 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+        <section id="faq" className="relative py-24 md:py-24 px-6 bg-white/70 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-3xl mx-auto relative z-10">
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
@@ -893,7 +893,7 @@ export default function Landing() {
         </section>
 
         {/* Final CTA */}
-        <section className="relative py-24 md:py-40 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
+        <section className="relative py-24 md:py-28 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Get Started</span>
