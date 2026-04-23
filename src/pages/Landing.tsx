@@ -545,9 +545,9 @@ export default function Landing() {
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
                     transition={{ delay: 0.2 }}
-                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-12 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    Most drivers get overcharged because they don’t know the real problem. We give you the truth instantly.
+                    Diagnose your car problem in 30 seconds — no mechanic needed.
                   </motion.p>
 
                   <motion.div 
@@ -563,7 +563,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Check Now
+                        Start Free Diagnosis
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -575,6 +575,21 @@ export default function Landing() {
                     >
                       View Pricing
                     </button>
+                  </motion.div>
+
+                  {/* Trust Line */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{ opacity: initialFadeOut }}
+                    transition={{ delay: 0.4 }}
+                    className="flex flex-wrap items-center justify-center lg:justify-start gap-2 md:gap-3 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6"
+                  >
+                    <span>Trusted by drivers</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
+                    <span>Instant results</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
+                    <span>No signup required</span>
                   </motion.div>
                 </motion.div>
 
