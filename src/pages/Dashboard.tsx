@@ -59,6 +59,16 @@ export default function Dashboard() {
 
   const modules = [
     {
+      to: '/dashboard/avoid-overpaying',
+      icon: ShieldCheck,
+      label: 'Avoid Overpaying',
+      desc: 'Verify if your mechanic\'s quote is fair.',
+      color: '#10b981', // emerald-500
+      bg: 'rgba(16, 185, 129, 0.06)',
+      badge: 'Protection',
+      locked: false,
+    },
+    {
       to: '/dashboard/ai-mechanic',
       icon: ShieldAlert,
       label: 'AI Mechanic',

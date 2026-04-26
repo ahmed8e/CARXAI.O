@@ -76,6 +76,7 @@ const GuidesIndex = lazy(() => import('./pages/GuidesIndex'))
 const GuideDetail = lazy(() => import('./pages/GuideDetail'))
 const DiagnosticGuideDetail = lazy(() => import('./pages/DiagnosticGuideDetail'))
 const AbsLightGuide = lazy(() => import('./pages/AbsLightGuide'))
+const AvoidOverpaying = lazy(() => import('./pages/AvoidOverpaying'))
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -158,6 +159,13 @@ export default function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <Vehicles />
+                  </AppLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/avoid-overpaying" element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <AvoidOverpaying />
                   </AppLayout>
                 </ProtectedRoute>
               } />
