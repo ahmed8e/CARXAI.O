@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ShieldCheck, AlertTriangle, ShieldAlert, ArrowLeft, 
@@ -6,97 +6,186 @@ import {
   Bot
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 type Tone = 'polite' | 'assertive' | 'expert'
 type TrustLevel = 'fair' | 'expensive' | 'overpriced' | null
 
 export default function AvoidOverpaying() {
+  const { session } = useAuth()
   const [step, setStep] = useState<'input' | 'results'>('input')
   const [carModel, setCarModel] = useState('')
   const [problemDesc, setProblemDesc] = useState('')
   const [quotedPrice, setQuotedPrice] = useState('')
-  const [isChecking, setIsChecking] = useState(false)
   
-  // Results State
+  // Loading & Error State
+  const [isChecking, setIsChecking] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  
+  // Real AI Results State
   const [trustLevel, setTrustLevel] = useState<TrustLevel>(null)
   const [fairPriceRange, setFairPriceRange] = useState('')
   const [explanation, setExplanation] = useState('')
   
   // Replies State
   const [selectedTone, setSelectedTone] = useState<Tone>('polite')
+  const [generatedReplies, setGeneratedReplies] = useState<Record<Tone, string>>({
+    polite: '', assertive: '', expert: ''
+  })
 
   // Live Assistant State
   const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([])
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
 
-  const handleCheckPrice = (e: React.FormEvent) => {
+  const getSessionToken = async () => {
+    if (session?.access_token) return session.access_token
+    const { data } = await supabase.auth.getSession()
+    return data.session?.access_token
+  }
+
+  const handleCheckPrice = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!carModel || !problemDesc || !quotedPrice) return
     
     setIsChecking(true)
+    setErrorMsg('')
     
-    // Mock the backend price analysis delay
-    setTimeout(() => {
-      const price = parseFloat(quotedPrice)
-      let level: TrustLevel = 'fair'
-      let range = ''
-      let exp = ''
-      
-      // Super mock logic
-      if (price < 300) {
-        level = 'fair'
-        range = `$${(price * 0.9).toFixed(0)} - $${(price * 1.1).toFixed(0)}`
-        exp = 'This quote is well within the typical market range for this repair on your vehicle.'
-      } else if (price >= 300 && price < 800) {
-        level = 'expensive'
-        range = `$${(price * 0.6).toFixed(0)} - $${(price * 0.8).toFixed(0)}`
-        exp = 'This seems a bit above average. There might be a premium markup on parts or high labor rate.'
-      } else {
-        level = 'overpriced'
-        range = `$${(price * 0.4).toFixed(0)} - $${(price * 0.6).toFixed(0)}`
-        exp = 'This quote is significantly higher than standard industry guidelines. Definitely negotiate or get a second opinion.'
+    try {
+      const token = await getSessionToken()
+      if (!token) throw new Error('Not authenticated')
+
+      const response = await fetch('/api/negotiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ carModel, problemDesc, quotedPrice })
+      })
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null)
+        throw new Error(errData?.error || 'Failed to analyze quote')
       }
+
+      const data = await response.json()
       
-      setTrustLevel(level)
-      setFairPriceRange(range)
-      setExplanation(exp)
+      setTrustLevel(data.status)
+      setFairPriceRange(data.fair_price_range)
+      setExplanation(data.explanation)
+      setGeneratedReplies(data.smart_replies)
       
-      setIsChecking(false)
       setStep('results')
-    }, 1500)
+    } catch (err: any) {
+      console.error(err)
+      setErrorMsg(err.message || 'Error communicating with AI.')
+    } finally {
+      setIsChecking(false)
+    }
   }
 
-  const generatedReplies: Record<Tone, string[]> = {
-    polite: [
-      "Thanks for the quote. I've looked into standard rates and was hoping we could meet somewhere around [Fair Price].",
-      "I appreciate your time. Is there any flexibility on the price for these specific parts?",
-      "Thank you. Let me think about it and maybe check one other place before committing."
-    ],
-    assertive: [
-      "This quote is higher than the standard market rate of [Fair Price]. Can you explain the markup?",
-      "I'm prepared to authorize the repair today if we can bring the price down to [Fair Price].",
-      "Given the typical labor hours for this job, the labor charge seems high. Could you review that for me?"
-    ],
-    expert: [
-      "Are you using OEM or aftermarket parts? Standard Mitchell/Alldata labor times suggest this is a [X] hour job, not [Y].",
-      "Could I get an itemized breakdown? The standard rate for this specific repair usually caps out at [Fair Price].",
-      "If the diagnostic fee is being rolled into the repair, the total should be closer to [Fair Price]."
-    ]
-  }
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          // Check for proper split for base64
+          const base64data = reader.result.split(',')[1];
+          resolve(base64data || '');
+        } else {
+          reject(new Error("Failed to convert blob to base64"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
 
-  const handleToggleRecord = () => {
+  const handleToggleRecord = async () => {
     if (isRecording) {
+      mediaRecorderRef.current?.stop()
       setIsRecording(false)
-      // Simulate Bot responding after "voice recording" finishes
-      setTimeout(() => {
-        setMessages(prev => [
-          ...prev, 
-          { role: 'user', text: '(Voice recording sent)' },
-          { role: 'assistant', text: "I heard that. If they say it requires a full replacement, ask them to show you the specific failure points first." }
-        ])
-      }, 500)
     } else {
-      setIsRecording(true)
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const mediaRecorder = new MediaRecorder(stream)
+        mediaRecorderRef.current = mediaRecorder
+        audioChunksRef.current = []
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            audioChunksRef.current.push(e.data)
+          }
+        }
+
+        mediaRecorder.onstop = async () => {
+          setIsTranscribing(true)
+          try {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+            const base64Audio = await blobToBase64(audioBlob)
+            
+            const token = await getSessionToken()
+            if (!token) throw new Error('Not authenticated')
+
+            // 1. Transcribe via Whisper
+            const transcribeRes = await fetch('/api/transcribe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ audioBase64: base64Audio })
+            })
+
+            if (!transcribeRes.ok) throw new Error('Failed to transcribe')
+            const transcribeData = await transcribeRes.json()
+            const transcript = transcribeData.text
+
+            setMessages(prev => [...prev, { role: 'user', text: transcript }])
+
+            // 2. Fetch negotiated real-time reply
+            const negotiateRes = await fetch('/api/negotiate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ 
+                carModel, 
+                problemDesc, 
+                quotedPrice,
+                liveTranscript: transcript
+              })
+            })
+
+            if (!negotiateRes.ok) throw new Error('Analysis failed')
+            const aiData = await negotiateRes.json()
+            
+            // The Live feedback could just be the short explanation or expert reply
+            const aiReply = aiData.explanation || aiData.smart_replies.polite
+            setMessages(prev => [...prev, { role: 'assistant', text: aiReply }])
+
+          } catch (err) {
+            console.error('Audio processing error:', err)
+            setMessages(prev => [...prev, { role: 'assistant', text: 'Sorry, I had trouble processing that audio.' }])
+          } finally {
+            setIsTranscribing(false)
+            // Stop tracks completely to release microphone
+            stream.getTracks().forEach(track => track.stop())
+          }
+        }
+
+        mediaRecorder.start()
+        setIsRecording(true)
+      } catch (err) {
+        console.error('Mic access denied:', err)
+        alert('Microphone access is required for the Live Assistant.')
+      }
     }
   }
 
@@ -133,6 +222,13 @@ export default function AvoidOverpaying() {
                 <h2 className="text-2xl font-display font-black text-slate-900 dark:text-white tracking-tight mb-2">Check Your Mechanic's Quote</h2>
                 <p className="text-sm text-slate-500 font-medium">Enter your repair details below and our AI will tell you if you're getting a fair deal.</p>
               </div>
+
+              {errorMsg && (
+                <div className="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-medium flex items-center gap-2 border border-rose-200">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  {errorMsg}
+                </div>
+              )}
 
               <form onSubmit={handleCheckPrice} className="space-y-4">
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
@@ -284,11 +380,9 @@ export default function AvoidOverpaying() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  {generatedReplies[selectedTone].map((reply, i) => (
-                    <div key={i} className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 relative group">
-                      <p>"{reply.replace('[Fair Price]', fairPriceRange)}"</p>
-                    </div>
-                  ))}
+                  <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 relative group">
+                    <p>"{generatedReplies[selectedTone] || 'Getting suggestion...'}"</p>
+                  </div>
                 </div>
               </div>
 
@@ -324,7 +418,9 @@ export default function AvoidOverpaying() {
 
                 <button 
                   onClick={handleToggleRecord}
+                  disabled={isTranscribing}
                   className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                    isTranscribing ? 'bg-slate-200 text-slate-400 cursor-not-allowed' :
                     isRecording 
                       ? 'bg-rose-50 border-4 border-rose-500 animate-pulse text-rose-500' 
                       : 'bg-emerald-500 hover:bg-emerald-600 text-white hover:scale-105 active:scale-95'
@@ -333,13 +429,17 @@ export default function AvoidOverpaying() {
                   <Mic className={`w-8 h-8 ${isRecording ? 'animate-bounce' : ''}`} />
                 </button>
                 <p className="text-[10px] uppercase font-black tracking-widest mt-4 text-slate-400">
-                  {isRecording ? 'Listening...' : 'Tap to Listen'}
+                  {isTranscribing ? 'Thinking...' : isRecording ? 'Listening...' : 'Tap to Listen'}
                 </p>
               </div>
 
               <div className="pt-4">
                 <button 
-                  onClick={() => setStep('input')}
+                  onClick={() => {
+                    setStep('input')
+                    setMessages([])
+                    setErrorMsg('')
+                  }}
                   className="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 py-4 rounded-2xl font-bold text-sm tracking-wide active:scale-[0.98] transition-all"
                 >
                   Check Another Quote
