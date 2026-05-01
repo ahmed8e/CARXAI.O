@@ -48,7 +48,7 @@ export default function NearbyMap() {
   }, [user])
 
   useEffect(() => {
-    const apiKey = import.meta.env.GOOGLE_MAPS_API_KEY
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     if (!apiKey || apiKey === 'placeholder_google_maps_key') {
       setLoading(false)
       setError('Google Maps API key is missing.')
