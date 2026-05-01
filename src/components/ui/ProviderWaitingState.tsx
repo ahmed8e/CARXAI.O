@@ -50,7 +50,7 @@ export default function ProviderWaitingState() {
           </div>
 
           <p className="text-base sm:text-lg text-slate-500 font-medium leading-relaxed max-w-2xl mb-10">
-            For your first local setup, Carsafety is refining nearby mechanic and towing options for your area. 
+            For your first local setup, Car Safety is refining nearby mechanic and towing options for your area. 
             This <span className="text-navy font-bold">one-time quality step</span> improves relevance, trust, and response quality and may take up to 24 hours. 
             Once completed, your local support experience stays ready in the background for faster, more reliable help.
           </p>
@@ -94,7 +94,7 @@ export default function ProviderWaitingState() {
               </div>
             ))}
           </div>
-          <p className="text-[11px] font-bold text-navy/50">Carsafety Quality Network is scaling in your area</p>
+          <p className="text-[11px] font-bold text-navy/50">Car Safety Quality Network is scaling in your area</p>
         </div>
         
         <div className="flex items-center gap-2">

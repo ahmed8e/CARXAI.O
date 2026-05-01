@@ -170,7 +170,7 @@ export default function AdminAddProvider() {
           <h1 className="text-2xl font-display font-black text-on-surface tracking-tight">
             {isEditing ? 'Edit Provider' : 'Add New Provider'}
           </h1>
-          <p className="text-sm text-muted">{isEditing ? 'Update provider details in the network' : 'Manually add a new provider to the Carsafety network'}</p>
+          <p className="text-sm text-muted">{isEditing ? 'Update provider details in the network' : 'Manually add a new provider to the Car Safety network'}</p>
         </div>
       </div>
 

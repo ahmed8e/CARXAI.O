@@ -11,7 +11,7 @@ interface StoryModalProps {
 
 const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { counts, userReaction, submitReaction, totalEngaged } = useStoryReactions('carsafety-origin');
+  const { counts, userReaction, submitReaction, totalEngaged } = useStoryReactions('car safety-origin');
 
   const reactions: { type: ReactionType; label: string; icon: any }[] = [
     { type: 'relate', label: 'I relate', icon: Heart },
@@ -96,7 +96,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                         className="text-[18px] font-display font-black leading-tight tracking-tight"
                         style={{ color: '#0E1628' }}
                       >
-                        How Carsafety Was Born
+                        How Car Safety Was Born
                       </h3>
                     </div>
                   </div>
@@ -125,7 +125,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 {/* Opening — Editorial typography */}
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p style={{ color: '#374151' }}>
-                    Carsafety did not begin with code.
+                    Car Safety did not begin with code.
                   </p>
                   <p>
                     It began with a feeling I saw too often in real life — that moment when a driver knows something is wrong,
@@ -219,7 +219,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
 
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    Carsafety was shaped from real patterns, repeated problems, and the kind of practical reasoning
+                    Car Safety was shaped from real patterns, repeated problems, and the kind of practical reasoning
                     that only becomes valuable when trust is on the line.
                   </p>
                 </div>
@@ -260,7 +260,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                     It is earned by helping someone feel more clear, more grounded, and less alone in the decision they have to make next.
                   </p>
                   <p style={{ color: '#1e3a5f', fontWeight: 700 }}>
-                    That is what Carsafety was built to do.
+                    That is what Car Safety was built to do.
                   </p>
                 </div>
 
@@ -325,7 +325,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 >
                   {/* Shimmer line */}
                   <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-                  See how Carsafety thinks
+                  See how Car Safety thinks
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform shrink-0" />
                 </motion.button>
 

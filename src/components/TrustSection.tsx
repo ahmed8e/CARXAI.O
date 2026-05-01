@@ -7,7 +7,7 @@ export interface TrustSectionProps {
 }
 
 export default function TrustSection({ onStoryClick }: TrustSectionProps) {
-  const { totalEngaged, counts } = useStoryReactions('carsafety-origin');
+  const { totalEngaged, counts } = useStoryReactions('car safety-origin');
 
   return (
     <section className="relative py-24 md:py-36 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
@@ -40,7 +40,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
           transition={{ delay: 0.2 }}
           className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6 leading-relaxed"
         >
-          Carsafety was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
+          Car Safety was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
         </motion.p>
 
         {/* Story Trigger & Social Proof */}
@@ -59,7 +59,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
             }}
           >
             <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
-            How Carsafety Was Born
+            How Car Safety Was Born
             <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
             <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
           </motion.button>

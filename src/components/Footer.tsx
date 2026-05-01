@@ -27,7 +27,7 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
 
   return (
     <footer className="relative bg-slate-50/40 backdrop-blur-xl pt-24 pb-12 overflow-hidden">
-      {/* Background patterns: Sync with Carsafety dot grid language */}
+      {/* Background patterns: Sync with Car Safety dot grid language */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035]" 
         style={{
           backgroundImage: 'radial-gradient(circle, #0070E0 1px, transparent 1px)',
@@ -93,7 +93,7 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
                   className="text-slate-500 hover:text-[#0070E0] text-[15px] font-medium transition-all duration-300 flex items-center group"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0070E0] mr-0 w-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300"></span>
-                  How Carsafety Began
+                  How Car Safety Began
                 </button>
               </li>
               {[
@@ -130,13 +130,13 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
                 </div>
               </li>
               <li>
-                <a href="mailto:support@carx.ai" className="flex items-center gap-4 group">
+                <a href="mailto:support@carsafety.online" className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-[#0070E0]/5 group-hover:text-[#0070E0] group-hover:border-[#0070E0]/10 transition-all duration-300">
                     <Mail size={18} />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Email Us</span>
-                    <span className="text-slate-600 text-[14px] font-medium group-hover:text-slate-900 transition-colors">support@carx.ai</span>
+                    <span className="text-slate-600 text-[14px] font-medium group-hover:text-slate-900 transition-colors">support@carsafety.online</span>
                   </div>
                 </a>
               </li>
@@ -160,10 +160,10 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex flex-col items-center lg:items-start gap-2">
               <p className="text-slate-400 text-[13px] font-medium">
-                © {currentYear} Carsafety. Built for clarity and peace of mind.
+                © {currentYear} Car Safety. Built for clarity and peace of mind.
               </p>
               <p className="text-[10px] text-slate-300 uppercase tracking-widest font-black lg:max-w-xl text-center lg:text-left leading-relaxed">
-                Carsafety provides digital diagnostics and guidance. Repairs and towing are handled by independent third-party providers.
+                Car Safety provides digital diagnostics and guidance. Repairs and towing are handled by independent third-party providers.
               </p>
             </div>
             

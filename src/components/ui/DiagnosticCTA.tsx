@@ -10,7 +10,7 @@ interface DiagnosticCTAProps {
 
 const DiagnosticCTA: React.FC<DiagnosticCTAProps> = ({ 
   title = "Not sure which cause fits your situation?", 
-  description = "Let Carsafety narrow it down for you. Our AI analyzes your specific symptoms and photos to give you a personalized diagnosis in minutes."
+  description = "Let Car Safety narrow it down for you. Our AI analyzes your specific symptoms and photos to give you a personalized diagnosis in minutes."
 }) => {
   return (
     <motion.div 

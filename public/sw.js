@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carsafety-v3';
+const CACHE_NAME = 'car safety-v3';
 
 // Minimal Service Worker to trigger PWA install banner while allowing Auth to work
 self.addEventListener('install', (event) => {

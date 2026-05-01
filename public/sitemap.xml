@@ -2,64 +2,64 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Pages -->
   <url>
-    <loc>https://carsafety.online/</loc>
+    <loc>https://car safety.online/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides</loc>
+    <loc>https://car safety.online/guides</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/privacy</loc>
+    <loc>https://car safety.online/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/terms</loc>
+    <loc>https://car safety.online/terms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <!-- Diagnostic Guides -->
   <url>
-    <loc>https://carsafety.online/guides/braking-problems/car-shakes-when-braking</loc>
+    <loc>https://car safety.online/guides/braking-problems/car-shakes-when-braking</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/symptoms/car-smells-like-gas</loc>
+    <loc>https://car safety.online/guides/symptoms/car-smells-like-gas</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/starting-battery/car-wont-crank</loc>
+    <loc>https://car safety.online/guides/starting-battery/car-wont-crank</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/starting-battery/wont-start-but-lights-come-on</loc>
+    <loc>https://car safety.online/guides/starting-battery/wont-start-but-lights-come-on</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/warning-lights/abs-light</loc>
+    <loc>https://car safety.online/guides/warning-lights/abs-light</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/warning-lights/oil-light-in-car</loc>
+    <loc>https://car safety.online/guides/warning-lights/oil-light-in-car</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/symptoms/car-shakes-when-driving</loc>
+    <loc>https://car safety.online/guides/symptoms/car-shakes-when-driving</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://carsafety.online/guides/symptoms/burning-smell-from-car</loc>
+    <loc>https://car safety.online/guides/symptoms/burning-smell-from-car</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

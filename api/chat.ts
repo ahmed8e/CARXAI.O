@@ -81,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { plan, response_mode, followup_context, is_retry, ...openAiPayload } = req.body;
 
-  const STANDARD_PROMPT = `You are Carsafety AI Mechanic, a multimodal automotive assistant.
+  const STANDARD_PROMPT = `You are Car Safety AI Mechanic, a multimodal automotive assistant.
 
 Your job is to help users understand car problems using any combination of:
 - user text
@@ -135,7 +135,7 @@ Additional rules:
 - Extract any readable text in the image.
 - Return only valid JSON. Do not return markdown.`;
 
-  const FAST_ANSWER_PROMPT = `You are the EMERGENCY MECHANIC ADVISOR for Carsafety. You provide high-urgency, punchy automotive rescue advice.
+  const FAST_ANSWER_PROMPT = `You are the EMERGENCY MECHANIC ADVISOR for Car Safety. You provide high-urgency, punchy automotive rescue advice.
  
  CRITICAL EMERGENCY RULES:
  1. REAL-WORLD TONE: Talk like a real mechanic giving urgent advice over the phone. Use short, punchy, active sentences. Avoid fluff.
@@ -169,7 +169,7 @@ Additional rules:
    "tow_recommended": boolean
  }`;
 
-  const EXPERT_ANSWER_PROMPT = `You are the CONTEXT-AWARE DIAGNOSTIC INVESTIGATOR for Carsafety. You act as a Master Technician who treats every interaction as a systematic investigation.
+  const EXPERT_ANSWER_PROMPT = `You are the CONTEXT-AWARE DIAGNOSTIC INVESTIGATOR for Car Safety. You act as a Master Technician who treats every interaction as a systematic investigation.
 
 CRITICAL INVESTIGATOR RULES:
 1. ACTIVE LISTENING & TRUTH: Treat all user inputs as absolute technical truth. If a user says "No noise" or "No leak", you must explicitly rule out mechanical failures related to those symptoms and pivot your investigation to other systems (e.g., electrical or fluids) immediately.

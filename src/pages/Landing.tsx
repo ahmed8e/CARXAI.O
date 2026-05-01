@@ -120,7 +120,7 @@ const AiBubble = ({ msg }: { msg: any }) => (
       <div className="w-4.5 h-4.5 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
         <Bot size={11} />
       </div>
-      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Carsafety Assistant</span>
+      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Car Safety Assistant</span>
     </div>
     <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tl-[4px] bg-[#F0F2F5] text-[#1C1E21] text-[11px] font-medium leading-relaxed border border-slate-100/50">
       {msg.content}
@@ -304,7 +304,7 @@ const features = [
 
 const reviews = [
   { name: 'Jason M.', car: 'Toyota RAV4 • Sensor Fault', rating: 5, text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
-  { name: 'Jessica W.', car: 'BMW 3 Series • Warning Light', rating: 5, text: 'Carx.ai helped me understand the warning light in seconds and showed me the right next step without confusing jargon.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
+  { name: 'Jessica W.', car: 'BMW 3 Series • Warning Light', rating: 5, text: 'Car Safety helped me understand the warning light in seconds and showed me the right next step without confusing jargon.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
   { name: 'Sarah J.', car: 'VW Golf • Overheating', rating: 5, text: 'My temperature gauge spiked. The AI told me exactly what to check safely and helped me find a nearby tow truck immediately. A total lifesaver.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
   { name: 'Michael B.', car: 'Audi A3 • No-Start Issue', rating: 5, text: 'Simple, clear, and actually useful. My car wouldn\'t turn over, and the breakdown analysis pointed right to the battery instead of the starter.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
   { name: 'Robert T.', car: 'Mercedes C-Class • Stranded', rating: 5, text: 'I broke down at night and needed visibility fast. The nearby help map found an open mechanic and towing option much faster than standard searching.', date: '5 days ago', image: '/JBJ RIV 5.jpg' },
@@ -426,7 +426,7 @@ export default function Landing() {
       <CarxGradientBg />
 
       <div className="relative z-10">
-        <ScrollProgress variant="carx" size="sm" showPercentage={false} />
+        <ScrollProgress variant="brand" position="top" showPercentage={false} />
         
         <Navbar 
           showNavLinks 
@@ -648,7 +648,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carsafety gives you immediate clarity and helps discover nearby options.</p>
+            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Car Safety gives you immediate clarity and helps discover nearby options.</p>
           </div>
         </section>
 
@@ -854,7 +854,7 @@ export default function Landing() {
               Common problems we help <span className="text-[#0070E0]">diagnose.</span>
             </h2>
             <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
-              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Carsafety can help.
+              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Car Safety can help.
             </p>
           </div>
           <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
@@ -868,7 +868,7 @@ export default function Landing() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Carsafety</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Car Safety</h2>
             <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community of supported drivers.</p>
           </div>
 
@@ -890,7 +890,7 @@ export default function Landing() {
                 <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Help Center</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">Common Questions</h2>
-              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about Carsafety.</p>
+              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about Car Safety.</p>
             </div>
 
             <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-2 md:p-4">

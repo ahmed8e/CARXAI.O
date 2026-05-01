@@ -23,10 +23,10 @@ export function useStoryReactions(storyId: string) {
   // Persistent anonymous session ID logic
   const getSessionId = useCallback(() => {
     if (typeof window === 'undefined') return '';
-    let sid = localStorage.getItem('carx_story_session_id');
+    let sid = localStorage.getItem('car_safety_story_session_id');
     if (!sid) {
       sid = crypto.randomUUID();
-      localStorage.setItem('carx_story_session_id', sid);
+      localStorage.setItem('car_safety_story_session_id', sid);
     }
     return sid;
   }, []);

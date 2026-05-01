@@ -199,7 +199,7 @@ export default function LocationOnboarding() {
           <div className="pt-4 border-t border-overlay flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-muted leading-relaxed font-medium">
-              Carsafety helps you discover relevant nearby options. We don't set prices or act as a middleman.
+              Car Safety helps you discover relevant nearby options. We don't set prices or act as a middleman.
             </p>
           </div>
         </div>

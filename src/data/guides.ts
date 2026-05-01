@@ -227,7 +227,7 @@ export const guides: Guide[] = [
     title: 'Why Does My Car Smell Like Gas?',
     cardImage: '/symptoms/smell-gas.webp',
     shortAnswer: 'A persistent gasoline smell is usually caused by a fuel leak, a faulty gas cap, or an issue with the evaporative emissions (EVAP) system. Because gasoline is highly flammable, any raw fuel smell should be treated as an emergency.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'June 10, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -255,7 +255,7 @@ export const guides: Guide[] = [
     faqs: [
       { question: 'Could it just be the exhaust?', answer: 'Raw fuel smell is distinct from exhaust smell. If it smells like the pump at the gas station, it is likely a raw fuel leak.' }
     ],
-    metaTitle: 'Common Causes for Gas Smell in Cars | Carsafety Safety Guide',
+    metaTitle: 'Common Causes for Gas Smell in Cars | Car Safety Safety Guide',
     metaDescription: 'Smelling gas while driving or parked? Discover the safety risks and common causes, including fuel leaks and EVAP issues.'
   },
   {
@@ -266,7 +266,7 @@ export const guides: Guide[] = [
     title: 'Car Won’t Crank: Troubleshooting Start Issues',
     cardImage: '/symptoms/wont-crank.webp',
     shortAnswer: 'If you turn the key and nothing happens (no sound), the problem is most likely a dead battery, a failed starter, or a bad ignition switch. This usually requires a battery test as the first diagnostic step.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'July 5, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -294,7 +294,7 @@ export const guides: Guide[] = [
     faqs: [
       { question: 'Can a bad alternator cause this?', answer: 'Yes, if the alternator failed while driving, the battery will be drained, preventing a restart.' }
     ],
-    metaTitle: 'Car Won’t Crank? Diagnostic and Fix Guide | Carsafety',
+    metaTitle: 'Car Won’t Crank? Diagnostic and Fix Guide | Car Safety',
     metaDescription: 'Stranded because your car won\'t turn over? Learn how to tell the difference between a dead battery, a bad starter, and ignition problems.'
   },
   {
@@ -305,7 +305,7 @@ export const guides: Guide[] = [
     title: 'Car Won’t Start But Lights Come On',
     cardImage: "/symptoms/lights-work-no-start.webp",
     shortAnswer: 'When your lights and dash work but the engine won\'t turn, the battery may have enough voltage for electronics but not enough amperage for the starter. This is a common source of confusion for drivers.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'August 12, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -329,7 +329,7 @@ export const guides: Guide[] = [
     faqs: [
       { question: 'Is it the starter?', answer: 'If you hear a loud "thud" or click but the engine doesn\'t turn, and the lights stay bright, the starter is a high suspect.' }
     ],
-    metaTitle: 'Car Won\'t Start but Electronics Work | Carsafety Guide',
+    metaTitle: 'Car Won\'t Start but Electronics Work | Car Safety Guide',
     metaDescription: 'Dashboard lights are on but the car won\'t start? Find out why your battery might be too weak to crank the engine but strong enough for lights.'
   },
   {
@@ -340,7 +340,7 @@ export const guides: Guide[] = [
     title: 'ABS Light On: Meaning and Urgency',
     cardImage: '/symptoms/ABS light is on.webp',
     shortAnswer: 'The ABS light indicates a fault in the Anti-lock Braking System. Your normal brakes will still work, but you won\'t have anti-lock capability in emergencies. This requires scanning the vehicle for a trouble code.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'September 2, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -364,7 +364,7 @@ export const guides: Guide[] = [
     faqs: [
       { question: 'Is it safe to drive with the ABS light on?', answer: 'Yes, but be aware that your safety net for panic stops is gone. Get it scanned as soon as possible.' }
     ],
-    metaTitle: 'What Does the ABS Light Mean? | Carsafety Warning Guide',
+    metaTitle: 'What Does the ABS Light Mean? | Car Safety Warning Guide',
     metaDescription: 'Understand why your ABS light is on. From wheel sensors to fluid levels, learn if it is safe to drive and how to fix the anti-lock system.'
   },
   {
@@ -375,7 +375,7 @@ export const guides: Guide[] = [
     title: 'Oil Light On: Stop Immediately',
     cardImage: '/symptoms/oil-light.webp',
     shortAnswer: 'A red oil can icon means your engine has lost oil pressure. This is a critical emergency that can destroy your engine in seconds. PULL OVER NOW.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'October 15, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -399,7 +399,7 @@ export const guides: Guide[] = [
     faqs: [
       { question: 'Can I drive just a few miles?', answer: 'No. Driving even a few minutes without oil pressure will cause permanent engine damage costings thousands.' }
     ],
-    metaTitle: 'Oil Pressure Light Guide: What to Do | Carsafety',
+    metaTitle: 'Oil Pressure Light Guide: What to Do | Car Safety',
     metaDescription: 'Red oil light on your dash? This is an engine emergency. Learn why you must stop immediately and how to check your oil level safely.'
   },
   {
@@ -409,7 +409,7 @@ export const guides: Guide[] = [
     categoryDisplay: 'Drivetrain Symptoms',
     title: 'Car Shakes When Driving (But Not Braking)',
     shortAnswer: 'If your car vibrates while cruising or accelerating, it is likely a wheel balance issue, a bent rim, or a failing cv axle rather than a brake problem. This often varies with vehicle speed.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'November 22, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -431,7 +431,7 @@ export const guides: Guide[] = [
       }
     ],
     faqs: [],
-    metaTitle: 'Why Does My Car Shake While Driving? | Carsafety',
+    metaTitle: 'Why Does My Car Shake While Driving? | Car Safety',
     metaDescription: 'Is your car vibrating at highway speeds? Learn the difference between wheel balance issues and drivetrain faults.'
   },
   {
@@ -441,7 +441,7 @@ export const guides: Guide[] = [
     categoryDisplay: 'Odor & Hazard Diagnosis',
     title: 'Burning Smell From Car: Common Causes',
     shortAnswer: 'A burning smell can range from a spilled oil to a sticking brake caliper or an electrical short. Identifying the "scent" is the first step in diagnosis.',
-    authorName: 'Carsafety Editorial Team',
+    authorName: 'Car Safety Editorial Team',
     lastUpdated: 'December 4, 2024',
     reviewerName: 'David Miller',
     reviewerTitle: 'ASE Master Technician',
@@ -463,7 +463,7 @@ export const guides: Guide[] = [
       }
     ],
     faqs: [],
-    metaTitle: 'Burning Smell from Car: Diagnosis & Safety | Carsafety',
+    metaTitle: 'Burning Smell from Car: Diagnosis & Safety | Car Safety',
     metaDescription: 'Smell something burning? Learn how to identify oil leaks, brake drag, and electrical issues before they become dangerous.'
   }
 ];

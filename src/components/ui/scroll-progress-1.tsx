@@ -16,7 +16,7 @@ const scrollProgressVariants = cva("fixed z-[100] origin-left", {
   variants: {
     variant: {
       default: "bg-navy shadow-[0_0_15px_rgba(0,112,224,0.3)]",
-      carx: "bg-gradient-to-r from-navy to-cyan-light shadow-[0_0_20px_rgba(0,112,224,0.4)]",
+      brand: "bg-gradient-to-r from-navy to-cyan-light shadow-[0_0_20px_rgba(0,112,224,0.4)]",
       rainbow:
         "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500",
       ocean: "bg-gradient-to-r from-cyan-400 via-blue-500 to-blue-600",
@@ -59,7 +59,7 @@ const scrollProgressVariants = cva("fixed z-[100] origin-left", {
     },
   },
   defaultVariants: {
-    variant: "carx",
+    variant: "brand",
     size: "sm",
     position: "top",
     rounded: "none",

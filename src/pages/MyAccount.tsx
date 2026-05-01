@@ -482,7 +482,7 @@ export default function MyAccount() {
                 />
                 <SettingsRow 
                   icon={Info} 
-                  title="About Carsafety" 
+                  title="About Car Safety" 
                   subtitle="Version 2.4.0 (Official Build)" 
                 />
               </div>
@@ -614,7 +614,7 @@ export default function MyAccount() {
                       Upgrade Plan
                     </button>
                     <p className="text-center mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      Managed via Carsafety Support
+                      Managed via Car Safety Support
                     </p>
                   </div>
                 </div>

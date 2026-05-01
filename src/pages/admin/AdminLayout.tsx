@@ -65,7 +65,7 @@ export default function AdminLayout() {
         </div>
         {!collapsed && (
           <div>
-            <p className="text-[12px] font-black uppercase tracking-widest text-navy">Carsafety</p>
+            <p className="text-[12px] font-black uppercase tracking-widest text-navy">Car Safety</p>
             <p className="text-[10px] font-bold text-muted uppercase tracking-widest">Admin Console</p>
           </div>
         )}

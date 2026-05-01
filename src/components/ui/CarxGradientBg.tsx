@@ -1,5 +1,5 @@
 /**
- * CarxGradientBg — Premium atmospheric background for the Carsafety landing page.
+ * CarxGradientBg — Premium atmospheric background for the Car Safety landing page.
  *
  * Renders a fixed, full-viewport layer of soft radial blue glows that sit
  * behind all page content.  The effect is intentionally subtle so that

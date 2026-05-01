@@ -7,7 +7,7 @@ interface LogoProps {
 }
 
 /**
- * Carsafety Premium Logo Mark
+ * Car Safety Premium Logo Mark
  */
 export const Logo: React.FC<LogoProps> = ({ 
   size = 32, 
@@ -55,7 +55,7 @@ interface WordmarkProps {
 }
 
 /**
- * Carsafety Refined Wordmark
+ * Car Safety Refined Wordmark
  * 
  * Consistent geometry, tight kerning, and premium Inter-based typography.
  */
@@ -75,7 +75,7 @@ export const Wordmark: React.FC<WordmarkProps> = ({
 
   return (
     <span className={`font-sans font-bold tracking-[-0.05em] select-none ${sizeClasses[size]} ${light ? 'text-white' : 'text-on-surface'} ${className}`}>
-      car<span className="text-[#0070E0]">x</span>ai
+      Car <span className="text-[#0070E0]">Safety</span>
     </span>
   );
 };

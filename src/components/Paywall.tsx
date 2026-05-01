@@ -29,7 +29,7 @@ export default function Paywall() {
             Your free trial has ended.
           </h2>
           <p className="text-[15px] font-medium text-muted leading-relaxed mb-6">
-            We hope you enjoyed the past 3 days of Carsafety! Subscribe now to restore full access to your digital AI mechanic.
+            We hope you enjoyed the past 3 days of Car Safety! Subscribe now to restore full access to your digital AI mechanic.
           </p>
 
           <div className="space-y-3 mb-8 text-left max-w-[280px] mx-auto">

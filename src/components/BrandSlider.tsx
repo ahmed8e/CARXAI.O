@@ -132,7 +132,7 @@ export default function BrandSlider() {
           </h2>
 
           <p className="text-[#64748B] text-base md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-            Carsafety delivers expert diagnostics across every major automotive
+            Car Safety delivers expert diagnostics across every major automotive
             brand — from everyday city cars to premium series.
           </p>
         </motion.div>

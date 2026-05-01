@@ -1,4 +1,4 @@
-$path = "c:\Users\amany\OneDrive\Dokumente\sas\carsafety\CARSAFETY.O\src\pages\Towing.tsx"
+$path = "c:\Users\amany\OneDrive\Dokumente\sas\car safety\CAR SAFETY.O\src\pages\Towing.tsx"
 $content = Get-Content -Path $path -Raw -Encoding utf8
 
 # Fix botched Skeleton comment and add SkeletonCard

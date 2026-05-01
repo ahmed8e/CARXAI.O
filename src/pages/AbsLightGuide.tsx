@@ -52,7 +52,7 @@ const AbsLightGuide: React.FC = () => {
   return (
     <GuideLayout 
       title="ABS Light: Definition, Causes, and Diagnostic Protocol" 
-      metaTitle="ABS Light On: Causes, Safety, and Fixes | Carsafety Authority Guide"
+      metaTitle="ABS Light On: Causes, Safety, and Fixes | Car Safety Authority Guide"
       description="Technical analysis of the Anti-lock Braking System (ABS) warning light. Understand sensor data, mechanical failures, and safety protocols."
       variant="technical"
     >

@@ -150,7 +150,7 @@ export default function AdminOverview() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-black text-on-surface tracking-tight">Overview</h1>
-          <p className="text-sm text-muted mt-0.5">Live stats from your Carsafety platform</p>
+          <p className="text-sm text-muted mt-0.5">Live stats from your Car Safety platform</p>
         </div>
         <button
           onClick={handleRefresh}

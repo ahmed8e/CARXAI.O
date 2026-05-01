@@ -117,21 +117,21 @@ export default function MechanicReport({
 
 
   const copySummary = () => {
-    const text = `Carsafety Mechanic Report ${token}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\nLikely Cause: ${diagnosis.likelyCause || 'Ongoing analysis'}\nRecommended Action: ${diagnosis.next_step}`
+    const text = `Car Safety Mechanic Report ${token}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\nLikely Cause: ${diagnosis.likelyCause || 'Ongoing analysis'}\nRecommended Action: ${diagnosis.next_step}`
     navigator.clipboard.writeText(text)
     alert('Report summary copied to clipboard!')
   }
 
   const handleShare = async () => {
-    console.log('[Carsafety Share Flow] 1. Share Button Clicked')
+    console.log('[Car Safety Share Flow] 1. Share Button Clicked')
     
     // We no longer wait for report_id. We share instantly using current memory data.
     const currentReportId = diagnosis.report_id || null
-    console.log('[Carsafety Share Flow] 2. Report ID present:', currentReportId ? 'YES' : 'NO (Omit from payload)')
+    console.log('[Car Safety Share Flow] 2. Report ID present:', currentReportId ? 'YES' : 'NO (Omit from payload)')
 
     setSharing(true)
     
-    console.group('[Carsafety Share Flow] 3. Execution Details')
+    console.group('[Car Safety Share Flow] 3. Execution Details')
     console.log('Report Object:', diagnosis)
 
     const payload: any = {
@@ -156,16 +156,16 @@ export default function MechanicReport({
     console.groupEnd()
 
     try {
-      console.log('[Carsafety Share Flow] 4. Requesting Supabase insert into `shared_reports`...')
+      console.log('[Car Safety Share Flow] 4. Requesting Supabase insert into `shared_reports`...')
       const { error: shareError } = await supabase
         .from('shared_reports')
         .insert([payload] as any)
 
       if (shareError && shareError.code !== '23505') {
-        console.error('[Carsafety Share Flow] 5. Supabase insert failed', shareError)
+        console.error('[Car Safety Share Flow] 5. Supabase insert failed', shareError)
         throw shareError
       }
-      console.log('[Carsafety Share Flow] 5. Supabase insert successful')
+      console.log('[Car Safety Share Flow] 5. Supabase insert successful')
       
       // Atomic Usage Increment
       if (incrementUsage) {
@@ -174,38 +174,38 @@ export default function MechanicReport({
 
       const shareUrl = `${window.location.origin}/shared-report/${token}`
       const shareData = {
-        title: `Carsafety Mechanic Report - ${diagnosis.issueName || 'Diagnostic Assessment'}`,
+        title: `Car Safety Mechanic Report - ${diagnosis.issueName || 'Diagnostic Assessment'}`,
         text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName || 'Issue detected'}.`,
         url: shareUrl
       }
 
-      console.log('[Carsafety Share Flow] 6. Share URL Generated:', shareUrl)
+      console.log('[Car Safety Share Flow] 6. Share URL Generated:', shareUrl)
 
       // Fallback executor function
       const executeClipboardFallback = async () => {
         try {
-          console.log('[Carsafety Share Flow] 7. Attempting Clipboard Fallback...')
-          await navigator.clipboard.writeText(`Carsafety Mechanic Report\n\nIssue: ${diagnosis.issueName || 'Diagnostic Assessment'}\nView report: ${shareUrl}`)
+          console.log('[Car Safety Share Flow] 7. Attempting Clipboard Fallback...')
+          await navigator.clipboard.writeText(`Car Safety Mechanic Report\n\nIssue: ${diagnosis.issueName || 'Diagnostic Assessment'}\nView report: ${shareUrl}`)
           alert('Public report link copied to clipboard!')
-          console.log('[Carsafety Share Flow] 8. Clipboard success')
+          console.log('[Car Safety Share Flow] 8. Clipboard success')
         } catch (clipErr) {
-          console.error('[Carsafety Share Flow] 8. Clipboard failed as well:', clipErr)
+          console.error('[Car Safety Share Flow] 8. Clipboard failed as well:', clipErr)
           alert(`Your report is ready, but we couldn't copy the link automatically. Please manually copy this url: ${shareUrl}`)
         }
       }
 
       if (navigator.share) {
         try {
-          console.log('[Carsafety Share Flow] 7. Attempting Native navigator.share...')
+          console.log('[Car Safety Share Flow] 7. Attempting Native navigator.share...')
           await navigator.share(shareData)
-          console.log('[Carsafety Share Flow] 8. Native Share Sheet executed')
+          console.log('[Car Safety Share Flow] 8. Native Share Sheet executed')
         } catch (shareErr: any) {
-          console.error('[Carsafety Share Flow] Native Share Promise failed:', shareErr)
+          console.error('[Car Safety Share Flow] Native Share Promise failed:', shareErr)
           // AbortError means user swiped closed the share sheet, do not fallback
           if (shareErr?.name !== 'AbortError') {
              await executeClipboardFallback()
           } else {
-             console.log('[Carsafety Share Flow] 8. User cancelled native share sheet')
+             console.log('[Car Safety Share Flow] 8. User cancelled native share sheet')
           }
         }
       } else {
@@ -213,14 +213,14 @@ export default function MechanicReport({
       }
 
     } catch (err: any) {
-      console.error('[Carsafety Share Flow] Fatal Error:', err)
+      console.error('[Car Safety Share Flow] Fatal Error:', err)
       if (err?.code === '42P01') {
         alert("Database structure missing. Please run the SQL migrations in Supabase to create the `shared_reports` table.")
       } else {
         alert(`There was an issue creating the share link. Please try again. Detailed error: ${err.message || 'Unknown Error'}`)
       }
     } finally {
-      console.log('[Carsafety Share Flow] 10. Flow completes, cleaning up state')
+      console.log('[Car Safety Share Flow] 10. Flow completes, cleaning up state')
       setSharing(false)
     }
   }
