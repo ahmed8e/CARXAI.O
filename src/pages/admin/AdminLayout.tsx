@@ -53,7 +53,7 @@ export default function AdminLayout() {
 
   const handleSignOut = async () => {
     await signOut()
-    navigate('/')
+    navigate('/login')
   }
 
   const sidebarContent = (

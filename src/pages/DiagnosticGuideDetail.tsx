@@ -59,7 +59,7 @@ const DiagnosticGuideDetail: React.FC = () => {
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <Link to="/auth" className="px-8 py-4 rounded-xl bg-navy text-white font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2">
+                <Link to="/login" className="px-8 py-4 rounded-xl bg-navy text-white font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2">
                   Complete Diagnosis <ArrowRight size={16} />
                 </Link>
                 <div className={`px-6 py-4 rounded-xl ${safetyBg} ${safetyBorder} border flex items-center gap-3`}>
@@ -210,7 +210,7 @@ const DiagnosticGuideDetail: React.FC = () => {
                 Brake symptoms can be subtle. Get a professional-level analysis focused on your specific vehicle and driving conditions.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/auth" className="px-10 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:-translate-y-1 transition-all">
+                <Link to="/login" className="px-10 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:-translate-y-1 transition-all">
                   Start AI Assessment
                 </Link>
                 <Link to="/guides" className="px-10 py-5 rounded-2xl border-2 border-slate-100 text-navy font-black text-sm uppercase tracking-widest hover:border-navy transition-all">

@@ -126,8 +126,8 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link to="/auth?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">Sign In</Link>
-            <Link to="/auth" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">Start Free</Link>
+            <Link to="/login?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">Sign In</Link>
+            <Link to="/login" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">Start Free</Link>
           </div>
         )}
         

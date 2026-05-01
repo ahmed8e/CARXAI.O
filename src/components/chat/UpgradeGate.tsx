@@ -19,7 +19,7 @@ export default function UpgradeGate({ isOpen, onClose, targetPlan = 'pro' }: Upg
 
   const handleWhatsAppActivate = () => {
     if (!user) {
-      navigate('/auth')
+      navigate('/login')
       return
     }
 

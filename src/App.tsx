@@ -112,9 +112,9 @@ export default function App() {
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
-              <Route path="/register" element={<Navigate to="/auth?mode=register" replace />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/auth" element={<Navigate to="/login" replace />} />
+              <Route path="/register" element={<Navigate to="/login?mode=register" replace />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/privacy" element={<Privacy />} />

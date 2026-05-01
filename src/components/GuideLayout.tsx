@@ -112,7 +112,7 @@ const GuideLayout: React.FC<GuideLayoutProps> = ({
             <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 mb-16 px-4">
               <Link to="/privacy" className="text-slate-500 hover:text-navy text-lg font-bold transition-all hover:-translate-y-0.5">Privacy</Link>
               <Link to="/terms" className="text-slate-500 hover:text-navy text-lg font-bold transition-all hover:-translate-y-0.5">Terms</Link>
-              <Link to="/auth" className="text-slate-500 hover:text-navy text-lg font-bold transition-all hover:-translate-y-0.5">Sign In</Link>
+              <Link to="/login" className="text-slate-500 hover:text-navy text-lg font-bold transition-all hover:-translate-y-0.5">Sign In</Link>
             </div>
 
             {/* Micro-Copyright */}

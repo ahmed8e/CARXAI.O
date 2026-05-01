@@ -501,8 +501,8 @@ export default function Landing() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-4 w-full px-10">
-                  <Link to="/auth?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                  <Link to="/auth" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Free Trial</Link>
+                  <Link to="/login?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                  <Link to="/login" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Free Trial</Link>
                 </div>
               )}
             </motion.div>
@@ -559,7 +559,7 @@ export default function Landing() {
                   >
                     {/* Primary CTA — Premium Gradient */}
                     <button 
-                      onClick={() => navigate('/auth?mode=register')} 
+                      onClick={() => navigate('/login?mode=register')} 
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
@@ -764,7 +764,7 @@ export default function Landing() {
               </p>
               
               <button 
-                onClick={() => navigate('/auth')} 
+                onClick={() => navigate('/login')} 
                 className="group relative inline-flex items-center justify-center gap-2.5 px-10 py-5 rounded-[20px] font-black uppercase tracking-widest text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-[0.98]"
               >
                 Check Now
@@ -917,7 +917,7 @@ export default function Landing() {
             <p className="text-muted text-xl md:text-2xl font-medium mb-14 max-w-2xl mx-auto">Get AI diagnostics, clear step-by-step guidance, and nearby provider discovery in one smart platform.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
               <button 
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/login')}
                 className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
                 Start Free Trial
@@ -941,7 +941,7 @@ export default function Landing() {
         <StoryModal
           isOpen={storyOpen}
           onClose={() => setStoryOpen(false)}
-          onCTAClick={() => navigate('/auth?mode=register')}
+          onCTAClick={() => navigate('/login?mode=register')}
         />
       </Suspense>
     </div>

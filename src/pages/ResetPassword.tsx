@@ -37,7 +37,7 @@ export default function ResetPassword() {
       setError(resetError.message)
     } else {
       setSuccess(true)
-      setTimeout(() => navigate('/auth?mode=login'), 3000)
+      setTimeout(() => navigate('/login?mode=login'), 3000)
     }
     setLoading(false)
   }
@@ -72,7 +72,7 @@ export default function ResetPassword() {
               <p className="text-muted text-sm mb-8 font-medium leading-relaxed">
                 Your password has been changed successfully. Redirecting you to sign in...
               </p>
-              <Link to="/auth?mode=login" className="inline-flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-navy text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-navy/20">
+              <Link to="/login?mode=login" className="inline-flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-navy text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-navy/20">
                 Sign In Now
               </Link>
             </div>
@@ -133,7 +133,7 @@ export default function ResetPassword() {
               </motion.button>
               
               <div className="text-center">
-                <Link to="/auth?mode=login" className="inline-flex items-center gap-2 text-slate-400 font-bold text-xs hover:text-navy transition-colors">
+                <Link to="/login?mode=login" className="inline-flex items-center gap-2 text-slate-400 font-bold text-xs hover:text-navy transition-colors">
                   <ArrowLeft className="w-3 h-3" /> Back to sign in
                 </Link>
               </div>

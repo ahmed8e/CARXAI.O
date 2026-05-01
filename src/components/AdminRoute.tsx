@@ -39,8 +39,8 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    console.log('[AdminRoute] no user → redirecting to /auth, redirect_target:', location.pathname)
-    return <Navigate to="/auth?mode=login" state={{ from: location }} replace />
+    console.log('[AdminRoute] no user → redirecting to /login, redirect_target:', location.pathname)
+    return <Navigate to="/login?mode=login" state={{ from: location }} replace />
   }
 
   if (!isAdmin) {

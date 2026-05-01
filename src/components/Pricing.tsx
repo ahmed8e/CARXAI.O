@@ -64,7 +64,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
     SaaSAnalytics.upgradeClick(plan.name)
     if (!user) {
 
-      navigate('/auth?redirect=choose-plan')
+      navigate('/login?redirect=choose-plan')
       return
     }
 

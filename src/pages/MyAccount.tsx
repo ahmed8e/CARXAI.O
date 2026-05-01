@@ -342,7 +342,7 @@ export default function MyAccount() {
 
   const handleSignOut = async () => {
     await signOut()
-    navigate('/')
+    navigate('/login')
   }
 
   const userInitial = profileData.fullName?.[0]?.toUpperCase() || user?.email?.[0].toUpperCase() || 'U'

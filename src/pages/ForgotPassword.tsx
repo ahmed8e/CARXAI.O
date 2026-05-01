@@ -52,7 +52,7 @@ export default function ForgotPassword() {
               </div>
               <h2 className="text-xl font-display font-bold text-on-surface mb-2">Check your email</h2>
               <p className="text-muted text-sm mb-6">We've sent a password reset link to <strong className="text-on-surface">{email}</strong></p>
-              <Link to="/auth?mode=login" className="inline-flex items-center gap-2 text-navy font-bold hover:underline">
+              <Link to="/login?mode=login" className="inline-flex items-center gap-2 text-navy font-bold hover:underline">
                 <ArrowLeft className="w-4 h-4" /> Back to login
               </Link>
             </div>
@@ -86,7 +86,7 @@ export default function ForgotPassword() {
 
               <p className="text-center text-muted mt-6 text-sm">
                 Remember your password?{' '}
-                <Link to="/auth?mode=login" className="text-navy font-bold hover:underline">Sign in</Link>
+                <Link to="/login?mode=login" className="text-navy font-bold hover:underline">Sign in</Link>
               </p>
             </>
           )}

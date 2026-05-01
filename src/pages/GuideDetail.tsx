@@ -104,7 +104,7 @@ const GuideDetail: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-4 shrink-0 w-full xl:w-auto relative z-10">
-                    <Link to="/auth" className="px-12 py-5 rounded-2xl bg-navy text-white font-black text-[12px] uppercase tracking-widest hover:bg-slate-800 hover:-translate-y-1 transition-all text-center shadow-xl shadow-navy/10">
+                    <Link to="/login" className="px-12 py-5 rounded-2xl bg-navy text-white font-black text-[12px] uppercase tracking-widest hover:bg-slate-800 hover:-translate-y-1 transition-all text-center shadow-xl shadow-navy/10">
                       Full Diagnostic Analysis
                     </Link>
                   </div>
@@ -213,10 +213,10 @@ const GuideDetail: React.FC = () => {
                     Not sure if it's the rotors or something else? Let Car Safety's tech-informed logic identify the exact failure point on your {guide.categoryDisplay?.toLowerCase() || 'vehicle'}.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-5 justify-center">
-                    <Link to="/auth" className="px-12 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-[13px] uppercase tracking-widest shadow-2xl shadow-blue-500/20 hover:-translate-y-1 transition-all">
+                    <Link to="/login" className="px-12 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-[13px] uppercase tracking-widest shadow-2xl shadow-blue-500/20 hover:-translate-y-1 transition-all">
                       Start Full AI Diagnosis
                     </Link>
-                    <Link to="/auth" className="px-12 py-5 rounded-2xl border-2 border-slate-200 text-navy font-black text-[13px] uppercase tracking-widest hover:border-navy transition-all">
+                    <Link to="/login" className="px-12 py-5 rounded-2xl border-2 border-slate-200 text-navy font-black text-[13px] uppercase tracking-widest hover:border-navy transition-all">
                       Check Safety Rating
                     </Link>
                   </div>
@@ -262,7 +262,7 @@ const GuideDetail: React.FC = () => {
                     <p className="text-4xl font-black text-navy leading-none mb-2">98.4%</p>
                     <p className="text-[13px] font-bold text-slate-400 leading-relaxed">Diagnostic precision for identified {guide.categoryDisplay?.toLowerCase() || 'brake'} issues</p>
                   </div>
-                  <Link to="/auth" className="inline-block text-[11px] font-black text-[#0070E0] uppercase tracking-widest border-b-2 border-blue-50 hover:border-[#0070E0] transition-all">
+                  <Link to="/login" className="inline-block text-[11px] font-black text-[#0070E0] uppercase tracking-widest border-b-2 border-blue-50 hover:border-[#0070E0] transition-all">
                     Try AI Diagnosis Now
                   </Link>
                 </div>
