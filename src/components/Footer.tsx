@@ -27,7 +27,7 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
 
   return (
     <footer className="relative bg-slate-50/40 backdrop-blur-xl pt-24 pb-12 overflow-hidden">
-      {/* Background patterns: Sync with CarxAI dot grid language */}
+      {/* Background patterns: Sync with Carsafety dot grid language */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035]" 
         style={{
           backgroundImage: 'radial-gradient(circle, #0070E0 1px, transparent 1px)',
@@ -93,7 +93,7 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
                   className="text-slate-500 hover:text-[#0070E0] text-[15px] font-medium transition-all duration-300 flex items-center group"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0070E0] mr-0 w-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300"></span>
-                  How CarxAI Began
+                  How Carsafety Began
                 </button>
               </li>
               {[
@@ -160,10 +160,10 @@ const Footer: React.FC<FooterProps> = ({ onStoryClick }) => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex flex-col items-center lg:items-start gap-2">
               <p className="text-slate-400 text-[13px] font-medium">
-                © {currentYear} CarxAI. Built for clarity and peace of mind.
+                © {currentYear} Carsafety. Built for clarity and peace of mind.
               </p>
               <p className="text-[10px] text-slate-300 uppercase tracking-widest font-black lg:max-w-xl text-center lg:text-left leading-relaxed">
-                CarxAI provides digital diagnostics and guidance. Repairs and towing are handled by independent third-party providers.
+                Carsafety provides digital diagnostics and guidance. Repairs and towing are handled by independent third-party providers.
               </p>
             </div>
             

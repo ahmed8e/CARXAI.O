@@ -22,11 +22,11 @@ function isTowingCategory(cat: string | null): boolean {
 
 // â”€â”€ Branded fallback trust messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TRUST_MESSAGES = [
-  'Verified provider in the Carxai assistance network.',
+  'Verified provider in the Carsafety assistance network.',
   'Trusted nearby roadside assistance, available now.',
-  'Reliable local automotive support through Carxai.',
+  'Reliable local automotive support through Carsafety.',
   'Nearby verified help when you need it most.',
-  'Available through the Carxai assistance network.',
+  'Available through the Carsafety assistance network.',
 ]
 
 /** Strip literal "null" / "undefined" strings from Supabase data */
@@ -107,7 +107,7 @@ function BrandedPlaceholder({ className }: { className?: string }) {
         <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center mb-1">
           <Truck className="w-5 h-5 text-navy/40" />
         </div>
-        <p className="text-[7px] font-black uppercase tracking-[0.2em] text-navy/30">CarxAI</p>
+        <p className="text-[7px] font-black uppercase tracking-[0.2em] text-navy/30">Carsafety</p>
       </div>
     </div>
   )

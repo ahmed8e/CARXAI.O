@@ -46,7 +46,7 @@ function BrandedPlaceholder({ className }: { className?: string }) {
         <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center mb-1">
           <Truck className="w-5 h-5 text-navy/40" />
         </div>
-        <p className="text-[7px] font-black uppercase tracking-[0.2em] text-navy/30">CarxAI</p>
+        <p className="text-[7px] font-black uppercase tracking-[0.2em] text-navy/30">Carsafety</p>
       </div>
     </div>
   )
@@ -415,7 +415,7 @@ export default function Towing() {
             <div>
               <h1 className="text-lg font-display font-black text-on-surface tracking-tight">Find Towing</h1>
               <p className="text-[11px] font-bold text-muted uppercase tracking-widest">
-                {loading ? 'Getting your location…' : 'CarxAI Recovery Network'}
+                {loading ? 'Getting your location…' : 'Carsafety Recovery Network'}
               </p>
             </div>
           </div>

@@ -1,10 +1,10 @@
 /**
- * CarxAI Location Persistence Utility
+ * Carsafety Location Persistence Utility
  * Manage user location with a 24-hour expiration window.
  * Persists to both localStorage for speed and Supabase for cross-device reliability.
  */
 
-const LOCATION_KEY = 'carxai_user_location'
+const LOCATION_KEY = 'carsafety_user_location'
 const EXPIRATION_TIME = 24 * 60 * 60 * 1000 // 24 hours
 
 interface SavedLocation {
@@ -25,7 +25,7 @@ export function saveUserLocation(coords: { lat: number; lng: number }, city?: st
     timestamp
   }
   localStorage.setItem(LOCATION_KEY, JSON.stringify(data))
-  localStorage.setItem('carxai_location_prompt_seen', timestamp.toString())
+  localStorage.setItem('carsafety_location_prompt_seen', timestamp.toString())
 }
 
 /**

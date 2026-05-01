@@ -7,7 +7,7 @@ interface LogoProps {
 }
 
 /**
- * CarxAI Premium Logo Mark
+ * Carsafety Premium Logo Mark
  */
 export const Logo: React.FC<LogoProps> = ({ 
   size = 32, 
@@ -55,7 +55,7 @@ interface WordmarkProps {
 }
 
 /**
- * CarxAI Refined Wordmark
+ * Carsafety Refined Wordmark
  * 
  * Consistent geometry, tight kerning, and premium Inter-based typography.
  */

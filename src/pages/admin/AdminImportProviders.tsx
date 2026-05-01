@@ -140,7 +140,7 @@ export default function AdminImportProviders() {
     const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = 'carxai_providers_template.csv'; a.click()
+    a.href = url; a.download = 'carsafety_providers_template.csv'; a.click()
     URL.revokeObjectURL(url)
   }
 

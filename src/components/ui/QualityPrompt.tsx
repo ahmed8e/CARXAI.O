@@ -14,7 +14,7 @@ export default function QualityPrompt({ isOpen, onClose, onContinue }: QualityPr
   const handleContinue = () => {
     setLoading(true)
     // Save to localStorage so it doesn't show again for this user session
-    localStorage.setItem('carxai_quality_prompt_seen', 'true')
+    localStorage.setItem('carsafety_quality_prompt_seen', 'true')
     setTimeout(() => {
       setLoading(false)
       onContinue()

@@ -1,6 +1,6 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- STORY REACTIONS SYSTEM MIGRATION
--- Project: CarxAI
+-- Project: Carsafety
 -- Purpose: Real-time engagement tracking with seeded baseline social proof
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS story_reaction_baselines (
 -- These numbers provide the "trust foundation" for the landing page
 INSERT INTO story_reaction_baselines (story_id, reaction_type, count)
 VALUES 
-    ('carxai-origin', 'relate', 4800),
-    ('carxai-origin', 'respect', 3100),
-    ('carxai-origin', 'powerful', 2700)
+    ('carsafety-origin', 'relate', 4800),
+    ('carsafety-origin', 'respect', 3100),
+    ('carsafety-origin', 'powerful', 2700)
 ON CONFLICT (story_id, reaction_type) 
 DO UPDATE SET count = EXCLUDED.count;
 
@@ -109,4 +109,4 @@ TO anon
 USING (user_id IS NULL AND session_id IS NOT NULL);
 
 -- Review the results
--- SELECT * FROM view_story_reaction_totals WHERE story_id = 'carxai-origin';
+-- SELECT * FROM view_story_reaction_totals WHERE story_id = 'carsafety-origin';

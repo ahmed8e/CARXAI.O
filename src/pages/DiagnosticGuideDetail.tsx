@@ -232,7 +232,7 @@ const DiagnosticGuideDetail: React.FC = () => {
           <CheckCircle2 size={14} /> Real-World Road Symptom Data
         </div>
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#0070E0]">
-          CarxAI Diagnostic Engine
+          Carsafety Diagnostic Engine
         </div>
       </div>
     </GuideLayout>

@@ -4,7 +4,7 @@ import { X, Download, Share, PlusSquare, Smartphone } from 'lucide-react'
 import { BrandLockup } from './ui/Brand'
 import { usePWAInstall } from '../hooks/usePWAInstall'
 
-const DISMISS_KEY = 'carxai_install_prompt_dismissed'
+const DISMISS_KEY = 'carsafety_install_prompt_dismissed'
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 
 export default function InstallPrompt() {
@@ -77,11 +77,11 @@ export default function InstallPrompt() {
             <BrandLockup size="md" />
             <div className="flex-1">
               <h3 className="text-lg font-display font-black text-on-surface italic tracking-tight sr-only">
-                {isIOS ? 'Add Carxai to Home' : 'Install Carxai'}
+                {isIOS ? 'Add Carsafety to Home' : 'Install Carsafety'}
               </h3>
               <p className="text-sm text-muted font-medium leading-relaxed mt-1">
                 {isIOS 
-                  ? 'Use Carxai like an app for faster access and a better mobile experience.' 
+                  ? 'Use Carsafety like an app for faster access and a better mobile experience.' 
                   : 'Install our app for instant access and a smoother experience.'}
               </p>
             </div>

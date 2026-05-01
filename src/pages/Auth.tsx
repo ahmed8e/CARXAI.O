@@ -41,7 +41,7 @@ export default function Auth() {
   
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 
                       searchParams.get('mode') === 'login' ? 'login' :
-                      localStorage.getItem('carxai_returning') === 'true' ? 'login' : 'login'; 
+                      localStorage.getItem('carsafety_returning') === 'true' ? 'login' : 'login'; 
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode as any)
   
@@ -72,7 +72,7 @@ export default function Auth() {
   }, [])
 
   const markReturningUser = () => {
-    localStorage.setItem('carxai_returning', 'true')
+    localStorage.setItem('carsafety_returning', 'true')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +138,7 @@ export default function Auth() {
               {mode === 'login' ? 'Welcome back' : 'Get started'}
             </h1>
             <p className="text-muted font-medium text-base">
-              {mode === 'login' ? 'Log in to your AI Mechanic dashboard' : 'Join thousands of drivers using CarxAI'}
+              {mode === 'login' ? 'Log in to your AI Mechanic dashboard' : 'Join thousands of drivers using Carsafety'}
             </p>
           </div>
 
@@ -315,7 +315,7 @@ export default function Auth() {
 
         {/* Footer info */}
         <div className="mt-12 lg:mt-24 text-[11px] font-medium text-slate-400 flex flex-wrap gap-x-6 gap-y-2">
-          <span>&copy; 2026 CarxAI</span>
+          <span>&copy; 2026 Carsafety</span>
           <Link to="/privacy" className="hover:text-navy hover:underline transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-navy hover:underline transition-colors">Terms</Link>
         </div>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://carxai.online/sitemap.xml
+Sitemap: https://carsafety.online/sitemap.xml

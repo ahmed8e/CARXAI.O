@@ -73,9 +73,9 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
 
     let text = ''
     if (isUpgrade && currentSubscription) {
-      text = `Hello, I would like to upgrade my CarxAI account.\nCurrent Plan: ${currentSubscription.planType || 'Free'}\nRequested Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
+      text = `Hello, I would like to upgrade my Carsafety account.\nCurrent Plan: ${currentSubscription.planType || 'Free'}\nRequested Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
     } else {
-      text = `Hello, I would like to activate a paid CarxAI plan for my account.\nSelected Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
+      text = `Hello, I would like to activate a paid Carsafety plan for my account.\nSelected Plan: ${plan.name}\nBilling Cycle: ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}\nEmail: ${user.email}\nUser ID: ${user.id}`
     }
 
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank')

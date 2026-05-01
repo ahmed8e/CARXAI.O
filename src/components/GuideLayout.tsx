@@ -26,7 +26,7 @@ const GuideLayout: React.FC<GuideLayoutProps> = ({
     if (metaTitle) {
       document.title = metaTitle;
     } else if (title) {
-      document.title = `${title} | CarxAI Diagnostic Hub`;
+      document.title = `${title} | Carsafety Diagnostic Hub`;
     }
 
     // Update meta description and favicon for SEO
@@ -100,12 +100,12 @@ const GuideLayout: React.FC<GuideLayoutProps> = ({
             
             {/* Brand Mark */}
             <div className="mb-12">
-              <img src="/favicon.svg" alt="CarxAI Icon" className="w-12 h-12 shadow-lg shadow-navy/10" />
+              <img src="/favicon.svg" alt="Carsafety Icon" className="w-12 h-12 shadow-lg shadow-navy/10" />
             </div>
 
             {/* Premium Wordmark */}
             <h4 className="text-2xl font-black text-slate-900 mb-12 flex items-center justify-center gap-2">
-              <span className="font-display">CarxAI</span>
+              <span className="font-display">Carsafety</span>
             </h4>
 
             {/* Navigation Links */}

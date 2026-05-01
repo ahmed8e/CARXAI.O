@@ -36,7 +36,7 @@ export default function NearbyMap() {
     // Proactive prompt for location if missing
     const timer = setTimeout(() => {
       const hasLocation = user?.user_metadata?.latitude || user?.user_metadata?.city
-      const lastSeen = localStorage.getItem('carxai_location_prompt_seen')
+      const lastSeen = localStorage.getItem('carsafety_location_prompt_seen')
       const now = Date.now()
       
       // Show if no location and hasn't been dismissed in the last 24h

@@ -216,7 +216,7 @@ export default function AIMechanic() {
       }
 
     } catch (err) {
-      console.error('[Carxai] Usage check failed:', err)
+      console.error('[Carsafety] Usage check failed:', err)
     }
     return false
   }
@@ -245,7 +245,7 @@ export default function AIMechanic() {
         .update(update)
         .eq('user_id', user.id)
     } catch (err) {
-      console.error('[Carxai] Failed to increment usage:', err)
+      console.error('[Carsafety] Failed to increment usage:', err)
     }
   }
 
@@ -264,10 +264,10 @@ export default function AIMechanic() {
       if (vehicles && vehicles.length > 0) {
         // Prefer default vehicle, otherwise take latest
         const defaultVehicle = vehicles.find(v => v.is_default) || vehicles[0];
-        console.log('[Carxai AI] Active vehicle loaded:', defaultVehicle.make, defaultVehicle.model);
+        console.log('[Carsafety AI] Active vehicle loaded:', defaultVehicle.make, defaultVehicle.model);
         setActiveVehicle(defaultVehicle as Vehicle)
       } else {
-        console.log('[Carxai AI] No active vehicle found for user.');
+        console.log('[Carsafety AI] No active vehicle found for user.');
         setActiveVehicle(null);
       }
 
@@ -632,7 +632,7 @@ export default function AIMechanic() {
         gearbox: activeVehicle.gearbox || 'Unknown'
       } : null;
 
-      console.log('[Carxai AI] Vehicle context for analysis:', vehicleContext);
+      console.log('[Carsafety AI] Vehicle context for analysis:', vehicleContext);
 
       const historyContext = diagnosticHistory ? `
 DIAGNOSTIC HISTORY (Last 5 events):
@@ -642,7 +642,7 @@ ${diagnosticHistory}
 
       // Use a helper for the API call to support retries
       const performAnalysis = async (isRetry = false, customContext?: any) => {
-        console.log(`[Carxai AI] Starting analysis (isRetry: ${isRetry})`);
+        console.log(`[Carsafety AI] Starting analysis (isRetry: ${isRetry})`);
         const sessionResponse = await supabase.auth.getSession();
         const token = sessionResponse.data.session?.access_token;
 
@@ -695,7 +695,7 @@ ${diagnosticHistory}
       }
 
       let accumulatedJSON = await performAnalysis(false, customContext);
-        console.log('[Carxai AI] Raw accumulated JSON from OpenAI:', accumulatedJSON);
+        console.log('[Carsafety AI] Raw accumulated JSON from OpenAI:', accumulatedJSON);
 
         let issueData: DiagnosticResult | undefined
         let finalDisplayContent = ''
@@ -805,16 +805,16 @@ ${diagnosticHistory}
           let parsed: any = null
 
           let parseResult = extractStructuredPayload(accumulatedJSON)
-          console.log('[Carxai AI] RAW API Payload:', accumulatedJSON)
-          console.log('[Carxai AI] Parse result:', parseResult)
+          console.log('[Carsafety AI] RAW API Payload:', accumulatedJSON)
+          console.log('[Carsafety AI] Parse result:', parseResult)
 
           if (!parseResult.success) {
-            console.warn('[Carxai AI] First parse failed, retrying once...', parseResult.reason)
+            console.warn('[Carsafety AI] First parse failed, retrying once...', parseResult.reason)
             accumulatedJSON = await performAnalysis(true, customContext)
-            console.log('[Carxai AI] RETRY RAW API Payload:', accumulatedJSON)
+            console.log('[Carsafety AI] RETRY RAW API Payload:', accumulatedJSON)
 
             parseResult = extractStructuredPayload(accumulatedJSON)
-            console.log('[Carxai AI] Retry parse result:', parseResult)
+            console.log('[Carsafety AI] Retry parse result:', parseResult)
           }
 
           parsed = parseResult.parsed
@@ -906,8 +906,8 @@ ${diagnosticHistory}
             prefetch(speechText, ttsToken).finally(() => setIsPreparingAudio(false))
           }
         } catch (err) {
-          console.error('[Carxai AI] Final Logic Catch Triggered:', (err as any)?.message || err)
-          console.log('[Carxai AI] Raw accumulatedJSON at time of failure:', accumulatedJSON)
+          console.error('[Carsafety AI] Final Logic Catch Triggered:', (err as any)?.message || err)
+          console.log('[Carsafety AI] Raw accumulatedJSON at time of failure:', accumulatedJSON)
 
           const textFallback = getEmergencyFallback(content)
           issueData = textFallback || buildSoftFallback(finalImageUrl)
@@ -986,7 +986,7 @@ ${diagnosticHistory}
               })
             }
           } catch (chatError) {
-            console.error('[Carxai AI] Failed to save chat to DB:', chatError)
+            console.error('[Carsafety AI] Failed to save chat to DB:', chatError)
           }
 
           // Final: Re-fetch usage to see if we hit the limit
@@ -1042,7 +1042,7 @@ ${diagnosticHistory}
         const { url } = await res.json()
         setAttachedImage(url)
       } catch (err: any) {
-        console.error('[Carxai AI] Image upload failed:', err)
+        console.error('[Carsafety AI] Image upload failed:', err)
         alert(err.message || 'Image upload failed. Please try a different photo and ensure it is under 5MB.')
       } finally {
         setIsImageProcessing(false)

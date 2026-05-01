@@ -120,7 +120,7 @@ const AiBubble = ({ msg }: { msg: any }) => (
       <div className="w-4.5 h-4.5 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
         <Bot size={11} />
       </div>
-      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">CarxAI Assistant</span>
+      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Carsafety Assistant</span>
     </div>
     <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tl-[4px] bg-[#F0F2F5] text-[#1C1E21] text-[11px] font-medium leading-relaxed border border-slate-100/50">
       {msg.content}
@@ -648,7 +648,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carxai gives you immediate clarity and helps discover nearby options.</p>
+            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Carsafety gives you immediate clarity and helps discover nearby options.</p>
           </div>
         </section>
 
@@ -854,7 +854,7 @@ export default function Landing() {
               Common problems we help <span className="text-[#0070E0]">diagnose.</span>
             </h2>
             <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
-              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how CarxAI can help.
+              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Carsafety can help.
             </p>
           </div>
           <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
@@ -868,7 +868,7 @@ export default function Landing() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Carxai</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Carsafety</h2>
             <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community of supported drivers.</p>
           </div>
 
@@ -890,7 +890,7 @@ export default function Landing() {
                 <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Help Center</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">Common Questions</h2>
-              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about CarxAI.</p>
+              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about Carsafety.</p>
             </div>
 
             <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-2 md:p-4">

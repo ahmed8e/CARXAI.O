@@ -47,7 +47,7 @@ export default function SharedReport() {
         setReportData(data)
         
         // Show modal only once per session for this report
-        const modalShownKey = `carxai_lead_modal_shown_${activeIdentifier}`
+        const modalShownKey = `carsafety_lead_modal_shown_${activeIdentifier}`
         if (!sessionStorage.getItem(modalShownKey)) {
           setTimeout(() => setShowLeadModal(true), 1500) // Delay modal slightly for premium feel
           sessionStorage.setItem(modalShownKey, 'true')
@@ -208,7 +208,7 @@ export default function SharedReport() {
           </motion.div>
           
           <div className="mt-8 text-center">
-              <p className="text-sm font-medium text-slate-500">Want to generate your own AI reports? <Link to="/register" className="text-[#0070E0] hover:underline font-bold">Join Carxai.</Link></p>
+              <p className="text-sm font-medium text-slate-500">Want to generate your own AI reports? <Link to="/register" className="text-[#0070E0] hover:underline font-bold">Join Carsafety.</Link></p>
           </div>
         </main>
 

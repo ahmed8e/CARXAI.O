@@ -51,10 +51,10 @@ function clean(val: string | null | undefined): string | null {
 
 // ── Trust fallback messages ───────────────────────────────────────────
 const TRUST_MESSAGES = [
-  'Verified local garage in the Carxai network.',
+  'Verified local garage in the Carsafety network.',
   'Trusted automotive workshop, available now.',
   'Reliable mechanic for all car makes and models.',
-  'Professional car repair through Carxai.',
+  'Professional car repair through Carsafety.',
   'Experienced local mechanic available nearby.',
 ]
 function trustFallback(id: number): string {

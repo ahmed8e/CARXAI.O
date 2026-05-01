@@ -51,7 +51,7 @@ export default function LocationPrompt({ isOpen, onClose }: LocationPromptProps)
   const handleNotNow = () => {
     // Dismiss for 24 hours (fake a date in the past that makes it "seen" but allows showing again soon if logic allows, 
     // or just set a "dismissed" flag). Let's use 30 days for primary, 24h for Not Now.
-    localStorage.setItem('carxai_location_prompt_seen', (Date.now() - (29 * 24 * 60 * 60 * 1000)).toString()) 
+    localStorage.setItem('carsafety_location_prompt_seen', (Date.now() - (29 * 24 * 60 * 60 * 1000)).toString()) 
     onClose()
   }
 

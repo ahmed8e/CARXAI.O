@@ -210,7 +210,7 @@ const GuideDetail: React.FC = () => {
                     Stop Guessing. Get a Professional-Level Diagnosis in Seconds.
                   </h2>
                   <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed">
-                    Not sure if it's the rotors or something else? Let CarxAI's tech-informed logic identify the exact failure point on your {guide.categoryDisplay?.toLowerCase() || 'vehicle'}.
+                    Not sure if it's the rotors or something else? Let Carsafety's tech-informed logic identify the exact failure point on your {guide.categoryDisplay?.toLowerCase() || 'vehicle'}.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-5 justify-center">
                     <Link to="/auth" className="px-12 py-5 rounded-2xl bg-[#0070E0] text-white font-black text-[13px] uppercase tracking-widest shadow-2xl shadow-blue-500/20 hover:-translate-y-1 transition-all">

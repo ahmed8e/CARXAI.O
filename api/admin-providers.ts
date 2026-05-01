@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Check multiple sources to verify admin status:
     // a) JWT User Metadata (fastest, standard Supabase)
     // b) Profiles Table (canonical DB state)
-    // c) Email Domain (fallback for CarxAI staff)
+    // c) Email Domain (fallback for Carsafety staff)
     
     const jwtMetadata = user.user_metadata || {};
     const jwtRole = jwtMetadata.role;

@@ -20,7 +20,7 @@ function PathTracker() {
                     location.pathname === '/choose-plan'
     
     if (isInApp) {
-      localStorage.setItem('carxai.last_path', location.pathname + location.search)
+      localStorage.setItem('carsafety.last_path', location.pathname + location.search)
     }
   }, [location])
 

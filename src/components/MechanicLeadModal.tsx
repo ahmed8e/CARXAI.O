@@ -53,13 +53,13 @@ export default function MechanicLeadModal({ sharedLinkId, isOpen, onClose }: Mec
       source: 'shared_report_modal'
     }
 
-    console.group('[Carxai Lead Capture] Submission Details')
+    console.group('[Carsafety Lead Capture] Submission Details')
     console.log('Shared Link UUID:', sharedLinkId)
     console.log('Payload:', payload)
     console.groupEnd()
 
     try {
-      console.log('[Carxai Lead Capture] Proceeding with API submission...')
+      console.log('[Carsafety Lead Capture] Proceeding with API submission...')
       
       const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch('/api/leads', {
@@ -76,7 +76,7 @@ export default function MechanicLeadModal({ sharedLinkId, isOpen, onClose }: Mec
         throw new Error(errData.error || 'Submission failed')
       }
 
-      console.log('[Carxai Lead Capture] Submission Successful')
+      console.log('[Carsafety Lead Capture] Submission Successful')
 
       if (typeof window !== 'undefined' && 'dataLayer' in window) {
         (window as any).dataLayer.push({ event: 'mechanic_lead_submitted', leadType: type })

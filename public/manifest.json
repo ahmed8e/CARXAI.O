@@ -1,6 +1,6 @@
 {
-  "name": "Carxai – AI Mechanic",
-  "short_name": "Carxai",
+  "name": "Carsafety – AI Mechanic",
+  "short_name": "Carsafety",
   "description": "AI-powered car assistance. Diagnose car issues, find nearby mechanics, and get towing help instantly.",
   "start_url": "/",
   "display": "standalone",

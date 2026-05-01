@@ -42,7 +42,7 @@ const GuidesIndex: React.FC = () => {
   const popularGuides = guides.slice(0, 3);
 
   return (
-    <GuideLayout title="Diagnostic Guides" metaTitle="Automotive Diagnostic Guides & Problem Library | CarxAI">
+    <GuideLayout title="Diagnostic Guides" metaTitle="Automotive Diagnostic Guides & Problem Library | Carsafety">
       <div className="flex flex-col gap-16 md:gap-24">
         
         {/* Hero Section */}
