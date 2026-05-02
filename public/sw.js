@@ -31,11 +31,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Simple pass-through for everything else with a safety catch
+  // 3. Simple pass-through for everything else
+  // If fetch fails, we just log it and let it fail naturally
   event.respondWith(
     fetch(event.request).catch(err => {
-      console.warn('[SW] Fetch failed:', event.request.url);
-      // Return a basic error response or offline fallback if needed
+      if (!url.pathname.includes('/auth')) {
+        console.warn('[SW] Fetch failed:', event.request.url);
+      }
+      throw err; // Re-throw so the browser handles it as a network error
     })
   );
 });
