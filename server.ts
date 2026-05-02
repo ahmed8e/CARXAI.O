@@ -52,7 +52,7 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   
   // Handle SPA routing: redirect all non-API requests to index.html
-  app.get('*', (req, res) => {
+  app.get('*', (req: express.Request, res: express.Response) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(distPath, 'index.html'));
     }
