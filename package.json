@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "rebuild": "force",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
