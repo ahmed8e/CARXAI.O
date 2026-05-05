@@ -68,12 +68,12 @@ const AIMechanic = lazy(() => import('./pages/AIMechanic'))
 const MyAccount = lazy(() => import('./pages/MyAccount'))
 const Vehicles = lazy(() => import('./pages/Vehicles'))
 const ChoosePlan = lazy(() => import('./pages/ChoosePlan'))
-const LocationOnboarding = lazy(() => import('./pages/LocationOnboarding'))
 const GuidesIndex = lazy(() => import('./pages/GuidesIndex'))
 const GuideDetail = lazy(() => import('./pages/GuideDetail'))
 const DiagnosticGuideDetail = lazy(() => import('./pages/DiagnosticGuideDetail'))
 const AbsLightGuide = lazy(() => import('./pages/AbsLightGuide'))
 const AvoidOverpaying = lazy(() => import('./pages/AvoidOverpaying'))
+const Reports = lazy(() => import('./pages/Reports'))
 
 // Admin
 import { AdminRoute } from './components/AdminRoute'
@@ -133,11 +133,7 @@ export default function App() {
                   <ChoosePlan />
                 </ProtectedRoute>
               } />
-              <Route path="/onboarding-location" element={
-                <ProtectedRoute>
-                  <LocationOnboarding />
-                </ProtectedRoute>
-              } />
+
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <AppLayout>

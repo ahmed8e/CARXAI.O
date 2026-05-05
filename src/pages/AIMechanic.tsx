@@ -1502,38 +1502,11 @@ ${diagnosticHistory}
                                         <div className="grid grid-cols-2 gap-3 w-full">
                                           {severity === 'high' && (
                                             <>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(239,68,68,0.4)] border border-white/20 order-1"
-                                              >
-                                                <Zap className="w-4 h-4 text-white/90" />
-                                                Towing
-                                              </motion.button>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
-                                              >
-                                                <MapPin className="w-4 h-4 text-navy/40" />
-                                                Find Mechanic
-                                              </motion.button>
                                             </>
                                           )}
 
                                           {severity === 'medium' && (
                                             <>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
-                                              >
-                                                <MapPin className="w-4 h-4 text-white/90" />
-                                                Find Mechanic
-                                              </motion.button>
                                               <motion.button
                                                 whileHover={{ y: -2, scale: 1.02 }}
                                                 whileTap={{ scale: 0.96 }}
@@ -1556,15 +1529,6 @@ ${diagnosticHistory}
                                               >
                                                 <Activity className="w-4 h-4 text-white/90" />
                                                 Monitor Issue
-                                              </motion.button>
-                                              <motion.button
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ scale: 0.96 }}
-                                                onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                                className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
-                                              >
-                                                <MapPin className="w-4 h-4 text-navy/40" />
-                                                Find Mechanic
                                               </motion.button>
                                             </>
                                           )}

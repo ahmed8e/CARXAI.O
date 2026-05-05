@@ -2,13 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
-  Car, ShieldAlert, ShieldCheck, Truck, 
+  Car, ShieldAlert, ShieldCheck, 
   CheckCircle, Loader2, ArrowRight
 } from 'lucide-react'
 import { BrandLockup } from '../components/ui/Brand'
 import { supabase } from '../lib/supabase'
 import { getUrgencyBadge } from '../lib/utils'
-import MechanicLeadModal from '../components/MechanicLeadModal'
 import ListenButton from '../components/ui/ListenButton'
 import ErrorBoundary from '../components/ErrorBoundary'
 
@@ -17,9 +16,6 @@ export default function SharedReport() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reportData, setReportData] = useState<any>(null)
-  
-  // Lead Capture Modal State
-  const [showLeadModal, setShowLeadModal] = useState(false)
   const currentAudioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -46,12 +42,7 @@ export default function SharedReport() {
 
         setReportData(data)
         
-        // Show modal only once per session for this report
-        const modalShownKey = `car safety_lead_modal_shown_${activeIdentifier}`
-        if (!sessionStorage.getItem(modalShownKey)) {
-          setTimeout(() => setShowLeadModal(true), 1500) // Delay modal slightly for premium feel
-          sessionStorage.setItem(modalShownKey, 'true')
-        }
+
 
       } catch (err) {
         console.error('Error fetching shared report:', err)
@@ -194,12 +185,7 @@ export default function SharedReport() {
                       {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
                     </div>
 
-                    {diagnosis.towingRecommended && (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-orange-50 text-orange-600 border border-orange-100">
-                        <Truck className="w-4 h-4" />
-                        Towing Recommended
-                      </div>
-                    )}
+
                   </div>
                 </div>
               </div>
@@ -212,12 +198,7 @@ export default function SharedReport() {
           </div>
         </main>
 
-        {/* Lead Capture Modal Overridden Logic */}
-        <MechanicLeadModal 
-          isOpen={showLeadModal}
-          onClose={() => setShowLeadModal(false)}
-          sharedLinkId={reportData.id}
-        />
+
       </div>
     </ErrorBoundary>
   )

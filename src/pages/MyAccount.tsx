@@ -19,7 +19,7 @@ type Section = 'profile' | 'security' | 'preferences' | 'billing' | 'activity' |
 
 interface ActivityItem {
   id: string;
-  type: 'diagnosis' | 'search' | 'towing';
+  type: 'diagnosis';
   title: string;
   date: string;
   timestamp: string;
@@ -215,22 +215,6 @@ export default function MyAccount() {
         .order('created_at', { ascending: false })
         .limit(5)
 
-      // Fetch Mechanic Searches
-      const { data: searches } = await supabase
-        .from('mechanic_searches')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-      // Fetch Towing Requests
-      const { data: towing } = await supabase
-        .from('towing_requests')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5)
-
       // Combine and filter results
       const merged: ActivityItem[] = []
 
@@ -242,28 +226,6 @@ export default function MyAccount() {
           date: new Date(chat.created_at).toLocaleDateString(),
           timestamp: chat.created_at,
           status: chat.urgency_level || 'Completed'
-        }))
-      }
-
-      if (searches) {
-        searches.forEach((search: any) => merged.push({
-          id: search.id,
-          type: 'search',
-          title: `Searched for ${search.selected_mechanic_name || 'Mechanics'}`,
-          date: new Date(search.created_at).toLocaleDateString(),
-          timestamp: search.created_at,
-          status: search.location_text || 'Nearby'
-        }))
-      }
-
-      if (towing) {
-        towing.forEach((req: any) => merged.push({
-          id: req.id,
-          type: 'towing',
-          title: `Towing: ${req.provider_name || 'Request Sent'}`,
-          date: new Date(req.created_at).toLocaleDateString(),
-          timestamp: req.created_at,
-          status: req.status || 'Sent'
         }))
       }
 
@@ -351,8 +313,6 @@ export default function MyAccount() {
   const ActivityIcon = ({ type }: { type: ActivityItem['type'] }) => {
     switch (type) {
       case 'diagnosis': return <ShieldAlert className="w-6 h-6 text-blue-500" />
-      case 'search': return <Navigation className="w-6 h-6 text-emerald-500" />
-      case 'towing': return <Wrench className="w-6 h-6 text-amber-500" />
       default: return <History className="w-6 h-6" />
     }
   }

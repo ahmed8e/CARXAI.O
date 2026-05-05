@@ -302,7 +302,7 @@ const reviews = [
 const faqData = [
   {
     question: "Is the diagnosis accurate?",
-    answer: "Our system provides highly accurate estimates based on real-world car issues and data. While it’s very reliable, we always recommend confirming with a professional mechanic."
+    answer: "Our system provides highly accurate estimates based on real-world car issues and data. While it’s very reliable, we always recommend confirming with a certified professional."
   },
   {
     question: "Is this service free?",
@@ -531,7 +531,7 @@ export default function Landing() {
                     transition={{ delay: 0.2 }}
                     className="text-slate-500 text-base md:text-lg lg:text-xl mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    Diagnose your car problem in 30 seconds — no mechanic needed.
+                    Diagnose your car problem in 30 seconds — no shop visit needed.
                   </motion.p>
 
                   <motion.div 
