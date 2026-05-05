@@ -88,6 +88,16 @@ export default function Dashboard() {
       badge: 'History',
       locked: false,
     },
+    {
+      to: '/dashboard/maintenance',
+      icon: Wrench,
+      label: 'Smart Maintenance',
+      desc: 'Track and forecast your car\'s maintenance needs.',
+      color: '#f59e0b', // amber-500
+      bg: 'rgba(245, 158, 11, 0.06)',
+      badge: 'Tracking',
+      locked: false,
+    },
   ]
 
   return (

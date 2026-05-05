@@ -21,6 +21,7 @@ const NAV_GROUPS = [
       { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
       { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic' },
       { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles' },
+      { to: '/dashboard/maintenance',  icon: Wrench,          label: 'Maintenance' },
       { to: '/dashboard/reports',      icon: CircuitBoard,    label: 'Reports'     },
     ],
   },
@@ -34,7 +35,7 @@ import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
   { to: '/dashboard/vehicles',    icon: Car,             label: 'Garage'      },
   { to: '/dashboard',             icon: LayoutDashboard, label: 'Dashboard'   },
-  { to: '/dashboard/ai-mechanic', icon: CircuitBoard,    label: 'AI Mechanic' },
+  { to: '/dashboard/maintenance', icon: Wrench,          label: 'Maintenance' },
   { to: '/my-account',            icon: Settings,        label: 'Account'     },
 ]
 
