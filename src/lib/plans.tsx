@@ -65,7 +65,7 @@ export const plans: Plan[] = [
       { text: 'Unlimited AI chat sessions', icon: <MessageCircle size={16} /> },
       { text: 'Full image & dashboard analysis', icon: <ImageIcon size={16} /> },
       { text: '15 shareable reports / month', icon: <FileText size={16} /> },
-      { text: 'Nearby provider map', icon: <MapPin size={16} /> },
+      { text: 'Avoid Overpaying protection', icon: <ShieldCheck size={16} /> },
       { text: 'Standard support', icon: <ShieldCheck size={16} /> },
     ],
     includes: [
@@ -92,13 +92,12 @@ export const plans: Plan[] = [
       { text: 'Image-based diagnosis', icon: <ImageIcon size={16} />, highlight: true },
       { text: 'Voice input & TTS readback', icon: <Mic size={16} />, highlight: true },
       { text: 'Structured follow-up flow', icon: <Star size={16} />, highlight: true },
-      { text: 'Priority human support', icon: <ShieldCheck size={16} /> },
+      { text: 'Priority support', icon: <ShieldCheck size={16} /> },
     ],
     includes: [
       'Everything in Pro, plus:',
       'Unlimited report sharing',
-      'Full provider visibility',
-      'Expert Support included',
+      'Advanced cost estimation',
     ],
   },
 ]

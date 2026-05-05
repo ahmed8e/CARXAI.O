@@ -20,15 +20,8 @@ const NAV_GROUPS = [
     items: [
       { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
       { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic' },
-      { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles'                },
-    ],
-  },
-  {
-    label: 'Get Help',
-    items: [
-      { to: '/dashboard/mechanic', icon: Users,  label: 'Find a Mechanic' },
-      { to: '/dashboard/towing',   icon: Wrench, label: 'Towing Service'  },
-      { to: '/dashboard/map',      icon: MapPin, label: 'Nearby Map'      },
+      { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles' },
+      { to: '/dashboard/reports',      icon: CircuitBoard,    label: 'Reports'     },
     ],
   },
 ]

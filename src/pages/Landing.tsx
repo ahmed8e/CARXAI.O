@@ -17,8 +17,8 @@ const SymptomCarousel = lazy(() => import('../components/ui/SymptomCarousel'))
 const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
-  Bot, Users, Truck, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
-  Aperture, MapPin, Mic, ImagePlus, ShieldAlert,
+  Bot, Users, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
+  MapPin, Mic, ImagePlus, ShieldAlert, FileText,
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
   Send, ChevronDown, HelpCircle, Camera, AlertTriangle, Star
 } from 'lucide-react'
@@ -76,8 +76,6 @@ const CHAT_SEQUENCE = [
     severity: "Medium",
     finding: "ABS Module — Wheel Speed Sensor Fault",
     advice: "Most likely cause: a dirty or failing front wheel speed sensor. Common on this model after 50k km. Not urgent, but should be scanned within the next few days.",
-    mechanic: "Schneider Automotive",
-    mechanicReason: "Specializes in ABS & braking systems",
     timestamp: "10:15 AM"
   }
 ];
@@ -155,18 +153,9 @@ const DiagnosticCard = ({ msg }: { msg: any }) => (
     <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-100/50 text-[9px] text-slate-600 font-medium leading-relaxed">
       {msg.advice}
     </div>
-    <div className="p-2.5 rounded-2xl bg-[#F0F7FF] border border-blue-100/50 flex items-start gap-2.5">
-      <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#0084FF] shadow-sm border border-blue-50 mt-0.5 flex-shrink-0">
-        <MapPin size={12} />
-      </div>
-      <div className="flex flex-col gap-0.5">
-        <span className="text-[10px] font-bold text-slate-800">{msg.mechanic}</span>
-        <span className="text-[8px] text-slate-500 font-medium leading-tight">{msg.mechanicReason}</span>
-      </div>
-    </div>
     <button className="w-full py-2.5 rounded-xl bg-[#0084FF] text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 active:scale-[0.98] transition-all text-[9px] font-black uppercase tracking-widest">
-      <MapPin size={11} />
-      Open Map
+      <FileText size={11} />
+      Full Report
     </button>
   </motion.div>
 );
@@ -294,20 +283,19 @@ const ScrollChatDemo = () => {
 const features = [
   { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
   { icon: Zap, title: 'Warning Light Help', desc: 'Understand dashboard alerts' },
-  { icon: Users, title: 'Provider Discovery', desc: 'Discover trusted local options' },
-  { icon: Truck, title: 'Towing Options', desc: 'Find nearby visibility options' },
-  { icon: Aperture, title: 'Nearby Help Map', desc: 'Explore providers on a map' },
   { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s an emergency' },
   { icon: ImagePlus, title: 'Photo Analysis', desc: 'AI visual damage check' },
+  { icon: DollarSign, title: 'Avoid Overpaying', desc: 'Verify repair cost estimates' },
+  { icon: LayoutDashboard, title: 'Vehicle History', desc: 'Track all previous reports' },
   { icon: CheckCircle2, title: 'Clear Guidance', desc: 'Step-by-step next steps' },
+  { icon: Bot, title: '24/7 AI Assistant', desc: 'Expert help anytime, anywhere' },
 ]
 
 const reviews = [
   { name: 'Jason M.', car: 'Toyota RAV4 • Sensor Fault', rating: 5, text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
   { name: 'Jessica W.', car: 'BMW 3 Series • Warning Light', rating: 5, text: 'Car Safety helped me understand the warning light in seconds and showed me the right next step without confusing jargon.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
-  { name: 'Sarah J.', car: 'VW Golf • Overheating', rating: 5, text: 'My temperature gauge spiked. The AI told me exactly what to check safely and helped me find a nearby tow truck immediately. A total lifesaver.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
+  { name: 'Sarah J.', car: 'VW Golf • Overheating', rating: 5, text: 'My temperature gauge spiked. The AI told me exactly what to check safely and explained the risks of driving further.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
   { name: 'Michael B.', car: 'Audi A3 • No-Start Issue', rating: 5, text: 'Simple, clear, and actually useful. My car wouldn\'t turn over, and the breakdown analysis pointed right to the battery instead of the starter.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
-  { name: 'Robert T.', car: 'Mercedes C-Class • Stranded', rating: 5, text: 'I broke down at night and needed visibility fast. The nearby help map found an open mechanic and towing option much faster than standard searching.', date: '5 days ago', image: '/JBJ RIV 5.jpg' },
   { name: 'Ryan K.', car: 'Peugeot 208 • Strange Noise', rating: 5, text: 'I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
 ]
 
@@ -330,11 +318,7 @@ const faqData = [
   },
   {
     question: "What should I do after getting the result?",
-    answer: "You’ll receive recommendations and next steps. You can either fix the issue yourself or contact a nearby mechanic."
-  },
-  {
-    question: "Can I find a mechanic through the platform?",
-    answer: "Yes, we help you connect with nearby trusted mechanics based on your location."
+    answer: "You’ll receive a detailed diagnostic report with next steps, potential costs, and safety advice."
   },
   {
     question: "Is my data safe?",
@@ -648,7 +632,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Car Safety gives you immediate clarity and helps discover nearby options.</p>
+            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Car Safety gives you immediate clarity and helps you avoid overpaying.</p>
           </div>
         </section>
 
@@ -734,7 +718,7 @@ export default function Landing() {
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Know What <br/> to Do Next</h3>
-                <p className="text-slate-500 font-medium leading-relaxed mb-6">See if you can keep driving, and get matched with a trusted mechanic.</p>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">See if you can keep driving, get cost estimates, and access your full report.</p>
                 
                 <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-100">

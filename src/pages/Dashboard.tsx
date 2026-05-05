@@ -79,33 +79,13 @@ export default function Dashboard() {
       locked: false,
     },
     {
-      to: '/dashboard/mechanic',
-      icon: Users,
-      label: 'Human Mechanic',
-      desc: 'Find nearby mechanics and garages fast.',
-      color: '#0891b2',
-      bg: 'rgba(8, 145, 178, 0.06)',
-      badge: 'Nearby',
-      locked: false,
-    },
-    {
-      to: '/dashboard/towing',
-      icon: Wrench,
-      label: 'Towing / Dépannage',
-      desc: 'Get emergency towing help in minutes.',
-      color: '#ea580c',
-      bg: 'rgba(234, 88, 12, 0.06)',
-      badge: 'Emergency',
-      locked: false,
-    },
-    {
-      to: '/dashboard/map',
-      icon: Navigation,
-      label: 'Nearby Help Map',
-      desc: 'Browse nearby providers on the map.',
+      to: '/dashboard/reports',
+      icon: Activity,
+      label: 'Diagnostic Reports',
+      desc: 'View your previous vehicle diagnostic history.',
       color: '#7c3aed',
       bg: 'rgba(124, 58, 237, 0.06)',
-      badge: 'Map View',
+      badge: 'History',
       locked: false,
     },
   ]
@@ -149,12 +129,6 @@ export default function Dashboard() {
                   e.preventDefault()
                   setIsDevModalOpen(true)
                   return
-                }
-
-                // Plan Gating for Mechanic & Towing
-                if ((mod.to === '/dashboard/mechanic' || mod.to === '/dashboard/towing') && isFree) {
-                  e.preventDefault()
-                  setShowUpgradePrompt(true)
                 }
               }}
               className="relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all"

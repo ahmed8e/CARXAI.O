@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, Download, Copy, Share2,
-  Truck, ShieldAlert, User,
+  ShieldAlert, User,
   Car, Info, AlertTriangle,
   Calendar, Hash, Loader2,
   ShieldCheck, Lock
@@ -462,12 +462,7 @@ export default function MechanicReport({
                                 {diagnosis.can_drive ? 'Safe to Drive' : 'Do Not Drive'}
                               </div>
 
-                              {diagnosis.towingRecommended && (
-                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-orange-50 text-orange-600 border border-orange-100">
-                                  <Truck className="w-4 h-4" />
-                                  Towing Recommended
-                                </div>
-                              )}
+                              </div>
                             </div>
                           </div>
                         </div>

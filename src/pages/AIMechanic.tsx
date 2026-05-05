@@ -1353,35 +1353,15 @@ ${diagnosticHistory}
                                       Generate Official Report
                                     </motion.button>
 
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="pt-2">
                                       <motion.button
                                         whileHover={{ y: -2 }}
-                                        onClick={() => navigate('/dashboard/mechanic', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                        className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
+                                        onClick={() => sendMessage("What are the estimated repair costs for this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
                                       >
-                                        <MapPin className="w-4 h-4 text-navy/30" />
-                                        Find Repair
+                                        <RefreshCw className="w-4 h-4 text-navy/30" />
+                                        Check Estimated Repair Costs
                                       </motion.button>
-
-                                      {(!msg.issueData.can_drive || msg.issueData.severity === 'high') ? (
-                                        <motion.button
-                                          whileHover={{ y: -2 }}
-                                          onClick={() => navigate('/dashboard/towing', { state: { initialSearch: msg.issueData!.normalized_issue || msg.issueData!.issueName } })}
-                                          className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-red-50 border border-red-100 text-red-600 text-[11px]"
-                                        >
-                                          <Zap className="w-4 h-4" />
-                                          Get Towing
-                                        </motion.button>
-                                      ) : (
-                                        <motion.button
-                                          whileHover={{ y: -2 }}
-                                          onClick={() => sendMessage("What are the estimated repair costs for this issue?", undefined, undefined, { previous_diagnosis: msg.issueData })}
-                                          className="flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
-                                        >
-                                          <RefreshCw className="w-4 h-4 text-navy/30" />
-                                          Check Costs
-                                        </motion.button>
-                                      )}
                                     </div>
                                     
                                     <div className="flex justify-center pt-2">

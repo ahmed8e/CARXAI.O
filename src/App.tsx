@@ -65,9 +65,6 @@ const Privacy = lazy(() => import('./pages/Privacy'))
 const Terms = lazy(() => import('./pages/Terms'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const AIMechanic = lazy(() => import('./pages/AIMechanic'))
-const HumanMechanic = lazy(() => import('./pages/HumanMechanic'))
-const Towing = lazy(() => import('./pages/Towing'))
-const NearbyMap = lazy(() => import('./pages/NearbyMap'))
 const MyAccount = lazy(() => import('./pages/MyAccount'))
 const Vehicles = lazy(() => import('./pages/Vehicles'))
 const ChoosePlan = lazy(() => import('./pages/ChoosePlan'))
@@ -169,24 +166,10 @@ export default function App() {
                   </AppLayout>
                 </ProtectedRoute>
               } />
-              <Route path="/dashboard/mechanic" element={
+              <Route path="/dashboard/reports" element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <HumanMechanic />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/towing" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Towing />
-                  </AppLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/map" element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <NearbyMap />
+                    <Reports />
                   </AppLayout>
                 </ProtectedRoute>
               } />
