@@ -461,8 +461,6 @@ export default function MechanicReport({
                                 {diagnosis.can_drive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
                                 {diagnosis.can_drive ? 'Safe to Drive' : 'Do Not Drive'}
                               </div>
-
-                              </div>
                             </div>
                           </div>
                         </div>
