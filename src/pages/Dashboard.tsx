@@ -7,7 +7,7 @@ import InstallPrompt from '../components/InstallPrompt'
 import { 
   Users, ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
-  Car, Zap, Plus, Thermometer, Battery, Activity
+  Car, Zap, Plus, Battery, Activity
 } from 'lucide-react'
 import DevelopmentModal from '../components/DevelopmentModal'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
@@ -20,7 +20,6 @@ import {
   type MaintenanceItem,
   type ServiceRecord
 } from '../data/maintenanceData'
-import HealthScoreCard from '../components/maintenance/HealthScoreCard'
 import MaintenanceReminderCard from '../components/maintenance/MaintenanceReminderCard'
 
 export default function Dashboard() {
@@ -106,233 +105,190 @@ export default function Dashboard() {
     {
       to: '/dashboard/avoid-overpaying',
       icon: ShieldCheck,
-      label: 'Avoid Overpaying',
-      desc: 'Verify if your mechanic\'s quote is fair.',
-      color: '#10b981', // emerald-500
-      bg: 'rgba(16, 185, 129, 0.06)',
-      badge: 'Protection',
-      locked: false,
+      label: 'Price Check',
+      desc: 'Verify repair quotes',
+      color: 'text-blue-500', 
+      bg: 'bg-blue-50',
+      border: 'border-blue-100'
     },
     {
       to: '/dashboard/ai-mechanic',
       icon: ShieldAlert,
       label: 'AI Mechanic',
-      desc: 'Get instant AI diagnosis and urgency level.',
-      color: '#0070E0',
-      bg: 'rgba(0, 112, 224, 0.06)',
-      badge: 'AI Powered',
-      locked: false,
-    },
-    {
-      to: '/dashboard/reports',
-      icon: Activity,
-      label: 'Diagnostic Reports',
-      desc: 'View your previous vehicle diagnostic history.',
-      color: '#7c3aed',
-      bg: 'rgba(124, 58, 237, 0.06)',
-      badge: 'History',
-      locked: false,
+      desc: 'Instant diagnosis',
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-50',
+      border: 'border-indigo-100'
     },
     {
       to: '/dashboard/maintenance',
       icon: Wrench,
-      label: 'Smart Maintenance',
-      desc: 'Track and forecast your car\'s maintenance needs.',
-      color: '#f59e0b', // amber-500
-      bg: 'rgba(245, 158, 11, 0.06)',
-      badge: 'Tracking',
-      locked: false,
+      label: 'Maintenance',
+      desc: 'Track schedule',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-100'
+    },
+    {
+      to: '/dashboard/reports',
+      icon: Activity,
+      label: 'Reports',
+      desc: 'Diagnostic history',
+      color: 'text-purple-500',
+      bg: 'bg-purple-50',
+      border: 'border-purple-100'
     },
   ]
 
   const urgentMaintenance = maintenanceStatuses.filter(s => s.status === 'overdue' || s.status === 'due')
 
   return (
-    <div className="p-4 lg:p-6 max-w-5xl mx-auto bg-transparent">
-      {/* 1. Status Strip */}
-      <div className="flex items-center justify-between gap-3 mb-6 px-1">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/80">System Ready</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-navy/5 border border-navy/10 text-navy font-black text-[9px] uppercase tracking-widest">
-            AI Pro Unlocked
-          </div>
-          {defaultVehicle && (
-             <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted">
-               <Car className="w-3 h-3" /> {defaultVehicle.make}
-             </div>
-          )}
-        </div>
+    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 pb-24">
+      
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[30%] bg-blue-400/5 blur-[120px] rounded-full" />
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
       </div>
 
-      {/* 2. Short Premium Hero */}
-      <div className="mb-8 px-1">
-        <p className="text-xs font-bold text-muted mb-1">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}</p>
-        <h1 className="text-2xl md:text-3xl font-display font-black text-on-surface italic tracking-tight leading-tight">
-          What do you need<br />help with today?
-        </h1>
-      </div>
-
-      {/* 3. Maintenance Alerts & Health Score */}
-      {(urgentMaintenance.length > 0 || healthScore) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Health Score Column */}
-          {healthScore && (
-            <div className="md:col-span-1">
-              <HealthScoreCard 
-                score={healthScore.total} 
-                label={healthScore.label} 
-                categories={healthScore.categories} 
-              />
+      {/* Crystal Header */}
+      <div className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm px-4 h-16 flex items-center justify-between">
+         <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20">
+               <Car className="w-4 h-4 text-white" />
             </div>
-          )}
+            <span className="text-sm font-black text-slate-900 tracking-tight">Car Safety</span>
+         </div>
+         <div className="flex items-center gap-3">
+            <span className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-full text-[9px] font-black uppercase tracking-widest border border-slate-200">
+               Pro Active
+            </span>
+            <Link to="/my-account" className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900">
+               <Users className="w-4 h-4" />
+            </Link>
+         </div>
+      </div>
 
-          {/* Urgent Alerts Column */}
-          {urgentMaintenance.length > 0 && (
-            <div className="md:col-span-2 space-y-3">
-              <div className="flex items-center gap-2 mb-2 px-1">
-                <AlertCircle className="w-4 h-4 text-red-500" />
-                <h2 className="text-[10px] font-black text-on-surface uppercase tracking-widest">Urgent Maintenance</h2>
+      <div className="max-w-xl mx-auto px-4 pt-6 relative z-10">
+        
+        {/* Greeting */}
+        <div className="mb-6">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Welcome back, {firstName}</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
+            How can we help<br />with your car today?
+          </h1>
+        </div>
+
+        {/* Active Vehicle Compact Card */}
+        <div className="mb-6">
+          {!defaultVehicle && !loadingVehicle ? (
+            <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-white/60 backdrop-blur-xl border border-white p-4 rounded-[24px] transition-all shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-200/50">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-blue-600" />
               </div>
-              {urgentMaintenance.slice(0, 2).map(s => (
-                <MaintenanceReminderCard 
-                  key={s.item.id} 
-                  status={s} 
-                  currentMileage={defaultVehicle?.mileage || 50000} 
-                  onLogService={() => navigate('/dashboard/maintenance')} 
-                />
-              ))}
-              {urgentMaintenance.length > 2 && (
-                <Link to="/dashboard/maintenance" className="block text-center py-2 text-[10px] font-black text-navy uppercase tracking-widest hover:underline">
-                  View {urgentMaintenance.length - 2} more alerts →
-                </Link>
-              )}
-            </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Garage Empty</p>
+                <p className="text-sm font-black text-slate-900">Add your vehicle</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-all" />
+            </Link>
+          ) : defaultVehicle ? (
+            <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-white/60 backdrop-blur-xl border border-white p-4 rounded-[28px] shadow-xl shadow-slate-200/30 active:scale-[0.98] transition-all">
+              <div className="relative">
+                <div className="w-14 h-14 rounded-[20px] bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
+                  <Car className="w-6 h-6 text-slate-400" />
+                </div>
+                {healthScore && (
+                  <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white ${healthScore.total >= 70 ? 'bg-emerald-500' : healthScore.total >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}>
+                    {healthScore.total}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Active Vehicle</p>
+                <h3 className="text-base font-black text-slate-900 truncate">
+                  {defaultVehicle.year} {defaultVehicle.make} {defaultVehicle.model}
+                </h3>
+              </div>
+              <ChevronRight className="w-5 h-5 text-slate-300" />
+            </Link>
+          ) : (
+            <div className="h-20 w-full animate-pulse bg-slate-200/50 rounded-[28px]" />
           )}
         </div>
-      )}
 
-      {/* 4. Main Action Grid (2x2) */}
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {modules.map((mod) => (
-          <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
-            <Link 
-              to={mod.to} 
-              onClick={(e) => {
-                if (mod.to === '/dashboard/map') {
-                  e.preventDefault()
-                  setIsDevModalOpen(true)
-                  return
-                }
-              }}
-              className="relative overflow-hidden block h-full bg-surface dark:bg-surface border border-overlay rounded-3xl p-4 shadow-sm active:shadow-inner transition-all"
-            >
-              <div className="flex flex-col h-full">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-sm border border-transparent" style={{ background: mod.bg }}>
-                  <mod.icon className="w-5 h-5" style={{ color: mod.color }} />
+        {/* 2x2 Main Action Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {modules.map((mod) => (
+            <motion.div key={mod.to} whileTap={{ scale: 0.96 }}>
+              <Link 
+                to={mod.to} 
+                className="block h-full bg-white/60 backdrop-blur-xl border border-white rounded-[28px] p-5 shadow-xl shadow-slate-200/30 hover:shadow-2xl hover:shadow-slate-200/40 transition-all"
+              >
+                <div className={`w-10 h-10 rounded-2xl ${mod.bg} ${mod.border} border flex items-center justify-center mb-3 shadow-sm`}>
+                  <mod.icon className={`w-5 h-5 ${mod.color}`} />
                 </div>
-                <h3 className="text-sm font-display font-black text-on-surface leading-tight mb-1">
+                <h3 className="text-sm font-black text-slate-900 mb-1 leading-tight">
                   {mod.label}
                 </h3>
-                <p className="text-[10px] text-muted font-medium leading-normal line-clamp-2">{mod.desc}</p>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
+                <p className="text-[10px] text-slate-500 font-bold leading-snug">{mod.desc}</p>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
 
-      {/* 5. Compact Vehicle Card */}
-      <div className="mb-10">
-        {!defaultVehicle && !loadingVehicle ? (
-          <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-white border border-slate-100 p-5 rounded-[28px] transition-all hover:shadow-lg hover:shadow-slate-200/50 shadow-sm shadow-slate-200/20">
-            <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:border-blue-100">
-              <Plus className="w-5 h-5 text-blue-600" />
+        {/* Urgent Action (Max 1) */}
+        {urgentMaintenance.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3 px-2">
+               <div className="flex items-center gap-2">
+                 <AlertCircle className="w-4 h-4 text-rose-500" />
+                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Urgent Attention</h2>
+               </div>
+               {urgentMaintenance.length > 1 && (
+                 <Link to="/dashboard/maintenance" className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                   +{urgentMaintenance.length - 1} More
+                 </Link>
+               )}
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-display font-black text-slate-900 uppercase tracking-widest mb-0.5">Add your vehicle</p>
-              <p className="text-[10px] text-slate-400 font-medium">Unlock precise AI help for your specific car.</p>
+            <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[28px] shadow-xl shadow-slate-200/30 overflow-hidden">
+               <MaintenanceReminderCard 
+                  status={urgentMaintenance[0]} 
+                  currentMileage={defaultVehicle?.mileage || 50000} 
+                  onLogService={() => navigate('/dashboard/maintenance')} 
+               />
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500 transition-all" />
-          </Link>
-        ) : defaultVehicle ? (
-          <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-surface dark:bg-surface-low/80 border border-overlay p-4 rounded-3xl shadow-sm hover:shadow-md transition-all group">
-            <div className="w-12 h-12 rounded-2xl bg-surface-low dark:bg-surface-low flex items-center justify-center shadow-sm overflow-hidden">
-               <Car className="w-6 h-6 text-navy/40" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-black text-navy uppercase tracking-widest mb-0.5">Active Vehicle</p>
-              <h3 className="text-sm font-display font-black text-on-surface truncate italic tracking-tight">
-                {defaultVehicle.year} {defaultVehicle.make} {defaultVehicle.model}
-              </h3>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
-          </Link>
-        ) : (
-          <div className="h-20 w-full animate-pulse bg-surface-low dark:bg-surface-low rounded-3xl" />
+          </div>
         )}
-      </div>
 
-      {/* 6. Quick Issue Shortcuts */}
-      <div className="mb-12">
-        <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">Quick Diagnosis</p>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
-          {[
-            { label: 'Check Engine', icon: Activity },
-            { label: 'Car Won\'t Start', icon: Zap },
-            { label: 'Strange Noise', icon: AlertCircle },
-            { label: 'Battery Prob', icon: Battery },
-            { label: 'Brake Warning', icon: ShieldAlert },
-            { label: 'Overheating', icon: Thermometer },
-          ].map((issue, idx) => (
-            <button 
-              key={idx}
-              onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: issue.label } })}
-              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface dark:bg-surface-low/80 border border-overlay shadow-sm hover:border-navy/30 transition-all whitespace-nowrap active:scale-95"
-            >
-              <issue.icon className="w-3.5 h-3.5 text-navy" />
-              <span className="text-[11px] font-bold text-on-surface">{issue.label}</span>
-            </button>
-          ))}
+        {/* Horizontal Quick Issue Shortcuts */}
+        <div className="mb-8">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-2">Quick Diagnostics</p>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+            {[
+              { label: 'Check Engine', icon: Activity, color: 'text-amber-500' },
+              { label: 'Won\'t Start', icon: Zap, color: 'text-rose-500' },
+              { label: 'Noise', icon: AlertCircle, color: 'text-slate-500' },
+              { label: 'Battery', icon: Battery, color: 'text-blue-500' },
+              { label: 'Brakes', icon: ShieldAlert, color: 'text-emerald-500' },
+            ].map((issue, idx) => (
+              <button 
+                key={idx}
+                onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: issue.label } })}
+                className="flex items-center gap-2 bg-white/70 backdrop-blur-xl border border-white px-4 py-3 rounded-[20px] shadow-md shadow-slate-200/20 active:scale-95 transition-all whitespace-nowrap"
+              >
+                <issue.icon className={`w-4 h-4 ${issue.color}`} />
+                <span className="text-[11px] font-black text-slate-700">{issue.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-
-      {/* 7. Lower Utility Zone */}
-      <div>
-        <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">System Utilities</p>
-        <div className="grid grid-cols-1 gap-2">
-          {[
-            { label: 'Diagnostic Reports', icon: ShieldCheck, to: '/dashboard/reports' },
-            { label: 'Support & Docs', icon: Wrench, to: '/support' },
-            { label: 'Account Maintenance', icon: Users, to: '/my-account' },
-          ].map((item, idx) => (
-            <Link 
-              key={idx} 
-              to={item.to}
-              className="flex items-center gap-4 bg-surface/40 dark:bg-surface-high/40 border border-overlay p-4 rounded-2xl hover:bg-surface dark:hover:bg-slate-800 transition-all group"
-            >
-              <div className="w-8 h-8 rounded-xl bg-surface-high dark:bg-surface-high flex items-center justify-center text-muted group-hover:text-navy transition-colors">
-                <item.icon className="w-4 h-4" />
-              </div>
-              <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy" />
-            </Link>
-          ))}
-        </div>
       </div>
-      <InstallPrompt />
       
-      <DevelopmentModal 
-        isOpen={isDevModalOpen} 
-        onClose={() => setIsDevModalOpen(false)} 
-      />
-
-      <UpgradePrompt 
-        isOpen={showUpgradePrompt}
-        onClose={() => setShowUpgradePrompt(false)}
-      />
+      <InstallPrompt />
+      <DevelopmentModal isOpen={isDevModalOpen} onClose={() => setIsDevModalOpen(false)} />
+      <UpgradePrompt isOpen={showUpgradePrompt} onClose={() => setShowUpgradePrompt(false)} />
     </div>
   )
 }
