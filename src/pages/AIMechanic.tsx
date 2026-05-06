@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -8,9 +7,9 @@ import { useTTS } from '../lib/useTTS'
 import ListenButton from '../components/ui/ListenButton'
 import type { Message, DiagnosticResult } from '../lib/types'
 import {
-  Loader2, CheckCircle, Bot, Zap, Activity,
+  Loader2, CheckCircle, Sparkles, Zap, Activity,
   AlertTriangle, Wrench, Aperture, FileText,
-  MapPin, AudioLines, Send, Mic, RefreshCw,
+  AudioLines, Send, Mic, RefreshCw,
   ImagePlus, Lock, CarFront
 } from 'lucide-react'
 import VehicleAddModal from '../components/VehicleAddModal'
@@ -30,7 +29,6 @@ const RESET_WINDOW_HOURS = 5
 
 export default function AIMechanic() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -1121,7 +1119,7 @@ ${diagnosticHistory}
                 <div className="relative w-16 h-16 mx-auto mb-5">
                   <div className="absolute inset-0 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
                     <div className="absolute inset-0 bg-navy/[0.02] rounded-2xl" />
-                    <Bot className="w-8 h-8 text-navy relative z-20" />
+                    <Sparkles className="w-8 h-8 text-navy relative z-20" />
                   </div>
                 </div>
                 <h2 className="text-3xl font-display font-[900] text-navy tracking-tight mb-3">AI Mechanic</h2>
@@ -1278,7 +1276,7 @@ ${diagnosticHistory}
                     {msg.role === 'assistant' && (
                       <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center flex-shrink-0 mr-3 mt-1 shadow-lg border border-white/10 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                        <Bot className="w-4 h-4 text-white relative z-10" />
+                        <Sparkles className="w-4 h-4 text-white relative z-10" />
                       </div>
                     )}
                     <div className={`max-w-[85%] lg:max-w-lg ${msg.role === 'user' ? 'order-first' : ''}`}>
@@ -1628,7 +1626,7 @@ ${diagnosticHistory}
               <div className="flex justify-start items-start mt-6">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center mr-3 bg-navy shadow-lg border border-white/10 relative overflow-hidden transition-all">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                  <Bot className="w-4 h-4 text-white relative z-10" />
+                  <Sparkles className="w-4 h-4 text-white relative z-10" />
                 </div>
                 <div className="space-y-2 max-w-[85%] lg:max-w-lg">
                   <div className="px-6 py-4.5 rounded-[26px] rounded-tl-none bg-white border border-slate-100 text-slate-800 shadow-[0_2px_15px_rgba(0,18,51,0.03)] assistant-card-bubble">

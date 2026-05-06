@@ -5,6 +5,7 @@ type IconComponentType = React.ElementType<{ className?: string }>;
 export interface InteractiveMenuItem {
   label: string;
   icon: IconComponentType;
+  to?: string;
 }
 
 export interface InteractiveMenuProps {

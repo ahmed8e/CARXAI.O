@@ -7,7 +7,7 @@ import InstallPrompt from '../components/InstallPrompt'
 import { 
   ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
-  Car, Zap, Plus, Battery, Activity
+  Car, Zap, Plus, Battery, Activity, Sparkles
 } from 'lucide-react'
 import DevelopmentModal from '../components/DevelopmentModal'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
@@ -113,12 +113,12 @@ export default function Dashboard() {
     },
     {
       to: '/dashboard/ai-mechanic',
-      icon: ShieldAlert,
+      icon: Sparkles,
       label: 'AI Mechanic',
       desc: 'Instant diagnosis',
-      color: 'text-indigo-500',
-      bg: 'bg-indigo-50',
-      border: 'border-indigo-100'
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      border: 'border-blue-100'
     },
     {
       to: '/dashboard/maintenance',

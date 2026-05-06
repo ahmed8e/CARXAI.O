@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard, Users, LogOut,
+  LayoutDashboard, LogOut,
   Wrench, Car, ChevronRight, Settings, X,
-  CircuitBoard, MapPin, Sparkles
+  Sparkles, Activity
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
@@ -19,10 +19,10 @@ const NAV_GROUPS = [
     label: 'Diagnosis',
     items: [
       { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
-      { to: '/dashboard/ai-mechanic',  icon: CircuitBoard,    label: 'AI Mechanic' },
+      { to: '/dashboard/ai-mechanic',  icon: Sparkles,        label: 'AI Mechanic' },
       { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles' },
       { to: '/dashboard/maintenance',  icon: Wrench,          label: 'Maintenance' },
-      { to: '/dashboard/reports',      icon: CircuitBoard,    label: 'Reports'     },
+      { to: '/dashboard/reports',      icon: Activity,        label: 'Reports'     },
     ],
   },
 ]
