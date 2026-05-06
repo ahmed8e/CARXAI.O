@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Sparkles, CheckCircle2 } from 'lucide-react'
+import { X, CheckCircle2 } from 'lucide-react'
+import AiSparkleIcon from './ui/AiSparkleIcon'
 
 interface DevelopmentModalProps {
   isOpen: boolean
@@ -78,14 +79,14 @@ export default function DevelopmentModal({
             <div className="flex flex-col items-center text-center">
               {/* Badge */}
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-navy/10 text-navy mb-6">
-                <Sparkles className="w-3 h-3" />
+                <AiSparkleIcon className="w-3 h-3" />
                 <span className="text-[10px] font-black uppercase tracking-widest">{badgeText}</span>
               </div>
 
               {/* Icon / Visual representation */}
               <div className="w-20 h-20 rounded-3xl bg-surface-low dark:bg-white/5 flex items-center justify-center mb-6 shadow-inner ring-1 ring-overlay">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-navy to-blue-400 flex items-center justify-center shadow-lg shadow-navy/30">
-                  <Sparkles className="w-6 h-6 text-white" />
+                  <AiSparkleIcon className="w-6 h-6 text-white" />
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { Crown, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Crown, CheckCircle2, ArrowRight } from 'lucide-react'
+import AiSparkleIcon from './ui/AiSparkleIcon'
 import { useNavigate } from 'react-router-dom'
 
 export default function Paywall() {
@@ -51,7 +52,7 @@ export default function Paywall() {
             className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-gradient-to-r from-navy to-[#0F172A] text-white font-bold hover:shadow-[0_8px_30px_rgba(0,112,224,0.3)] transition-all hover:-translate-y-[2px] group"
           >
             <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-white/70" />
+              <AiSparkleIcon className="w-4 h-4 text-white/70" />
               Continue with Pro
             </span>
             <ArrowRight className="w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />

@@ -9,9 +9,9 @@ import {
   AlertTriangle, 
   Thermometer, 
   LayoutDashboard,
-  Sparkles,
   ArrowRight
 } from 'lucide-react';
+import AiSparkleIcon from '../components/ui/AiSparkleIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import GuideLayout from '../components/GuideLayout';
 import { guides, GUIDE_CATEGORIES } from '../data/guides';
@@ -52,7 +52,7 @@ const GuidesIndex: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy/5 text-navy text-[10px] uppercase tracking-[0.2em] font-black mb-6 border border-navy/10"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <AiSparkleIcon className="w-3.5 h-3.5" />
             Product Library
           </motion.div>
           <motion.h1 

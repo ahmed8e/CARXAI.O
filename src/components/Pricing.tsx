@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import NumberFlow from '@number-flow/react'
-import { Check, Zap, Sparkles, MessageSquare, ShieldCheck, Lock } from 'lucide-react'
+import { Check, Zap, MessageSquare, ShieldCheck, Lock } from 'lucide-react'
+import AiSparkleIcon from './ui/AiSparkleIcon'
 import { Card, CardContent, CardHeader } from './ui/card'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -168,7 +169,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                   {/* Popular badge */}
                   {isPopular && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-[#0070E0]/30">
-                      <Sparkles className="w-3 h-3 animate-pulse" />
+                      <AiSparkleIcon className="w-3 h-3 animate-pulse" />
                       {plan.badgeLabel}
                     </div>
                   )}
@@ -296,7 +297,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
               { title: 'Cancel anytime', icon: ShieldCheck },
               { title: 'No hidden fees', icon: Lock },
               { title: 'Clear limits', icon: Check },
-              { title: 'Instant access', icon: Sparkles },
+              { title: 'Instant access', icon: AiSparkleIcon },
             ].map((trust, idx) => (
               <div key={idx} className="flex items-center gap-3 text-slate-500 justify-center md:justify-start">
                 <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
