@@ -33,11 +33,11 @@ import { InteractiveMenu } from './ui/modern-mobile-menu'
 import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
-  { to: '/dashboard/vehicles',         icon: Car,             label: 'Garage'      },
-  { to: '/dashboard',                  icon: LayoutDashboard, label: 'Dashboard'   },
+  { to: '/dashboard',                  icon: LayoutDashboard, label: 'Home' },
+  { to: '/dashboard/ai-mechanic',      icon: Sparkles,        label: 'Diagnostics' },
   { to: '/dashboard/maintenance',      icon: Wrench,          label: 'Maintenance' },
-  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Avoid Overpaying' },
-  { to: '/my-account',                 icon: Settings,        label: 'Settings'    },
+  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Overpaying' },
+  { to: '/dashboard/reports',          icon: Activity,        label: 'Reports' },
 ]
 
 export default function AppLayout({ children }: AppLayoutProps) {

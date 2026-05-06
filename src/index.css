@@ -282,20 +282,20 @@
     display: none;
   }
 
-  /* ── Modern Bottom Menu (Crystal Dock) ─────────────────────────── */
+  /* ── Premium Mobile Capsule Nav ─────────────────────────────────── */
   .menu {
     @apply fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-around;
-    @apply mx-4 mb-[calc(0.75rem_+_env(safe-area-inset-bottom,12px))] p-2;
-    @apply bg-white/40 backdrop-blur-3xl border border-white/40 rounded-[32px];
-    @apply shadow-[0_15px_35px_rgba(0,112,224,0.15),0_5px_15px_rgba(0,0,0,0.05)];
-    height: 4.25rem;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    @apply mx-5 mb-[calc(1.25rem_+_env(safe-area-inset-bottom,8px))] px-3 py-2;
+    @apply bg-white border border-slate-200/50 rounded-full;
+    @apply shadow-[0_12px_40px_rgba(15,23,42,0.12),0_4px_12px_rgba(0,0,0,0.04)];
+    height: 4rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .menu__item {
     @apply relative flex flex-col items-center justify-center flex-1 h-full gap-1;
-    @apply transition-all duration-300 outline-none no-underline;
-    color: var(--color-muted);
+    @apply transition-all duration-200 outline-none no-underline;
+    color: #94A3B8; /* Slate-400 */
   }
 
   .menu__item.active {
@@ -307,41 +307,41 @@
   }
 
   .menu__item.active .menu__icon {
-    @apply -translate-y-1 scale-110;
-    filter: drop-shadow(0 0 8px rgba(0, 112, 224, 0.3));
-    animation: iconBounce 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    @apply -translate-y-0.5;
+    filter: drop-shadow(0 0 12px rgba(0, 112, 224, 0.2));
   }
 
   .menu__item .icon {
-    @apply w-[22px] h-[22px] transition-all duration-300;
-    stroke-width: 1.8;
+    @apply w-[20px] h-[20px] transition-all duration-300;
+    stroke-width: 1.6;
   }
 
   .menu__item.active .icon {
+    @apply scale-110;
     stroke-width: 2.2;
   }
 
   .menu__text {
-    @apply text-[9px] font-black uppercase tracking-widest opacity-40 transform translate-y-1;
-    @apply transition-all duration-300 pointer-events-none absolute bottom-0.5;
+    @apply text-[8.5px] font-black uppercase tracking-[0.08em] opacity-60;
+    @apply transition-all duration-200 pointer-events-none mt-0.5;
   }
 
   .menu__text.active {
-    @apply opacity-100 translate-y-0 text-navy;
-    letter-spacing: 0.12em;
+    @apply opacity-100 text-navy;
+    letter-spacing: 0.1em;
   }
 
-  /* Sliding line indicator managed by component ref but styled here */
+  /* Refined indicator: soft bar at the very bottom */
   .menu__item::after {
     content: '';
-    @apply absolute bottom-0 left-1/2 -translate-x-1/2 h-[2.5px] rounded-full;
-    @apply bg-navy opacity-0 transition-all duration-400;
+    @apply absolute bottom-0.5 left-1/2 -translate-x-1/2 h-[2px] rounded-full;
+    @apply bg-navy opacity-0 transition-all duration-300;
     width: var(--lineWidth, 0);
-    box-shadow: 0 0 10px rgba(0, 112, 224, 0.5);
   }
 
   .menu__item.active::after {
-    @apply opacity-100 bottom-0;
+    @apply opacity-100;
+    box-shadow: 0 0 8px rgba(0, 112, 224, 0.4);
   }
 }
 

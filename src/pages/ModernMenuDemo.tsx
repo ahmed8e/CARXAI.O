@@ -1,19 +1,19 @@
 import { InteractiveMenu } from "@/components/ui/modern-mobile-menu";
 import type { InteractiveMenuItem } from "@/components/ui/modern-mobile-menu";
 import { 
-  Car, 
   LayoutDashboard, 
   Wrench, 
   ShieldCheck, 
-  Settings 
+  Sparkles,
+  Activity
 } from 'lucide-react';
 
 const lucideDemoMenuItems: InteractiveMenuItem[] = [
-    { label: 'Garage', icon: Car, to: '/dashboard/vehicles' },
-    { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+    { label: 'Home', icon: LayoutDashboard, to: '/dashboard' },
+    { label: 'Diagnostics', icon: Sparkles, to: '/dashboard/ai-mechanic' },
     { label: 'Maintenance', icon: Wrench, to: '/dashboard/maintenance' },
-    { label: 'Price Check', icon: ShieldCheck, to: '/dashboard/avoid-overpaying' },
-    { label: 'Settings', icon: Settings, to: '/my-account' },
+    { label: 'Overpaying', icon: ShieldCheck, to: '/dashboard/avoid-overpaying' },
+    { label: 'Reports', icon: Activity, to: '/dashboard/reports' },
 ];
 
 const customAccentColor = 'var(--color-chart-2)';
