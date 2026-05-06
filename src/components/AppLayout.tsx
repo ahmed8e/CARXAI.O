@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, LogOut,
   Wrench, Car, ChevronRight, Settings, X,
-  Sparkles, Activity
+  Sparkles, Activity, ShieldCheck
 } from 'lucide-react'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
