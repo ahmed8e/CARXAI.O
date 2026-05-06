@@ -1,554 +1,474 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { 
-  Wrench, Activity, AlertCircle, ShieldCheck, 
-  Calendar, CheckCircle2, AlertTriangle, Info,
-  Settings2, ChevronRight, Calculator, FileText, ChevronDown
-} from 'lucide-react'
 import { Link } from 'react-router-dom'
+import {
+  Wrench, Car, Plus, Download, Calculator,
+  Sun, Droplets, History, Scale, ChevronRight,
+  AlertTriangle, CheckCircle2, Activity
+} from 'lucide-react'
+
+import {
+  DEFAULT_SCHEDULE, calculateMaintenanceStatus, calculateHealthScore,
+  getSeasonalChecklists,
+  type MaintenanceItem, type MaintenancePrefs, type ServiceRecord,
+  type MaintenanceStatus, type SeasonalChecklistData, type ChecklistItem
+} from '../data/maintenanceData'
+
+import HealthScoreCard from '../components/maintenance/HealthScoreCard'
+import MaintenanceReminderCard from '../components/maintenance/MaintenanceReminderCard'
+import ServiceHistoryTimeline from '../components/maintenance/ServiceHistoryTimeline'
+import SeasonalChecklist from '../components/maintenance/SeasonalChecklist'
+import WorthFixingAdvisor from '../components/maintenance/WorthFixingAdvisor'
+import FluidCheckGuide from '../components/maintenance/FluidCheckGuide'
+import AddServiceRecordModal from '../components/maintenance/AddServiceRecordModal'
 
 interface Vehicle {
-  id: string
-  make: string
-  model: string
-  year: number
-  mileage: number | null
+  id: string; make: string; model: string; year: number; mileage: number | null; is_default?: boolean
 }
 
-interface MaintenancePrefs {
-  avgMilesPerMonth: number
-  drivingStyle: 'city' | 'highway' | 'mixed'
-  usageLevel: 'light' | 'normal' | 'heavy'
-}
+type Tab = 'overview' | 'history' | 'seasonal' | 'fluids' | 'advisor'
 
-interface ServiceItem {
-  id: string
-  service_type: string
-  last_service_date: string // ISO date
-  last_service_mileage: number
-  interval_miles: number
-  interval_months: number
-  estimated_cost_low: number
-  estimated_cost_high: number
-  anti_scam_note: string
-}
-
-interface ServiceStatus {
-  item: ServiceItem
-  miles_since: number
-  months_since: number
-  next_due_mileage: number
-  next_due_date: Date
-  status: 'overdue' | 'due_now' | 'due_soon' | 'ok'
-  urgency: 'low' | 'medium' | 'high'
-  can_wait: boolean
-  risk_if_delayed: string
-}
-
-const DEFAULT_SERVICES: ServiceItem[] = [
-  {
-    id: 'oil',
-    service_type: 'Oil Change',
-    last_service_date: new Date(Date.now() - 5 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 5 months ago
-    last_service_mileage: 0,
-    interval_miles: 5000,
-    interval_months: 6,
-    estimated_cost_low: 50,
-    estimated_cost_high: 120,
-    anti_scam_note: 'Upsell warning: engine flush is not always needed unless recommended by manufacturer.'
-  },
-  {
-    id: 'brakes',
-    service_type: 'Brake Pad Replacement',
-    last_service_date: new Date(Date.now() - 20 * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    last_service_mileage: 0,
-    interval_miles: 50000,
-    interval_months: 36,
-    estimated_cost_low: 150,
-    estimated_cost_high: 300,
-    anti_scam_note: 'Rotors often just need resurfacing, not replacing, if caught early.'
-  },
-  {
-    id: 'tires',
-    service_type: 'Tire Rotation',
-    last_service_date: new Date(Date.now() - 4 * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    last_service_mileage: 0,
-    interval_miles: 7500,
-    interval_months: 6,
-    estimated_cost_low: 20,
-    estimated_cost_high: 50,
-    anti_scam_note: 'Some tire shops do this for free if you bought tires there.'
-  },
-  {
-    id: 'filter',
-    service_type: 'Engine Air Filter',
-    last_service_date: new Date(Date.now() - 12 * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    last_service_mileage: 0,
-    interval_miles: 30000,
-    interval_months: 24,
-    estimated_cost_low: 20,
-    estimated_cost_high: 60,
-    anti_scam_note: 'You can often replace this yourself in 5 minutes with a $15 part.'
-  }
+const TABS: { id: Tab; label: string; icon: React.ComponentType<any> }[] = [
+  { id: 'overview',  label: 'Overview',    icon: Activity },
+  { id: 'history',   label: 'History',     icon: History },
+  { id: 'seasonal',  label: 'Seasonal',    icon: Sun },
+  { id: 'fluids',    label: 'Fluids',      icon: Droplets },
+  { id: 'advisor',   label: 'Worth Fix?',  icon: Scale },
 ]
+
+function buildSchedule(vehicle: Vehicle): MaintenanceItem[] {
+  const m = vehicle.mileage || 50000
+  return DEFAULT_SCHEDULE.map(s => ({
+    ...s,
+    lastServiceMileage: Math.max(0, m - Math.round(s.intervalMiles * 0.7)),
+    lastServiceDate: new Date(Date.now() - (s.intervalMonths * 0.6) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+  }))
+}
 
 export default function Maintenance() {
   const { user } = useAuth()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
-  
-  const [mileage, setMileage] = useState<number>(0)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [mileage, setMileage] = useState(50000)
   const [prefs, setPrefs] = useState<MaintenancePrefs>({
-    avgMilesPerMonth: 1000,
-    drivingStyle: 'mixed',
-    usageLevel: 'normal'
+    avgMilesPerMonth: 1000, drivingStyle: 'mixed', usageLevel: 'normal', region: 'temperate'
   })
-  
-  const [services, setServices] = useState<ServiceItem[]>([])
+  const [schedule, setSchedule] = useState<MaintenanceItem[]>([])
+  const [serviceHistory, setServiceHistory] = useState<ServiceRecord[]>([])
+  const [checklists, setChecklists] = useState<SeasonalChecklistData[]>([])
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<Tab>('overview')
+  const [showAddModal, setShowAddModal] = useState(false)
   const [saving, setSaving] = useState(false)
-  
-  const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId)
+
+  const vehicle = vehicles.find(v => v.id === selectedId)
+
+  useEffect(() => { if (user) fetchVehicles() }, [user])
 
   useEffect(() => {
-    if (user) fetchVehicles()
-  }, [user])
+    if (selectedId) loadVehicleData(selectedId)
+  }, [selectedId])
 
   useEffect(() => {
-    if (selectedVehicleId) {
-      loadVehicleData(selectedVehicleId)
-    }
-  }, [selectedVehicleId])
+    setChecklists(getSeasonalChecklists(prefs.region))
+  }, [prefs.region])
 
   const fetchVehicles = async () => {
     try {
-      const { data } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('user_id', user?.id)
-        
-      if (data && data.length > 0) {
+      const { data } = await (supabase as any).from('vehicles').select('*').eq('user_id', user?.id)
+      if (data?.length) {
         setVehicles(data)
-        const defaultVeh = data.find((v: any) => v.is_default) || data[0]
-        setSelectedVehicleId(defaultVeh.id)
-        setMileage(defaultVeh.mileage || 80000)
+        const def = data.find((v: any) => v.is_default) || data[0]
+        setSelectedId(def.id)
+        setMileage(def.mileage || 50000)
       }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
+    } catch (e) { console.error(e) }
+    finally { setLoading(false) }
   }
 
   const loadVehicleData = (vid: string) => {
     const v = vehicles.find(x => x.id === vid)
-    if (v) setMileage(v.mileage || 80000)
+    if (v) setMileage(v.mileage || 50000)
 
-    const savedPrefs = localStorage.getItem(`maint_prefs_${vid}`)
+    const savedPrefs = localStorage.getItem(`maint_prefs_v2_${vid}`)
     if (savedPrefs) setPrefs(JSON.parse(savedPrefs))
-      
-    const savedServices = localStorage.getItem(`maint_services_${vid}`)
-    if (savedServices) {
-      setServices(JSON.parse(savedServices))
-    } else {
-      // Init defaults based on current mileage
-      const defaultMileage = v?.mileage || 80000
-      const initServices = DEFAULT_SERVICES.map(s => ({
-        ...s,
-        last_service_mileage: Math.max(0, defaultMileage - s.interval_miles + 1000) // fake some history
-      }))
-      setServices(initServices)
-      localStorage.setItem(`maint_services_${vid}`, JSON.stringify(initServices))
-    }
+
+    const savedSched = localStorage.getItem(`maint_schedule_${vid}`)
+    if (savedSched) setSchedule(JSON.parse(savedSched))
+    else if (v) { const s = buildSchedule(v); setSchedule(s) }
+
+    const savedHistory = localStorage.getItem(`maint_history_${vid}`)
+    if (savedHistory) setServiceHistory(JSON.parse(savedHistory))
+    else setServiceHistory([])
   }
 
-  const saveVehicleData = async () => {
-    if (!selectedVehicleId) return
+  const savePrefs = () => {
+    if (!selectedId) return
     setSaving(true)
-    
-    // Save to local storage
-    localStorage.setItem(`maint_prefs_${selectedVehicleId}`, JSON.stringify(prefs))
-    localStorage.setItem(`maint_services_${selectedVehicleId}`, JSON.stringify(services))
-    
-    // Update Supabase mileage
-    await supabase
-      .from('vehicles')
-      .update({ mileage })
-      .eq('id', selectedVehicleId)
-      
-    // Update local vehicle state
-    setVehicles(prev => prev.map(v => v.id === selectedVehicleId ? { ...v, mileage } : v))
-    
-    setTimeout(() => setSaving(false), 500)
+    localStorage.setItem(`maint_prefs_v2_${selectedId}`, JSON.stringify(prefs))
+    localStorage.setItem(`maint_schedule_${selectedId}`, JSON.stringify(schedule));
+    (supabase as any).from('vehicles').update({ mileage }).eq('id', selectedId)
+    setVehicles(prev => prev.map(v => v.id === selectedId ? { ...v, mileage } : v))
+    setTimeout(() => setSaving(false), 600)
   }
 
-  const handleUpdateService = (id: string, newMileage: number, newDate: string) => {
-    setServices(prev => prev.map(s => 
-      s.id === id ? { ...s, last_service_mileage: newMileage, last_service_date: newDate } : s
-    ))
+  const handleLogService = (itemId: string, loggedMileage: number) => {
+    const updated = schedule.map(s =>
+      s.id === itemId ? { ...s, lastServiceMileage: loggedMileage, lastServiceDate: new Date().toISOString() } : s
+    )
+    setSchedule(updated)
+    if (selectedId) localStorage.setItem(`maint_schedule_${selectedId}`, JSON.stringify(updated))
   }
 
-  // --- Calculations ---
-  const calculateStatus = (item: ServiceItem): ServiceStatus => {
-    const milesSince = Math.max(0, mileage - item.last_service_mileage)
-    
-    const lastDate = new Date(item.last_service_date)
-    const today = new Date()
-    const monthsSince = (today.getFullYear() - lastDate.getFullYear()) * 12 + (today.getMonth() - lastDate.getMonth())
-    
-    const nextDueMileage = item.last_service_mileage + item.interval_miles
-    const nextDueDate = new Date(lastDate)
-    nextDueDate.setMonth(nextDueDate.getMonth() + item.interval_months)
-    
-    let status: ServiceStatus['status'] = 'ok'
-    let urgency: ServiceStatus['urgency'] = 'low'
-    let risk = 'Normal wear'
-    
-    if (item.id === 'oil') risk = 'Engine wear, sludge buildup, decreased efficiency'
-    if (item.id === 'brakes') risk = 'Reduced stopping power, rotor damage (expensive)'
-    if (item.id === 'tires') risk = 'Uneven wear, reduced traction, shorter tire life'
-    if (item.id === 'filter') risk = 'Reduced MPG, sluggish acceleration'
-
-    // Multipliers based on usage/style
-    let modifier = 1.0
-    if (prefs.usageLevel === 'heavy') modifier *= 0.8
-    if (prefs.drivingStyle === 'city') modifier *= 0.9
-
-    const adjIntervalMiles = item.interval_miles * modifier
-    const adjNextDueMileage = item.last_service_mileage + adjIntervalMiles
-
-    if (mileage >= adjNextDueMileage || today >= nextDueDate) {
-      status = 'overdue'
-      urgency = 'high'
-    } else if (mileage >= adjNextDueMileage - 500 || today >= new Date(nextDueDate.getTime() - 30*24*60*60*1000)) {
-      status = 'due_now'
-      urgency = 'high'
-    } else if (mileage >= adjNextDueMileage - 1500 || today >= new Date(nextDueDate.getTime() - 60*24*60*60*1000)) {
-      status = 'due_soon'
-      urgency = 'medium'
-    }
-
-    return {
-      item,
-      miles_since: milesSince,
-      months_since: monthsSince,
-      next_due_mileage: adjNextDueMileage,
-      next_due_date: nextDueDate,
-      status,
-      urgency,
-      can_wait: status === 'ok' || status === 'due_soon',
-      risk_if_delayed: risk
-    }
+  const handleAddRecord = (record: Omit<ServiceRecord, 'id'>) => {
+    const newRecord: ServiceRecord = { ...record, id: crypto.randomUUID() }
+    const updated = [newRecord, ...serviceHistory]
+    setServiceHistory(updated)
+    if (selectedId) localStorage.setItem(`maint_history_${selectedId}`, JSON.stringify(updated))
   }
 
-  const statuses = services.map(calculateStatus)
+  const handleChecklistUpdate = (checklistId: string, items: ChecklistItem[]) => {
+    setChecklists(prev => prev.map(c => c.id === checklistId ? { ...c, items } : c))
+  }
+
+  const handleExport = () => {
+    if (!vehicle) return
+    const lines = [
+      `Car Safety — Maintenance Report`,
+      `Vehicle: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      `Current Mileage: ${mileage.toLocaleString()}`,
+      `Generated: ${new Date().toLocaleDateString()}`,
+      ``,
+      `=== SERVICE HISTORY ===`,
+      ...serviceHistory.map(r =>
+        `${r.date} | ${r.serviceType} | ${r.mileage.toLocaleString()} mi | $${r.cost} | ${r.shopName || 'N/A'}`
+      ),
+    ]
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a'); a.href = url
+    a.download = `car-safety-report-${vehicle.make}-${vehicle.model}.txt`
+    a.click(); URL.revokeObjectURL(url)
+  }
+
+  // Computed
+  const statuses: MaintenanceStatus[] = schedule.map(item => calculateMaintenanceStatus(item, mileage, prefs))
   const overdue = statuses.filter(s => s.status === 'overdue')
-  const dueNow = statuses.filter(s => s.status === 'due_now')
-  const dueSoon = statuses.filter(s => s.status === 'due_soon')
-  const ok = statuses.filter(s => s.status === 'ok')
+  const dueNow = statuses.filter(s => s.status === 'due')
+  const dueSoon = statuses.filter(s => s.status === 'coming_soon')
+  const good = statuses.filter(s => s.status === 'good')
+  const health = calculateHealthScore(statuses, serviceHistory)
 
-  const actionNeeded = [...overdue, ...dueNow]
-
-  // 90-day forecast
-  let forecastLow = 0
-  let forecastHigh = 0
-  statuses.forEach(s => {
-    // If due now/overdue, or due within 3 months (or next 3000 miles assuming 1000/mo)
-    const monthsUntil = (s.next_due_date.getTime() - Date.now()) / (30*24*60*60*1000)
-    const milesUntil = s.next_due_mileage - mileage
-    if (s.status !== 'ok' || monthsUntil <= 3 || milesUntil <= (prefs.avgMilesPerMonth * 3)) {
-      forecastLow += s.item.estimated_cost_low
-      forecastHigh += s.item.estimated_cost_high
-    }
-  })
+  const forecast90 = statuses.reduce((acc, s) => {
+    const mi = s.nextDueMileage - mileage
+    const days = s.daysUntilDue
+    if (s.status !== 'good' || days <= 90 || mi <= prefs.avgMilesPerMonth * 3)
+      return { low: acc.low + s.item.costLow, high: acc.high + s.item.costHigh }
+    return acc
+  }, { low: 0, high: 0 })
 
   if (loading) {
-    return <div className="flex justify-center p-12"><div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" /></div>
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
-  if (vehicles.length === 0) {
+  if (!vehicles.length) {
     return (
-      <div className="p-4 max-w-3xl mx-auto text-center mt-12">
-        <div className="w-16 h-16 bg-surface-high rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <div className="p-8 max-w-2xl mx-auto text-center mt-16">
+        <div className="w-16 h-16 bg-surface-low rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Car className="w-8 h-8 text-muted" />
         </div>
-        <h2 className="text-2xl font-bold text-on-surface mb-2">No Vehicles Found</h2>
-        <p className="text-muted mb-6">Add a vehicle to your garage to start tracking maintenance.</p>
-        <Link to="/dashboard/vehicles" className="px-6 py-3 bg-navy text-white rounded-xl font-bold">Go to Garage</Link>
+        <h2 className="text-2xl font-black text-on-surface mb-2">No Vehicles Found</h2>
+        <p className="text-muted mb-6">Add a vehicle to start tracking maintenance.</p>
+        <Link to="/dashboard/vehicles" className="btn-primary">Go to My Garage</Link>
       </div>
     )
   }
 
   return (
-    <div className="p-4 lg:p-8 max-w-6xl mx-auto space-y-6">
-      
-      {/* Header */}
+    <div className="p-4 lg:p-8 max-w-6xl mx-auto space-y-6 pb-32 lg:pb-10">
+
+      {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-black text-on-surface tracking-tight italic mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-navy animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/70">Maintenance Hub</span>
+          </div>
+          <h1 className="text-3xl font-display font-black text-on-surface italic tracking-tight">
             Smart Maintenance
           </h1>
-          <p className="text-muted font-medium">
-            AI-driven tracking to prevent breakdowns and avoid scams.
+          <p className="text-sm text-muted font-medium mt-1">
+            Your car ownership assistant — prevent breakdowns, avoid scams.
           </p>
         </div>
 
-        <select 
-          className="bg-surface border border-overlay rounded-xl px-4 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy"
-          value={selectedVehicleId || ''}
-          onChange={(e) => setSelectedVehicleId(e.target.value)}
-        >
-          {vehicles.map(v => (
-            <option key={v.id} value={v.id}>{v.year} {v.make} {v.model}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Vehicle selector */}
+          <select
+            value={selectedId || ''}
+            onChange={e => setSelectedId(e.target.value)}
+            className="bg-surface border border-overlay rounded-xl px-4 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy"
+          >
+            {vehicles.map(v => (
+              <option key={v.id} value={v.id}>{v.year} {v.make} {v.model}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => { setTab('history'); setShowAddModal(true) }}
+            className="flex items-center gap-2 px-4 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Record
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Left Column: Settings & Forecast */}
-        <div className="space-y-6">
-          
-          {/* Settings Card */}
-          <div className="bg-surface dark:bg-surface-high/40 p-6 rounded-[24px] border border-overlay shadow-sm">
-            <div className="flex items-center gap-2 mb-6">
-              <Settings2 className="w-5 h-5 text-navy" />
-              <h2 className="text-lg font-bold text-on-surface">Vehicle Profile</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">Current Mileage</label>
-                <input 
-                  type="number" 
-                  value={mileage} 
-                  onChange={(e) => setMileage(Number(e.target.value))}
-                  className="w-full bg-surface-low border border-overlay rounded-xl px-4 py-2.5 font-bold text-on-surface focus:border-navy focus:ring-1 focus:ring-navy outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">Driving Style</label>
-                  <select 
-                    value={prefs.drivingStyle}
-                    onChange={(e) => setPrefs({...prefs, drivingStyle: e.target.value as any})}
-                    className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy"
-                  >
-                    <option value="mixed">Mixed</option>
-                    <option value="city">City (Stop/Go)</option>
-                    <option value="highway">Highway</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">Usage Level</label>
-                  <select 
-                    value={prefs.usageLevel}
-                    onChange={(e) => setPrefs({...prefs, usageLevel: e.target.value as any})}
-                    className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy"
-                  >
-                    <option value="light">Light</option>
-                    <option value="normal">Normal</option>
-                    <option value="heavy">Heavy Duty</option>
-                  </select>
-                </div>
-              </div>
-
-              <button 
-                onClick={saveVehicleData}
-                disabled={saving}
-                className="w-full py-3 bg-navy text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-navy/20 hover:scale-[1.02] transition-transform active:scale-[0.98]"
-              >
-                {saving ? 'Updating...' : 'Update Logic'}
-              </button>
-            </div>
+      {/* ── Top summary row ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Health Score', value: `${health.total}/100`, sub: health.label, color: health.total >= 65 ? 'text-emerald-500' : 'text-amber-500' },
+          { label: 'Overdue', value: overdue.length, sub: 'services', color: overdue.length > 0 ? 'text-red-500' : 'text-emerald-500' },
+          { label: 'Due Soon', value: dueSoon.length + dueNow.length, sub: 'reminders', color: 'text-amber-500' },
+          { label: '90-Day Cost', value: `$${forecast90.low}–$${forecast90.high}`, sub: 'estimated', color: 'text-navy' },
+        ].map(s => (
+          <div key={s.label} className="bg-surface dark:bg-surface-high/30 rounded-[20px] border border-overlay p-4">
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted mb-1">{s.label}</p>
+            <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-[10px] text-muted font-medium">{s.sub}</p>
           </div>
+        ))}
+      </div>
 
-          {/* 90-Day Forecast */}
-          <div className="bg-gradient-to-br from-navy to-[#005bb5] p-6 rounded-[24px] text-white shadow-xl shadow-navy/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-            <div className="flex items-center gap-2 mb-2 relative z-10">
-              <Calculator className="w-5 h-5 text-white/80" />
-              <h2 className="text-sm font-bold text-white/90">90-Day Cost Forecast</h2>
-            </div>
-            <div className="relative z-10">
-              <p className="text-3xl font-black tracking-tight mb-1">
-                ${forecastLow} <span className="text-xl text-white/60 font-medium">—</span> ${forecastHigh}
-              </p>
-              <p className="text-xs text-white/70 font-medium">Estimated maintenance costs coming up.</p>
-            </div>
+      {/* ── Settings bar ── */}
+      <div className="bg-surface dark:bg-surface-high/30 rounded-[24px] border border-overlay p-5">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-[120px]">
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Current Mileage</label>
+            <input type="number" value={mileage} onChange={e => setMileage(Number(e.target.value))}
+              className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface outline-none focus:border-navy text-sm" />
           </div>
-
-          {/* Records Placeholder */}
-          <div className="bg-surface dark:bg-surface-high/40 p-6 rounded-[24px] border border-overlay border-dashed flex flex-col items-center justify-center text-center min-h-[160px]">
-            <FileText className="w-8 h-8 text-muted/50 mb-3" />
-            <h3 className="text-sm font-bold text-on-surface mb-1">Service Records</h3>
-            <p className="text-xs text-muted max-w-[200px]">Upload receipts and proofs (Coming soon).</p>
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Avg mi/month</label>
+            <input type="number" value={prefs.avgMilesPerMonth} onChange={e => setPrefs(p => ({ ...p, avgMilesPerMonth: Number(e.target.value) }))}
+              className="w-24 bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface outline-none focus:border-navy text-sm" />
           </div>
-
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Driving</label>
+            <select value={prefs.drivingStyle} onChange={e => setPrefs(p => ({ ...p, drivingStyle: e.target.value as any }))}
+              className="bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy">
+              <option value="city">City</option>
+              <option value="highway">Highway</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Region</label>
+            <select value={prefs.region} onChange={e => setPrefs(p => ({ ...p, region: e.target.value as any }))}
+              className="bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy">
+              <option value="hot">Hot Climate</option>
+              <option value="cold">Cold / Winter</option>
+              <option value="temperate">Temperate</option>
+            </select>
+          </div>
+          <button onClick={savePrefs} disabled={saving}
+            className="px-5 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-60">
+            {saving ? 'Saved ✓' : 'Save'}
+          </button>
         </div>
+      </div>
 
-        {/* Right Column: Timeline & Tasks */}
-        <div className="lg:col-span-2 space-y-6">
-          
-          {actionNeeded.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 px-1">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                <h2 className="text-lg font-bold text-on-surface tracking-tight">Action Required</h2>
+      {/* ── Tab Nav ── */}
+      <div className="flex gap-1 overflow-x-auto scrollbar-hide bg-surface dark:bg-surface-high/30 rounded-2xl border border-overlay p-1.5">
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all flex-1 justify-center ${
+              tab === t.id ? 'bg-navy text-white shadow-lg shadow-navy/20' : 'text-muted hover:text-on-surface'
+            }`}>
+            <t.icon className="w-3.5 h-3.5" />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Tab Content ── */}
+
+      {/* OVERVIEW TAB */}
+      {tab === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Health Score */}
+          <div className="space-y-6">
+            <HealthScoreCard score={health.total} label={health.label} categories={health.categories} />
+
+            {/* 90-Day forecast card */}
+            <div className="bg-gradient-to-br from-navy to-[#005bb5] p-6 rounded-[24px] text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+              <div className="flex items-center gap-2 mb-2 relative z-10">
+                <Calculator className="w-4 h-4 text-white/80" />
+                <span className="text-xs font-black text-white/90 uppercase tracking-widest">90-Day Forecast</span>
               </div>
-              
-              <div className="grid gap-4">
-                {actionNeeded.map(s => <ServiceCard key={s.item.id} status={s} onUpdate={handleUpdateService} currentMileage={mileage} />)}
+              <p className="text-3xl font-black relative z-10">
+                ${forecast90.low} <span className="text-xl text-white/50 font-medium">—</span> ${forecast90.high}
+              </p>
+              <p className="text-xs text-white/60 mt-1 relative z-10">Estimated upcoming service costs</p>
+            </div>
+
+            {/* Quick links */}
+            <div className="space-y-2">
+              {[
+                { label: 'View History', icon: History, action: () => setTab('history') },
+                { label: 'Seasonal Checks', icon: Sun, action: () => setTab('seasonal') },
+                { label: 'Fluid Guide', icon: Droplets, action: () => setTab('fluids') },
+                { label: 'Worth Fixing?', icon: Scale, action: () => setTab('advisor') },
+              ].map(item => (
+                <button key={item.label} onClick={item.action}
+                  className="w-full flex items-center gap-3 px-4 py-3 bg-surface dark:bg-surface-high/30 border border-overlay rounded-2xl hover:border-navy/20 hover:shadow-sm transition-all group text-left">
+                  <div className="w-7 h-7 rounded-xl bg-surface-low dark:bg-surface-highest/40 flex items-center justify-center">
+                    <item.icon className="w-3.5 h-3.5 text-navy" />
+                  </div>
+                  <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy transition-colors" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Maintenance items */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Urgent */}
+            {(overdue.length > 0 || dueNow.length > 0) && (
+              <div>
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Action Required</h2>
+                </div>
+                <div className="space-y-3">
+                  {[...overdue, ...dueNow].map(s => (
+                    <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Due Soon */}
+            {dueSoon.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <Activity className="w-4 h-4 text-amber-500" />
+                  <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Coming Up</h2>
+                </div>
+                <div className="space-y-3">
+                  {dueSoon.map(s => (
+                    <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Good */}
+            <div>
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">All Good</h2>
+              </div>
+              <div className="space-y-3">
+                {good.map(s => (
+                  <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                ))}
               </div>
             </div>
-          )}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 px-1">
-              <Activity className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-on-surface tracking-tight">Upcoming Soon</h2>
-            </div>
-            
-            {dueSoon.length > 0 ? (
-              <div className="grid gap-4">
-                {dueSoon.map(s => <ServiceCard key={s.item.id} status={s} onUpdate={handleUpdateService} currentMileage={mileage} />)}
-              </div>
-            ) : (
-              <div className="bg-surface border border-overlay rounded-[24px] p-6 text-center">
-                <p className="text-sm text-muted">Nothing due soon. You're in good shape.</p>
+            {/* Recent history preview */}
+            {serviceHistory.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <div className="flex items-center gap-2">
+                    <History className="w-4 h-4 text-muted" />
+                    <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Recent Services</h2>
+                  </div>
+                  <button onClick={() => setTab('history')} className="text-[10px] font-black text-navy uppercase tracking-widest hover:underline">
+                    View All →
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {serviceHistory.slice(0, 3).map(r => (
+                    <div key={r.id} className="flex items-center gap-3 bg-surface dark:bg-surface-high/30 rounded-2xl border border-overlay p-3">
+                      <div className="w-7 h-7 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
+                        <Wrench className="w-3.5 h-3.5 text-navy" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-black text-on-surface truncate">{r.serviceType}</p>
+                        <p className="text-[10px] text-muted">{new Date(r.date).toLocaleDateString()} · {r.mileage.toLocaleString()} mi</p>
+                      </div>
+                      {r.cost > 0 && <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">${r.cost}</span>}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
+        </div>
+      )}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 px-1">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-lg font-bold text-on-surface tracking-tight">Healthy / Can Wait</h2>
+      {/* HISTORY TAB */}
+      {tab === 'history' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-on-surface">Maintenance History</h2>
+            <div className="flex gap-2">
+              <button onClick={handleExport}
+                className="flex items-center gap-2 px-4 py-2 border border-overlay rounded-xl text-xs font-black text-muted hover:bg-surface-low transition-colors">
+                <Download className="w-3.5 h-3.5" /> Export Report
+              </button>
+              <button onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all">
+                <Plus className="w-3.5 h-3.5" /> Add Service
+              </button>
             </div>
-            
-            <div className="grid gap-4">
-              {ok.map(s => <ServiceCard key={s.item.id} status={s} onUpdate={handleUpdateService} currentMileage={mileage} />)}
-            </div>
           </div>
-
+          <ServiceHistoryTimeline records={serviceHistory} onExport={handleExport} />
         </div>
-      </div>
-    </div>
-  )
-}
+      )}
 
-function ServiceCard({ status, onUpdate, currentMileage }: { status: ServiceStatus, onUpdate: any, currentMileage: number }) {
-  const [expanded, setExpanded] = useState(false)
-  
-  const isDanger = status.status === 'overdue' || status.status === 'due_now'
-  const isWarn = status.status === 'due_soon'
-
-  return (
-    <div className={`bg-surface rounded-[24px] border overflow-hidden transition-all duration-200 ${
-      isDanger ? 'border-red-200 dark:border-red-500/30 shadow-[0_4px_20px_rgba(239,68,68,0.05)]' : 
-      isWarn ? 'border-amber-200 dark:border-amber-500/30 shadow-[0_4px_20px_rgba(245,158,11,0.05)]' : 
-      'border-overlay'
-    }`}>
-      {/* Top Banner */}
-      <div className={`px-5 py-2.5 flex items-center justify-between border-b ${
-        isDanger ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20' : 
-        isWarn ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20' : 
-        'bg-surface-low border-overlay'
-      }`}>
-        <div className="flex items-center gap-2">
-          {isDanger && <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />}
-          {isWarn && <Activity className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
-          {!isDanger && !isWarn && <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
-          <span className={`text-[11px] font-black uppercase tracking-widest ${
-            isDanger ? 'text-red-600 dark:text-red-400' : 
-            isWarn ? 'text-amber-600 dark:text-amber-400' : 
-            'text-emerald-600 dark:text-emerald-400'
-          }`}>
-            {status.status === 'overdue' ? 'Overdue' : 
-             status.status === 'due_now' ? 'Due Now' : 
-             status.status === 'due_soon' ? 'Due Soon' : 'Healthy'}
-          </span>
+      {/* SEASONAL TAB */}
+      {tab === 'seasonal' && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-black text-on-surface">Seasonal Checklists</h2>
+          <p className="text-sm text-muted -mt-2">Based on your selected region: <strong>{prefs.region === 'hot' ? 'Hot Climate' : prefs.region === 'cold' ? 'Cold / Winter' : 'Temperate'}</strong></p>
+          {checklists.map(cl => (
+            <SeasonalChecklist key={cl.id} checklist={cl} onUpdate={handleChecklistUpdate} />
+          ))}
         </div>
-        <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
-          Next: {status.next_due_mileage.toLocaleString()} mi
-        </span>
-      </div>
+      )}
 
-      {/* Main Content */}
-      <div className="p-5">
-        <div className="flex items-start justify-between cursor-pointer" onClick={() => setExpanded(!expanded)}>
-          <div>
-            <h3 className="text-lg font-black text-on-surface tracking-tight mb-1">{status.item.service_type}</h3>
-            <p className="text-sm font-medium text-muted">
-              Est. ${status.item.estimated_cost_low} – ${status.item.estimated_cost_high}
-            </p>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-surface-low flex items-center justify-center flex-shrink-0">
-            <ChevronDown className={`w-4 h-4 text-muted transition-transform ${expanded ? 'rotate-180' : ''}`} />
-          </div>
+      {/* FLUIDS TAB */}
+      {tab === 'fluids' && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-black text-on-surface">Fluid Check Guide</h2>
+          <FluidCheckGuide />
         </div>
+      )}
 
-        <AnimatePresence>
-          {expanded && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="pt-5 mt-5 border-t border-overlay space-y-4">
-                
-                {/* Risk & Scam notes */}
-                <div className="bg-surface-low rounded-xl p-4 space-y-3">
-                  <div className="flex gap-3">
-                    <ShieldCheck className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                    <div>
-                      <span className="text-xs font-bold text-on-surface block mb-0.5">Anti-Scam Note</span>
-                      <span className="text-sm text-muted">{status.item.anti_scam_note}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <AlertCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                    <div>
-                      <span className="text-xs font-bold text-on-surface block mb-0.5">Risk if delayed</span>
-                      <span className="text-sm text-muted">{status.risk_if_delayed}</span>
-                    </div>
-                  </div>
-                </div>
+      {/* ADVISOR TAB */}
+      {tab === 'advisor' && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-black text-on-surface">Is This Worth Fixing?</h2>
+          <WorthFixingAdvisor />
+        </div>
+      )}
 
-                {/* Mark as done */}
-                <div className="flex items-end gap-3">
-                  <div className="flex-1">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted block mb-1">Mark as serviced at (miles)</label>
-                    <input 
-                      type="number" 
-                      defaultValue={currentMileage}
-                      id={`miles-${status.item.id}`}
-                      className="w-full bg-surface-low border border-overlay rounded-lg px-3 py-2 text-sm font-bold text-on-surface outline-none"
-                    />
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const input = document.getElementById(`miles-${status.item.id}`) as HTMLInputElement
-                      if (input && input.value) {
-                        onUpdate(status.item.id, Number(input.value), new Date().toISOString())
-                        setExpanded(false)
-                      }
-                    }}
-                    className="px-4 py-2 bg-navy text-white rounded-lg text-xs font-bold uppercase tracking-widest"
-                  >
-                    Save
-                  </button>
-                </div>
-
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Add Record Modal */}
+      <AddServiceRecordModal
+        isOpen={showAddModal}
+        vehicleId={selectedId || ''}
+        currentMileage={mileage}
+        onClose={() => setShowAddModal(false)}
+        onSaved={handleAddRecord}
+      />
     </div>
   )
 }

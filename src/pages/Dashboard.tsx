@@ -7,12 +7,21 @@ import InstallPrompt from '../components/InstallPrompt'
 import { 
   Users, ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
-  Navigation, Car,
-  Zap, Plus, Thermometer, Battery, Activity
+  Car, Zap, Plus, Thermometer, Battery, Activity
 } from 'lucide-react'
 import DevelopmentModal from '../components/DevelopmentModal'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
-import { useSubscription } from '../hooks/useSubscription'
+import { 
+  calculateMaintenanceStatus, 
+  calculateHealthScore, 
+  DEFAULT_SCHEDULE,
+  type MaintenanceStatus,
+  type MaintenancePrefs,
+  type MaintenanceItem,
+  type ServiceRecord
+} from '../data/maintenanceData'
+import HealthScoreCard from '../components/maintenance/HealthScoreCard'
+import MaintenanceReminderCard from '../components/maintenance/MaintenanceReminderCard'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -21,7 +30,10 @@ export default function Dashboard() {
   const [loadingVehicle, setLoadingVehicle] = useState(true)
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-  const { isFree } = useSubscription()
+  
+  // Maintenance State
+  const [maintenanceStatuses, setMaintenanceStatuses] = useState<MaintenanceStatus[]>([])
+  const [healthScore, setHealthScore] = useState<any>(null)
   
   const firstName = user?.email?.split('@')[0] ?? 'Driver'
 
@@ -38,23 +50,56 @@ export default function Dashboard() {
         .eq('is_default', true)
         .maybeSingle()
       
-      if (data) {
-        setDefaultVehicle(data)
-      } else {
-        // Fetch first vehicle if no default is set
+      let vehicle = data
+      if (!data) {
         const { data: firstVal } = await (supabase as any)
           .from('vehicles')
           .select('*')
           .eq('user_id', user?.id)
           .limit(1)
           .maybeSingle()
-        if (firstVal) setDefaultVehicle(firstVal)
+        if (firstVal) vehicle = firstVal
+      }
+
+      if (vehicle) {
+        setDefaultVehicle(vehicle)
+        loadMaintenanceData(vehicle)
       }
     } catch (err) {
       console.log('No default vehicle found')
     } finally {
       setLoadingVehicle(false)
     }
+  }
+
+  const loadMaintenanceData = (vehicle: any) => {
+    const vid = vehicle.id
+    const mileage = vehicle.mileage || 50000
+
+    // Load Prefs
+    const savedPrefs = localStorage.getItem(`maint_prefs_v2_${vid}`)
+    const prefs: MaintenancePrefs = savedPrefs ? JSON.parse(savedPrefs) : {
+      avgMilesPerMonth: 1000, drivingStyle: 'mixed', usageLevel: 'normal', region: 'temperate'
+    }
+
+    // Load Schedule
+    const savedSched = localStorage.getItem(`maint_schedule_${vid}`)
+    const schedule: MaintenanceItem[] = savedSched ? JSON.parse(savedSched) : DEFAULT_SCHEDULE.map(s => ({
+      ...s,
+      lastServiceMileage: Math.max(0, mileage - Math.round(s.intervalMiles * 0.7)),
+      lastServiceDate: new Date(Date.now() - (s.intervalMonths * 0.6) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+    }))
+
+    // Load History
+    const savedHistory = localStorage.getItem(`maint_history_${vid}`)
+    const history: ServiceRecord[] = savedHistory ? JSON.parse(savedHistory) : []
+
+    // Calculate
+    const statuses = schedule.map(item => calculateMaintenanceStatus(item, mileage, prefs))
+    const health = calculateHealthScore(statuses, history)
+
+    setMaintenanceStatuses(statuses)
+    setHealthScore(health)
   }
 
   const modules = [
@@ -100,6 +145,8 @@ export default function Dashboard() {
     },
   ]
 
+  const urgentMaintenance = maintenanceStatuses.filter(s => s.status === 'overdue' || s.status === 'due')
+
   return (
     <div className="p-4 lg:p-6 max-w-5xl mx-auto bg-transparent">
       {/* 1. Status Strip */}
@@ -128,7 +175,46 @@ export default function Dashboard() {
         </h1>
       </div>
 
-      {/* 3. Main Action Grid (2x2) */}
+      {/* 3. Maintenance Alerts & Health Score */}
+      {(urgentMaintenance.length > 0 || healthScore) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Health Score Column */}
+          {healthScore && (
+            <div className="md:col-span-1">
+              <HealthScoreCard 
+                score={healthScore.total} 
+                label={healthScore.label} 
+                categories={healthScore.categories} 
+              />
+            </div>
+          )}
+
+          {/* Urgent Alerts Column */}
+          {urgentMaintenance.length > 0 && (
+            <div className="md:col-span-2 space-y-3">
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <AlertCircle className="w-4 h-4 text-red-500" />
+                <h2 className="text-[10px] font-black text-on-surface uppercase tracking-widest">Urgent Maintenance</h2>
+              </div>
+              {urgentMaintenance.slice(0, 2).map(s => (
+                <MaintenanceReminderCard 
+                  key={s.item.id} 
+                  status={s} 
+                  currentMileage={defaultVehicle?.mileage || 50000} 
+                  onLogService={() => navigate('/dashboard/maintenance')} 
+                />
+              ))}
+              {urgentMaintenance.length > 2 && (
+                <Link to="/dashboard/maintenance" className="block text-center py-2 text-[10px] font-black text-navy uppercase tracking-widest hover:underline">
+                  View {urgentMaintenance.length - 2} more alerts →
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. Main Action Grid (2x2) */}
       <div className="grid grid-cols-2 gap-3 mb-8">
         {modules.map((mod) => (
           <motion.div key={mod.to} whileTap={{ scale: 0.97 }}>
@@ -157,7 +243,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* 4. Compact Vehicle Card */}
+      {/* 5. Compact Vehicle Card */}
       <div className="mb-10">
         {!defaultVehicle && !loadingVehicle ? (
           <Link to="/dashboard/vehicles" className="group flex items-center gap-4 bg-white border border-slate-100 p-5 rounded-[28px] transition-all hover:shadow-lg hover:shadow-slate-200/50 shadow-sm shadow-slate-200/20">
@@ -188,7 +274,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* 5. Quick Issue Shortcuts */}
+      {/* 6. Quick Issue Shortcuts */}
       <div className="mb-12">
         <p className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1">Quick Diagnosis</p>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1">
