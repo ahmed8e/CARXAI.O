@@ -25,7 +25,14 @@
     "reports": "Reports",
     "settings": "Settings",
     "home": "Home",
-    "diagnosis": "Diagnostics"
+    "diagnosis": "Diagnostics",
+    "mobile": {
+      "dashboard": "Home",
+      "garage": "Garage",
+      "maintenance": "Maintenance",
+      "overpaying": "Price",
+      "settings": "Settings"
+    }
   },
   "landing": {
     "nav": {

@@ -25,7 +25,14 @@
     "reports": "التقارير",
     "settings": "الإعدادات",
     "home": "الرئيسية",
-    "diagnosis": "التشخيصات"
+    "diagnosis": "التشخيصات",
+    "mobile": {
+      "dashboard": "الرئيسية",
+      "garage": "المرآب",
+      "maintenance": "الصيانة",
+      "overpaying": "الأسعار",
+      "settings": "الإعدادات"
+    }
   },
   "landing": {
     "nav": {

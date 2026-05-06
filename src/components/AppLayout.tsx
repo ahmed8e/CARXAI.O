@@ -36,11 +36,11 @@ import { InteractiveMenu } from './ui/modern-mobile-menu'
 import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
-  { to: '/dashboard/vehicles',         icon: Car,             label: 'nav.garage' },
-  { to: '/dashboard',                  icon: LayoutDashboard, label: 'nav.dashboard' },
-  { to: '/dashboard/maintenance',      icon: Wrench,          label: 'nav.maintenance' },
-  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'nav.overpaying' },
-  { to: '/my-account',                 icon: Settings,        label: 'nav.settings' },
+  { to: '/dashboard/vehicles',         icon: Car,             label: 'nav.mobile.garage' },
+  { to: '/dashboard',                  icon: LayoutDashboard, label: 'nav.mobile.dashboard' },
+  { to: '/dashboard/maintenance',      icon: Wrench,          label: 'nav.mobile.maintenance' },
+  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'nav.mobile.overpaying' },
+  { to: '/my-account',                 icon: Settings,        label: 'nav.mobile.settings' },
 ]
 
 export default function AppLayout({ children }: AppLayoutProps) {
@@ -229,12 +229,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Mobile sidebar overlay */}
       <AnimatePresence>
         {sidebarOpen && (
-          <div className="fixed inset-0 z-[70] flex lg:hidden">
+          <div className="fixed inset-0 z-[100] flex lg:hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-surface-low dark:bg-surface-low/95 backdrop-blur-sm shadow-2xl border-r border-overlay"
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
               onClick={() => setSidebarOpen(false)}
             />
             <motion.aside
@@ -242,7 +242,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               animate={{ x: 0 }}
               exit={{ x: -240 }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="relative w-[232px] flex-shrink-0 z-10 shadow-2xl"
+              className="relative w-[232px] h-full flex-shrink-0 z-10 shadow-2xl overflow-hidden"
             >
               <SidebarContent mobile />
             </motion.aside>
@@ -268,11 +268,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </main>
       </div>
 
-      {!isAIMechanic && (
-        <div className="lg:hidden">
-          <InteractiveMenu items={BOTTOM_NAV_ITEMS} />
-        </div>
-      )}
+      <AnimatePresence>
+        {!isAIMechanic && !sidebarOpen && (
+          <motion.div 
+            initial={{ y: 80 }}
+            animate={{ y: 0 }}
+            exit={{ y: 80 }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-[90]"
+          >
+            <InteractiveMenu items={BOTTOM_NAV_ITEMS} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <DevelopmentModal 
         isOpen={isDevModalOpen} 
         onClose={() => setIsDevModalOpen(false)} 
