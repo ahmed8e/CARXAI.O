@@ -1,13 +1,19 @@
 import { InteractiveMenu } from "@/components/ui/modern-mobile-menu";
 import type { InteractiveMenuItem } from "@/components/ui/modern-mobile-menu";
-import { Home, Briefcase, Calendar, Shield, Settings } from 'lucide-react';
+import { 
+  Car, 
+  LayoutDashboard, 
+  Wrench, 
+  ShieldCheck, 
+  Settings 
+} from 'lucide-react';
 
 const lucideDemoMenuItems: InteractiveMenuItem[] = [
-    { label: 'home', icon: Home },
-    { label: 'strategy', icon: Briefcase },
-    { label: 'period', icon: Calendar },
-    { label: 'security', icon: Shield },
-    { label: 'settings', icon: Settings },
+    { label: 'Garage', icon: Car, to: '/dashboard/vehicles' },
+    { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+    { label: 'Maintenance', icon: Wrench, to: '/dashboard/maintenance' },
+    { label: 'Price Check', icon: ShieldCheck, to: '/dashboard/avoid-overpaying' },
+    { label: 'Settings', icon: Settings, to: '/my-account' },
 ];
 
 const customAccentColor = 'var(--color-chart-2)';

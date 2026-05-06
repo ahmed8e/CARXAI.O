@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { Home, Briefcase, Calendar, Shield, Settings } from 'lucide-react';
 
 type IconComponentType = React.ElementType<{ className?: string }>;
@@ -14,21 +15,21 @@ export interface InteractiveMenuProps {
 }
 
 const defaultItems: InteractiveMenuItem[] = [
-    { label: 'home', icon: Home },
-    { label: 'strategy', icon: Briefcase },
-    { label: 'period', icon: Calendar },
-    { label: 'security', icon: Shield },
-    { label: 'settings', icon: Settings },
+    { label: 'home', icon: Home, to: '/dashboard' },
+    { label: 'strategy', icon: Briefcase, to: '/dashboard/strategy' },
+    { label: 'period', icon: Calendar, to: '/dashboard/calendar' },
+    { label: 'security', icon: Shield, to: '/dashboard/security' },
+    { label: 'settings', icon: Settings, to: '/my-account' },
 ];
 
 const defaultAccentColor = 'var(--component-active-color-default)';
 
 const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor }) => {
+  const location = useLocation();
 
   const finalItems = useMemo(() => {
      const isValid = items && Array.isArray(items) && items.length >= 2 && items.length <= 5;
      if (!isValid) {
-        console.warn("InteractiveMenu: 'items' prop is invalid or missing. Using default items.", items);
         return defaultItems;
      }
      return items;
@@ -36,14 +37,18 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor })
 
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Sync active state with route
   useEffect(() => {
-      if (activeIndex >= finalItems.length) {
-          setActiveIndex(0);
-      }
-  }, [finalItems, activeIndex]);
+    const currentIndex = finalItems.findIndex(item => {
+      if (!item.to) return false;
+      if (item.to === "/dashboard") return location.pathname === "/dashboard";
+      return location.pathname.startsWith(item.to);
+    });
+    if (currentIndex !== -1) setActiveIndex(currentIndex);
+  }, [location.pathname, finalItems]);
 
   const textRefs = useRef<(HTMLElement | null)[]>([]);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
     const setLineWidth = () => {
@@ -64,10 +69,6 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor })
     };
   }, [activeIndex, finalItems]);
 
-  const handleItemClick = (index: number) => {
-    setActiveIndex(index);
-  };
-
   const navStyle = useMemo(() => {
       const activeColor = accentColor || defaultAccentColor;
       return { '--component-active-color': activeColor } as React.CSSProperties;
@@ -81,16 +82,14 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor })
     >
       {finalItems.map((item, index) => {
         const isActive = index === activeIndex;
-        const isTextActive = isActive;
-
 
         const IconComponent = item.icon;
 
         return (
-          <button
+          <Link
             key={item.label}
+            to={item.to || '#'}
             className={`menu__item ${isActive ? 'active' : ''}`}
-            onClick={() => handleItemClick(index)}
             ref={(el) => { itemRefs.current[index] = el; }}
             style={{ '--lineWidth': '0px' } as React.CSSProperties} 
           >
@@ -98,12 +97,12 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor })
               <IconComponent className="icon" />
             </div>
             <strong
-              className={`menu__text ${isTextActive ? 'active' : ''}`}
+              className={`menu__text ${isActive ? 'active' : ''}`}
               ref={(el) => { textRefs.current[index] = el; }}
             >
               {item.label}
             </strong>
-          </button>
+          </Link>
         );
       })}
     </nav>
