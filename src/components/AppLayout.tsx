@@ -1,5 +1,6 @@
 import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -13,17 +14,18 @@ import Paywall from './Paywall'
 import DevelopmentModal from './DevelopmentModal'
 import { useSubscription } from '../hooks/useSubscription'
 import { BrandLockup } from './ui/Brand'
+import { LanguageSelector } from './ui/LanguageSelector'
 
 // ── Navigation groups ────────────────────────────────────────────────
 const NAV_GROUPS = [
   {
-    label: 'Diagnosis',
+    label: 'nav.diagnosis',
     items: [
-      { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
-      { to: '/dashboard/ai-mechanic',  icon: ShieldWrenchIcon,   label: 'AI Mechanic' },
-      { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles' },
-      { to: '/dashboard/maintenance',  icon: Wrench,          label: 'Maintenance' },
-      { to: '/dashboard/reports',      icon: Activity,        label: 'Reports'     },
+      { to: '/dashboard',              icon: LayoutDashboard, label: 'nav.dashboard',       end: true  },
+      { to: '/dashboard/ai-mechanic',  icon: ShieldWrenchIcon,   label: 'nav.mechanic' },
+      { to: '/dashboard/vehicles',     icon: Car,             label: 'nav.garage' },
+      { to: '/dashboard/maintenance',  icon: Wrench,          label: 'nav.maintenance' },
+      { to: '/dashboard/reports',      icon: Activity,        label: 'nav.reports'     },
     ],
   },
 ]
@@ -34,14 +36,15 @@ import { InteractiveMenu } from './ui/modern-mobile-menu'
 import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
-  { to: '/dashboard/vehicles',         icon: Car,             label: 'Garage' },
-  { to: '/dashboard',                  icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/dashboard/maintenance',      icon: Wrench,          label: 'Maintenance' },
-  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Price Check' },
-  { to: '/my-account',                 icon: Settings,        label: 'Settings' },
+  { to: '/dashboard/vehicles',         icon: Car,             label: 'nav.garage' },
+  { to: '/dashboard',                  icon: LayoutDashboard, label: 'nav.dashboard' },
+  { to: '/dashboard/maintenance',      icon: Wrench,          label: 'nav.maintenance' },
+  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'nav.overpaying' },
+  { to: '/my-account',                 icon: Settings,        label: 'nav.settings' },
 ]
 
 export default function AppLayout({ children }: AppLayoutProps) {
+  const { t } = useTranslation()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -96,7 +99,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <div key={group.label}>
               {/* Group label */}
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted/80 px-2.5 mb-1.5">
-                {group.label}
+                {t(group.label)}
               </p>
 
               <div className="space-y-0.5">
@@ -133,7 +136,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                           <item.icon className="w-[15px] h-[15px]" />
                         </span>
 
-                        <span className="flex-1 leading-none">{item.label}</span>
+                        <span className="flex-1 leading-none">{t(item.label)}</span>
 
 
                         {/* Active indicator chevron */}
@@ -156,8 +159,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">AI Engine Ready</p>
-                    <p className="text-[9px] text-muted mt-0.5 tracking-wide">Available 24/7</p>
+                    <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">{t('app.dashboard.engine_ready')}</p>
+                    <p className="text-[9px] text-muted mt-0.5 tracking-wide">{t('common.available_24_7')}</p>
                   </div>
                   <ShieldWrenchIcon className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
                 </div>
@@ -167,7 +170,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </nav>
 
         {/* ── Account ── */}
-        <div className="px-3 pt-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))] border-t border-overlay space-y-1.5">
+        <div className="px-3 pt-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))] border-t border-overlay space-y-3">
+          
+          {/* Language Switcher */}
+          <div className="px-1">
+            <LanguageSelector className="w-full" />
+          </div>
+
           {/* Profile card */}
           <Link
             to="/my-account"
@@ -200,7 +209,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                        hover:bg-red-50/50 transition-all duration-200 tracking-wide"
           >
             <LogOut className="w-3 h-3 flex-shrink-0" />
-            Sign out
+            {t('common.logout')}
           </button>
         </div>
       </div>

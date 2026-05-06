@@ -4,6 +4,7 @@ import { BrandLockup } from './ui/Brand'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { LanguageSelector } from './ui/LanguageSelector'
 
 interface NavbarProps {
   onMenuClick?: () => void
@@ -66,7 +67,10 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
       )}
 
       {/* Right Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        
+        {/* Language Selector */}
+        <LanguageSelector className="hidden sm:block" />
 
         {user ? (
           <div className="relative" ref={accountMenuRef}>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -40,6 +41,7 @@ function buildSchedule(vehicle: Vehicle): MaintenanceItem[] {
 }
 
 export default function Maintenance() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -165,9 +167,9 @@ export default function Maintenance() {
     return (
       <div className="p-8 max-w-xl mx-auto text-center mt-16 bg-[#f8fafc] min-h-screen">
         <div className="w-20 h-20 bg-white border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm"><Car className="w-10 h-10 text-slate-300" /></div>
-        <h2 className="text-2xl font-black text-slate-900 mb-2">No Vehicles Found</h2>
-        <p className="text-slate-500 mb-8 font-medium">Add a vehicle to start tracking maintenance.</p>
-        <Link to="/dashboard/vehicles" className="inline-block px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all">Go to My Garage</Link>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">{t('app.garage.no_vehicles')}</h2>
+        <p className="text-slate-500 mb-8 font-medium">{t('maintenance.no_vehicles_desc')}</p>
+        <Link to="/dashboard/vehicles" className="inline-block px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all">{t('maintenance.go_to_garage')}</Link>
       </div>
     )
   }

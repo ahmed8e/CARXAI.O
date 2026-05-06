@@ -79,9 +79,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Request body is missing.', diagnosticCode: 'EMPTY_BODY' });
   }
 
-  const { plan, response_mode, followup_context, is_retry, ...openAiPayload } = req.body;
+  const { plan, response_mode, followup_context, is_retry, lang, ...openAiPayload } = req.body;
+
+  const langMap: Record<string, string> = {
+    'en': 'English',
+    'fr': 'French',
+    'ar': 'Arabic'
+  };
+  const targetLang = langMap[lang as string] || 'English';
 
   const STANDARD_PROMPT = `You are Car Safety AI Mechanic, a multimodal automotive assistant.
+IMPORTANT: You MUST respond in ${targetLang}. All fields in the JSON response including titles, explanations, and next steps MUST be in ${targetLang}.
 
 Your job is to help users understand car problems using any combination of:
 - user text
@@ -136,6 +144,7 @@ Additional rules:
 - Return only valid JSON. Do not return markdown.`;
 
   const FAST_ANSWER_PROMPT = `You are the EMERGENCY MECHANIC ADVISOR for Car Safety. You provide high-urgency, punchy automotive rescue advice.
+ IMPORTANT: You MUST respond in ${targetLang}. All fields in the JSON response MUST be in ${targetLang}.
  
  CRITICAL EMERGENCY RULES:
  1. REAL-WORLD TONE: Talk like a real mechanic giving urgent advice over the phone. Use short, punchy, active sentences. Avoid fluff.
@@ -170,6 +179,7 @@ Additional rules:
  }`;
 
   const EXPERT_ANSWER_PROMPT = `You are the CONTEXT-AWARE DIAGNOSTIC INVESTIGATOR for Car Safety. You act as a Master Technician who treats every interaction as a systematic investigation.
+IMPORTANT: You MUST respond in ${targetLang}. All fields in the JSON response MUST be in ${targetLang}.
 
 CRITICAL INVESTIGATOR RULES:
 1. ACTIVE LISTENING & TRUTH: Treat all user inputs as absolute technical truth. If a user says "No noise" or "No leak", you must explicitly rule out mechanical failures related to those symptoms and pivot your investigation to other systems (e.g., electrical or fluids) immediately.

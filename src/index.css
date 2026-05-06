@@ -295,6 +295,11 @@
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Hide bottom nav when modal is open (Option A) */
+  body.modal-open .menu {
+    @apply translate-y-32 opacity-0 pointer-events-none;
+  }
+
   .menu__item {
     @apply relative flex flex-col items-center justify-center flex-1 h-full;
     @apply transition-all duration-300 outline-none no-underline;

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
 import { Home, Briefcase, Calendar, Shield, Settings } from 'lucide-react';
 
@@ -22,7 +23,7 @@ const defaultItems: InteractiveMenuItem[] = [
     { label: 'settings', icon: Settings, to: '/my-account' },
 ];
 
-const defaultAccentColor = 'var(--component-active-color-default)';
+
 
 const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items }) => {
   const location = useLocation();
@@ -47,6 +48,8 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items }) => {
     if (currentIndex !== -1) setActiveIndex(currentIndex);
   }, [location.pathname, finalItems]);
 
+  const { t } = useTranslation();
+
   return (
     <nav
       className="menu"
@@ -66,7 +69,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items }) => {
               <IconComponent className="icon" />
             </div>
             <strong className={`menu__text ${isActive ? 'active' : ''}`}>
-              {item.label}
+              {t(item.label)}
             </strong>
           </Link>
         );

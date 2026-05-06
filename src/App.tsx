@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useEffect, lazy, Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -52,6 +53,20 @@ function UserIdentityTracker() {
       })
     }
   }, [user, subscription])
+
+  return null
+}
+
+// ── Language & RTL Tracking ────────────────────────────────────────────────
+function LanguageTracker() {
+  const { i18n } = useTranslation()
+  
+  useEffect(() => {
+    const lang = i18n.language || 'en'
+    const dir = lang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.lang = lang
+    document.documentElement.dir = dir
+  }, [i18n.language])
 
   return null
 }
@@ -133,6 +148,7 @@ export default function App() {
           <PathTracker />
           <GA4Tracker />
           <UserIdentityTracker />
+          <LanguageTracker />
 
           <Suspense fallback={<LoadingFallback />}>
             <Routes>

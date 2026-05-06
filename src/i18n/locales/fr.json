@@ -1,0 +1,168 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès !",
+    "back": "Retour",
+    "continue": "Continuer",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "search": "Rechercher...",
+    "no_data": "Aucune donnée trouvée",
+    "available_24_7": "Disponible 24/7"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "garage": "Garage",
+    "mechanic": "Mécanicien IA",
+    "maintenance": "Entretien",
+    "overpaying": "Vérif. Prix",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "home": "Accueil",
+    "diagnosis": "Diagnostics"
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "how_it_works": "Comment ça marche",
+      "pricing": "Tarifs",
+      "reviews": "Avis",
+      "faq": "FAQ"
+    },
+    "hero": {
+      "badge": "Diagnostic auto instantané",
+      "title_line1": "Arrêtez de trop payer pour",
+      "title_line2": "vos réparations.",
+      "subtitle": "Diagnostiquez votre problème de voiture en 30 secondes — sans passer par le garage.",
+      "cta_start": "Commencer le diagnostic",
+      "cta_demo": "Voir les tarifs",
+      "trust_drivers": "Approuvé par les conducteurs",
+      "trust_results": "Résultats instantanés",
+      "trust_signup": "Sans inscription"
+    },
+    "demo": {
+       "msg1": "Mon voyant ABS vient de s'allumer en conduisant. Est-ce que je peux continuer ?",
+       "msg2": "Je vois le voyant ABS sur votre tableau de bord. Vos freins normaux fonctionnent toujours — mais le système anti-blocage est désactivé, vos roues pourraient donc se bloquer lors d'un freinage brusque. Quand l'avez-vous remarqué ?",
+       "msg3": "Il y a environ 10 minutes. Il a commencé à pleuvoir et le voyant s'est allumé après avoir freiné fort à un feu.",
+       "msg4": "C'est utile. Un freinage brusque sur sol mouillé peut déclencher un défaut ABS si un capteur de vitesse de roue perd le signal. Le voyant est-il resté allumé depuis ?",
+       "msg5": "Il est resté allumé tout le temps. Dois-je m'arrêter ?",
+       "msg6": "Vous n'avez pas besoin de vous arrêter immédiatement — vos freins principaux sont corrects. Mais évitez les arrêts brusques et roulez à moins de 50 km/h jusqu'à ce que vous puissiez faire un scan. Voici mon évaluation complète :",
+       "analysis_complete": "Analyse de diagnostic terminée",
+       "report_ready": "Rapport de diagnostic",
+       "medium": "Moyen",
+       "finding": "Module ABS — Défaut du capteur de vitesse de roue",
+       "advice": "Cause la plus probable : un capteur de vitesse de roue avant sale ou défaillant. Courant sur ce modèle après 50k km. Pas urgent, mais devrait être scanné dans les prochains jours."
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin pour votre voiture",
+      "mechanic": "Mécanicien IA",
+      "mechanic_desc": "Diagnostics experts instantanés pour tout bruit ou voyant de tableau de bord.",
+      "maintenance": "Entretien intelligent",
+      "maintenance_desc": "Calendriers automatisés adaptés à vos habitudes de conduite.",
+      "overpaying": "Évitez de trop payer",
+      "overpaying_desc": "Vérifiez les coûts de réparation et évitez les arnaques."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous à votre compte",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "button": "Se connecter",
+      "no_account": "Pas encore de compte ?",
+      "signup_link": "S'inscrire gratuitement"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez votre voyage vers une conduite plus sûre",
+      "full_name": "Nom complet",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "button": "Créer le compte",
+      "has_account": "Déjà un compte ?",
+      "login_link": "Se connecter"
+    }
+  },
+  "app": {
+    "dashboard": {
+      "welcome": "Bon retour,",
+      "greeting_question": "Comment pouvons-nous\nvous aider aujourd'hui ?",
+      "engine_ready": "Moteur IA prêt",
+      "quick_actions": "Actions rapides",
+      "health_score": "Score de santé",
+      "recent_activity": "Activité récente",
+      "garage_empty": "Garage vide",
+      "add_vehicle": "Ajoutez votre véhicule",
+      "active_vehicle": "Véhicule actif",
+      "urgent_attention": "Attention urgente",
+      "more_urgent": "+{{count}} de plus",
+      "quick_diagnostics": "Diagnostics rapides",
+      "diagnostics": {
+        "engine": "Vérifier moteur",
+        "start": "Démarre pas",
+        "noise": "Bruit",
+        "battery": "Batterie",
+        "brakes": "Freins"
+      }
+    },
+    "garage": {
+      "title": "Mon Garage",
+      "add_vehicle": "Ajouter un véhicule",
+      "no_vehicles": "Aucun véhicule trouvé",
+      "year": "Année",
+      "make": "Marque",
+      "model": "Modèle",
+      "mileage": "Kilométrage"
+    },
+    "mechanic": {
+      "title": "Mécanicien IA",
+      "header": "Assistant Diagnostic Expert",
+      "placeholder": "Décrivez le bruit, le voyant ou le problème...",
+      "streaming": "Analyse en direct",
+      "connecting": "Connexion aux systèmes",
+      "disclaimer": "Les recommandations de l'IA sont données à titre indicatif. Consultez un professionnel certifié.",
+      "vague_response": "Pas de souci — je suis là pour vous aider. Voyons cela ensemble.\n\nPour m'aider à vous orienter, pourriez-vous me dire :\n**Quelle est la chose principale que fait (ou ne fait pas) votre voiture en ce moment ?**\n\nPar exemple : un bruit étrange, un voyant allumé, des difficultés au démarrage, ou quelque chose que vous avez remarqué en conduisant.",
+      "analyzing_photo": "Analyse de votre photo…",
+      "analyzing_systems": "Analyse des systèmes..."
+    }
+  },
+  "maintenance": {
+    "title": "Entretien",
+    "add_record": "Enregistrer un entretien",
+    "history": "Historique",
+    "seasonal": "Contrôles saisonniers",
+    "fluids": "Guide des fluides",
+    "advisor": "Vaut le coup ?",
+    "export": "Exporter le rapport",
+    "no_vehicles_desc": "Ajoutez un véhicule pour commencer le suivi de l'entretien.",
+    "go_to_garage": "Aller à mon garage",
+    "urgent": "Action urgente",
+    "upcoming": "À venir",
+    "service_types": {
+      "oil_change": "Vidange d'huile",
+      "tire_rotation": "Rotation des pneus",
+      "brakes": "Inspection des freins",
+      "battery": "Vérification batterie",
+      "fluids": "Vidange fluides",
+      "inspection": "Inspection complète"
+    },
+    "modal": {
+      "title": "Ajouter un entretien",
+      "subtitle": "Enregistrer l'entretien effectué",
+      "type_label": "Type de service",
+      "date_label": "Date",
+      "mileage_label": "Kilométrage",
+      "cost_label": "Coût (€)",
+      "shop_label": "Garage / Mécanicien",
+      "notes_label": "Notes",
+      "save": "Enregistrer"
+    }
+  }
+}

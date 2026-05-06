@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -30,6 +31,7 @@ const RESET_WINDOW_HOURS = 5
 
 
 export default function AIMechanic() {
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -604,7 +606,7 @@ export default function AIMechanic() {
         const vagueResponse: Message = {
           id: Date.now().toString(),
           role: 'assistant',
-          content: `No worries — I'm here to help. Let's figure this out together.\n\nTo point you in the right direction, could you tell me:\n**What's the main thing your car is doing (or not doing) right now?**\n\nFor example: a strange noise, a warning light, trouble starting, or something you noticed while driving.`,
+          content: t('app.mechanic.vague_response'),
           timestamp: new Date(),
         }
         setMessages(prev => [...prev, vagueResponse])
@@ -659,6 +661,7 @@ ${diagnosticHistory}
             response_mode: responseMode,
             followup_context: customContext || null,
             is_retry: isRetry,
+            lang: i18n.language,
             messages: [
               {
                 role: 'system',
@@ -689,7 +692,7 @@ ${diagnosticHistory}
           throw new Error('Missing content in /api/chat response')
         }
 
-        setStreamingMessage(imageUrl ? 'Analyzing your photo…' : 'Analyzing systems...')
+        setStreamingMessage(imageUrl ? t('app.mechanic.analyzing_photo') : t('app.mechanic.analyzing_systems'))
 
         return JSON.stringify(result.content)
       }

@@ -1,7 +1,7 @@
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, X, ArrowRight } from 'lucide-react'
 import ShieldWrenchIcon from './ShieldWrenchIcon'
-import { useState } from 'react'
 
 interface QualityPromptProps {
   isOpen: boolean
@@ -21,6 +21,18 @@ export default function QualityPrompt({ isOpen, onClose, onContinue }: QualityPr
       onContinue()
     }, 600)
   }
+
+  // Side effects: hide bottom nav
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [isOpen])
 
   return (
     <AnimatePresence>

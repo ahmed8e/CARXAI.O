@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
@@ -24,6 +25,7 @@ import {
 import MaintenanceReminderCard from '../components/maintenance/MaintenanceReminderCard'
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [defaultVehicle, setDefaultVehicle] = useState<any>(null)
@@ -106,8 +108,8 @@ export default function Dashboard() {
     {
       to: '/dashboard/avoid-overpaying',
       icon: ShieldCheck,
-      label: 'Price Check',
-      desc: 'Verify repair quotes',
+      label: 'nav.overpaying',
+      desc: 'landing.features.overpaying_desc',
       color: 'text-blue-500', 
       bg: 'bg-blue-50',
       border: 'border-blue-100'
@@ -115,8 +117,8 @@ export default function Dashboard() {
     {
       to: '/dashboard/ai-mechanic',
       icon: ShieldWrenchIcon,
-      label: 'AI Mechanic',
-      desc: 'Expert diagnosis',
+      label: 'nav.mechanic',
+      desc: 'landing.features.mechanic_desc',
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-blue-100'
@@ -124,8 +126,8 @@ export default function Dashboard() {
     {
       to: '/dashboard/maintenance',
       icon: Wrench,
-      label: 'Maintenance',
-      desc: 'Track schedule',
+      label: 'nav.maintenance',
+      desc: 'landing.features.maintenance_desc',
       color: 'text-emerald-500',
       bg: 'bg-emerald-50',
       border: 'border-emerald-100'
@@ -133,8 +135,8 @@ export default function Dashboard() {
     {
       to: '/dashboard/reports',
       icon: Activity,
-      label: 'Reports',
-      desc: 'Diagnostic history',
+      label: 'nav.reports',
+      desc: 'app.mechanic.disclaimer',
       color: 'text-purple-500',
       bg: 'bg-purple-50',
       border: 'border-purple-100'
@@ -152,15 +154,15 @@ export default function Dashboard() {
         <div className="absolute top-[20%] right-[-10%] w-[40%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
       </div>
 
-
-
       <div className="max-w-xl mx-auto px-4 pt-6 relative z-10">
         
         {/* Greeting */}
         <div className="mb-6">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Welcome back, {firstName}</p>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
-            How can we help<br />with your car today?
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            {t('app.dashboard.welcome')} {firstName}
+          </p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight whitespace-pre-line">
+            {t('app.dashboard.greeting_question')}
           </h1>
         </div>
 
@@ -172,8 +174,8 @@ export default function Dashboard() {
                 <Plus className="w-5 h-5 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Garage Empty</p>
-                <p className="text-sm font-black text-slate-900">Add your vehicle</p>
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">{t('app.dashboard.garage_empty')}</p>
+                <p className="text-sm font-black text-slate-900">{t('app.dashboard.add_vehicle')}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-all" />
             </Link>
@@ -190,7 +192,7 @@ export default function Dashboard() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Active Vehicle</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('app.dashboard.active_vehicle')}</p>
                 <h3 className="text-base font-black text-slate-900 truncate">
                   {defaultVehicle.year} {defaultVehicle.make} {defaultVehicle.model}
                 </h3>
@@ -214,9 +216,9 @@ export default function Dashboard() {
                   <mod.icon className={`w-5 h-5 ${mod.color}`} />
                 </div>
                 <h3 className="text-sm font-black text-slate-900 mb-1 leading-tight">
-                  {mod.label}
+                  {t(mod.label)}
                 </h3>
-                <p className="text-[10px] text-slate-500 font-bold leading-snug">{mod.desc}</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-snug">{t(mod.desc)}</p>
               </Link>
             </motion.div>
           ))}
@@ -228,11 +230,11 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-3 px-2">
                <div className="flex items-center gap-2">
                  <AlertCircle className="w-4 h-4 text-rose-500" />
-                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Urgent Attention</h2>
+                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('app.dashboard.urgent_attention')}</h2>
                </div>
                {urgentMaintenance.length > 1 && (
                  <Link to="/dashboard/maintenance" className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                   +{urgentMaintenance.length - 1} More
+                   {t('app.dashboard.more_urgent', { count: urgentMaintenance.length - 1 })}
                  </Link>
                )}
             </div>
@@ -248,28 +250,29 @@ export default function Dashboard() {
 
         {/* Horizontal Quick Issue Shortcuts */}
         <div className="mb-8">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-2">Quick Diagnostics</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-2">{t('app.dashboard.quick_diagnostics')}</p>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
             {[
-              { label: 'Check Engine', icon: Activity, color: 'text-amber-500' },
-              { label: 'Won\'t Start', icon: Zap, color: 'text-rose-500' },
-              { label: 'Noise', icon: AlertCircle, color: 'text-slate-500' },
-              { label: 'Battery', icon: Battery, color: 'text-blue-500' },
-              { label: 'Brakes', icon: ShieldAlert, color: 'text-emerald-500' },
+              { label: 'app.dashboard.diagnostics.engine', icon: Activity, color: 'text-amber-500' },
+              { label: 'app.dashboard.diagnostics.start', icon: Zap, color: 'text-rose-500' },
+              { label: 'app.dashboard.diagnostics.noise', icon: AlertCircle, color: 'text-slate-500' },
+              { label: 'app.dashboard.diagnostics.battery', icon: Battery, color: 'text-blue-500' },
+              { label: 'app.dashboard.diagnostics.brakes', icon: ShieldAlert, color: 'text-emerald-500' },
             ].map((issue, idx) => (
               <button 
                 key={idx}
-                onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: issue.label } })}
+                onClick={() => navigate('/dashboard/ai-mechanic', { state: { initialIssue: t(issue.label) } })}
                 className="flex items-center gap-2 bg-white/70 backdrop-blur-xl border border-white px-4 py-3 rounded-[20px] shadow-md shadow-slate-200/20 active:scale-95 transition-all whitespace-nowrap"
               >
                 <issue.icon className={`w-4 h-4 ${issue.color}`} />
-                <span className="text-[11px] font-black text-slate-700">{issue.label}</span>
+                <span className="text-[11px] font-black text-slate-700">{t(issue.label)}</span>
               </button>
             ))}
           </div>
         </div>
 
       </div>
+
       
       <InstallPrompt />
       <DevelopmentModal isOpen={isDevModalOpen} onClose={() => setIsDevModalOpen(false)} />

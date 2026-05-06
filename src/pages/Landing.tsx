@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
@@ -17,8 +18,8 @@ const SymptomCarousel = lazy(() => import('../components/ui/SymptomCarousel'))
 const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
-  Bot, Users, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
-  MapPin, Mic, ImagePlus, ShieldAlert, FileText,
+  Bot, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
+  Mic, ImagePlus, ShieldAlert, FileText,
   UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
   Send, ChevronDown, HelpCircle, Camera, AlertTriangle, Star
 } from 'lucide-react'
@@ -27,55 +28,55 @@ import {
 // IMMERSIVE SCROLL DEMO COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CHAT_SEQUENCE = [
+const CHAT_SEQUENCE = (t: any) => [
   { 
     id: 1, 
     type: 'user', 
-    content: "My ABS light just came on while driving. Is it safe to keep going?", 
+    content: t('landing.demo.msg1'), 
     image: "/dashboard_abs_warning_light.png",
     timestamp: "10:12 AM" 
   },
   { 
     id: 2, 
     type: 'ai', 
-    sender: 'AI Mechanic',
-    content: "I can see the ABS warning light on your dashboard. Your normal brakes still work — but the anti-lock system is off, so your wheels could lock up under hard braking. When did you first notice it?", 
+    sender: t('nav.mechanic'),
+    content: t('landing.demo.msg2'), 
     timestamp: "10:12 AM" 
   },
   { 
     id: 3, 
     type: 'user', 
-    content: "About 10 minutes ago. It started raining and the light came on after I braked hard at a traffic light.", 
+    content: t('landing.demo.msg3'), 
     timestamp: "10:13 AM" 
   },
   { 
     id: 4, 
     type: 'ai', 
-    sender: 'AI Mechanic',
-    content: "That timing is helpful. Hard braking in wet conditions can trigger an ABS fault if a wheel speed sensor loses signal. Has the light stayed on continuously since then, or does it come and go?", 
-    timestamp: "10:13 AM"
+    sender: t('nav.mechanic'),
+    content: t('landing.demo.msg4'), 
+    timestamp: "10:13 AM" 
   },
   { 
     id: 5, 
     type: 'user', 
-    content: "It's stayed on the whole time. Should I pull over?", 
+    content: t('landing.demo.msg5'), 
     timestamp: "10:14 AM" 
   },
   { 
     id: 6, 
     type: 'ai', 
-    sender: 'AI Mechanic',
-    content: "You don't need to pull over immediately — your main brakes are fine. But avoid sudden stops and drive below 50 km/h until you can get it scanned. Here's my full assessment:", 
+    sender: t('nav.mechanic'),
+    content: t('landing.demo.msg6'), 
     timestamp: "10:14 AM",
-    action: "Diagnostic Analysis Complete"
+    action: t('landing.demo.analysis_complete')
   },
   { 
     id: 7, 
     type: 'ai-card',
-    title: "Diagnostic Report",
-    severity: "Medium",
-    finding: "ABS Module — Wheel Speed Sensor Fault",
-    advice: "Most likely cause: a dirty or failing front wheel speed sensor. Common on this model after 50k km. Not urgent, but should be scanned within the next few days.",
+    title: t('landing.demo.report_ready'),
+    severity: t('landing.demo.medium'),
+    finding: t('landing.demo.finding'),
+    advice: t('landing.demo.advice'),
     timestamp: "10:15 AM"
   }
 ];
@@ -172,13 +173,16 @@ const MESSAGE_DELAYS = [
 ];
 
 const ScrollChatDemo = () => {
+  const { t } = useTranslation();
   const [visibleCount, setVisibleCount] = useState(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  const sequence = CHAT_SEQUENCE(t);
+
   // Auto-play replay logic: Snappy reveal, no typing indicators
   useEffect(() => {
-    const totalMessages = CHAT_SEQUENCE.length;
+    const totalMessages = sequence.length;
     let currentIndex = 0;
     let timeoutId: any;
 
@@ -247,7 +251,7 @@ const ScrollChatDemo = () => {
           {/* Chat Replay Stream */}
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto relative bg-white scrollbar-hide px-4 py-5" style={{ scrollbarWidth: 'none' }}>
             <div className="flex flex-col gap-5">
-              {CHAT_SEQUENCE.slice(0, visibleCount).map((msg) => {
+              {sequence.slice(0, visibleCount).map((msg) => {
                 if (msg.type === 'user') return <UserBubble key={msg.id} msg={msg} />;
                 if (msg.type === 'ai') return <AiBubble key={msg.id} msg={msg} />;
                 if (msg.type === 'ai-card') return <DiagnosticCard key={msg.id} msg={msg} />;
@@ -370,6 +374,7 @@ const FAQItem = ({ question, answer, isOpen, onClick }: { question: string, answ
 )
 
 export default function Landing() {
+  const { t } = useTranslation()
   const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -437,11 +442,11 @@ export default function Landing() {
               </button>
 
               {[
-                { name: 'Features', id: 'features' },
-                { name: 'How it works', id: 'how-it-works' },
-                { name: 'Pricing', id: 'pricing' },
-                { name: 'Reviews', id: 'reviews' },
-                { name: 'FAQ', id: 'faq' },
+                { name: t('landing.nav.features'), id: 'features' },
+                { name: t('landing.nav.how_it_works'), id: 'how-it-works' },
+                { name: t('landing.nav.pricing'), id: 'pricing' },
+                { name: t('landing.nav.reviews'), id: 'reviews' },
+                { name: t('landing.nav.faq'), id: 'faq' },
               ].map((link) => (
                 <a 
                   key={link.id}
@@ -471,22 +476,22 @@ export default function Landing() {
                   <div className="w-full space-y-3">
                     <Link to="/dashboard" className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-navy text-white font-bold shadow-xl shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>
                       <LayoutDashboard className="w-5 h-5" />
-                      Go to Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                     <Link to="/my-account" className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold" onClick={() => setMobileMenuOpen(false)}>
                       <User className="w-5 h-5" />
-                      My Account
+                      {t('nav.settings')}
                     </Link>
                     <button onClick={handleSignOut} className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl border border-red-100 bg-red-50/30 text-red-500 font-bold">
                       <LogOut className="w-5 h-5" />
-                      Sign Out
+                      {t('common.logout')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-4 w-full px-10">
-                  <Link to="/login?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                  <Link to="/login" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>Start Free Trial</Link>
+                  <Link to="/login?mode=login" className="text-lg text-muted" onClick={() => setMobileMenuOpen(false)}>{t('auth.login.button')}</Link>
+                  <Link to="/login" className="w-full py-4 rounded-2xl bg-navy text-white font-bold text-center shadow-lg shadow-navy/20" onClick={() => setMobileMenuOpen(false)}>{t('landing.hero.cta_start')}</Link>
                 </div>
               )}
             </motion.div>
@@ -510,7 +515,7 @@ export default function Landing() {
                     <div className="w-5 h-5 rounded-full bg-[#0070E0]/10 flex items-center justify-center">
                       <Zap className="w-3 h-3 text-[#0070E0]" />
                     </div>
-                    <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#0070E0] to-[#004A99] font-black pr-1">Instant Car Diagnosis</span>
+                    <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#0070E0] to-[#004A99] font-black pr-1">{t('landing.hero.badge')}</span>
                   </motion.div>
 
                   <motion.h1 
@@ -520,8 +525,8 @@ export default function Landing() {
                     transition={{ delay: 0.1 }}
                     className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
                   >
-                    Stop Overpaying for <br />
-                    <span className="text-[#0070E0]">Car Repairs.</span>
+                    {t('landing.hero.title_line1')} <br />
+                    <span className="text-[#0070E0]">{t('landing.hero.title_line2')}</span>
                   </motion.h1>
 
                   <motion.p 
@@ -531,7 +536,7 @@ export default function Landing() {
                     transition={{ delay: 0.2 }}
                     className="text-slate-500 text-base md:text-lg lg:text-xl mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
-                    Diagnose your car problem in 30 seconds — no shop visit needed.
+                    {t('landing.hero.subtitle')}
                   </motion.p>
 
                   <motion.div 
@@ -547,7 +552,7 @@ export default function Landing() {
                       className="w-full sm:w-auto relative group"
                     >
                       <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
-                        Start Free Diagnosis
+                        {t('landing.hero.cta_start')}
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
@@ -557,7 +562,7 @@ export default function Landing() {
                       onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
                       className="w-full sm:w-auto px-8 py-4 md:py-5 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-slate-600 font-bold text-[15px] hover:border-[#0070E0]/30 hover:text-[#0070E0] hover:bg-[#F0F7FF]/60 transition-all duration-300 shadow-sm hover:shadow-md"
                     >
-                      View Pricing
+                      {t('landing.hero.cta_demo')}
                     </button>
                   </motion.div>
 
@@ -569,11 +574,11 @@ export default function Landing() {
                     transition={{ delay: 0.4 }}
                     className="flex flex-wrap items-center justify-center lg:justify-start gap-2 md:gap-3 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6"
                   >
-                    <span>Trusted by drivers</span>
+                    <span>{t('landing.hero.trust_drivers')}</span>
                     <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
-                    <span>Instant results</span>
+                    <span>{t('landing.hero.trust_results')}</span>
                     <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
-                    <span>No signup required</span>
+                    <span>{t('landing.hero.trust_signup')}</span>
                   </motion.div>
                 </motion.div>
 

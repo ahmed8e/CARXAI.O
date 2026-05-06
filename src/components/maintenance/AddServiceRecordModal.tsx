@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Wrench, Calendar, Gauge, DollarSign, MapPin, FileText, Package, ShieldCheck } from 'lucide-react'
 import type { ServiceRecord } from '../../data/maintenanceData'
@@ -32,6 +32,18 @@ export default function AddServiceRecordModal({ isOpen, vehicleId, currentMileag
   })
   const [saving, setSaving] = useState(false)
 
+  // Side effects: Prevent background scroll and hide bottom nav
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [isOpen])
+
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = () => {
@@ -63,7 +75,7 @@ export default function AddServiceRecordModal({ isOpen, vehicleId, currentMileag
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+        <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}

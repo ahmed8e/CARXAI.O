@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Crown, X, ArrowRight, ShieldCheck } from 'lucide-react'
 import ShieldWrenchIcon from './ShieldWrenchIcon'
@@ -15,6 +16,18 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
     navigate('/dashboard/choose-plan')
     onClose()
   }
+
+  // Side effects: hide bottom nav
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [isOpen])
 
   return (
     <AnimatePresence>

@@ -1,0 +1,168 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "back": "Back",
+    "continue": "Continue",
+    "settings": "Settings",
+    "logout": "Sign out",
+    "search": "Search...",
+    "no_data": "No data found",
+    "available_24_7": "Available 24/7"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "garage": "Garage",
+    "mechanic": "AI Mechanic",
+    "maintenance": "Maintenance",
+    "overpaying": "Price Check",
+    "reports": "Reports",
+    "settings": "Settings",
+    "home": "Home",
+    "diagnosis": "Diagnostics"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "how_it_works": "How it works",
+      "pricing": "Pricing",
+      "reviews": "Reviews",
+      "faq": "FAQ"
+    },
+    "hero": {
+      "badge": "Instant Car Diagnosis",
+      "title_line1": "Stop Overpaying for",
+      "title_line2": "Car Repairs.",
+      "subtitle": "Diagnose your car problem in 30 seconds — no shop visit needed.",
+      "cta_start": "Start Free Diagnosis",
+      "cta_demo": "View Pricing",
+      "trust_drivers": "Trusted by drivers",
+      "trust_results": "Instant results",
+      "trust_signup": "No signup required"
+    },
+    "demo": {
+       "msg1": "My ABS light just came on while driving. Is it safe to keep going?",
+       "msg2": "I can see the ABS warning light on your dashboard. Your normal brakes still work — but the anti-lock system is off, so your wheels could lock up under hard braking. When did you first notice it?",
+       "msg3": "About 10 minutes ago. It started raining and the light came on after I braked hard at a traffic light.",
+       "msg4": "That timing is helpful. Hard braking in wet conditions can trigger an ABS fault if a wheel speed sensor loses signal. Has the light stayed on continuously since then, or does it come and go?",
+       "msg5": "It's stayed on the whole time. Should I pull over?",
+       "msg6": "You don't need to pull over immediately — your main brakes are fine. But avoid sudden stops and drive below 50 km/h until you can get it scanned. Here's my full assessment:",
+       "analysis_complete": "Diagnostic Analysis Complete",
+       "report_ready": "Diagnostic Report",
+       "medium": "Medium",
+       "finding": "ABS Module — Wheel Speed Sensor Fault",
+       "advice": "Most likely cause: a dirty or failing front wheel speed sensor. Common on this model after 50k km. Not urgent, but should be scanned within the next few days."
+    },
+    "features": {
+      "title": "Everything you need for your car",
+      "mechanic": "AI Mechanic",
+      "mechanic_desc": "Instant expert diagnostics for any car noise or dashboard light.",
+      "maintenance": "Smart Maintenance",
+      "maintenance_desc": "Automated schedules tailored to your driving habits.",
+      "overpaying": "Avoid Overpaying",
+      "overpaying_desc": "Verify repair costs and avoid mechanic scams."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Log in to your account",
+      "email": "Email Address",
+      "password": "Password",
+      "button": "Sign In",
+      "no_account": "Don't have an account?",
+      "signup_link": "Sign up free"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Start your journey to safer driving",
+      "full_name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "button": "Create Account",
+      "has_account": "Already have an account?",
+      "login_link": "Log in"
+    }
+  },
+  "app": {
+    "dashboard": {
+      "welcome": "Welcome back,",
+      "greeting_question": "How can we help\nwith your car today?",
+      "engine_ready": "AI Engine Ready",
+      "quick_actions": "Quick Actions",
+      "health_score": "Health Score",
+      "recent_activity": "Recent Activity",
+      "garage_empty": "Garage Empty",
+      "add_vehicle": "Add your vehicle",
+      "active_vehicle": "Active Vehicle",
+      "urgent_attention": "Urgent Attention",
+      "more_urgent": "+{{count}} More",
+      "quick_diagnostics": "Quick Diagnostics",
+      "diagnostics": {
+        "engine": "Check Engine",
+        "start": "Won't Start",
+        "noise": "Noise",
+        "battery": "Battery",
+        "brakes": "Brakes"
+      }
+    },
+    "garage": {
+      "title": "My Garage",
+      "add_vehicle": "Add Vehicle",
+      "no_vehicles": "No vehicles found",
+      "year": "Year",
+      "make": "Make",
+      "model": "Model",
+      "mileage": "Mileage"
+    },
+    "mechanic": {
+      "title": "AI Mechanic",
+      "header": "Expert Diagnostic Assistant",
+      "placeholder": "Describe the noise, light, or issue...",
+      "streaming": "Live Analysis",
+      "connecting": "Connecting to Systems",
+      "disclaimer": "AI recommendations are for guidance. Consult a certified professional.",
+      "vague_response": "No worries — I'm here to help. Let's figure this out together.\n\nTo point you in the right direction, could you tell me:\n**What's the main thing your car is doing (or not doing) right now?**\n\nFor example: a strange noise, a warning light, trouble starting, or something you noticed while driving.",
+      "analyzing_photo": "Analyzing your photo…",
+      "analyzing_systems": "Analyzing systems..."
+    }
+  },
+  "maintenance": {
+    "title": "Maintenance",
+    "add_record": "Log Service Record",
+    "history": "Service History",
+    "seasonal": "Seasonal Checks",
+    "fluids": "Fluid Guide",
+    "advisor": "Worth Fixing?",
+    "export": "Export Report",
+    "no_vehicles_desc": "Add a vehicle to start tracking maintenance.",
+    "go_to_garage": "Go to My Garage",
+    "urgent": "Urgent Action",
+    "upcoming": "Upcoming",
+    "service_types": {
+      "oil_change": "Oil Change",
+      "tire_rotation": "Tire Rotation",
+      "brakes": "Brake Inspection",
+      "battery": "Battery Check",
+      "fluids": "Fluid Flush",
+      "inspection": "Full Inspection"
+    },
+    "modal": {
+      "title": "Add Service Record",
+      "subtitle": "Log completed maintenance",
+      "type_label": "Service Type",
+      "date_label": "Date",
+      "mileage_label": "Mileage",
+      "cost_label": "Cost ($)",
+      "shop_label": "Shop / Mechanic",
+      "notes_label": "Notes",
+      "save": "Save Record"
+    }
+  }
+}
