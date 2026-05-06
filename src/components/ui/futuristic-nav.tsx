@@ -57,7 +57,7 @@ export function FuturisticNav() {
         scale: isChat ? 0.94 : 1,
         opacity: isChat ? 0.9 : 1
       }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-full max-w-[320px] px-4 pointer-events-none"
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[60] w-full max-w-[320px] px-4 pointer-events-none"
     >
       <div className={cn(
         "relative flex items-center justify-between gap-1 bg-white/95 backdrop-blur-2xl rounded-[22px] px-2 transition-all duration-500 pointer-events-auto overflow-hidden",
