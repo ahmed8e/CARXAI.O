@@ -282,32 +282,25 @@
     display: none;
   }
 
-  /* ── Premium Mobile Glass Dock ─────────────────────────────────── */
+  /* ── Premium Mobile Floating Dock ─────────────────────────────────── */
   .menu {
-    @apply fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around;
-    @apply px-4 pb-[env(safe-area-inset-bottom,12px)] pt-3;
-    @apply bg-white/70 backdrop-blur-xl border-t border-white/40;
-    @apply shadow-[0_-8px_30px_rgba(0,0,0,0.04)];
-    height: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Optional pill style if preferred over edge-to-edge, but anchored low */
-  @media (max-width: 640px) {
-    .menu {
-      @apply left-4 right-4 bottom-4 rounded-[32px] border border-white/50;
-      @apply shadow-[0_20px_50px_rgba(0,0,0,0.15)];
-      height: 4.25rem;
-      padding-bottom: 0;
-      /* If floating, we keep it very low to the bottom edge */
-      bottom: calc(env(safe-area-inset-bottom, 12px) / 2 + 8px);
-    }
+    @apply fixed left-1/2 -translate-x-1/2 z-[100] flex items-center justify-around;
+    @apply w-[92%] max-w-[400px] px-2 py-3;
+    @apply bg-white/80 backdrop-blur-2xl border border-white/40;
+    @apply shadow-[0_15px_45px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.04)];
+    @apply rounded-[32px];
+    /* Anchored low but floating clean */
+    bottom: calc(env(safe-area-inset-bottom, 12px) + 8px);
+    height: 4.5rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .menu__item {
-    @apply relative flex flex-col items-center justify-center flex-1 h-full gap-1.5;
+    @apply relative flex flex-col items-center justify-center flex-1 h-full;
     @apply transition-all duration-300 outline-none no-underline;
+    @apply gap-1; /* Tight, consistent gap between icon and text */
     color: #94A3B8; /* Slate-400 */
+    min-width: 0;
   }
 
   .menu__item.active {
@@ -315,12 +308,12 @@
   }
 
   .menu__icon {
-    @apply relative z-10 flex items-center justify-center transition-all duration-300;
+    @apply relative z-10 flex items-center justify-center transition-all duration-300 h-6 w-6;
   }
 
   .menu__item.active .menu__icon {
     @apply -translate-y-0.5 scale-110;
-    filter: drop-shadow(0 0 12px rgba(0, 112, 224, 0.3));
+    filter: drop-shadow(0 0 15px rgba(0, 112, 224, 0.25));
   }
 
   .menu__item .icon {
@@ -333,24 +326,27 @@
   }
 
   .menu__text {
-    @apply text-[9px] font-bold uppercase tracking-[0.12em] opacity-50;
+    /* Fixed font size and weight for consistency */
+    @apply text-[9px] font-black uppercase tracking-[0.06em] opacity-50;
     @apply transition-all duration-300 pointer-events-none;
+    @apply w-full text-center truncate px-1;
+    line-height: 1;
   }
 
   .menu__text.active {
-    @apply opacity-100 text-navy font-black scale-105;
+    @apply opacity-100 text-navy;
   }
 
-  /* Refined indicator: premium dot */
+  /* Refined indicator: soft premium dot */
   .menu__item::after {
     content: '';
-    @apply absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full;
-    @apply bg-navy opacity-0 scale-0 transition-all duration-300;
+    @apply absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-1.5 h-1 rounded-full;
+    @apply bg-navy opacity-0 scale-0 transition-all duration-400;
   }
 
   .menu__item.active::after {
     @apply opacity-100 scale-100;
-    box-shadow: 0 0 8px var(--color-navy);
+    box-shadow: 0 2px 6px var(--color-navy);
   }
 }
 
