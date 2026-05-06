@@ -7,7 +7,7 @@ import {
   Wrench, Car, ChevronRight, Settings, X,
   Activity, ShieldCheck
 } from 'lucide-react'
-import AiSparkleIcon from './ui/AiSparkleIcon'
+import ShieldWrenchIcon from './ui/ShieldWrenchIcon'
 import Navbar from './Navbar'
 import Paywall from './Paywall'
 import DevelopmentModal from './DevelopmentModal'
@@ -20,7 +20,7 @@ const NAV_GROUPS = [
     label: 'Diagnosis',
     items: [
       { to: '/dashboard',              icon: LayoutDashboard, label: 'Overview',       end: true  },
-      { to: '/dashboard/ai-mechanic',  icon: AiSparkleIcon,   label: 'AI Mechanic' },
+      { to: '/dashboard/ai-mechanic',  icon: ShieldWrenchIcon,   label: 'AI Mechanic' },
       { to: '/dashboard/vehicles',     icon: Car,             label: 'My Vehicles' },
       { to: '/dashboard/maintenance',  icon: Wrench,          label: 'Maintenance' },
       { to: '/dashboard/reports',      icon: Activity,        label: 'Reports'     },
@@ -35,7 +35,7 @@ import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
   { to: '/dashboard',                  icon: LayoutDashboard, label: 'Home' },
-  { to: '/dashboard/ai-mechanic',      icon: AiSparkleIcon,   label: 'Diagnostics' },
+  { to: '/dashboard/ai-mechanic',      icon: ShieldWrenchIcon,   label: 'Diagnostics' },
   { to: '/dashboard/maintenance',      icon: Wrench,          label: 'Maintenance' },
   { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Overpaying' },
   { to: '/dashboard/reports',          icon: Activity,        label: 'Reports' },
@@ -159,7 +159,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">AI Engine Ready</p>
                     <p className="text-[9px] text-muted mt-0.5 tracking-wide">Available 24/7</p>
                   </div>
-                  <AiSparkleIcon className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
+                  <ShieldWrenchIcon className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
                 </div>
               )}
             </div>

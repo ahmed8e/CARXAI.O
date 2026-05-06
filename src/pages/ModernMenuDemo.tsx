@@ -6,11 +6,11 @@ import {
   ShieldCheck, 
   Activity
 } from 'lucide-react';
-import AiSparkleIcon from '../components/ui/AiSparkleIcon';
+import ShieldWrenchIcon from '../components/ui/ShieldWrenchIcon';
 
 const lucideDemoMenuItems: InteractiveMenuItem[] = [
     { label: 'Home', icon: LayoutDashboard, to: '/dashboard' },
-    { label: 'Diagnostics', icon: AiSparkleIcon, to: '/dashboard/ai-mechanic' },
+    { label: 'Diagnostics', icon: ShieldWrenchIcon, to: '/dashboard/ai-mechanic' },
     { label: 'Maintenance', icon: Wrench, to: '/dashboard/maintenance' },
     { label: 'Overpaying', icon: ShieldCheck, to: '/dashboard/avoid-overpaying' },
     { label: 'Reports', icon: Activity, to: '/dashboard/reports' },

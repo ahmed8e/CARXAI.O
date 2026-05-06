@@ -1,0 +1,42 @@
+import React from 'react';
+
+interface ShieldWrenchIconProps {
+  className?: string;
+  size?: number;
+  color?: string;
+}
+
+/**
+ * Professional Mechanic Shield icon.
+ * Combines a Shield (Trust) with a Wrench (Mechanical expertise).
+ * Designed for a serious, trustworthy automotive SaaS feel.
+ */
+const ShieldWrenchIcon: React.FC<ShieldWrenchIconProps> = ({
+  className = '',
+  size = 24,
+  color = 'currentColor',
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Shield Outer */}
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+    
+    {/* Wrench Silhouette inside the shield */}
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z" 
+      transform="scale(0.6) translate(8, 8)"
+      strokeWidth="2.5"
+    />
+  </svg>
+);
+
+export default ShieldWrenchIcon;

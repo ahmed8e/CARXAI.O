@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, X, ArrowRight } from 'lucide-react'
-import AiSparkleIcon from './AiSparkleIcon'
+import ShieldWrenchIcon from './ShieldWrenchIcon'
 import { useState } from 'react'
 
 interface QualityPromptProps {
@@ -61,7 +61,7 @@ export default function QualityPrompt({ isOpen, onClose, onContinue }: QualityPr
                 <div className="absolute inset-0 bg-navy/5 rounded-[36px] rotate-6 group-hover:rotate-12 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-white/80 dark:bg-surface-high/80 rounded-[36px] shadow-xl border border-navy/10 flex items-center justify-center -rotate-3 group-hover:rotate-0 transition-transform duration-500">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-navy/5 to-navy/10 flex items-center justify-center">
-                    <AiSparkleIcon className="w-6 h-6 text-navy animate-pulse" />
+                    <ShieldWrenchIcon className="w-6 h-6 text-navy animate-pulse" />
                   </div>
                 </div>
               </div>

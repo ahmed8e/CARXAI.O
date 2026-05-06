@@ -9,7 +9,7 @@ import {
   ShieldAlert, Wrench, ShieldCheck, 
   Car, Zap, Plus, Battery, Activity
 } from 'lucide-react'
-import AiSparkleIcon from '../components/ui/AiSparkleIcon'
+import ShieldWrenchIcon from '../components/ui/ShieldWrenchIcon'
 import DevelopmentModal from '../components/DevelopmentModal'
 import UpgradePrompt from '../components/ui/UpgradePrompt'
 import { 
@@ -114,9 +114,9 @@ export default function Dashboard() {
     },
     {
       to: '/dashboard/ai-mechanic',
-      icon: AiSparkleIcon,
+      icon: ShieldWrenchIcon,
       label: 'AI Mechanic',
-      desc: 'Instant diagnosis',
+      desc: 'Expert diagnosis',
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-blue-100'
