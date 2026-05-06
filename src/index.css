@@ -20,6 +20,11 @@
   --color-surface-highest: #E2E8F0;
   --color-surface-container: #FFFFFF;
 
+  --color-chart-2: var(--color-chart-2);
+  --color-chart-3: var(--color-chart-3);
+  --color-chart-4: var(--color-chart-4);
+  --color-chart-5: var(--color-chart-5);
+
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
 
@@ -309,6 +314,10 @@
     @apply w-5 h-5 transition-all duration-300;
   }
 
+  .menu__item .icon {
+    @apply w-5 h-5 transition-all duration-300;
+  }
+
   .menu__text {
     @apply text-[10px] font-black uppercase tracking-widest opacity-0 transform translate-y-2;
     @apply transition-all duration-300 pointer-events-none absolute bottom-1;
@@ -426,11 +435,21 @@
 }
 
 @keyframes iconBounce {
-  0%, 100% { transform: translateY(0); }
-  20% { transform: translateY(-4px); }
-  40% { transform: translateY(0); }
-  60% { transform: translateY(-2px); }
-  80% { transform: translateY(0); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-0.3em);
+  }
+  40% {
+    transform: translateY(0);
+  }
+  60% {
+    transform: translateY(-0.1em);
+  }
+  80% {
+    transform: translateY(0);
+  }
 }
 
 /* Scrollbar */

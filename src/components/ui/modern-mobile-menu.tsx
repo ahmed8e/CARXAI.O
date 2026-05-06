@@ -1,64 +1,71 @@
-import React, { useRef, useEffect, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Home, Briefcase, Calendar, Shield, Settings } from 'lucide-react';
 
+type IconComponentType = React.ElementType<{ className?: string }>;
 export interface InteractiveMenuItem {
   label: string;
-  icon: LucideIcon;
-  to: string;
+  icon: IconComponentType;
 }
 
 export interface InteractiveMenuProps {
-  items: InteractiveMenuItem[];
+  items?: InteractiveMenuItem[];
   accentColor?: string;
 }
 
+const defaultItems: InteractiveMenuItem[] = [
+    { label: 'home', icon: Home },
+    { label: 'strategy', icon: Briefcase },
+    { label: 'period', icon: Calendar },
+    { label: 'security', icon: Shield },
+    { label: 'settings', icon: Settings },
+];
+
 const defaultAccentColor = 'var(--component-active-color-default)';
 
-export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentColor }) => {
 
-  // Find active index based on current path
-  const activeIndex = useMemo(() => {
-    const index = items.findIndex(item => {
-        if (item.to === '/dashboard') return location.pathname === '/dashboard';
-        return location.pathname.startsWith(item.to);
-    });
-    return index !== -1 ? index : 0;
-  }, [items, location.pathname]);
+  const finalItems = useMemo(() => {
+     const isValid = items && Array.isArray(items) && items.length >= 2 && items.length <= 5;
+     if (!isValid) {
+        console.warn("InteractiveMenu: 'items' prop is invalid or missing. Using default items.", items);
+        return defaultItems;
+     }
+     return items;
+  }, [items]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+      if (activeIndex >= finalItems.length) {
+          setActiveIndex(0);
+      }
+  }, [finalItems, activeIndex]);
 
   const textRefs = useRef<(HTMLElement | null)[]>([]);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
-    // Precise layout measurement using requestAnimationFrame to avoid thrashing
-    const updateUnderline = () => {
-      requestAnimationFrame(() => {
-        const activeTextElement = textRefs.current[activeIndex];
-        const activeItemElement = itemRefs.current[activeIndex];
+    const setLineWidth = () => {
+      const activeItemElement = itemRefs.current[activeIndex];
+      const activeTextElement = textRefs.current[activeIndex];
 
-        if (activeItemElement && activeTextElement) {
-          const textWidth = activeTextElement.offsetWidth;
-          activeItemElement.style.setProperty('--lineWidth', `${textWidth}px`);
-        }
-      });
+      if (activeItemElement && activeTextElement) {
+        const textWidth = activeTextElement.offsetWidth;
+        activeItemElement.style.setProperty('--lineWidth', `${textWidth}px`);
+      }
     };
 
-    updateUnderline();
+    setLineWidth();
 
-    // ResizeObserver is more efficient than 'resize' event for layout stability
-    const observer = new ResizeObserver(() => {
-        updateUnderline();
-    });
-
-    const activeText = textRefs.current[activeIndex];
-    if (activeText) observer.observe(activeText);
-
+    window.addEventListener('resize', setLineWidth);
     return () => {
-      observer.disconnect();
+      window.removeEventListener('resize', setLineWidth);
     };
-  }, [activeIndex, items]);
+  }, [activeIndex, finalItems]);
+
+  const handleItemClick = (index: number) => {
+    setActiveIndex(index);
+  };
 
   const navStyle = useMemo(() => {
       const activeColor = accentColor || defaultAccentColor;
@@ -71,22 +78,26 @@ export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentC
       role="navigation"
       style={navStyle}
     >
-      {items.map((item, index) => {
+      {finalItems.map((item, index) => {
         const isActive = index === activeIndex;
+        const isTextActive = isActive;
+
+
         const IconComponent = item.icon;
 
         return (
           <button
             key={item.label}
             className={`menu__item ${isActive ? 'active' : ''}`}
-            onClick={() => navigate(item.to)}
+            onClick={() => handleItemClick(index)}
             ref={(el) => { itemRefs.current[index] = el; }}
+            style={{ '--lineWidth': '0px' } as React.CSSProperties} 
           >
             <div className="menu__icon">
-              <IconComponent className="icon" strokeWidth={isActive ? 2.5 : 2} />
+              <IconComponent className="icon" />
             </div>
             <strong
-              className={`menu__text ${isActive ? 'active' : ''}`}
+              className={`menu__text ${isTextActive ? 'active' : ''}`}
               ref={(el) => { textRefs.current[index] = el; }}
             >
               {item.label}
@@ -97,3 +108,5 @@ export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ items, accentC
     </nav>
   );
 };
+
+export {InteractiveMenu}
