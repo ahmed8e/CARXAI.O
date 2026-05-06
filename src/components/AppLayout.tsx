@@ -34,11 +34,11 @@ import { InteractiveMenu } from './ui/modern-mobile-menu'
 import type { InteractiveMenuItem } from './ui/modern-mobile-menu'
 
 const BOTTOM_NAV_ITEMS: InteractiveMenuItem[] = [
-  { to: '/dashboard',                  icon: LayoutDashboard, label: 'Home' },
-  { to: '/dashboard/ai-mechanic',      icon: ShieldWrenchIcon,   label: 'Diagnostics' },
+  { to: '/dashboard/vehicles',         icon: Car,             label: 'Garage' },
+  { to: '/dashboard',                  icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/dashboard/maintenance',      icon: Wrench,          label: 'Maintenance' },
-  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Overpaying' },
-  { to: '/dashboard/reports',          icon: Activity,        label: 'Reports' },
+  { to: '/dashboard/avoid-overpaying', icon: ShieldCheck,     label: 'Price Check' },
+  { to: '/my-account',                 icon: Settings,        label: 'Settings' },
 ]
 
 export default function AppLayout({ children }: AppLayoutProps) {
@@ -242,7 +242,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0 pb-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))] pb-28 lg:pb-0'}`}>
+      <div className={`flex-1 flex flex-col overflow-hidden relative ${isAIMechanic ? 'pt-0 pb-0' : 'pt-[calc(5.5rem_+_env(safe-area-inset-top))] pb-32 lg:pb-0'}`}>
         <main className={`flex-1 relative ${isAIMechanic ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {subLoading ? (
             <div className="absolute inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-sm z-[100]">
