@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import InstallPrompt from '../components/InstallPrompt'
 import { 
-  Users, ChevronRight, AlertCircle, 
+  ChevronRight, AlertCircle, 
   ShieldAlert, Wrench, ShieldCheck, 
   Car, Zap, Plus, Battery, Activity
 } from 'lucide-react'
@@ -151,23 +151,7 @@ export default function Dashboard() {
         <div className="absolute top-[20%] right-[-10%] w-[40%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
       </div>
 
-      {/* Crystal Header */}
-      <div className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm px-4 h-16 flex items-center justify-between">
-         <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/20">
-               <Car className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-black text-slate-900 tracking-tight">Car Safety</span>
-         </div>
-         <div className="flex items-center gap-3">
-            <span className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-full text-[9px] font-black uppercase tracking-widest border border-slate-200">
-               Pro Active
-            </span>
-            <Link to="/my-account" className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900">
-               <Users className="w-4 h-4" />
-            </Link>
-         </div>
-      </div>
+
 
       <div className="max-w-xl mx-auto px-4 pt-6 relative z-10">
         
