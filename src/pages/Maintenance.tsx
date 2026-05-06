@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { Link } from 'react-router-dom'
 import {
-  Wrench, Car, Plus, Download, Calculator,
+  Car, Plus, Download, Calculator,
   Sun, Droplets, History, Scale, ChevronRight,
-  AlertTriangle, CheckCircle2, Activity
+  AlertTriangle, Activity, Info,
+  Settings, ArrowLeft, Calendar
 } from 'lucide-react'
 
 import {
@@ -16,7 +17,7 @@ import {
   type MaintenanceStatus, type SeasonalChecklistData, type ChecklistItem
 } from '../data/maintenanceData'
 
-import HealthScoreCard from '../components/maintenance/HealthScoreCard'
+
 import MaintenanceReminderCard from '../components/maintenance/MaintenanceReminderCard'
 import ServiceHistoryTimeline from '../components/maintenance/ServiceHistoryTimeline'
 import SeasonalChecklist from '../components/maintenance/SeasonalChecklist'
@@ -28,15 +29,7 @@ interface Vehicle {
   id: string; make: string; model: string; year: number; mileage: number | null; is_default?: boolean
 }
 
-type Tab = 'overview' | 'history' | 'seasonal' | 'fluids' | 'advisor'
-
-const TABS: { id: Tab; label: string; icon: React.ComponentType<any> }[] = [
-  { id: 'overview',  label: 'Overview',    icon: Activity },
-  { id: 'history',   label: 'History',     icon: History },
-  { id: 'seasonal',  label: 'Seasonal',    icon: Sun },
-  { id: 'fluids',    label: 'Fluids',      icon: Droplets },
-  { id: 'advisor',   label: 'Worth Fix?',  icon: Scale },
-]
+type View = 'hub' | 'history' | 'seasonal' | 'fluids' | 'advisor' | 'full-plan'
 
 function buildSchedule(vehicle: Vehicle): MaintenanceItem[] {
   const m = vehicle.mileage || 50000
@@ -59,8 +52,9 @@ export default function Maintenance() {
   const [serviceHistory, setServiceHistory] = useState<ServiceRecord[]>([])
   const [checklists, setChecklists] = useState<SeasonalChecklistData[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<Tab>('overview')
+  const [view, setView] = useState<View>('hub')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const vehicle = vehicles.find(v => v.id === selectedId)
@@ -111,7 +105,10 @@ export default function Maintenance() {
     localStorage.setItem(`maint_schedule_${selectedId}`, JSON.stringify(schedule));
     (supabase as any).from('vehicles').update({ mileage }).eq('id', selectedId)
     setVehicles(prev => prev.map(v => v.id === selectedId ? { ...v, mileage } : v))
-    setTimeout(() => setSaving(false), 600)
+    setTimeout(() => {
+      setSaving(false)
+      setShowSettings(false)
+    }, 600)
   }
 
   const handleLogService = (itemId: string, loggedMileage: number) => {
@@ -158,8 +155,10 @@ export default function Maintenance() {
   const overdue = statuses.filter(s => s.status === 'overdue')
   const dueNow = statuses.filter(s => s.status === 'due')
   const dueSoon = statuses.filter(s => s.status === 'coming_soon')
-  const good = statuses.filter(s => s.status === 'good')
   const health = calculateHealthScore(statuses, serviceHistory)
+
+  const urgentItems = [...overdue, ...dueNow]
+  const upcomingItems = dueSoon.slice(0, 2)
 
   const forecast90 = statuses.reduce((acc, s) => {
     const mi = s.nextDueMileage - mileage
@@ -169,20 +168,12 @@ export default function Maintenance() {
     return acc
   }, { low: 0, high: 0 })
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" /></div>
 
   if (!vehicles.length) {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center mt-16">
-        <div className="w-16 h-16 bg-surface-low rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Car className="w-8 h-8 text-muted" />
-        </div>
+        <div className="w-16 h-16 bg-surface-low rounded-2xl flex items-center justify-center mx-auto mb-4"><Car className="w-8 h-8 text-muted" /></div>
         <h2 className="text-2xl font-black text-on-surface mb-2">No Vehicles Found</h2>
         <p className="text-muted mb-6">Add a vehicle to start tracking maintenance.</p>
         <Link to="/dashboard/vehicles" className="btn-primary">Go to My Garage</Link>
@@ -191,275 +182,292 @@ export default function Maintenance() {
   }
 
   return (
-    <div className="p-4 lg:p-8 max-w-6xl mx-auto space-y-6 pb-32 lg:pb-10">
+    <div className="p-4 lg:p-8 max-w-4xl mx-auto pb-32 lg:pb-10 min-h-screen">
 
-      {/* ── Header ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-navy animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/70">Maintenance Hub</span>
-          </div>
-          <h1 className="text-3xl font-display font-black text-on-surface italic tracking-tight">
-            Smart Maintenance
-          </h1>
-          <p className="text-sm text-muted font-medium mt-1">
-            Your car ownership assistant — prevent breakdowns, avoid scams.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Vehicle selector */}
-          <select
-            value={selectedId || ''}
-            onChange={e => setSelectedId(e.target.value)}
-            className="bg-surface border border-overlay rounded-xl px-4 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy"
+      <AnimatePresence mode="wait">
+        {view === 'hub' ? (
+          <motion.div 
+            key="hub"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
           >
-            {vehicles.map(v => (
-              <option key={v.id} value={v.id}>{v.year} {v.make} {v.model}</option>
-            ))}
-          </select>
-          <button
-            onClick={() => { setTab('history'); setShowAddModal(true) }}
-            className="flex items-center gap-2 px-4 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add Record
-          </button>
-        </div>
-      </div>
-
-      {/* ── Top summary row ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Health Score', value: `${health.total}/100`, sub: health.label, color: health.total >= 65 ? 'text-emerald-500' : 'text-amber-500' },
-          { label: 'Overdue', value: overdue.length, sub: 'services', color: overdue.length > 0 ? 'text-red-500' : 'text-emerald-500' },
-          { label: 'Due Soon', value: dueSoon.length + dueNow.length, sub: 'reminders', color: 'text-amber-500' },
-          { label: '90-Day Cost', value: `$${forecast90.low}–$${forecast90.high}`, sub: 'estimated', color: 'text-navy' },
-        ].map(s => (
-          <div key={s.label} className="bg-surface dark:bg-surface-high/30 rounded-[20px] border border-overlay p-4">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted mb-1">{s.label}</p>
-            <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-[10px] text-muted font-medium">{s.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Settings bar ── */}
-      <div className="bg-surface dark:bg-surface-high/30 rounded-[24px] border border-overlay p-5">
-        <div className="flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[120px]">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Current Mileage</label>
-            <input type="number" value={mileage} onChange={e => setMileage(Number(e.target.value))}
-              className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface outline-none focus:border-navy text-sm" />
-          </div>
-          <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Avg mi/month</label>
-            <input type="number" value={prefs.avgMilesPerMonth} onChange={e => setPrefs(p => ({ ...p, avgMilesPerMonth: Number(e.target.value) }))}
-              className="w-24 bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface outline-none focus:border-navy text-sm" />
-          </div>
-          <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Driving</label>
-            <select value={prefs.drivingStyle} onChange={e => setPrefs(p => ({ ...p, drivingStyle: e.target.value as any }))}
-              className="bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy">
-              <option value="city">City</option>
-              <option value="highway">Highway</option>
-              <option value="mixed">Mixed</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Region</label>
-            <select value={prefs.region} onChange={e => setPrefs(p => ({ ...p, region: e.target.value as any }))}
-              className="bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy">
-              <option value="hot">Hot Climate</option>
-              <option value="cold">Cold / Winter</option>
-              <option value="temperate">Temperate</option>
-            </select>
-          </div>
-          <button onClick={savePrefs} disabled={saving}
-            className="px-5 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-60">
-            {saving ? 'Saved ✓' : 'Save'}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Tab Nav ── */}
-      <div className="flex gap-1 overflow-x-auto scrollbar-hide bg-surface dark:bg-surface-high/30 rounded-2xl border border-overlay p-1.5">
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all flex-1 justify-center ${
-              tab === t.id ? 'bg-navy text-white shadow-lg shadow-navy/20' : 'text-muted hover:text-on-surface'
-            }`}>
-            <t.icon className="w-3.5 h-3.5" />
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Tab Content ── */}
-
-      {/* OVERVIEW TAB */}
-      {tab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Health Score */}
-          <div className="space-y-6">
-            <HealthScoreCard score={health.total} label={health.label} categories={health.categories} />
-
-            {/* 90-Day forecast card */}
-            <div className="bg-gradient-to-br from-navy to-[#005bb5] p-6 rounded-[24px] text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-              <div className="flex items-center gap-2 mb-2 relative z-10">
-                <Calculator className="w-4 h-4 text-white/80" />
-                <span className="text-xs font-black text-white/90 uppercase tracking-widest">90-Day Forecast</span>
+            {/* ── Hub Header ── */}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-navy animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/70">Maintenance Hub</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={selectedId || ''}
+                    onChange={e => setSelectedId(e.target.value)}
+                    className="bg-transparent border-none p-0 text-xl font-display font-black text-on-surface italic tracking-tight outline-none focus:ring-0 cursor-pointer"
+                  >
+                    {vehicles.map(v => (
+                      <option key={v.id} value={v.id}>{v.year} {v.make} {v.model}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <p className="text-3xl font-black relative z-10">
-                ${forecast90.low} <span className="text-xl text-white/50 font-medium">—</span> ${forecast90.high}
-              </p>
-              <p className="text-xs text-white/60 mt-1 relative z-10">Estimated upcoming service costs</p>
+
+              <button 
+                onClick={() => setShowSettings(!showSettings)}
+                className="w-10 h-10 rounded-xl bg-surface dark:bg-surface-high/30 border border-overlay flex items-center justify-center text-muted hover:text-navy transition-colors shadow-sm"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Quick links */}
-            <div className="space-y-2">
-              {[
-                { label: 'View History', icon: History, action: () => setTab('history') },
-                { label: 'Seasonal Checks', icon: Sun, action: () => setTab('seasonal') },
-                { label: 'Fluid Guide', icon: Droplets, action: () => setTab('fluids') },
-                { label: 'Worth Fixing?', icon: Scale, action: () => setTab('advisor') },
-              ].map(item => (
-                <button key={item.label} onClick={item.action}
-                  className="w-full flex items-center gap-3 px-4 py-3 bg-surface dark:bg-surface-high/30 border border-overlay rounded-2xl hover:border-navy/20 hover:shadow-sm transition-all group text-left">
-                  <div className="w-7 h-7 rounded-xl bg-surface-low dark:bg-surface-highest/40 flex items-center justify-center">
-                    <item.icon className="w-3.5 h-3.5 text-navy" />
+            {/* ── Settings Drawer (Simple Expand) ── */}
+            <AnimatePresence>
+              {showSettings && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden bg-surface dark:bg-surface-high/30 rounded-[24px] border border-overlay px-5"
+                >
+                  <div className="py-5 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted block mb-1.5">Current Mileage</label>
+                        <input type="number" value={mileage} onChange={e => setMileage(Number(e.target.value))}
+                          className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface text-sm outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted block mb-1.5">Avg mi/month</label>
+                        <input type="number" value={prefs.avgMilesPerMonth} onChange={e => setPrefs(p => ({ ...p, avgMilesPerMonth: Number(e.target.value) }))}
+                          className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 font-bold text-on-surface text-sm outline-none" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted block mb-1.5">Driving Style</label>
+                        <select value={prefs.drivingStyle} onChange={e => setPrefs(p => ({ ...p, drivingStyle: e.target.value as any }))}
+                          className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold outline-none">
+                          <option value="city">City</option>
+                          <option value="highway">Highway</option>
+                          <option value="mixed">Mixed</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-muted block mb-1.5">Climate Region</label>
+                        <select value={prefs.region} onChange={e => setPrefs(p => ({ ...p, region: e.target.value as any }))}
+                          className="w-full bg-surface-low border border-overlay rounded-xl px-3 py-2 text-sm font-bold outline-none">
+                          <option value="hot">Hot Climate</option>
+                          <option value="cold">Cold / Winter</option>
+                          <option value="temperate">Temperate</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button onClick={savePrefs} disabled={saving} className="w-full py-3 bg-navy text-white rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-50">
+                      {saving ? 'Saving...' : 'Update Vehicle Details'}
+                    </button>
                   </div>
-                  <span className="flex-1 text-xs font-bold text-on-surface">{item.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-navy transition-colors" />
-                </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ── Compact Summary Cards ── */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: 'Car Health', value: `${health.total}%`, sub: health.label, color: health.total >= 65 ? 'text-emerald-500' : 'text-amber-500', icon: Activity },
+                { label: 'Overdue', value: overdue.length, sub: 'services', color: overdue.length > 0 ? 'text-red-500' : 'text-emerald-500', icon: AlertTriangle },
+                { label: 'Due Soon', value: dueSoon.length + dueNow.length, sub: 'reminders', color: 'text-amber-500', icon: Calendar },
+                { label: '90-Day Est.', value: `$${forecast90.low}`, sub: 'budget', color: 'text-navy', icon: Calculator },
+              ].map(s => (
+                <div key={s.label} className="bg-surface dark:bg-surface-high/30 rounded-2xl border border-overlay p-3 flex items-center gap-3 shadow-sm">
+                  <div className={`w-8 h-8 rounded-lg bg-surface-low flex items-center justify-center ${s.color.replace('text-', 'text-opacity-20 bg-')}`}>
+                     <s.icon className={`w-4 h-4 ${s.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black uppercase tracking-wider text-muted">{s.label}</p>
+                    <p className={`text-sm font-black ${s.color}`}>{s.value}</p>
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
 
-          {/* Right: Maintenance items */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Urgent */}
-            {(overdue.length > 0 || dueNow.length > 0) && (
-              <div>
-                <div className="flex items-center gap-2 mb-3 px-1">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Action Required</h2>
-                </div>
-                <div className="space-y-3">
-                  {[...overdue, ...dueNow].map(s => (
-                    <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* ── Primary Action ── */}
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="w-full flex items-center justify-center gap-3 py-4 bg-navy text-white rounded-2xl shadow-lg shadow-navy/20 hover:scale-[1.01] active:scale-[0.99] transition-all"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="text-sm font-black uppercase tracking-widest">Log New Service Record</span>
+            </button>
 
-            {/* Due Soon */}
-            {dueSoon.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-3 px-1">
-                  <Activity className="w-4 h-4 text-amber-500" />
-                  <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Coming Up</h2>
-                </div>
-                <div className="space-y-3">
-                  {dueSoon.map(s => (
-                    <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Good */}
-            <div>
-              <div className="flex items-center gap-2 mb-3 px-1">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">All Good</h2>
-              </div>
-              <div className="space-y-3">
-                {good.map(s => (
-                  <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
-                ))}
-              </div>
-            </div>
-
-            {/* Recent history preview */}
-            {serviceHistory.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-3 px-1">
-                  <div className="flex items-center gap-2">
-                    <History className="w-4 h-4 text-muted" />
-                    <h2 className="text-sm font-black text-on-surface uppercase tracking-widest">Recent Services</h2>
-                  </div>
-                  <button onClick={() => setTab('history')} className="text-[10px] font-black text-navy uppercase tracking-widest hover:underline">
-                    View All →
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {serviceHistory.slice(0, 3).map(r => (
-                    <div key={r.id} className="flex items-center gap-3 bg-surface dark:bg-surface-high/30 rounded-2xl border border-overlay p-3">
-                      <div className="w-7 h-7 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
-                        <Wrench className="w-3.5 h-3.5 text-navy" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-black text-on-surface truncate">{r.serviceType}</p>
-                        <p className="text-[10px] text-muted">{new Date(r.date).toLocaleDateString()} · {r.mileage.toLocaleString()} mi</p>
-                      </div>
-                      {r.cost > 0 && <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">${r.cost}</span>}
+            {/* ── Urgent & Upcoming ── */}
+            <div className="space-y-4">
+              {urgentItems.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                      <h2 className="text-[10px] font-black text-on-surface uppercase tracking-[0.2em]">Urgent Action Required</h2>
                     </div>
+                  </div>
+                  <div className="space-y-3">
+                    {urgentItems.slice(0, 2).map(s => (
+                      <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {upcomingItems.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-amber-500" />
+                      <h2 className="text-[10px] font-black text-on-surface uppercase tracking-[0.2em]">Upcoming Maintenance</h2>
+                    </div>
+                    <button onClick={() => setView('full-plan')} className="text-[9px] font-black text-navy uppercase tracking-widest hover:underline">Full Plan →</button>
+                  </div>
+                  <div className="space-y-3">
+                    {upcomingItems.map(s => (
+                      <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            {/* ── Feature Navigation Grid ── */}
+            <section>
+               <h2 className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-4 px-1 text-center">Maintenance Tools</h2>
+               <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'history', label: 'Service History', icon: History, sub: 'Full record timeline', color: 'text-purple-500', bg: 'bg-purple-500/10' },
+                    { id: 'seasonal', label: 'Seasonal Checks', icon: Sun, sub: 'Weather-ready guides', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                    { id: 'fluids', label: 'Fluid Guide', icon: Droplets, sub: 'Visual self-check', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                    { id: 'advisor', label: 'Worth Fixing?', icon: Scale, sub: 'Repair vs Value', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                  ].map(f => (
+                    <button 
+                      key={f.id} 
+                      onClick={() => setView(f.id as View)}
+                      className="bg-surface dark:bg-surface-high/30 border border-overlay p-4 rounded-3xl flex flex-col items-center text-center gap-2 hover:border-navy/20 transition-all shadow-sm active:scale-95"
+                    >
+                      <div className={`w-10 h-10 rounded-2xl ${f.bg} flex items-center justify-center mb-1`}>
+                        <f.icon className={`w-5 h-5 ${f.color}`} />
+                      </div>
+                      <p className="text-xs font-black text-on-surface">{f.label}</p>
+                      <p className="text-[9px] text-muted font-medium">{f.sub}</p>
+                    </button>
                   ))}
+               </div>
+            </section>
+
+            {/* Full Plan Link */}
+            <button 
+              onClick={() => setView('full-plan')}
+              className="w-full flex items-center justify-between px-6 py-4 bg-surface dark:bg-surface-high/30 border border-overlay rounded-2xl group"
+            >
+              <div className="flex items-center gap-3">
+                <Calculator className="w-5 h-5 text-navy" />
+                <div className="text-left">
+                  <p className="text-xs font-black text-on-surface uppercase tracking-wider">Full Maintenance Plan</p>
+                  <p className="text-[10px] text-muted font-medium">View all components and thresholds</p>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      )}
+              <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 transition-transform" />
+            </button>
 
-      {/* HISTORY TAB */}
-      {tab === 'history' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-on-surface">Maintenance History</h2>
-            <div className="flex gap-2">
-              <button onClick={handleExport}
-                className="flex items-center gap-2 px-4 py-2 border border-overlay rounded-xl text-xs font-black text-muted hover:bg-surface-low transition-colors">
-                <Download className="w-3.5 h-3.5" /> Export Report
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="subview"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6 pb-20"
+          >
+            {/* ── Subview Header ── */}
+            <div className="flex items-center gap-4 sticky top-0 bg-background/80 backdrop-blur-md py-4 z-20">
+              <button 
+                onClick={() => setView('hub')}
+                className="w-10 h-10 rounded-xl bg-surface border border-overlay flex items-center justify-center text-on-surface hover:text-navy transition-all"
+              >
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <button onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all">
-                <Plus className="w-3.5 h-3.5" /> Add Service
-              </button>
+              <div>
+                <h1 className="text-xl font-display font-black text-on-surface italic tracking-tight">
+                  {view === 'history' && 'Service History'}
+                  {view === 'seasonal' && 'Seasonal Checklists'}
+                  {view === 'fluids' && 'Fluid Check Guide'}
+                  {view === 'advisor' && 'Worth Fixing Advisor'}
+                  {view === 'full-plan' && 'Maintenance Plan'}
+                </h1>
+                <p className="text-[10px] font-bold text-muted uppercase tracking-widest">
+                  {vehicle?.year} {vehicle?.make} {vehicle?.model}
+                </p>
+              </div>
             </div>
-          </div>
-          <ServiceHistoryTimeline records={serviceHistory} onExport={handleExport} />
-        </div>
-      )}
 
-      {/* SEASONAL TAB */}
-      {tab === 'seasonal' && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-black text-on-surface">Seasonal Checklists</h2>
-          <p className="text-sm text-muted -mt-2">Based on your selected region: <strong>{prefs.region === 'hot' ? 'Hot Climate' : prefs.region === 'cold' ? 'Cold / Winter' : 'Temperate'}</strong></p>
-          {checklists.map(cl => (
-            <SeasonalChecklist key={cl.id} checklist={cl} onUpdate={handleChecklistUpdate} />
-          ))}
-        </div>
-      )}
+            {/* ── Content ── */}
+            <div className="space-y-6">
+              {view === 'history' && (
+                <div className="space-y-6">
+                  <div className="flex gap-2">
+                    <button onClick={handleExport} className="flex-1 flex items-center justify-center gap-2 py-3 border border-overlay rounded-xl text-[10px] font-black uppercase tracking-widest text-muted bg-surface">
+                      <Download className="w-3.5 h-3.5" /> Export PDF
+                    </button>
+                    <button onClick={() => setShowAddModal(true)} className="flex-1 flex items-center justify-center gap-2 py-3 bg-navy text-white rounded-xl text-[10px] font-black uppercase tracking-widest">
+                      <Plus className="w-3.5 h-3.5" /> Add Record
+                    </button>
+                  </div>
+                  <ServiceHistoryTimeline records={serviceHistory} onExport={handleExport} />
+                </div>
+              )}
 
-      {/* FLUIDS TAB */}
-      {tab === 'fluids' && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-black text-on-surface">Fluid Check Guide</h2>
-          <FluidCheckGuide />
-        </div>
-      )}
+              {view === 'seasonal' && (
+                <div className="space-y-6">
+                  <div className="bg-surface border border-overlay p-4 rounded-2xl flex items-center gap-3">
+                    <Sun className="w-5 h-5 text-amber-500" />
+                    <div>
+                       <p className="text-xs font-black text-on-surface uppercase tracking-wider">Region: {prefs.region}</p>
+                       <p className="text-[10px] text-muted">Showing guides for your local climate.</p>
+                    </div>
+                  </div>
+                  {checklists.map(cl => (
+                    <SeasonalChecklist key={cl.id} checklist={cl} onUpdate={handleChecklistUpdate} />
+                  ))}
+                </div>
+              )}
 
-      {/* ADVISOR TAB */}
-      {tab === 'advisor' && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-black text-on-surface">Is This Worth Fixing?</h2>
-          <WorthFixingAdvisor />
-        </div>
-      )}
+              {view === 'fluids' && <FluidCheckGuide />}
+
+              {view === 'advisor' && <WorthFixingAdvisor />}
+
+              {view === 'full-plan' && (
+                <div className="space-y-8">
+                   <section>
+                      <h2 className="text-sm font-black text-on-surface uppercase tracking-widest mb-4 px-1">Current Maintenance Status</h2>
+                      <div className="space-y-3">
+                        {statuses.map(s => (
+                          <MaintenanceReminderCard key={s.item.id} status={s} currentMileage={mileage} onLogService={handleLogService} />
+                        ))}
+                      </div>
+                   </section>
+                   <div className="bg-surface-low p-6 rounded-[32px] border border-overlay">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Info className="w-5 h-5 text-navy" />
+                        <h3 className="text-sm font-black text-on-surface">Data Sources</h3>
+                      </div>
+                      <p className="text-xs text-muted leading-relaxed">
+                        This plan is generated from industry standards and your vehicle profile. 
+                        Actual service needs may vary based on specific manufacturer recommendations.
+                      </p>
+                   </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add Record Modal */}
       <AddServiceRecordModal
@@ -469,6 +477,19 @@ export default function Maintenance() {
         onClose={() => setShowAddModal(false)}
         onSaved={handleAddRecord}
       />
+
+      {/* ── Persistent Footer Disclaimer (only on hub) ── */}
+      {view === 'hub' && (
+        <div className="mt-12 pt-8 border-t border-overlay text-center">
+           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/5 rounded-full mb-2">
+              <AlertTriangle className="w-3 h-3 text-amber-600" />
+              <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Smart Estimation</span>
+           </div>
+           <p className="text-[10px] text-muted max-w-sm mx-auto leading-relaxed">
+             This system uses standard automotive intervals. Always verify with your owner's manual for model-specific requirements.
+           </p>
+        </div>
+      )}
     </div>
   )
 }
