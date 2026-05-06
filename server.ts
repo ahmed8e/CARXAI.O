@@ -65,11 +65,38 @@ if (fs.existsSync(apiDir)) {
 // ── Static Frontend ─────────────────────────────────────────────────────────
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath, { maxAge: '1d' }));
-  // SPA fallback — all non-api routes serve index.html
+  // 1. Serve hashed assets with aggressive caching
+  app.use('/assets', express.static(path.join(distPath, 'assets'), {
+    maxAge: '1y',
+    immutable: true,
+    fallthrough: false // If an asset is missing, don't fall through to index.html
+  }));
+
+  // 2. Serve other static files (public folder content)
+  app.use(express.static(distPath, { 
+    maxAge: '1h',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      }
+    }
+  }));
+
+  // 3. SPA fallback — ONLY for routes without extensions
   app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api/')) {
-      res.sendFile(path.join(distPath, 'index.html'));
+    // Avoid API and file requests
+    const isApi = req.path.startsWith('/api/');
+    const hasExtension = path.extname(req.path) !== '';
+    
+    if (!isApi && !hasExtension) {
+      res.sendFile(path.join(distPath, 'index.html'), {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+        }
+      });
+    } else if (!isApi) {
+      // If it has an extension but wasn't caught by express.static, it's a 404
+      res.status(404).send('Not Found');
     }
   });
   console.log(`[Server] Serving frontend from: ${distPath}`);

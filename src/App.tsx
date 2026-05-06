@@ -97,11 +97,39 @@ const LoadingFallback = () => (
   </div>
 );
 
+// ── Dynamic Import Error Handler ───────────────────────────────────────────
+// Detects when a lazy-loaded chunk fails to load (usually after a new deploy)
+// and forces a full page reload to get the latest version.
+function ChunkErrorHandler() {
+  useEffect(() => {
+    const handleError = (e: ErrorEvent | PromiseRejectionEvent) => {
+      const message = (e instanceof ErrorEvent) ? e.message : (e.reason?.message || '');
+      const isChunkError = /Failed to fetch dynamically imported module|Loading chunk .* failed/i.test(message);
+      
+      if (isChunkError) {
+        console.warn('[App] Dynamic import failed — likely due to a new deployment. Reloading...');
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('error', handleError, true);
+    window.addEventListener('unhandledrejection', handleError);
+    
+    return () => {
+      window.removeEventListener('error', handleError, true);
+      window.removeEventListener('unhandledrejection', handleError);
+    };
+  }, []);
+
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <ChunkErrorHandler />
           <PathTracker />
           <GA4Tracker />
           <UserIdentityTracker />
