@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldCheck, AlertTriangle, ShieldAlert, ArrowLeft, Car, Wrench, DollarSign, MessageSquare, Mic, Bot, Camera, X, CheckCircle, Copy, ExternalLink, Zap, TrendingDown, TrendingUp, Info } from 'lucide-react'
+import { ShieldCheck, AlertTriangle, ShieldAlert, ArrowLeft, Car, Wrench, DollarSign, MessageSquare, Mic, Bot, Camera, X, CheckCircle, Copy, ExternalLink, Zap, TrendingDown, TrendingUp, Info, Layout } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -27,16 +27,42 @@ interface AIResult {
 }
 
 const STATUS = {
-  fair: { label: 'Fair Price', badge: 'Looks Good', bar: 'from-emerald-500 to-teal-500', icon: ShieldCheck, ring: 'ring-emerald-500/30', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  expensive: { label: 'Slightly High', badge: 'Caution', bar: 'from-amber-500 to-orange-500', icon: AlertTriangle, ring: 'ring-amber-500/30', bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  overpriced: { label: 'Overpriced', badge: 'High Alert', bar: 'from-rose-500 to-red-600', icon: ShieldAlert, ring: 'ring-rose-500/30', bg: 'bg-rose-500/10', text: 'text-rose-400' },
+  fair: { 
+    label: 'Fair Price', 
+    badge: 'Verified Fair', 
+    bar: 'from-emerald-500 to-emerald-400', 
+    icon: ShieldCheck, 
+    ring: 'ring-emerald-500/10', 
+    bg: 'bg-emerald-50', 
+    text: 'text-emerald-600' 
+  },
+  expensive: { 
+    label: 'Slightly High', 
+    badge: 'Caution Advised', 
+    bar: 'from-amber-500 to-amber-400', 
+    icon: AlertTriangle, 
+    ring: 'ring-amber-500/10', 
+    bg: 'bg-amber-50', 
+    text: 'text-amber-600' 
+  },
+  overpriced: { 
+    label: 'Overpriced', 
+    badge: 'Significant Overcharge', 
+    bar: 'from-rose-500 to-rose-400', 
+    icon: ShieldAlert, 
+    ring: 'ring-rose-500/10', 
+    bg: 'bg-rose-50', 
+    text: 'text-rose-600' 
+  },
 }
+
 const RISK = {
-  low: { label: 'Low Risk', cls: 'text-emerald-400 bg-emerald-500/10 ring-1 ring-emerald-500/20' },
-  medium: { label: 'Medium Risk', cls: 'text-amber-400 bg-amber-500/10 ring-1 ring-amber-500/20' },
-  high: { label: 'High Risk', cls: 'text-rose-400 bg-rose-500/10 ring-1 ring-rose-500/20' },
+  low: { label: 'Low Risk', cls: 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-500/20' },
+  medium: { label: 'Medium Risk', cls: 'text-amber-600 bg-amber-50 ring-1 ring-amber-500/20' },
+  high: { label: 'High Risk', cls: 'text-rose-600 bg-rose-50 ring-1 ring-rose-500/20' },
 }
-const fade = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 } }
+
+const fade = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10 } }
 
 export default function AvoidOverpaying() {
   const { user, session } = useAuth()
@@ -148,108 +174,120 @@ export default function AvoidOverpaying() {
   const StatusIcon = s?.icon ?? ShieldCheck
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] pb-24">
+    <div className="min-h-screen bg-[#f8fafc] pb-24 font-sans text-slate-900">
+      {/* Premium Apple-style Background Decoration */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
+      </div>
+
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-[#0d1425]/95 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
         <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/dashboard" className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all">
+          <Link to="/dashboard" className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">Price Protection</p>
-            <h1 className="text-sm font-black text-white uppercase tracking-wider">Avoid Overpaying</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-0.5">Price Intelligence</p>
+            <h1 className="text-sm font-black text-slate-900 uppercase tracking-wider">Avoid Overpaying</h1>
           </div>
-          <div className="w-10 h-10 flex items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 border border-blue-100/50 shadow-sm">
+            <ShieldCheck className="w-5 h-5 text-blue-600" />
           </div>
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 py-6">
+      <div className="max-w-xl mx-auto px-4 py-8 relative z-10">
         <AnimatePresence mode="wait">
 
           {/* ── INPUT STEP ── */}
           {step === 'input' && (
-            <motion.div key="input" {...fade} transition={{ duration: 0.3 }} className="space-y-5">
+            <motion.div key="input" {...fade} transition={{ duration: 0.4 }} className="space-y-6">
               <div className="text-center py-4">
-                <div className="inline-flex items-center gap-2 bg-emerald-500/10 ring-1 ring-emerald-500/20 px-4 py-1.5 rounded-full mb-4">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">AI Powered Analysis</span>
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100/50 px-4 py-1.5 rounded-full mb-6 shadow-sm">
+                  <Zap className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Expert AI Analysis</span>
                 </div>
-                <h2 className="text-2xl font-black text-white mb-2">Check Your Quote</h2>
-                <p className="text-sm text-white/40">Get expert-level pricing intelligence before you commit.</p>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Check Your Quote</h2>
+                <p className="text-sm text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
+                  Verify repair costs, estimate fair pricing, and spot overcharging in seconds.
+                </p>
               </div>
 
               {errorMsg && (
-                <div className="flex items-center gap-3 bg-rose-500/10 ring-1 ring-rose-500/20 text-rose-400 text-sm font-medium p-4 rounded-2xl">
+                <div className="flex items-center gap-3 bg-rose-50 border border-rose-100 text-rose-600 text-sm font-semibold p-4 rounded-2xl shadow-sm">
                   <AlertTriangle className="w-4 h-4 shrink-0" />{errorMsg}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="bg-white/5 ring-1 ring-white/10 p-5 rounded-3xl space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="bg-white/40 backdrop-blur-xl border border-white shadow-xl shadow-slate-200/40 p-6 rounded-[32px] space-y-6">
                   {/* Image Upload */}
                   <div>
-                    <label className="flex items-center gap-2 text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
-                      <Camera className="w-4 h-4 text-emerald-400" />Photo of Quote / Damage
-                      <span className="ml-auto font-normal text-white/30 normal-case tracking-normal">Optional</span>
+                    <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">
+                      <Camera className="w-4 h-4 text-blue-500" />Photo of Quote / Damage
+                      <span className="ml-auto font-bold text-slate-300 normal-case tracking-normal">Optional</span>
                     </label>
                     <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onloadend = () => setImagePreview(r.result as string); r.readAsDataURL(f) }} />
                     {!imagePreview ? (
-                      <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-20 rounded-2xl border-2 border-dashed border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 flex flex-col items-center justify-center gap-1 text-white/30 hover:text-white/60 transition-all">
-                        <Camera className="w-5 h-5" /><span className="text-xs font-semibold">Tap to upload</span>
+                      <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-blue-600 transition-all group">
+                        <Camera className="w-6 h-6 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Tap to upload receipt or photo</span>
                       </button>
                     ) : (
-                      <div className="relative h-32 rounded-2xl overflow-hidden ring-1 ring-white/10">
+                      <div className="relative h-40 rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                        <button type="button" onClick={() => { setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = '' }} className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 text-white flex items-center justify-center">
-                          <X className="w-3.5 h-3.5" />
+                        <button type="button" onClick={() => { setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = '' }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/80 backdrop-blur-md text-white flex items-center justify-center hover:scale-110 transition-all">
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     )}
                   </div>
 
                   {/* Vehicle */}
-                  <div>
-                    <label className="flex items-center gap-2 text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
-                      <Car className="w-4 h-4 text-emerald-400" />Your Vehicle
-                      {carModel && <span className="ml-auto text-[9px] bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 px-2 py-0.5 rounded-full font-bold normal-case tracking-normal">Auto-filled</span>}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                      <Car className="w-4 h-4 text-blue-500" />Your Vehicle
+                      {carModel && <span className="ml-auto text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Auto-filled</span>}
                     </label>
-                    <input type="text" placeholder="e.g. 2019 Honda Civic" value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-white/5 ring-1 ring-white/10 rounded-2xl px-4 py-3.5 text-sm font-medium text-white placeholder:text-white/20 focus:ring-emerald-500/40 outline-none transition-all" />
+                    <input type="text" placeholder="e.g. 2019 Honda Civic" value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                   </div>
 
                   {/* Problem */}
-                  <div>
-                    <label className="flex items-center gap-2 text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
-                      <Wrench className="w-4 h-4 text-emerald-400" />What does the mechanic say?
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                      <Wrench className="w-4 h-4 text-blue-500" />Problem Description
                     </label>
-                    <textarea placeholder="e.g. Needs front brake pads and rotors replaced" value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-white/5 ring-1 ring-white/10 rounded-2xl px-4 py-3.5 text-sm font-medium text-white placeholder:text-white/20 focus:ring-emerald-500/40 outline-none transition-all resize-none" />
+                    <textarea placeholder="e.g. Needs front brake pads and rotors replaced..." value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all resize-none shadow-sm" />
                   </div>
 
                   {/* Price + Region */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="flex items-center gap-2 text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
-                        <DollarSign className="w-4 h-4 text-emerald-400" />Quoted Price
-                        <span className="ml-auto font-normal text-white/30 normal-case tracking-normal">Optional</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                        <DollarSign className="w-4 h-4 text-blue-500" />Quoted Price
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">$</span>
-                        <input type="number" min="0" placeholder="0" value={quotedPrice} onChange={e => setQuotedPrice(e.target.value)} className="w-full bg-white/5 ring-1 ring-white/10 rounded-2xl pl-8 pr-4 py-3.5 text-lg font-black text-white placeholder:text-white/20 focus:ring-emerald-500/40 outline-none transition-all" />
+                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                        <input type="number" min="0" placeholder="0" value={quotedPrice} onChange={e => setQuotedPrice(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl pl-10 pr-5 py-4 text-lg font-black text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                       </div>
                     </div>
-                    <div>
-                      <label className="flex items-center gap-2 text-xs font-bold text-white/50 uppercase tracking-wider mb-2">
-                        <Info className="w-4 h-4 text-emerald-400" />Region
-                        <span className="ml-auto font-normal text-white/30 normal-case tracking-normal">Optional</span>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                        <Info className="w-4 h-4 text-blue-500" />Region
                       </label>
-                      <input type="text" placeholder="e.g. Texas" value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-white/5 ring-1 ring-white/10 rounded-2xl px-4 py-3.5 text-sm font-medium text-white placeholder:text-white/20 focus:ring-emerald-500/40 outline-none transition-all" />
+                      <input type="text" placeholder="e.g. Texas" value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
 
-                <button type="submit" disabled={isChecking} className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 transition-all text-white py-4 rounded-2xl font-bold text-sm tracking-wide shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 active:scale-[0.98]">
-                  {isChecking ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Analyzing with AI...</>) : (<><Bot className="w-5 h-5" />Run AI Price Analysis</>)}
+                <button type="submit" disabled={isChecking} className="group relative w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/25 flex items-center justify-center gap-3 active:scale-[0.98] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  {isChecking ? (
+                    <><div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />Running Analysis...</>
+                  ) : (
+                    <><Bot className="w-5 h-5" />Run AI Price Analysis</>
+                  )}
                 </button>
               </form>
             </motion.div>
@@ -257,148 +295,161 @@ export default function AvoidOverpaying() {
 
           {/* ── RESULTS STEP ── */}
           {step === 'results' && result && s && (
-            <motion.div key="results" {...fade} transition={{ duration: 0.3 }} className="space-y-4">
+            <motion.div key="results" {...fade} transition={{ duration: 0.5 }} className="space-y-5">
 
-              {/* S1: Verdict */}
-              <div className={`relative overflow-hidden rounded-3xl ring-2 ${s.ring} bg-[#0d1425] p-6 flex flex-col items-center text-center`}>
-                <div className={`absolute top-0 inset-x-0 h-1 bg-gradient-to-r ${s.bar}`} />
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 ${s.bg} ring-2 ${s.ring}`}>
-                  <StatusIcon className={`w-8 h-8 ${s.text}`} />
+              {/* S1: Verdict Card (Premium Glass) */}
+              <div className={`relative overflow-hidden rounded-[40px] bg-white/70 backdrop-blur-2xl border border-white shadow-2xl shadow-slate-200/60 p-8 flex flex-col items-center text-center`}>
+                <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${s.bar}`} />
+                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-4 ${s.bg} border border-slate-100 shadow-sm transition-transform hover:scale-110`}>
+                  <StatusIcon className={`w-10 h-10 ${s.text}`} />
                 </div>
-                <span className={`text-[10px] font-black uppercase tracking-[0.25em] mb-1 ${s.text}`}>{s.badge}</span>
-                <h2 className="text-3xl font-black text-white mb-1">{s.label}</h2>
+                <span className={`text-[10px] font-black uppercase tracking-[0.3em] mb-2 px-3 py-1 rounded-full ${s.bg} ${s.text}`}>{s.badge}</span>
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-2">{s.label}</h2>
+                
                 {result.overpay_percent > 0 && (
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp className="w-4 h-4 text-rose-400" />
-                    <span className="text-rose-400 font-black text-lg">+{result.overpay_percent}% above market</span>
+                  <div className="inline-flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-2xl mb-2">
+                    <TrendingUp className="w-5 h-5 text-rose-500" />
+                    <span className="text-rose-600 font-black text-xl">+{result.overpay_percent}% above market</span>
                   </div>
                 )}
-                <div className="mt-4 w-full flex items-center justify-between bg-white/5 rounded-2xl p-3">
+                
+                <div className="mt-6 w-full flex items-center justify-between bg-slate-50 border border-slate-100 rounded-3xl p-5">
                   <div className="text-left">
-                    <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Detected Issue</p>
-                    <p className="text-sm font-bold text-white">{result.detected_issue}</p>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Detected Issue</p>
+                    <p className="text-base font-black text-slate-900 leading-tight">{result.detected_issue}</p>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-full ${RISK[result.risk_level].cls}`}>{RISK[result.risk_level].label}</span>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm ${RISK[result.risk_level].cls}`}>{RISK[result.risk_level].label}</span>
                 </div>
               </div>
 
               {/* S2: Market Breakdown */}
-              <div className="bg-[#0d1425] ring-1 ring-white/10 rounded-3xl p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-xl bg-blue-500/10 flex items-center justify-center"><DollarSign className="w-4 h-4 text-blue-400" /></div>
-                  <h3 className="font-black text-white text-sm">Market Breakdown</h3>
+              <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><DollarSign className="w-5 h-5 text-blue-600" /></div>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Market Comparison</h3>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: 'Parts', val: result.market_breakdown?.parts_range ?? '—', color: 'text-purple-400' },
-                    { label: 'Labor', val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-400' },
-                    { label: 'Total', val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-400' },
-                  ].map(({ label, val, color }) => (
-                    <div key={label} className="bg-white/5 rounded-2xl p-3 text-center">
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider mb-1">{label}</p>
-                      <p className={`text-sm font-black ${color}`}>{val}</p>
+                    { label: 'Parts Cost', val: result.market_breakdown?.parts_range ?? '—', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                    { label: 'Labor Cost', val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { label: 'Fair Total', val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                  ].map(({ label, val, color, bg }) => (
+                    <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-white shadow-sm`}>
+                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider mb-1.5">{label}</p>
+                      <p className={`text-base font-black ${color}`}>{val}</p>
                     </div>
                   ))}
                 </div>
                 {result.overpriced_component && (
-                  <div className="mt-3 flex items-center gap-2 bg-rose-500/10 ring-1 ring-rose-500/20 rounded-xl px-3 py-2">
-                    <TrendingDown className="w-4 h-4 text-rose-400 shrink-0" />
-                    <p className="text-xs text-rose-400 font-semibold capitalize"><span className="font-black">{result.overpriced_component}</span> costs appear inflated</p>
+                  <div className="mt-5 flex items-center gap-3 bg-rose-50 border border-rose-100/50 rounded-2xl px-4 py-3">
+                    <TrendingDown className="w-5 h-5 text-rose-500 shrink-0" />
+                    <p className="text-xs text-rose-700 font-bold leading-tight">Expert analysis suggests <span className="font-black underline uppercase">{result.overpriced_component}</span> costs are significantly inflated.</p>
                   </div>
                 )}
               </div>
 
-              {/* S3: Expert Analysis */}
-              <div className="bg-[#0d1425] ring-1 ring-white/10 rounded-3xl p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Bot className="w-4 h-4 text-emerald-400" /></div>
-                  <h3 className="font-black text-white text-sm">Expert Analysis</h3>
+              {/* S3: Expert Insight */}
+              <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm"><Bot className="w-5 h-5 text-emerald-600" /></div>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">AI Pricing Intelligence</h3>
                 </div>
-                <p className="text-sm text-white/70 leading-relaxed">{result.explanation}</p>
-                <div className="mt-3 bg-white/5 rounded-2xl p-3">
-                  <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider mb-1">Next Step</p>
-                  <p className="text-sm font-semibold text-white">{result.next_steps}</p>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{result.explanation}</p>
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5">Actionable Next Step</p>
+                  <p className="text-sm font-bold text-slate-900 leading-snug">{result.next_steps}</p>
                 </div>
               </div>
 
-              {/* S4: Scam Warning */}
+              {/* S4: Scam Alert */}
               {result.scam_warning && (
-                <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-500/10 ring-2 ring-rose-500/30 rounded-3xl p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-rose-500/20 flex items-center justify-center shrink-0 mt-0.5"><ShieldAlert className="w-4 h-4 text-rose-400" /></div>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-600 text-white rounded-[32px] p-6 shadow-xl shadow-rose-500/20">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-sm"><ShieldAlert className="w-6 h-6 text-white" /></div>
                     <div>
-                      <p className="text-xs font-black uppercase tracking-wider text-rose-400 mb-1">⚠ Scam Alert</p>
-                      <p className="text-sm text-rose-300 leading-relaxed">{result.scam_warning}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">Scam Warning</p>
+                      <p className="text-sm font-bold leading-relaxed">{result.scam_warning}</p>
                     </div>
                   </div>
                 </motion.div>
               )}
 
-              {/* S5: Negotiation */}
-              <div className="bg-[#0d1425] ring-1 ring-white/10 rounded-3xl p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-xl bg-indigo-500/10 flex items-center justify-center"><MessageSquare className="w-4 h-4 text-indigo-400" /></div>
-                  <h3 className="font-black text-white text-sm">Negotiation Script</h3>
+              {/* S5: Negotiation Suite */}
+              <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm"><MessageSquare className="w-5 h-5 text-indigo-600" /></div>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Negotiation Scripts</h3>
                 </div>
-                <div className="relative bg-indigo-500/5 ring-1 ring-indigo-500/20 rounded-2xl p-4 mb-3">
-                  <p className="text-sm text-white/80 italic leading-relaxed pr-8">"{result.negotiation_script}"</p>
-                  <button onClick={() => copyText(result.negotiation_script, 'neg')} className="absolute top-2 right-2 w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
-                    {copied === 'neg' ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/40" />}
+                
+                <div className="relative bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-5 group">
+                  <p className="text-sm text-indigo-900 font-bold italic leading-relaxed pr-10">"{result.negotiation_script}"</p>
+                  <button onClick={() => copyText(result.negotiation_script, 'neg')} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white shadow-sm border border-indigo-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                    {copied === 'neg' ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-indigo-300" />}
                   </button>
                 </div>
-                <div className="flex gap-2 mb-3">
+
+                <div className="flex gap-2 p-1 bg-slate-100 rounded-2xl mb-4">
                   {(['polite', 'assertive', 'expert'] as Tone[]).map(t => (
-                    <button key={t} onClick={() => setSelectedTone(t)} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${selectedTone === t ? 'bg-white text-slate-900' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}>{t}</button>
+                    <button key={t} onClick={() => setSelectedTone(t)} className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedTone === t ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
                   ))}
                 </div>
-                <div className="relative bg-white/5 rounded-2xl p-4">
-                  <p className="text-sm text-white/70 italic leading-relaxed pr-8">"{result.smart_replies[selectedTone]}"</p>
-                  <button onClick={() => copyText(result.smart_replies[selectedTone], selectedTone)} className="absolute top-2 right-2 w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
-                    {copied === selectedTone ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/40" />}
+
+                <div className="relative bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                  <p className="text-sm text-slate-600 font-bold italic leading-relaxed pr-10">"{result.smart_replies[selectedTone]}"</p>
+                  <button onClick={() => copyText(result.smart_replies[selectedTone], selectedTone)} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                    {copied === selectedTone ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-slate-300" />}
                   </button>
                 </div>
               </div>
 
-              {/* S6: Cheaper Parts */}
+              {/* S6: Parts Sources */}
               {result.cheaper_parts_sources?.length > 0 && (
-                <div className="bg-[#0d1425] ring-1 ring-white/10 rounded-3xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-xl bg-teal-500/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-teal-400" /></div>
-                    <h3 className="font-black text-white text-sm">Find Cheaper Parts</h3>
+                <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><Layout className="w-5 h-5 text-blue-600" /></div>
+                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Part Savings Guide</h3>
                   </div>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 gap-2">
                     {result.cheaper_parts_sources.map((src, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-white/5 rounded-xl px-3 py-2.5">
-                        <ExternalLink className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                        <span className="text-sm text-white/70 font-medium">{src}</span>
+                      <div key={i} className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl p-4 group hover:bg-white hover:border-blue-200 transition-all cursor-default">
+                        <span className="text-sm text-slate-700 font-bold">{src}</span>
+                        <ExternalLink className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-all" />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Live Assistant */}
-              <div className="bg-[#0d1425] ring-1 ring-white/10 rounded-3xl p-5 flex flex-col items-center">
-                <h3 className="font-black text-white text-sm mb-1">Live Assistant</h3>
-                <p className="text-xs text-white/40 text-center max-w-[200px] mb-5">At the mechanic now? Record for instant AI feedback.</p>
+              {/* Live Assistant (Apple Glass UI) */}
+              <div className="bg-white/40 backdrop-blur-2xl border border-white rounded-[40px] p-8 shadow-2xl shadow-slate-200/50 flex flex-col items-center">
+                <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em] mb-1">Live Assistant</h3>
+                <p className="text-xs text-slate-400 font-bold text-center max-w-[220px] mb-6">Need immediate help? Record the mechanic's explanation for instant AI audit.</p>
+                
                 {messages.length > 0 && (
-                  <div className="w-full space-y-2 mb-5 bg-white/5 p-3 rounded-2xl max-h-44 overflow-y-auto">
+                  <div className="w-full space-y-3 mb-8 bg-slate-50/50 border border-slate-100 p-4 rounded-3xl max-h-56 overflow-y-auto scrollbar-hide shadow-inner">
                     {messages.map((m, i) => (
                       <div key={i} className={`flex items-start gap-2 ${m.role === 'user' ? 'justify-end' : ''}`}>
-                        {m.role === 'assistant' && <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0"><Bot className="w-3.5 h-3.5 text-emerald-400" /></div>}
-                        <div className={`px-3 py-2 rounded-2xl text-xs font-medium max-w-[85%] ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white/5 text-white/70'}`}>{m.text}</div>
+                        {m.role === 'assistant' && <div className="w-7 h-7 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm"><Bot className="w-4 h-4 text-emerald-600" /></div>}
+                        <div className={`px-4 py-3 rounded-[20px] text-xs font-bold leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-100 text-slate-600'}`}>{m.text}</div>
                       </div>
                     ))}
                     <div ref={chatBottomRef} />
                   </div>
                 )}
-                <button onClick={handleToggleRecord} disabled={isTranscribing} className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all ${isTranscribing ? 'bg-white/5 text-white/30 cursor-not-allowed' : isRecording ? 'bg-rose-500/10 ring-4 ring-rose-500 text-rose-400 animate-pulse' : 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white hover:scale-105 active:scale-95'}`}>
-                  <Mic className={`w-8 h-8 ${isRecording ? 'animate-bounce' : ''}`} />
-                </button>
-                <p className="text-[10px] uppercase font-black tracking-widest mt-3 text-white/30">{isTranscribing ? 'Thinking...' : isRecording ? 'Tap to Stop' : 'Tap to Record'}</p>
+
+                <div className="relative">
+                   <button onClick={handleToggleRecord} disabled={isTranscribing} className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all z-10 ${isTranscribing ? 'bg-slate-100 text-slate-300' : isRecording ? 'bg-rose-50 text-rose-500 ring-8 ring-rose-500/10' : 'bg-white text-blue-600 shadow-xl shadow-blue-500/10 border border-blue-50 hover:scale-105 active:scale-95'}`}>
+                    <Mic className={`w-10 h-10 ${isRecording ? 'animate-pulse' : ''}`} />
+                    {isRecording && (
+                      <div className="absolute inset-0 rounded-full ring-4 ring-rose-500/30 animate-ping" />
+                    )}
+                  </button>
+                </div>
+                
+                <p className="text-[10px] uppercase font-black tracking-[0.3em] mt-5 text-slate-400">{isTranscribing ? 'Analyzing Voice...' : isRecording ? 'Stop Recording' : 'Start Audit'}</p>
               </div>
 
-              <button onClick={reset} className="w-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white py-4 rounded-2xl font-bold text-sm tracking-wide transition-all active:scale-[0.98]">
+              <button onClick={reset} className="w-full bg-white border border-slate-200 hover:border-blue-400 text-slate-500 hover:text-blue-600 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-[0.98] shadow-sm">
                 Check Another Quote
               </button>
             </motion.div>
