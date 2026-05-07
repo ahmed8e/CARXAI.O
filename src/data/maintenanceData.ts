@@ -51,8 +51,13 @@ export interface MaintenanceStatus {
   nextDueDate: Date
   milesUntilDue: number
   daysUntilDue: number
-  title: string
-  explanation: string
+  titleKey: string
+  explanationKey: string
+  explanationParams: {
+    miles?: string
+    months?: number
+    days?: number
+  }
 }
 
 export interface ServiceRecord {
@@ -76,11 +81,16 @@ export interface HealthCategory {
   status: 'excellent' | 'good' | 'attention' | 'risk'
 }
 
+export interface RepairReason {
+  key: string
+  params?: Record<string, string | number>
+}
+
 export interface RepairDecision {
   verdict: 'worth_fixing' | 'second_opinion' | 'not_worth' | 'consider_selling'
-  title: string
+  titleKey: string
   color: string
-  reasons: string[]
+  reasons: RepairReason[]
   savings?: string
 }
 
@@ -88,69 +98,69 @@ export interface RepairDecision {
 export const DEFAULT_SCHEDULE: Omit<MaintenanceItem, 'lastServiceMileage' | 'lastServiceDate'>[] = [
   {
     id: 'oil_change',
-    label: 'Oil Change',
+    label: 'maintenance.service_types.oil_change',
     icon: 'Droplets',
     intervalMiles: 5000,
     intervalMonths: 6,
     costLow: 40,
     costHigh: 120,
-    riskIfDelayed: 'Engine wear, sludge buildup, decreased fuel efficiency, potential engine failure.',
-    antiScamNote: 'Engine flush add-on is rarely needed. Synthetic oil lasts longer — ask if it\'s included in the quoted price.',
+    riskIfDelayed: 'maintenance.risk_delayed.oil_change',
+    antiScamNote: 'maintenance.anti_scam.oil_change',
   },
   {
     id: 'tire_rotation',
-    label: 'Tire Rotation',
+    label: 'maintenance.service_types.tire_rotation',
     icon: 'CircleDot',
     intervalMiles: 7500,
     intervalMonths: 6,
     costLow: 20,
     costHigh: 50,
-    riskIfDelayed: 'Uneven tire wear, reduced traction, shorter tire lifespan, alignment issues.',
-    antiScamNote: 'Many tire shops offer free rotations if you purchased tires there. Always ask.',
+    riskIfDelayed: 'maintenance.risk_delayed.tire_rotation',
+    antiScamNote: 'maintenance.anti_scam.tire_rotation',
   },
   {
     id: 'brake_inspection',
-    label: 'Brake Inspection',
+    label: 'maintenance.service_types.brake_inspection',
     icon: 'ShieldAlert',
     intervalMiles: 20000,
     intervalMonths: 12,
     costLow: 0,
     costHigh: 50,
-    riskIfDelayed: 'Reduced stopping power, rotor damage (expensive to fix), safety hazard.',
-    antiScamNote: 'Rotors often only need resurfacing, not full replacement. Get a second opinion before approving rotor work.',
+    riskIfDelayed: 'maintenance.risk_delayed.brake_inspection',
+    antiScamNote: 'maintenance.anti_scam.brake_inspection',
   },
   {
     id: 'air_filter',
-    label: 'Air Filter Replacement',
+    label: 'maintenance.service_types.air_filter',
     icon: 'Wind',
     intervalMiles: 30000,
     intervalMonths: 24,
     costLow: 15,
     costHigh: 60,
-    riskIfDelayed: 'Reduced fuel economy, sluggish acceleration, increased emissions.',
-    antiScamNote: 'You can replace this yourself in 5 minutes with a $15 part from any auto store.',
+    riskIfDelayed: 'maintenance.risk_delayed.air_filter',
+    antiScamNote: 'maintenance.anti_scam.air_filter',
   },
   {
     id: 'battery_check',
-    label: 'Battery Check',
+    label: 'maintenance.service_types.battery_check',
     icon: 'BatteryMedium',
     intervalMiles: 0,
     intervalMonths: 12,
     costLow: 0,
     costHigh: 30,
-    riskIfDelayed: 'Unexpected no-start, electrical issues, stranded on the road.',
-    antiScamNote: 'Most auto parts stores test batteries for free. Don\'t pay for a test.',
+    riskIfDelayed: 'maintenance.risk_delayed.battery_check',
+    antiScamNote: 'maintenance.anti_scam.battery_check',
   },
   {
     id: 'coolant_check',
-    label: 'Coolant System Check',
+    label: 'maintenance.service_types.coolant_check',
     icon: 'Thermometer',
     intervalMiles: 30000,
     intervalMonths: 24,
     costLow: 20,
     costHigh: 80,
-    riskIfDelayed: 'Overheating, engine damage, head gasket failure (very expensive).',
-    antiScamNote: 'Coolant flush is only needed every 30k-50k miles. Don\'t let shops push it at every oil change.',
+    riskIfDelayed: 'maintenance.risk_delayed.coolant_check',
+    antiScamNote: 'maintenance.anti_scam.coolant_check',
   },
 ]
 
@@ -179,30 +189,50 @@ export function calculateMaintenanceStatus(
   const daysUntilDue = Math.round((nextDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
   let status: ServiceStatus = 'good'
-  let title = `${item.label} — All Good`
-  let explanation = `Next service in ~${Math.max(0, milesUntilDue).toLocaleString()} miles or ${Math.max(0, Math.round(daysUntilDue / 30))} months.`
+  let titleKey = 'maintenance.status_labels.all_good'
+  let explanationKey = item.intervalMiles > 0 ? 'maintenance.status_explanations.good_miles' : 'maintenance.status_explanations.good_date'
+  let explanationParams: { miles?: string; months?: number; days?: number } = { 
+    miles: Math.max(0, milesUntilDue).toLocaleString(), 
+    months: Math.max(0, Math.round(daysUntilDue / 30)) 
+  }
 
   if (milesUntilDue <= 0 || daysUntilDue <= 0) {
     status = 'overdue'
-    title = `${item.label} Overdue`
-    explanation = milesUntilDue <= 0
-      ? `Overdue by ${Math.abs(milesUntilDue).toLocaleString()} miles. Schedule this soon.`
-      : `Overdue by ${Math.abs(daysUntilDue)} days. Schedule this soon.`
+    titleKey = 'maintenance.status_labels.overdue'
+    if (milesUntilDue <= 0) {
+      explanationKey = 'maintenance.status_explanations.overdue_miles'
+      explanationParams = { miles: Math.abs(milesUntilDue).toLocaleString() }
+    } else {
+      explanationKey = 'maintenance.status_explanations.overdue_days'
+      explanationParams = { days: Math.abs(daysUntilDue) }
+    }
   } else if (milesUntilDue <= 500 || daysUntilDue <= 14) {
     status = 'due'
-    title = `${item.label} Due Now`
-    explanation = `Due within ${Math.max(0, milesUntilDue).toLocaleString()} miles or ${daysUntilDue} days.`
+    titleKey = 'maintenance.status_labels.due_now'
+    if (item.intervalMiles > 0) {
+      explanationKey = 'maintenance.status_explanations.due_now_miles'
+      explanationParams = { miles: Math.max(0, milesUntilDue).toLocaleString(), days: daysUntilDue }
+    } else {
+      explanationKey = 'maintenance.status_explanations.due_now_days'
+      explanationParams = { days: daysUntilDue }
+    }
   } else if (milesUntilDue <= 1500 || daysUntilDue <= 60) {
     status = 'coming_soon'
-    title = `${item.label} Coming Soon`
-    explanation = `Coming up in ~${milesUntilDue.toLocaleString()} miles or ${Math.round(daysUntilDue / 30)} months.`
+    titleKey = 'maintenance.status_labels.coming_soon'
+    if (item.intervalMiles > 0) {
+      explanationKey = 'maintenance.status_explanations.coming_soon_miles'
+      explanationParams = { miles: milesUntilDue.toLocaleString(), months: Math.round(daysUntilDue / 30) }
+    } else {
+      explanationKey = 'maintenance.status_explanations.coming_soon_date'
+      explanationParams = { months: Math.round(daysUntilDue / 30) }
+    }
   }
 
   return {
     item, status, milesSince, monthsSince,
     nextDueMileage, nextDueDate,
     milesUntilDue, daysUntilDue,
-    title, explanation,
+    titleKey, explanationKey, explanationParams,
   }
 }
 
@@ -210,7 +240,7 @@ export function calculateMaintenanceStatus(
 export function calculateHealthScore(
   statuses: MaintenanceStatus[],
   serviceHistory: ServiceRecord[]
-): { total: number; label: string; categories: HealthCategory[] } {
+): { total: number; labelKey: string; categories: HealthCategory[] } {
   const cats: HealthCategory[] = [
     { label: 'Engine', score: 20, maxScore: 20, status: 'excellent' },
     { label: 'Brakes', score: 20, maxScore: 20, status: 'excellent' },
@@ -244,88 +274,157 @@ export function calculateHealthScore(
   })
 
   const total = cats.reduce((a, c) => a + c.score, 0)
-  const label = total >= 85 ? 'Excellent' : total >= 65 ? 'Good' : total >= 40 ? 'Needs Attention' : 'High Risk'
+  const labelKey = total >= 85 ? 'maintenance.status_labels.excellent' : total >= 65 ? 'maintenance.status_labels.good' : total >= 40 ? 'maintenance.status_labels.attention' : 'maintenance.status_labels.high_risk'
 
-  return { total, label, categories: cats }
+  return { total, labelKey, categories: cats }
 }
+
+// ── Fluid Guide Data ────────────────────────────────────────────────
+export interface FluidInfo {
+  id: string
+  nameKey: string
+  locationKey: string
+  howToCheckKey: string
+  warningSignsKey: string
+  doNotKey: string
+  seeAMechanicKey: string
+  color: string
+  icon: string
+}
+
+export const FLUID_GUIDE: FluidInfo[] = [
+  {
+    id: 'oil',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.engine_oil.see_mechanic',
+    color: '#eab308',
+    icon: 'Droplet'
+  },
+  {
+    id: 'coolant',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.coolant.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.coolant.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.coolant.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.coolant.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.coolant.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.coolant.see_mechanic',
+    color: '#22c55e',
+    icon: 'Thermometer'
+  },
+  {
+    id: 'brake',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.brake_fluid.see_mechanic',
+    color: '#f97316',
+    icon: 'ShieldAlert'
+  },
+  {
+    id: 'steering',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.power_steering.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.power_steering.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.power_steering.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.power_steering.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.power_steering.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.power_steering.see_mechanic',
+    color: '#ef4444',
+    icon: 'RotateCw'
+  },
+  {
+    id: 'washer',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.washer_fluid.see_mechanic',
+    color: '#3b82f6',
+    icon: 'Droplets'
+  },
+  {
+    id: 'transmission',
+    nameKey: 'maintenance.fluid_guide_tool.fluids.transmission.name',
+    locationKey: 'maintenance.fluid_guide_tool.fluids.transmission.location',
+    howToCheckKey: 'maintenance.fluid_guide_tool.fluids.transmission.how_to_check',
+    warningSignsKey: 'maintenance.fluid_guide_tool.fluids.transmission.warning_signs',
+    doNotKey: 'maintenance.fluid_guide_tool.fluids.transmission.do_not',
+    seeAMechanicKey: 'maintenance.fluid_guide_tool.fluids.transmission.see_mechanic',
+    color: '#8b5cf6',
+    icon: 'Cog'
+  }
+]
 
 // ── Seasonal Checklists ──────────────────────────────────────────────
 export interface ChecklistItem {
   id: string
-  label: string
-  description: string
+  labelKey: string
+  descriptionKey: string
   warningLevel: 'info' | 'warning' | 'critical'
   checked: boolean
 }
 
 export interface SeasonalChecklistData {
   id: string
-  title: string
+  titleKey: string
   icon: string
   color: string
   items: ChecklistItem[]
 }
 
-export function getSeasonalChecklists(region: 'hot' | 'cold' | 'temperate'): SeasonalChecklistData[] {
+export function getSeasonalChecklists(_region: 'hot' | 'cold' | 'temperate'): SeasonalChecklistData[] {
   const summer: SeasonalChecklistData = {
     id: 'summer',
-    title: 'Summer Readiness Check',
+    titleKey: 'maintenance.seasonal_tool.checklists.summer.title',
     icon: 'Sun',
     color: '#f59e0b',
-    items: region === 'hot' ? [
-      { id: 's1', label: 'Coolant Level', description: 'Critical in hot climates. Low coolant = overheating risk.', warningLevel: 'critical', checked: false },
-      { id: 's2', label: 'AC Performance', description: 'Test before peak heat. Recharge if blowing warm air.', warningLevel: 'warning', checked: false },
-      { id: 's3', label: 'Battery Health', description: 'Heat kills batteries faster than cold. Test voltage.', warningLevel: 'critical', checked: false },
-      { id: 's4', label: 'Tire Pressure', description: 'Heat expands air. Check when tires are cold.', warningLevel: 'warning', checked: false },
-      { id: 's5', label: 'Wiper Condition', description: 'Sun damage cracks wiper blades. Replace if streaking.', warningLevel: 'info', checked: false },
-      { id: 's6', label: 'Engine Temperature', description: 'Monitor gauge. If needle rises, pull over immediately.', warningLevel: 'critical', checked: false },
-      { id: 's7', label: 'Brake Fluid', description: 'Heat can degrade brake fluid. Check color and level.', warningLevel: 'warning', checked: false },
-      { id: 's8', label: 'Emergency Kit', description: 'Water, sunshade, jumper cables, first aid kit.', warningLevel: 'info', checked: false },
-    ] : [
-      { id: 's1', label: 'AC System Check', description: 'Ensure proper cooling before summer heat arrives.', warningLevel: 'warning', checked: false },
-      { id: 's2', label: 'Coolant Level', description: 'Top up coolant. Flush if over 2 years old.', warningLevel: 'warning', checked: false },
-      { id: 's3', label: 'Tire Pressure', description: 'Warmer temps increase pressure. Adjust to spec.', warningLevel: 'info', checked: false },
-      { id: 's4', label: 'Battery Test', description: 'Summer heat is hard on batteries. Test charge level.', warningLevel: 'warning', checked: false },
-      { id: 's5', label: 'Wiper Blades', description: 'Replace if worn. Summer storms need clear visibility.', warningLevel: 'info', checked: false },
-      { id: 's6', label: 'Emergency Kit', description: 'Water, sunscreen, flashlight, jumper cables.', warningLevel: 'info', checked: false },
+    items: [
+      { id: 's1', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s1.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s1.description', warningLevel: 'critical', checked: false },
+      { id: 's2', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s2.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s2.description', warningLevel: 'warning', checked: false },
+      { id: 's3', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s3.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s3.description', warningLevel: 'critical', checked: false },
+      { id: 's4', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s4.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s4.description', warningLevel: 'warning', checked: false },
+      { id: 's5', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s5.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s5.description', warningLevel: 'info', checked: false },
+      { id: 's6', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s6.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s6.description', warningLevel: 'critical', checked: false },
+      { id: 's7', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s7.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s7.description', warningLevel: 'warning', checked: false },
+      { id: 's8', labelKey: 'maintenance.seasonal_tool.checklists.summer.items.s8.label', descriptionKey: 'maintenance.seasonal_tool.checklists.summer.items.s8.description', warningLevel: 'info', checked: false },
     ],
   }
 
   const winter: SeasonalChecklistData = {
     id: 'winter',
-    title: 'Winter Readiness Check',
+    titleKey: 'maintenance.seasonal_tool.checklists.winter.title',
     icon: 'Snowflake',
     color: '#3b82f6',
-    items: region === 'cold' ? [
-      { id: 'w1', label: 'Antifreeze Level', description: 'Must be at proper concentration to prevent freezing.', warningLevel: 'critical', checked: false },
-      { id: 'w2', label: 'Battery Health', description: 'Cold cranking amps drop in winter. Test before freeze.', warningLevel: 'critical', checked: false },
-      { id: 'w3', label: 'Tire Tread Depth', description: 'Consider winter tires. Min 4/32" tread for snow.', warningLevel: 'critical', checked: false },
-      { id: 'w4', label: 'Wiper Blades', description: 'Install winter-grade wipers. Stock washer fluid.', warningLevel: 'warning', checked: false },
-      { id: 'w5', label: 'Heater & Defroster', description: 'Test both. A broken heater is a safety issue.', warningLevel: 'warning', checked: false },
-      { id: 'w6', label: 'Oil Viscosity', description: 'Switch to winter-weight oil if recommended.', warningLevel: 'info', checked: false },
-      { id: 'w7', label: 'Winter Emergency Kit', description: 'Blanket, shovel, sand/salt, flashlight, snacks.', warningLevel: 'info', checked: false },
-    ] : [
-      { id: 'w1', label: 'Coolant Check', description: 'Ensure antifreeze mix is adequate for mild cold.', warningLevel: 'warning', checked: false },
-      { id: 'w2', label: 'Battery Test', description: 'Cold mornings can strain older batteries.', warningLevel: 'warning', checked: false },
-      { id: 'w3', label: 'Tire Condition', description: 'Check tread depth and pressure in cooler temps.', warningLevel: 'info', checked: false },
-      { id: 'w4', label: 'Wiper Blades', description: 'Replace if streaking. Rain season needs clear visibility.', warningLevel: 'info', checked: false },
-      { id: 'w5', label: 'Lights Check', description: 'Shorter days mean more night driving. Test all lights.', warningLevel: 'info', checked: false },
+    items: [
+      { id: 'w1', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w1.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w1.description', warningLevel: 'critical', checked: false },
+      { id: 'w2', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w2.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w2.description', warningLevel: 'critical', checked: false },
+      { id: 'w3', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w3.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w3.description', warningLevel: 'critical', checked: false },
+      { id: 'w4', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w4.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w4.description', warningLevel: 'warning', checked: false },
+      { id: 'w5', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w5.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w5.description', warningLevel: 'warning', checked: false },
+      { id: 'w6', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w6.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w6.description', warningLevel: 'info', checked: false },
+      { id: 'w7', labelKey: 'maintenance.seasonal_tool.checklists.winter.items.w7.label', descriptionKey: 'maintenance.seasonal_tool.checklists.winter.items.w7.description', warningLevel: 'info', checked: false },
     ],
   }
 
   const roadTrip: SeasonalChecklistData = {
     id: 'roadtrip',
-    title: 'Long Road Trip Check',
+    titleKey: 'maintenance.seasonal_tool.checklists.roadtrip.title',
     icon: 'MapPin',
     color: '#10b981',
     items: [
-      { id: 'r1', label: 'Oil Level & Condition', description: 'Check dipstick. Change if due within 1,000 miles.', warningLevel: 'warning', checked: false },
-      { id: 'r2', label: 'Tire Pressure & Spare', description: 'All 4 tires + spare. Check tread depth too.', warningLevel: 'critical', checked: false },
-      { id: 'r3', label: 'Brake Condition', description: 'Listen for squealing. Test stopping distance.', warningLevel: 'critical', checked: false },
-      { id: 'r4', label: 'All Fluid Levels', description: 'Coolant, brake fluid, power steering, washer fluid.', warningLevel: 'warning', checked: false },
-      { id: 'r5', label: 'Belts & Hoses', description: 'Look for cracks, fraying, or soft spots.', warningLevel: 'warning', checked: false },
-      { id: 'r6', label: 'Lights & Signals', description: 'Headlights, brake lights, turn signals, hazards.', warningLevel: 'info', checked: false },
-      { id: 'r7', label: 'Emergency Kit', description: 'Jumper cables, flashlight, first aid, water, phone charger.', warningLevel: 'info', checked: false },
+      { id: 'r1', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r1.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r1.description', warningLevel: 'warning', checked: false },
+      { id: 'r2', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r2.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r2.description', warningLevel: 'critical', checked: false },
+      { id: 'r3', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r3.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r3.description', warningLevel: 'critical', checked: false },
+      { id: 'r4', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r4.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r4.description', warningLevel: 'warning', checked: false },
+      { id: 'r5', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r5.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r5.description', warningLevel: 'warning', checked: false },
+      { id: 'r6', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r6.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r6.description', warningLevel: 'info', checked: false },
+      { id: 'r7', labelKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r7.label', descriptionKey: 'maintenance.seasonal_tool.checklists.roadtrip.items.r7.description', warningLevel: 'info', checked: false },
     ],
   }
 
@@ -343,136 +442,64 @@ export function evaluateRepair(input: {
   yearsToKeep: number
 }): RepairDecision {
   const { carValue, repairCost, mileage, carYear, repairType, condition, yearsToKeep } = input
-  const ratio = repairCost / carValue
+  const ratio = Math.round((repairCost / carValue) * 100)
   const carAge = new Date().getFullYear() - carYear
   const isSafety = /brake|steering|tire|airbag|suspension|light/i.test(repairType)
   const isHighMileage = mileage > 150000
-  const reasons: string[] = []
+  const reasons: RepairReason[] = []
 
-  // Safety items are always worth fixing
   if (isSafety) {
-    reasons.push(`This is a safety-critical repair. It should be fixed regardless of car value.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.safety' })
   }
 
-  if (ratio > 0.75) {
-    reasons.push(`Repair cost (${Math.round(ratio * 100)}% of car value) is very high relative to the car's worth.`)
-  } else if (ratio > 0.5) {
-    reasons.push(`Repair is ${Math.round(ratio * 100)}% of your car's value — that's significant.`)
+  if (ratio > 75) {
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.ratio_high', params: { ratio } })
+  } else if (ratio > 50) {
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.ratio_sig', params: { ratio } })
   } else {
-    reasons.push(`Repair cost is ${Math.round(ratio * 100)}% of car value — reasonable range.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.ratio_ok', params: { ratio } })
   }
 
   if (isHighMileage) {
-    reasons.push(`At ${mileage.toLocaleString()} miles, other major components may need attention soon.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.high_mileage', params: { mileage: mileage.toLocaleString() } })
   }
 
   if (carAge > 12) {
-    reasons.push(`At ${carAge} years old, consider the likelihood of additional repairs in the near future.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.old_car', params: { age: carAge } })
   }
 
   if (yearsToKeep <= 1) {
-    reasons.push(`If you plan to keep it only ${yearsToKeep} year(s), the repair may not pay for itself.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.keep_short', params: { years: yearsToKeep } })
   } else if (yearsToKeep >= 3) {
-    reasons.push(`Planning to keep it ${yearsToKeep}+ years makes the repair more worthwhile.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.keep_long', params: { years: yearsToKeep } })
   }
 
   if (condition === 'poor') {
-    reasons.push(`The car's overall poor condition may make this repair less cost-effective.`)
+    reasons.push({ key: 'maintenance.advisor_tool.reasons.poor_condition' })
   }
 
-  // Verdict
   let verdict: RepairDecision['verdict']
-  let title: string
   let color: string
+  let titleKey: string
 
-  if (isSafety && ratio < 0.6) {
+  if (isSafety && ratio < 60) {
     verdict = 'worth_fixing'
-    title = 'Worth Fixing'
+    titleKey = 'maintenance.advisor_tool.verdicts.worth_fixing'
     color = '#10b981'
-  } else if (ratio > 0.75 && !isSafety) {
+  } else if (ratio > 75 && !isSafety) {
     verdict = isHighMileage || carAge > 15 ? 'consider_selling' : 'not_worth'
-    title = verdict === 'consider_selling' ? 'Consider Selling / Trading' : 'Probably Not Worth It'
+    titleKey = `maintenance.advisor_tool.verdicts.${verdict}`
     color = verdict === 'consider_selling' ? '#f59e0b' : '#ef4444'
-  } else if (ratio > 0.5 || (isHighMileage && carAge > 10)) {
+  } else if (ratio > 50 || (isHighMileage && carAge > 10)) {
     verdict = 'second_opinion'
-    title = 'Get a Second Opinion'
+    titleKey = 'maintenance.advisor_tool.verdicts.second_opinion'
     color = '#f59e0b'
   } else {
     verdict = 'worth_fixing'
-    title = 'Worth Fixing'
+    titleKey = 'maintenance.advisor_tool.verdicts.worth_fixing'
     color = '#10b981'
   }
 
-  return { verdict, title, color, reasons }
+  return { verdict, titleKey, color, reasons }
 }
 
-// ── Fluid Guide Data ─────────────────────────────────────────────────
-export interface FluidInfo {
-  id: string
-  name: string
-  icon: string
-  color: string
-  normalColor: string
-  location: string
-  howToCheck: string
-  warningSigns: string[]
-  doNot: string
-  seeAMechanic: string
-}
-
-export const FLUID_GUIDE: FluidInfo[] = [
-  {
-    id: 'engine_oil', name: 'Engine Oil', icon: 'Droplets', color: '#92400e',
-    normalColor: 'Amber / light brown (new) to dark brown (used)',
-    location: 'Yellow dipstick handle, usually near the front of the engine.',
-    howToCheck: 'Pull dipstick, wipe clean, reinsert fully, pull again. Oil should be between MIN and MAX marks.',
-    warningSigns: ['Black and gritty texture', 'Milky or frothy appearance (possible coolant leak)', 'Very low level', 'Burning oil smell'],
-    doNot: 'Never check oil immediately after driving — let the car sit for 5 minutes first.',
-    seeAMechanic: 'If oil is milky, significantly low between changes, or you see metal particles.',
-  },
-  {
-    id: 'coolant', name: 'Coolant / Antifreeze', icon: 'Thermometer', color: '#059669',
-    normalColor: 'Green, orange, pink, or blue depending on type — should be translucent',
-    location: 'Translucent reservoir tank near the radiator, marked with MIN/MAX.',
-    howToCheck: 'Check the reservoir level when the engine is COLD. Should be between MIN and MAX.',
-    warningSigns: ['Level drops repeatedly', 'Rusty or cloudy color', 'Sweet smell from engine bay', 'Temperature gauge runs hot'],
-    doNot: 'NEVER open the radiator cap when the engine is hot — pressurized steam can cause serious burns.',
-    seeAMechanic: 'If coolant is disappearing without visible leaks, or if the engine is overheating.',
-  },
-  {
-    id: 'brake_fluid', name: 'Brake Fluid', icon: 'ShieldAlert', color: '#dc2626',
-    normalColor: 'Clear to light yellow (fresh). Dark brown = old and needs replacing.',
-    location: 'Small reservoir on top of the brake master cylinder, near the firewall on the driver\'s side.',
-    howToCheck: 'Check level through the translucent reservoir. Should be between MIN and MAX marks.',
-    warningSigns: ['Dark brown or black color', 'Level significantly below MIN', 'Spongy brake pedal', 'Brake warning light on'],
-    doNot: 'Don\'t let brake fluid contact paint — it strips automotive paint. Don\'t leave the cap off (it absorbs moisture).',
-    seeAMechanic: 'If fluid is dark, level keeps dropping, or brake pedal feels soft.',
-  },
-  {
-    id: 'power_steering', name: 'Power Steering Fluid', icon: 'RotateCw', color: '#7c3aed',
-    normalColor: 'Clear, amber, or light red — should not be dark or foamy',
-    location: 'Small reservoir with a cap labeled "Power Steering" near the serpentine belt area.',
-    howToCheck: 'Some have a dipstick in the cap, others have MIN/MAX marks on the reservoir.',
-    warningSigns: ['Whining noise when turning', 'Stiff steering', 'Fluid is dark or has particles', 'Low level'],
-    doNot: 'Don\'t use the wrong type — ATF and power steering fluid are not always interchangeable.',
-    seeAMechanic: 'If steering is making noise or if fluid keeps disappearing (possible leak in the rack).',
-  },
-  {
-    id: 'washer_fluid', name: 'Windshield Washer Fluid', icon: 'Droplet', color: '#0ea5e9',
-    normalColor: 'Blue, purple, or orange — color varies by brand',
-    location: 'Large reservoir with a windshield/water icon on the cap. Usually near the front fender.',
-    howToCheck: 'Open cap and look inside. Refill when low. Use proper washer fluid, not just water.',
-    warningSigns: ['Empty reservoir', 'Nozzles clogged (no spray)', 'Frozen in winter (use winter-rated fluid)'],
-    doNot: 'Don\'t use plain water — it freezes in winter and doesn\'t clean well. Don\'t use dish soap.',
-    seeAMechanic: 'Only if nozzles are broken or the pump motor has failed.',
-  },
-  {
-    id: 'transmission', name: 'Transmission Fluid', icon: 'Cog', color: '#e11d48',
-    normalColor: 'Bright red (new) to dark red/brown (used). Should not smell burnt.',
-    location: 'Some cars have a dipstick (often red handle). Many newer cars are sealed (dealer-only).',
-    howToCheck: 'If accessible: engine running, in Park, pull dipstick. Check level and color.',
-    warningSigns: ['Dark brown or black color', 'Burnt smell', 'Slipping gears', 'Delayed shifts', 'Transmission warning light'],
-    doNot: 'Don\'t overfill — too much fluid causes foaming and erratic shifting.',
-    seeAMechanic: 'If fluid smells burnt, looks very dark, or you notice any shifting problems.',
-  },
-]

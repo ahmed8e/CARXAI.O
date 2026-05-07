@@ -88,14 +88,14 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
       {/* Status Banner */}
       <div className={`px-5 py-2.5 flex items-center justify-between border-b ${cfg.bannerBg}`}>
         <div className="flex items-center gap-2">
-          <StatusIcon className={`w-3.5 h-3.5 ${cfg.bannerText}`} />
+          <StatusIcon className={`w-3.5 h-3.5 ${cfg.bannerText} rtl:-scale-x-100`} />
           <span className={`text-[10px] font-black uppercase tracking-widest ${cfg.bannerText}`}>
             {t(`maintenance.status_labels.${cfg.key}`)}
           </span>
         </div>
         <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
           {status.item.intervalMiles > 0
-            ? t('maintenance.reminder_card.next_service', { mileage: status.nextDueMileage.toLocaleString() })
+            ? t('maintenance.reminder_card.next_service', { mileage: status.nextDueMileage.toLocaleString(i18n.language) })
             : t('maintenance.reminder_card.due_date', { date: dueDateStr })}
         </span>
       </div>
@@ -111,20 +111,36 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
               <ItemIcon className="w-4.5 h-4.5 text-navy" style={{ width: 18, height: 18 }} />
             </div>
             <div>
-              <h3 className="text-[15px] font-black text-on-surface tracking-tight leading-tight mb-1">
-                {status.title}
+              <h3 className="text-[15px] font-black text-on-surface tracking-tight leading-tight mb-1 text-start">
+                {t(`maintenance.service_types.${status.item.id}`, { defaultValue: status.item.label })}
               </h3>
-              <p className="text-xs text-muted font-medium leading-relaxed max-w-xs">
-                {status.explanation}
+              <p className="text-xs text-muted font-medium leading-relaxed max-w-xs text-start">
+                {status.status === 'good' ? (
+                  status.item.intervalMiles > 0 
+                    ? t('maintenance.status_explanations.good_miles', { miles: Math.max(0, status.milesUntilDue).toLocaleString(i18n.language), months: Math.max(0, Math.round(status.daysUntilDue / 30)) })
+                    : t('maintenance.status_explanations.good_date', { months: Math.max(0, Math.round(status.daysUntilDue / 30)) })
+                ) : status.status === 'overdue' ? (
+                  status.milesUntilDue <= 0
+                    ? t('maintenance.status_explanations.overdue_miles', { miles: Math.abs(status.milesUntilDue).toLocaleString(i18n.language) })
+                    : t('maintenance.status_explanations.overdue_days', { days: Math.abs(status.daysUntilDue) })
+                ) : status.status === 'due' ? (
+                  status.item.intervalMiles > 0
+                    ? t('maintenance.status_explanations.due_now_miles', { miles: Math.max(0, status.milesUntilDue).toLocaleString(i18n.language), days: status.daysUntilDue })
+                    : t('maintenance.status_explanations.due_now_days', { days: status.daysUntilDue })
+                ) : (
+                  status.item.intervalMiles > 0
+                    ? t('maintenance.status_explanations.coming_soon_miles', { miles: status.milesUntilDue.toLocaleString(i18n.language), months: Math.round(status.daysUntilDue / 30) })
+                    : t('maintenance.status_explanations.coming_soon_date', { months: Math.round(status.daysUntilDue / 30) })
+                )}
               </p>
               {status.item.intervalMiles > 0 && (
-                <p className="text-[10px] text-muted/60 font-bold mt-1">
+                <p className="text-[10px] text-muted/60 font-bold mt-1 text-start">
                   {t('maintenance.reminder_card.est_cost', { low: status.item.costLow, high: status.item.costHigh })}
                 </p>
               )}
             </div>
           </div>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 transition-colors ${expanded ? 'bg-navy/10' : 'bg-surface-low dark:bg-surface-highest/40'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ms-2 transition-colors ${expanded ? 'bg-navy/10' : 'bg-surface-low dark:bg-surface-highest/40'}`}>
             <ChevronDown className={`w-4 h-4 text-muted transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`} />
           </div>
         </div>
@@ -141,18 +157,22 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
               <div className="pt-4 mt-4 border-t border-overlay space-y-4">
                 {/* Anti-scam & Risk */}
                 <div className="bg-surface-low dark:bg-surface-highest/30 rounded-2xl p-4 space-y-3">
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 text-start">
                     <ShieldCheck className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">{t('maintenance.reminder_card.anti_scam')}</p>
-                      <p className="text-xs text-muted leading-relaxed">{status.item.antiScamNote}</p>
+                      <p className="text-xs text-muted leading-relaxed">
+                        {t(`maintenance.anti_scam.${status.item.id}`, { defaultValue: status.item.antiScamNote })}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 text-start">
                     <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">{t('maintenance.reminder_card.risk_delayed')}</p>
-                      <p className="text-xs text-muted leading-relaxed">{status.item.riskIfDelayed}</p>
+                      <p className="text-xs text-muted leading-relaxed">
+                        {t(`maintenance.risk_delayed.${status.item.id}`, { defaultValue: status.item.riskIfDelayed })}
+                      </p>
                     </div>
                   </div>
                 </div>

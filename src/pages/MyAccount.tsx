@@ -63,7 +63,7 @@ function SettingsRow({
             <CreditCard className="w-3 h-3" /> {t('settings.coming_soon')}
           </div>
         ) : (
-          <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+          <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-all rtl:-scale-x-100" />
         )}
       </div>
     </button>
@@ -324,11 +324,11 @@ export default function MyAccount() {
   return (
     <div className="min-h-screen bg-white pt-24 pb-20 px-6 md:px-10 overflow-x-hidden relative">
       {/* Premium Atmospheric Background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-gradient-to-b from-blue-50 to-transparent pointer-events-none" />
+      <div className="absolute top-0 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-full max-w-7xl h-[400px] bg-gradient-to-b from-blue-50 to-transparent pointer-events-none" />
       
       <div className="max-w-4xl mx-auto relative z-10">
         <header className="flex items-center justify-between mb-12 py-2">
-           <div className="space-y-1">
+           <div className="space-y-1 text-start">
              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('settings.title')}</h1>
              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.subtitle')}</p>
            </div>
@@ -342,8 +342,8 @@ export default function MyAccount() {
 
         {/* 1. Profile Hero (Refined & Elegant) */}
         <section className="relative mb-12 p-8 rounded-[40px] bg-white border border-slate-100 overflow-hidden shadow-sm shadow-slate-200/40">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <User className="w-48 h-48 -mr-16 -mt-16" />
+          <div className="absolute top-0 end-0 p-8 opacity-10">
+            <User className="w-48 h-48 -me-16 -mt-16" />
           </div>
           
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
@@ -364,7 +364,7 @@ export default function MyAccount() {
               <button 
                 onClick={() => fileInputRef.current?.click()} 
                 disabled={uploadingAvatar} 
-                className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-blue-600 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-20 cursor-pointer"
+                className="absolute -bottom-2 -end-2 w-12 h-12 rounded-2xl bg-blue-600 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-20 cursor-pointer"
               >
                 <Camera className="w-6 h-6" />
               </button>
@@ -382,7 +382,7 @@ export default function MyAccount() {
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1">
                  <div className="px-4 py-2 rounded-xl bg-white border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-widest shadow-sm">
-                   {t('settings.join_date')} <span className="text-slate-900 ml-1">{new Date(user?.created_at || Date.now()).getFullYear()}</span>
+                   {t('settings.join_date')} <span className="text-slate-900 ms-1">{new Date(user?.created_at || Date.now()).getFullYear()}</span>
                  </div>
               </div>
             </div>
@@ -392,7 +392,7 @@ export default function MyAccount() {
         <div className="grid gap-10">
             {/* 2. Account Settings Group */}
              <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.account_management')}</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ms-6 text-start">{t('settings.account_management')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={User} 
@@ -420,7 +420,7 @@ export default function MyAccount() {
 
             {/* 3. System Preferences Group */}
             <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.app_settings')}</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ms-6 text-start">{t('settings.app_settings')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={Globe} 
@@ -441,7 +441,7 @@ export default function MyAccount() {
 
             {/* 4. Support & Info Group */}
             <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.resources')}</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ms-6 text-start">{t('settings.resources')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={HelpCircle} 
@@ -474,7 +474,7 @@ export default function MyAccount() {
                     <p className="text-[11px] font-medium text-red-500/50 uppercase tracking-widest">{t('settings.end_session')}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-red-300 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 text-red-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform rtl:-scale-x-100" />
               </button>
             </div>
           </div>
@@ -495,7 +495,7 @@ export default function MyAccount() {
                          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
                            <ActivityIcon type={act.type} />
                          </div>
-                         <div className="flex-1 min-w-0">
+                         <div className="flex-1 min-w-0 text-start">
                            <h4 className="font-bold text-slate-900 truncate text-sm">{act.title}</h4>
                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{act.date} • {act.status}</p>
                          </div>
@@ -512,7 +512,7 @@ export default function MyAccount() {
               <ContentSheet title={t('settings.support_title')} icon={HelpCircle} onClose={() => setActiveSection('profile')}>
                  <div className="bg-blue-50 p-8 rounded-[40px] text-center space-y-6">
                     <h3 className="text-2xl font-display font-black text-navy italic">{t('settings.need_help')}</h3>
-                    <p className="text-sm text-slate-600 font-medium">{t('settings.support_desc')}</p>
+                    <p className="text-sm text-slate-600 font-medium leading-relaxed">{t('settings.support_desc')}</p>
                     <button className="w-full py-4 rounded-2xl bg-navy text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-navy/30">{t('settings.contact_support')}</button>
                  </div>
               </ContentSheet>
@@ -522,8 +522,8 @@ export default function MyAccount() {
                 <div className="space-y-8">
                   {/* Premium Plan Header */}
                   <div className="p-8 rounded-[40px] bg-slate-50 border border-slate-100 flex flex-col items-center text-center gap-4 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
-                      <Zap className="w-32 h-32 -mr-10 -mt-10" />
+                    <div className="absolute top-0 end-0 p-4 opacity-[0.03]">
+                      <Zap className="w-32 h-32 -me-10 -mt-10" />
                     </div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] relative z-10">{t('settings.current_plan')}</p>
                     <h3 className="text-5xl font-display font-black text-slate-900 tracking-tighter uppercase italic relative z-10">
@@ -551,21 +551,21 @@ export default function MyAccount() {
 
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 gap-6 px-4">
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.status')}</p>
                       <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.status || 'None')}</p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.billing_cycle')}</p>
                       <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.billingCycle || 'One-time')}</p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.started_on')}</p>
                       <p className="text-base font-bold text-slate-900">
                         {loadingSub ? '...' : (subscription?.startDate ? new Date(subscription.startDate).toLocaleDateString() : 'N/A')}
                       </p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
                         {subscription?.status === 'cancelled' ? t('settings.ends_on') : t('settings.renewal_date')}
                       </p>
@@ -606,26 +606,26 @@ export default function MyAccount() {
                </div>
                <form id="profile-form" onSubmit={handleUpdateProfile} className="p-8 space-y-6">
                   <div className="space-y-4">
-                    <div>
+                    <div className="text-start">
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.full_name')}</label>
                       <input 
                         required 
                         type="text" 
                         value={profileData.fullName} 
                         onChange={e => setProfileData(prev => ({ ...prev, fullName: e.target.value }))}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all text-start"
                       />
                     </div>
-                    <div>
+                    <div className="text-start">
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.phone')}</label>
                       <input 
                         type="tel" 
                         value={profileData.phoneNumber} 
                         onChange={e => setProfileData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all text-start"
                       />
                     </div>
-                    <div>
+                    <div className="text-start">
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.pref_lang')}</label>
                       <select 
                         value={profileData.preferredLanguage} 
@@ -634,7 +634,7 @@ export default function MyAccount() {
                           setProfileData(prev => ({ ...prev, preferredLanguage: newLang }));
                           i18n.changeLanguage(newLang);
                         }}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none text-start"
                       >
                          <option value="en">English</option>
                          <option value="fr">Français</option>
@@ -676,29 +676,29 @@ export default function MyAccount() {
                        <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm border border-blue-100 flex-shrink-0">
                           <Shield className="w-4 h-4 text-blue-600" />
                        </div>
-                       <div className="flex-1">
+                       <div className="flex-1 text-start">
                           <p className="text-[11px] text-blue-600 font-bold leading-relaxed mb-3 pt-1">{t('settings.password_security_hint')}</p>
                           <PasswordRequirement password={passFields.newPassword} />
                        </div>
                     </div>
-                    <div>
+                    <div className="text-start">
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.new_password')}</label>
                       <input 
                         required 
                         type="password" 
                         value={passFields.newPassword} 
                         onChange={e => setPassFields(prev => ({ ...prev, newPassword: e.target.value }))}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all text-start"
                       />
                     </div>
-                    <div>
+                    <div className="text-start">
                       <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.confirm_password')}</label>
                       <input 
                         required 
                         type="password" 
                         value={passFields.confirmPassword} 
                         onChange={e => setPassFields(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all text-start"
                       />
                     </div>
                   </div>

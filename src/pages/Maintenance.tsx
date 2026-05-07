@@ -41,7 +41,7 @@ function buildSchedule(vehicle: Vehicle): MaintenanceItem[] {
 }
 
 export default function Maintenance() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -134,14 +134,14 @@ export default function Maintenance() {
   const handleExport = () => {
     if (!vehicle) return
     const lines = [
-      `Car Safety — Maintenance Report`,
-      `Vehicle: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
-      `Current Mileage: ${mileage.toLocaleString()}`,
-      `Generated: ${new Date().toLocaleDateString()}`,
+      `${t('title')} — ${t('maintenance.plan_title')}`,
+      `${t('common.vehicle')}: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      `${t('maintenance.current_mileage')}: ${mileage.toLocaleString(i18n.language)} ${t('maintenance.mileage_unit')}`,
+      `${t('common.generated')}: ${new Date().toLocaleDateString(i18n.language)}`,
       ``,
-      `=== SERVICE HISTORY ===`,
+      `=== ${t('maintenance.history_title').toUpperCase()} ===`,
       ...serviceHistory.map(r =>
-        `${r.date} | ${r.serviceType} | ${r.mileage.toLocaleString()} mi | $${r.cost} | ${r.shopName || 'N/A'}`
+        `${r.date} | ${t(`maintenance.service_types.${r.serviceType}`, { defaultValue: r.serviceType })} | ${r.mileage.toLocaleString(i18n.language)} ${t('maintenance.mileage_unit')} | $${r.cost} | ${r.shopName || t('common.na')}`
       ),
     ]
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
@@ -167,7 +167,7 @@ export default function Maintenance() {
     return (
       <div className="p-8 max-w-xl mx-auto text-center mt-16 bg-[#f8fafc] min-h-screen">
         <div className="w-20 h-20 bg-white border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm"><Car className="w-10 h-10 text-slate-300" /></div>
-        <h2 className="text-2xl font-black text-slate-900 mb-2">{t('app.dashboard.garage_empty')}</h2>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">{t('dashboard.garage_empty')}</h2>
         <p className="text-slate-500 mb-8 font-medium">{t('maintenance.no_vehicles_desc')}</p>
         <Link to="/dashboard/vehicles" className="inline-block px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all">{t('maintenance.go_to_garage')}</Link>
       </div>
@@ -273,14 +273,14 @@ export default function Maintenance() {
 
               {/* ── Compact Health Card ── */}
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30 flex items-center justify-between">
-                <div>
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t('app.dashboard.health_score')}</p>
+                <div className="text-start">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t('dashboard.health_score')}</p>
                    <div className="flex items-end gap-2">
                       <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">{healthScore.total}</span>
                       <span className="text-sm font-bold text-slate-500 mb-1">/100</span>
                    </div>
                    <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${healthScore.total >= 70 ? 'text-emerald-500' : healthScore.total >= 40 ? 'text-amber-500' : 'text-rose-500'}`}>
-                     {healthScore.label}
+                     {t(healthScore.labelKey)}
                    </p>
                 </div>
                 <div className="relative w-20 h-20">
@@ -361,7 +361,7 @@ export default function Maintenance() {
                         <p className="text-[9px] text-slate-500 font-bold">{f.sub}</p>
                       </button>
                     ))}
-                 </div>
+                  </div>
               </div>
 
             </div>
@@ -380,9 +380,9 @@ export default function Maintenance() {
                 onClick={() => setView('hub')}
                 className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 active:scale-95 transition-all"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 rtl:-scale-x-100" />
               </button>
-              <div>
+              <div className="text-start">
                 <h1 className="text-lg font-black text-slate-900 tracking-tight leading-tight">
                   {view === 'history' && t('maintenance.history_title')}
                   {view === 'seasonal' && t('maintenance.seasonal_title')}
@@ -420,9 +420,9 @@ export default function Maintenance() {
                     <div className="w-10 h-10 bg-amber-50 border border-amber-100 rounded-xl flex items-center justify-center shadow-sm">
                        <Sun className="w-5 h-5 text-amber-500" />
                     </div>
-                    <div>
+                    <div className="text-start">
                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('maintenance.climate')}: {t(`maintenance.climates.${prefs.region}`)}</p>
-                       <p className="text-sm font-bold text-slate-900">Customized climate checks</p>
+                       <p className="text-sm font-bold text-slate-900">{t('maintenance.climate_checks_desc')}</p>
                     </div>
                   </div>
                   <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-2 shadow-xl shadow-slate-200/30">

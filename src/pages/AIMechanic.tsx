@@ -606,7 +606,7 @@ export default function AIMechanic() {
         const vagueResponse: Message = {
           id: Date.now().toString(),
           role: 'assistant',
-          content: t('app.mechanic.vague_response'),
+          content: t('mechanic.vague_response'),
           timestamp: new Date(),
         }
         setMessages(prev => [...prev, vagueResponse])
@@ -692,7 +692,7 @@ ${diagnosticHistory}
           throw new Error('Missing content in /api/chat response')
         }
 
-        setStreamingMessage(imageUrl ? t('app.mechanic.analyzing_photo') : t('app.mechanic.analyzing_systems'))
+        setStreamingMessage(imageUrl ? t('mechanic.analyzing_photo') : t('mechanic.analyzing_systems'))
 
         return JSON.stringify(result.content)
       }
@@ -706,100 +706,100 @@ ${diagnosticHistory}
         const getEmergencyFallback = (input: string): DiagnosticResult | null => {
           const lowerInput = input.toLowerCase()
           if (lowerInput.includes('flat tire') || lowerInput.includes('puncture')) return {
-            issueName: 'Flat Tire Detected',
-            likelyCause: 'A puncture from road debris or a faulty valve stem.',
-            explanation: 'Driving on a flat tire will permanently damage your rim and can cause loss of vehicle control.',
+            issueName: t('mechanic.fallbacks.flat_tire.title'),
+            likelyCause: t('mechanic.fallbacks.flat_tire.cause'),
+            explanation: t('mechanic.fallbacks.flat_tire.explanation'),
             can_drive: false,
-            driveWhy: 'Driving on a flat tire will permanently damage your rim and can cause loss of vehicle control.',
+            driveWhy: t('mechanic.fallbacks.flat_tire.explanation'),
             urgencyLevel: 'high',
-            next_step: 'Stop immediately in a safe location and change to a spare or call for professional towing.',
+            next_step: t('mechanic.fallbacks.flat_tire.next_step'),
             mechanicRecommended: true,
             towingRecommended: true,
-            spokenSummary: 'You have a flat tire. Stop driving immediately to stay safe and protect your rims.'
+            spokenSummary: t('mechanic.fallbacks.flat_tire.summary')
           }
           if (lowerInput.includes('battery') || lowerInput.includes('won\'t start')) return {
-            issueName: 'Potential Battery Failure',
-            likelyCause: 'Corroded terminals, battery age, or an alternator issue.',
-            explanation: 'The engine lacks sufficient power to turn over or may stall unexpectedly.',
+            issueName: t('mechanic.fallbacks.battery.title'),
+            likelyCause: t('mechanic.fallbacks.battery.cause'),
+            explanation: t('mechanic.fallbacks.battery.explanation'),
             can_drive: false,
-            driveWhy: 'The engine lacks sufficient power to turn over or may stall unexpectedly.',
+            driveWhy: t('mechanic.fallbacks.battery.explanation'),
             urgencyLevel: 'medium',
-            next_step: 'Check battery terminals for corrosion and attempt a jump-start using high-quality cables.',
+            next_step: t('mechanic.fallbacks.battery.next_step'),
             mechanicRecommended: true,
             towingRecommended: false,
-            spokenSummary: 'Your battery is likely the culprit. Try a jump-start or check the connections.'
+            spokenSummary: t('mechanic.fallbacks.battery.summary')
           }
           if (lowerInput.includes('engine light') || lowerInput.includes('check engine')) return {
-            issueName: 'Check Engine Indicator',
-            likelyCause: 'Varies from a loose gas cap to a critical sensor malfunction.',
-            explanation: 'The vehicle is likely safe for a short trip to a shop unless the light is flashing.',
+            issueName: t('mechanic.fallbacks.engine_light.title'),
+            likelyCause: t('mechanic.fallbacks.engine_light.cause'),
+            explanation: t('mechanic.fallbacks.engine_light.explanation'),
             can_drive: true,
-            driveWhy: 'The vehicle is likely safe for a short trip to a shop unless the light is flashing.',
+            driveWhy: t('mechanic.fallbacks.engine_light.explanation'),
             urgencyLevel: 'medium',
-            next_step: 'Ensure your gas cap is tight and get an OBD-II scan at a local garage soon.',
+            next_step: t('mechanic.fallbacks.engine_light.next_step'),
             mechanicRecommended: true,
             towingRecommended: false,
-            spokenSummary: 'The check engine light is on. It\'s usually safe for a short drive, but don\'t ignore it.'
+            spokenSummary: t('mechanic.fallbacks.engine_light.summary')
           }
           if (lowerInput.includes('overheating') || lowerInput.includes('steam')) return {
-            issueName: 'Engine Overheating Alert',
-            likelyCause: 'Low coolant, a burst hose, or a failing water pump.',
-            explanation: 'Excessive heat will melt engine components, leading to total engine destruction.',
+            issueName: t('mechanic.fallbacks.overheating.title'),
+            likelyCause: t('mechanic.fallbacks.overheating.cause'),
+            explanation: t('mechanic.fallbacks.overheating.explanation'),
             can_drive: false,
-            driveWhy: 'Excessive heat will melt engine components, leading to total engine destruction.',
+            driveWhy: t('mechanic.fallbacks.overheating.explanation'),
             urgencyLevel: 'stop_driving',
-            next_step: 'Pull over and shut off the engine IMMEDIATELY. Do not open the hood if steam is present.',
+            next_step: t('mechanic.fallbacks.overheating.next_step'),
             mechanicRecommended: true,
             towingRecommended: true,
-            spokenSummary: 'Your engine is overheating. Pull over and stop immediately to prevent a total rebuild.'
+            spokenSummary: t('mechanic.fallbacks.overheating.summary')
           }
           if (lowerInput.includes('leak') || lowerInput.includes('fluid') || lowerInput.includes('dripping')) return {
-            issueName: 'Fluid Leak Detected',
-            likelyCause: 'Leaks can range from engine oil to coolant or brake fluid.',
-            explanation: 'Loss of vital fluids can lead to component failure or loss of braking/steering capability.',
+            issueName: t('mechanic.fallbacks.leak.title'),
+            likelyCause: t('mechanic.fallbacks.leak.cause'),
+            explanation: t('mechanic.fallbacks.leak.explanation'),
             can_drive: false,
-            driveWhy: 'Loss of vital fluids can lead to component failure or loss of braking/steering capability.',
+            driveWhy: t('mechanic.fallbacks.leak.explanation'),
             urgencyLevel: 'high',
-            next_step: 'Identify the color of the fluid and check levels before driving. Do not drive if it is brake fluid.',
+            next_step: t('mechanic.fallbacks.leak.next_step'),
             mechanicRecommended: true,
             towingRecommended: true,
-            spokenSummary: 'I detected a fluid leak. You should check your fluid levels before driving further.'
+            spokenSummary: t('mechanic.fallbacks.leak.summary')
           }
           if (lowerInput.includes('smoke') || lowerInput.includes('burning') || lowerInput.includes('smell')) return {
-            issueName: 'Burning or Smoke Detected',
-            likelyCause: 'Could be electrical short, leaking oil on hot exhaust, or stuck brake.',
-            explanation: 'Burning smells or smoke are signs of excessive heat or friction and pose a fire risk.',
+            issueName: t('mechanic.fallbacks.smoke.title'),
+            likelyCause: t('mechanic.fallbacks.smoke.cause'),
+            explanation: t('mechanic.fallbacks.smoke.explanation'),
             can_drive: false,
-            driveWhy: 'Burning smells or smoke are signs of excessive heat or friction and pose a fire risk.',
+            driveWhy: t('mechanic.fallbacks.smoke.explanation'),
             urgencyLevel: 'stop_driving',
-            next_step: 'Pull over safely and investigate source. Avoid driving until the cause is identified.',
+            next_step: t('mechanic.fallbacks.smoke.next_step'),
             mechanicRecommended: true,
             towingRecommended: true,
-            spokenSummary: 'I detected a burning smell or smoke. This is a potential fire hazard, please stop safely.'
+            spokenSummary: t('mechanic.fallbacks.smoke.summary')
           }
           if (lowerInput.includes('noise') || lowerInput.includes('grinding') || lowerInput.includes('squeak')) return {
-            issueName: 'Mechanical Noise Issue',
-            likelyCause: 'Likely worn brake pads, a failing wheel bearing, or a loose belt.',
-            explanation: 'Most noises are early warning signs, but safe for a cautious drive to a mechanic.',
+            issueName: t('mechanic.fallbacks.noise.title'),
+            likelyCause: t('mechanic.fallbacks.noise.cause'),
+            explanation: t('mechanic.fallbacks.noise.explanation'),
             can_drive: true,
-            driveWhy: 'Most noises are early warning signs, but safe for a cautious drive to a mechanic.',
+            driveWhy: t('mechanic.fallbacks.noise.explanation'),
             urgencyLevel: 'medium',
-            next_step: 'Listen for when the noise changes (turning, braking) and book a diagnostic check.',
+            next_step: t('mechanic.fallbacks.noise.next_step'),
             mechanicRecommended: true,
             towingRecommended: false,
-            spokenSummary: 'That strange noise sounds like a mechanical component wearing out. Get it looked at soon.'
+            spokenSummary: t('mechanic.fallbacks.noise.summary')
           }
           if (lowerInput.includes('damage') || lowerInput.includes('crash') || lowerInput.includes('accident')) return {
-            issueName: 'Vehicle Damage Assessment',
-            likelyCause: 'Physical impact or collision.',
-            explanation: 'Structural damage or impact may have affected internal components or safety systems.',
+            issueName: t('mechanic.fallbacks.damage.title'),
+            likelyCause: t('mechanic.fallbacks.damage.cause'),
+            explanation: t('mechanic.fallbacks.damage.explanation'),
             can_drive: false,
-            driveWhy: 'Structural damage or impact may have affected internal components or safety systems.',
+            driveWhy: t('mechanic.fallbacks.damage.explanation'),
             urgencyLevel: 'high',
-            next_step: 'Check for fluid leaks and ensure no parts are rubbing against tires before attempting to drive.',
+            next_step: t('mechanic.fallbacks.damage.next_step'),
             mechanicRecommended: true,
             towingRecommended: true,
-            spokenSummary: 'Vehicle damage detected. Please ensure the car is safe to move before driving.'
+            spokenSummary: t('mechanic.fallbacks.damage.summary')
           }
           return null
         }
@@ -1803,7 +1803,7 @@ ${diagnosticHistory}
                           sendMessage(input)
                         }
                       }}
-                      placeholder={t('app.mechanic.placeholder')}
+                      placeholder={t('mechanic.placeholder')}
                       rows={1}
                       style={{ minHeight: 24, maxHeight: 200 }}
                       className="w-full bg-transparent outline-none resize-none

@@ -210,13 +210,13 @@ export default function WorthFixingAdvisor() {
                   const V = VERDICT_CONFIG[result.verdict].icon
                   return <V className="w-5 h-5" />
                 })()}
-                <span className="text-base font-black">{t(`maintenance.advisor_tool.verdicts.${result.verdict}`)}</span>
+                <span className="text-base font-black">{t(result.titleKey)}</span>
               </div>
               <ul className="space-y-2">
                 {result.reasons.map((r, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <AlertCircle className="w-3.5 h-3.5 text-muted flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-muted font-medium leading-relaxed">{r}</p>
+                    <p className="text-xs text-muted font-medium leading-relaxed">{t(r.key, r.params)}</p>
                   </li>
                 ))}
               </ul>

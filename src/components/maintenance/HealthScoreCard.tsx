@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 interface Props {
   score: number
-  label: string
+  labelKey: string
   categories: HealthCategory[]
 }
 

@@ -29,8 +29,8 @@ interface AIResult {
 
 const STATUS = {
   fair: { 
-    label: 'app.overpaying.verdict.fair', 
-    badge: 'app.overpaying.verdict.fair_badge', 
+    label: 'overpaying.verdict.fair', 
+    badge: 'overpaying.verdict.fair_badge', 
     bar: 'from-emerald-500 to-emerald-400', 
     icon: ShieldCheck, 
     ring: 'ring-emerald-500/10', 
@@ -38,8 +38,8 @@ const STATUS = {
     text: 'text-emerald-600' 
   },
   expensive: { 
-    label: 'app.overpaying.verdict.expensive', 
-    badge: 'app.overpaying.verdict.expensive_badge', 
+    label: 'overpaying.verdict.expensive', 
+    badge: 'overpaying.verdict.expensive_badge', 
     bar: 'from-amber-500 to-amber-400', 
     icon: AlertTriangle, 
     ring: 'ring-amber-500/10', 
@@ -47,8 +47,8 @@ const STATUS = {
     text: 'text-amber-600' 
   },
   overpriced: { 
-    label: 'app.overpaying.verdict.overpriced', 
-    badge: 'app.overpaying.verdict.overpriced_badge', 
+    label: 'overpaying.verdict.overpriced', 
+    badge: 'overpaying.verdict.overpriced_badge', 
     bar: 'from-rose-500 to-rose-400', 
     icon: ShieldAlert, 
     ring: 'ring-rose-500/10', 
@@ -58,9 +58,9 @@ const STATUS = {
 }
 
 const RISK = {
-  low: { label: 'app.overpaying.risk.low', cls: 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-500/20' },
-  medium: { label: 'app.overpaying.risk.medium', cls: 'text-amber-600 bg-amber-50 ring-1 ring-amber-500/20' },
-  high: { label: 'app.overpaying.risk.high', cls: 'text-rose-600 bg-rose-50 ring-1 ring-rose-500/20' },
+  low: { label: 'overpaying.risk.low', cls: 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-500/20' },
+  medium: { label: 'overpaying.risk.medium', cls: 'text-amber-600 bg-amber-50 ring-1 ring-amber-500/20' },
+  high: { label: 'overpaying.risk.high', cls: 'text-rose-600 bg-rose-50 ring-1 ring-rose-500/20' },
 }
 
 const fade = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10 } }
@@ -133,7 +133,7 @@ export default function AvoidOverpaying() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!carModel && !problemDesc && !imagePreview) { setErrorMsg(t('app.overpaying.error_empty')); return }
+    if (!carModel && !problemDesc && !imagePreview) { setErrorMsg(t('overpaying.error_empty')); return }
     setIsChecking(true); setErrorMsg('')
     try { const data = await callAI(); setResult(data); setStep('results') }
     catch (err: any) { setErrorMsg(err.message) }
@@ -187,10 +187,10 @@ export default function AvoidOverpaying() {
       <div className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
         <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/dashboard" className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all">
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 rtl:-scale-x-100" />
           </Link>
           <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-0.5">{t('app.overpaying.price_intelligence')}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-0.5">{t('overpaying.price_intelligence')}</p>
             <h1 className="text-sm font-black text-slate-900 uppercase tracking-wider">{t('nav.overpaying')}</h1>
           </div>
           <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 border border-blue-100/50 shadow-sm">
@@ -208,11 +208,11 @@ export default function AvoidOverpaying() {
               <div className="text-center py-4">
                 <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100/50 px-4 py-1.5 rounded-full mb-6 shadow-sm">
                   <Zap className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{t('app.overpaying.expert_analysis')}</span>
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{t('overpaying.expert_analysis')}</span>
                 </div>
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">{t('app.overpaying.title')}</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">{t('overpaying.title')}</h2>
                 <p className="text-sm text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
-                  {t('app.overpaying.subtitle')}
+                  {t('overpaying.subtitle')}
                 </p>
               </div>
 
@@ -227,19 +227,19 @@ export default function AvoidOverpaying() {
                   {/* Image Upload */}
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">
-                      <Camera className="w-4 h-4 text-blue-500" />{t('app.overpaying.photo_label')}
-                      <span className="ml-auto font-bold text-slate-300 normal-case tracking-normal">{t('common.optional')}</span>
+                      <Camera className="w-4 h-4 text-blue-500" />{t('overpaying.photo_label')}
+                      <span className="ms-auto font-bold text-slate-300 normal-case tracking-normal">{t('common.optional')}</span>
                     </label>
                     <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onloadend = () => setImagePreview(r.result as string); r.readAsDataURL(f) }} />
                     {!imagePreview ? (
                       <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-blue-600 transition-all group">
                         <Camera className="w-6 h-6 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all" />
-                        <span className="text-xs font-bold uppercase tracking-wider">{t('app.overpaying.upload_prompt')}</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">{t('overpaying.upload_prompt')}</span>
                       </button>
                     ) : (
                       <div className="relative h-40 rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                        <button type="button" onClick={() => { setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = '' }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/80 backdrop-blur-md text-white flex items-center justify-center hover:scale-110 transition-all">
+                        <button type="button" onClick={() => { setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = '' }} className="absolute top-3 end-3 w-8 h-8 rounded-full bg-slate-900/80 backdrop-blur-md text-white flex items-center justify-center hover:scale-110 transition-all">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -249,36 +249,36 @@ export default function AvoidOverpaying() {
                   {/* Vehicle */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                      <Car className="w-4 h-4 text-blue-500" />{t('app.overpaying.vehicle_label')}
-                      {carModel && <span className="ml-auto text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">{t('app.overpaying.auto_filled')}</span>}
+                      <Car className="w-4 h-4 text-blue-500" />{t('overpaying.vehicle_label')}
+                      {carModel && <span className="ms-auto text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">{t('overpaying.auto_filled')}</span>}
                     </label>
-                    <input type="text" placeholder={t('app.overpaying.vehicle_placeholder')} value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
+                    <input type="text" placeholder={t('overpaying.vehicle_placeholder')} value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm text-start" />
                   </div>
 
                   {/* Problem */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                      <Wrench className="w-4 h-4 text-blue-500" />{t('app.overpaying.problem_label')}
+                      <Wrench className="w-4 h-4 text-blue-500" />{t('overpaying.problem_label')}
                     </label>
-                    <textarea placeholder={t('app.overpaying.problem_placeholder')} value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all resize-none shadow-sm" />
+                    <textarea placeholder={t('overpaying.problem_placeholder')} value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all resize-none shadow-sm text-start" />
                   </div>
 
                   {/* Price + Region */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-start">
                       <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                        <DollarSign className="w-4 h-4 text-blue-500" />{t('app.overpaying.price_label')}
+                        <DollarSign className="w-4 h-4 text-blue-500" />{t('overpaying.price_label')}
                       </label>
                       <div className="relative">
-                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                        <input type="number" min="0" placeholder="0" value={quotedPrice} onChange={e => setQuotedPrice(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl pl-10 pr-5 py-4 text-lg font-black text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
+                        <span className="absolute start-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                        <input type="number" min="0" placeholder="0" value={quotedPrice} onChange={e => setQuotedPrice(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl ps-10 pe-5 py-4 text-lg font-black text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                       </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-start">
                       <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                        <Info className="w-4 h-4 text-blue-500" />{t('app.overpaying.region_label')}
+                        <Info className="w-4 h-4 text-blue-500" />{t('overpaying.region_label')}
                       </label>
-                      <input type="text" placeholder={t('app.overpaying.region_placeholder')} value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
+                      <input type="text" placeholder={t('overpaying.region_placeholder')} value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
@@ -286,9 +286,9 @@ export default function AvoidOverpaying() {
                 <button type="submit" disabled={isChecking} className="group relative w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/25 flex items-center justify-center gap-3 active:scale-[0.98] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                   {isChecking ? (
-                    <><div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />{t('app.overpaying.running_analysis')}</>
+                    <><div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />{t('overpaying.running_analysis')}</>
                   ) : (
-                    <><Bot className="w-5 h-5" />{t('app.overpaying.run_analysis')}</>
+                    <><Bot className="w-5 h-5" />{t('overpaying.run_analysis')}</>
                   )}
                 </button>
               </form>
@@ -311,13 +311,13 @@ export default function AvoidOverpaying() {
                 {result.overpay_percent > 0 && (
                   <div className="inline-flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-2xl mb-2">
                     <TrendingUp className="w-5 h-5 text-rose-500" />
-                    <span className="text-rose-600 font-black text-xl">+{result.overpay_percent}% {t('app.overpaying.above_market')}</span>
+                    <span className="text-rose-600 font-black text-xl">+{result.overpay_percent}% {t('overpaying.above_market')}</span>
                   </div>
                 )}
                 
                 <div className="mt-6 w-full flex items-center justify-between bg-slate-50 border border-slate-100 rounded-3xl p-5">
-                  <div className="text-left">
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">{t('app.overpaying.detected_issue')}</p>
+                  <div className="text-start">
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">{t('overpaying.detected_issue')}</p>
                     <p className="text-base font-black text-slate-900 leading-tight">{result.detected_issue}</p>
                   </div>
                   <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm ${RISK[result.risk_level].cls}`}>{t(RISK[result.risk_level].label)}</span>
@@ -328,13 +328,13 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><DollarSign className="w-5 h-5 text-blue-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.market_comparison')}</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('overpaying.market_comparison')}</h3>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: t('app.overpaying.parts_cost'), val: result.market_breakdown?.parts_range ?? '—', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-                    { label: t('app.overpaying.labor_cost'), val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-600', bg: 'bg-blue-50' },
-                    { label: t('app.overpaying.fair_total'), val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                    { label: t('overpaying.parts_cost'), val: result.market_breakdown?.parts_range ?? '—', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                    { label: t('overpaying.labor_cost'), val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { label: t('overpaying.fair_total'), val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                   ].map(({ label, val, color, bg }) => (
                     <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-white shadow-sm`}>
                       <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider mb-1.5">{label}</p>
@@ -343,9 +343,9 @@ export default function AvoidOverpaying() {
                   ))}
                 </div>
                 {result.overpriced_component && (
-                  <div className="mt-5 flex items-center gap-3 bg-rose-50 border border-rose-100/50 rounded-2xl px-4 py-3">
-                    <TrendingDown className="w-5 h-5 text-rose-500 shrink-0" />
-                    <p className="text-xs text-rose-700 font-bold leading-tight">{t('app.overpaying.expert_suggestion', { component: t(`app.overpaying.${result.overpriced_component}`) })}</p>
+                  <div className="mt-5 flex items-center gap-3 bg-rose-50 border border-rose-100/50 rounded-2xl px-4 py-3 text-start">
+                    <TrendingDown className="w-5 h-5 text-rose-500 shrink-0 rtl:-scale-x-100" />
+                    <p className="text-xs text-rose-700 font-bold leading-tight">{t('overpaying.expert_suggestion', { component: t(`overpaying.${result.overpriced_component}`) })}</p>
                   </div>
                 )}
               </div>
@@ -354,22 +354,22 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm"><Bot className="w-5 h-5 text-emerald-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.ai_intelligence')}</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('overpaying.ai_intelligence')}</h3>
                 </div>
-                <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{result.explanation}</p>
-                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5">{t('app.overpaying.next_step_label')}</p>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4 text-start">{result.explanation}</p>
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-start">
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5">{t('overpaying.next_step_label')}</p>
                   <p className="text-sm font-bold text-slate-900 leading-snug">{result.next_steps}</p>
                 </div>
               </div>
 
               {/* S4: Scam Alert */}
               {result.scam_warning && (
-                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-600 text-white rounded-[32px] p-6 shadow-xl shadow-rose-500/20">
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-rose-600 text-white rounded-[32px] p-6 shadow-xl shadow-rose-500/20 text-start">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-sm"><ShieldAlert className="w-6 h-6 text-white" /></div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">{t('app.overpaying.scam_warning_label')}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">{t('overpaying.scam_warning_label')}</p>
                       <p className="text-sm font-bold leading-relaxed">{result.scam_warning}</p>
                     </div>
                   </div>
@@ -380,12 +380,12 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm"><MessageSquare className="w-5 h-5 text-indigo-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.negotiation_scripts')}</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('overpaying.negotiation_scripts')}</h3>
                 </div>
                 
-                <div className="relative bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-5 group">
-                  <p className="text-sm text-indigo-900 font-bold italic leading-relaxed pr-10">"{result.negotiation_script}"</p>
-                  <button onClick={() => copyText(result.negotiation_script, 'neg')} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white shadow-sm border border-indigo-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <div className="relative bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-5 group text-start">
+                  <p className="text-sm text-indigo-900 font-bold italic leading-relaxed pe-10">"{result.negotiation_script}"</p>
+                  <button onClick={() => copyText(result.negotiation_script, 'neg')} className="absolute top-3 end-3 w-9 h-9 rounded-xl bg-white shadow-sm border border-indigo-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
                     {copied === 'neg' ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-indigo-300" />}
                   </button>
                 </div>
@@ -396,9 +396,9 @@ export default function AvoidOverpaying() {
                   ))}
                 </div>
 
-                <div className="relative bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-                  <p className="text-sm text-slate-600 font-bold italic leading-relaxed pr-10">"{result.smart_replies[selectedTone]}"</p>
-                  <button onClick={() => copyText(result.smart_replies[selectedTone], selectedTone)} className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <div className="relative bg-white border border-slate-100 rounded-2xl p-5 shadow-sm text-start">
+                  <p className="text-sm text-slate-600 font-bold italic leading-relaxed pe-10">"{result.smart_replies[selectedTone]}"</p>
+                  <button onClick={() => copyText(result.smart_replies[selectedTone], selectedTone)} className="absolute top-3 end-3 w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
                     {copied === selectedTone ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-slate-300" />}
                   </button>
                 </div>
@@ -409,7 +409,7 @@ export default function AvoidOverpaying() {
                 <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><Layout className="w-5 h-5 text-blue-600" /></div>
-                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.parts_savings')}</h3>
+                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('overpaying.parts_savings')}</h3>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
                     {result.cheaper_parts_sources.map((src, i) => (
@@ -424,15 +424,15 @@ export default function AvoidOverpaying() {
 
               {/* Live Assistant (Apple Glass UI) */}
               <div className="bg-white/40 backdrop-blur-2xl border border-white rounded-[40px] p-8 shadow-2xl shadow-slate-200/50 flex flex-col items-center">
-                <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em] mb-1">{t('app.overpaying.live_assistant')}</h3>
-                <p className="text-xs text-slate-400 font-bold text-center max-w-[220px] mb-6">{t('app.overpaying.live_desc')}</p>
+                <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em] mb-1">{t('overpaying.live_assistant')}</h3>
+                <p className="text-xs text-slate-400 font-bold text-center max-w-[220px] mb-6">{t('overpaying.live_desc')}</p>
                 
                 {messages.length > 0 && (
                   <div className="w-full space-y-3 mb-8 bg-slate-50/50 border border-slate-100 p-4 rounded-3xl max-h-56 overflow-y-auto scrollbar-hide shadow-inner">
                     {messages.map((m, i) => (
                       <div key={i} className={`flex items-start gap-2 ${m.role === 'user' ? 'justify-end' : ''}`}>
                         {m.role === 'assistant' && <div className="w-7 h-7 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0 shadow-sm"><Bot className="w-4 h-4 text-emerald-600" /></div>}
-                        <div className={`px-4 py-3 rounded-[20px] text-xs font-bold leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-100 text-slate-600'}`}>{m.text}</div>
+                        <div className={`px-4 py-3 rounded-[20px] text-xs font-bold leading-relaxed shadow-sm text-start ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-100 text-slate-600'}`}>{m.text}</div>
                       </div>
                     ))}
                     <div ref={chatBottomRef} />
@@ -448,11 +448,11 @@ export default function AvoidOverpaying() {
                   </button>
                 </div>
                 
-                <p className="text-[10px] uppercase font-black tracking-[0.3em] mt-5 text-slate-400">{isTranscribing ? t('app.overpaying.analyzing_voice') : isRecording ? t('app.overpaying.stop_recording') : t('app.overpaying.start_audit')}</p>
+                <p className="text-[10px] uppercase font-black tracking-[0.3em] mt-5 text-slate-400">{isTranscribing ? t('overpaying.analyzing_voice') : isRecording ? t('overpaying.stop_recording') : t('overpaying.start_audit')}</p>
               </div>
 
               <button onClick={reset} className="w-full bg-white border border-slate-200 hover:border-blue-400 text-slate-500 hover:text-blue-600 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-[0.98] shadow-sm">
-                {t('app.overpaying.check_another')}
+                {t('overpaying.check_another')}
               </button>
             </motion.div>
           )}

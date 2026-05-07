@@ -98,7 +98,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {NAV_GROUPS.map((group, gi) => (
             <div key={group.label}>
               {/* Group label */}
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted/80 px-2.5 mb-1.5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-muted/80 ps-2.5 mb-1.5">
                 {t(group.label)}
               </p>
 
@@ -117,10 +117,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       }
                     }}
                     className={({ isActive }) => [
-                      'flex items-center gap-2.5 pr-3 pl-2 py-2.5 rounded-2xl font-semibold text-[13.5px]',
+                      'flex items-center gap-2.5 pe-3 ps-2 py-2.5 rounded-2xl font-semibold text-[13.5px]',
                       'transition-all duration-150 group relative overflow-hidden',
                       isActive
-                        ? 'bg-surface dark:bg-navy/10 text-navy shadow-[0_1px_6px_rgba(0,112,224,0.10)] border border-navy/10 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:bg-navy'
+                        ? 'bg-surface dark:bg-navy/10 text-navy shadow-[0_1px_6px_rgba(0,112,224,0.10)] border border-navy/10 before:absolute before:start-0 before:top-2 before:bottom-2 before:w-[3px] before:rounded-e-full before:bg-navy'
                         : 'text-muted hover:bg-surface-high/70 hover:text-on-surface',
                     ].join(' ')}
                   >
@@ -141,7 +141,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
                         {/* Active indicator chevron */}
                         {isActive && (
-                          <ChevronRight className="w-3 h-3 text-navy/40 flex-shrink-0" />
+                          <ChevronRight className="w-3 h-3 text-navy/40 flex-shrink-0 rtl:rotate-180" />
                         )}
                       </>
                     )}
@@ -158,11 +158,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     <span className="w-2 h-2 rounded-full bg-emerald-400 block" />
                     <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">{t('app.dashboard.engine_ready')}</p>
+                  <div className="flex-1 min-w-0 text-start">
+                    <p className="text-[11px] font-bold text-on-surface leading-none tracking-tight">{t('dashboard.engine_ready')}</p>
                     <p className="text-[9px] text-muted mt-0.5 tracking-wide">{t('common.available_24_7')}</p>
                   </div>
-                  <ShieldWrenchIcon className="w-3.5 h-3.5 text-navy/25 flex-shrink-0" />
+                  <ShieldWrenchIcon className="w-3.5 h-3.5 text-navy/25 flex-shrink-0 rtl:-scale-x-100" />
                 </div>
               )}
             </div>
@@ -173,7 +173,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="px-3 pt-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))] border-t border-overlay space-y-3">
           
           {/* Language Switcher */}
-          <div className="px-1">
+          <div className="ps-1">
             <LanguageSelector className="w-full" />
           </div>
 
@@ -194,7 +194,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 : userInitial}
             </div>
 
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 text-start">
               <p className="text-[13px] font-bold text-on-surface truncate leading-tight">{userName}</p>
             </div>
 

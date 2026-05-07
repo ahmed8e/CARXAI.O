@@ -136,7 +136,7 @@ export default function Dashboard() {
       to: '/dashboard/reports',
       icon: Activity,
       label: 'nav.reports',
-      desc: 'app.mechanic.disclaimer',
+      desc: 'mechanic.disclaimer',
       color: 'text-purple-500',
       bg: 'bg-purple-50',
       border: 'border-purple-100'
@@ -150,19 +150,19 @@ export default function Dashboard() {
       
       {/* Background Decor */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[30%] bg-blue-400/5 blur-[120px] rounded-full" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
+        <div className="absolute top-[-5%] start-[-10%] w-[50%] h-[30%] bg-blue-400/5 blur-[120px] rounded-full" />
+        <div className="absolute top-[20%] end-[-10%] w-[40%] h-[30%] bg-emerald-400/5 blur-[100px] rounded-full" />
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-6 relative z-10">
         
         {/* Greeting */}
-        <div className="mb-6">
+        <div className="mb-6 text-start">
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-            {t('app.dashboard.welcome')} {firstName}
+            {t('dashboard.welcome')} {firstName}
           </p>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight whitespace-pre-line">
-            {t('app.dashboard.greeting_question')}
+            {t('dashboard.greeting_question')}
           </h1>
         </div>
 
@@ -173,11 +173,11 @@ export default function Dashboard() {
               <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center">
                 <Plus className="w-5 h-5 text-blue-600" />
               </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">{t('app.dashboard.garage_empty')}</p>
-                <p className="text-sm font-black text-slate-900">{t('app.dashboard.add_vehicle')}</p>
+              <div className="flex-1 text-start">
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">{t('dashboard.garage_empty')}</p>
+                <p className="text-sm font-black text-slate-900">{t('dashboard.add_vehicle')}</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 transition-all" />
             </Link>
           ) : defaultVehicle ? (
             <Link to="/dashboard/vehicles" className="flex items-center gap-4 bg-white/60 backdrop-blur-xl border border-white p-4 rounded-[28px] shadow-xl shadow-slate-200/30 active:scale-[0.98] transition-all">
@@ -186,18 +186,18 @@ export default function Dashboard() {
                   <Car className="w-6 h-6 text-slate-400" />
                 </div>
                 {healthScore && (
-                  <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white ${healthScore.total >= 70 ? 'bg-emerald-500' : healthScore.total >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}>
+                  <div className={`absolute -bottom-1 -end-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white ${healthScore.total >= 70 ? 'bg-emerald-500' : healthScore.total >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}>
                     {healthScore.total}
                   </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('app.dashboard.active_vehicle')}</p>
+              <div className="flex-1 min-w-0 text-start">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('dashboard.active_vehicle')}</p>
                 <h3 className="text-base font-black text-slate-900 truncate">
                   {defaultVehicle.year} {defaultVehicle.make} {defaultVehicle.model}
                 </h3>
               </div>
-              <ChevronRight className="w-5 h-5 text-slate-300" />
+              <ChevronRight className="w-5 h-5 text-slate-300 rtl:rotate-180" />
             </Link>
           ) : (
             <div className="h-20 w-full animate-pulse bg-slate-200/50 rounded-[28px]" />
@@ -208,12 +208,12 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 gap-3 mb-6">
           {modules.map((mod) => (
             <motion.div key={mod.to} whileTap={{ scale: 0.96 }}>
-              <Link 
+                <Link 
                 to={mod.to} 
-                className="block h-full bg-white/60 backdrop-blur-xl border border-white rounded-[28px] p-5 shadow-xl shadow-slate-200/30 hover:shadow-2xl hover:shadow-slate-200/40 transition-all"
+                className="block h-full bg-white/60 backdrop-blur-xl border border-white rounded-[28px] p-5 shadow-xl shadow-slate-200/30 hover:shadow-2xl hover:shadow-slate-200/40 transition-all text-start"
               >
                 <div className={`w-10 h-10 rounded-2xl ${mod.bg} ${mod.border} border flex items-center justify-center mb-3 shadow-sm`}>
-                  <mod.icon className={`w-5 h-5 ${mod.color}`} />
+                  <mod.icon className={`w-5 h-5 ${mod.color} rtl:-scale-x-100`} />
                 </div>
                 <h3 className="text-sm font-black text-slate-900 mb-1 leading-tight">
                   {t(mod.label)}
@@ -227,14 +227,14 @@ export default function Dashboard() {
         {/* Urgent Action (Max 1) */}
         {urgentMaintenance.length > 0 && (
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-3 px-2">
+            <div className="flex items-center justify-between mb-3 ps-2 pe-2">
                <div className="flex items-center gap-2">
                  <AlertCircle className="w-4 h-4 text-rose-500" />
-                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('app.dashboard.urgent_attention')}</h2>
+                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('dashboard.urgent_attention')}</h2>
                </div>
                {urgentMaintenance.length > 1 && (
                  <Link to="/dashboard/maintenance" className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                   {t('app.dashboard.more_urgent', { count: urgentMaintenance.length - 1 })}
+                   {t('dashboard.more_urgent', { count: urgentMaintenance.length - 1 })}
                  </Link>
                )}
             </div>
@@ -250,14 +250,14 @@ export default function Dashboard() {
 
         {/* Horizontal Quick Issue Shortcuts */}
         <div className="mb-8">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-2">{t('app.dashboard.quick_diagnostics')}</p>
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ps-2 pe-2 text-start">{t('dashboard.quick_diagnostics')}</p>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -ms-4 -me-4 ps-4 pe-4">
             {[
-              { label: 'app.dashboard.diagnostics.engine', icon: Activity, color: 'text-amber-500' },
-              { label: 'app.dashboard.diagnostics.start', icon: Zap, color: 'text-rose-500' },
-              { label: 'app.dashboard.diagnostics.noise', icon: AlertCircle, color: 'text-slate-500' },
-              { label: 'app.dashboard.diagnostics.battery', icon: Battery, color: 'text-blue-500' },
-              { label: 'app.dashboard.diagnostics.brakes', icon: ShieldAlert, color: 'text-emerald-500' },
+              { label: 'dashboard.diagnostics.engine', icon: Activity, color: 'text-amber-500' },
+              { label: 'dashboard.diagnostics.start', icon: Zap, color: 'text-rose-500' },
+              { label: 'dashboard.diagnostics.noise', icon: AlertCircle, color: 'text-slate-500' },
+              { label: 'dashboard.diagnostics.battery', icon: Battery, color: 'text-blue-500' },
+              { label: 'dashboard.diagnostics.brakes', icon: ShieldAlert, color: 'text-emerald-500' },
             ].map((issue, idx) => (
               <button 
                 key={idx}

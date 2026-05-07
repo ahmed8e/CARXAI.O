@@ -1,4 +1,4 @@
-import { Loader2, ArrowLeft, ShieldCheck, Clock, FileText } from 'lucide-react'
+import { Loader2, ShieldCheck, Clock, FileText } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
@@ -20,6 +20,7 @@ export default function Reports() {
   }, [user])
 
   const fetchReports = async () => {
+    if (!user?.id) return
     try {
       const { data, error } = await supabase
         .from('shared_reports')
@@ -95,12 +96,12 @@ export default function Reports() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-black text-navy leading-tight mb-2 line-clamp-2">
+                <h3 className="text-lg font-black text-navy leading-tight mb-2 line-clamp-2 text-start">
                   {diag.issueName}
                 </h3>
                 
                 {veh && (
-                  <p className="text-sm font-medium text-slate-500 mb-6">
+                  <p className="text-sm font-medium text-slate-500 mb-6 text-start">
                     {veh.year} {veh.make} {veh.model}
                   </p>
                 )}
@@ -109,7 +110,7 @@ export default function Reports() {
                   onClick={() => navigate(`/report/${report.token || report.share_id}`)}
                   className="w-full py-3 rounded-xl bg-slate-50 text-navy text-xs font-black uppercase tracking-widest group-hover:bg-navy group-hover:text-white transition-colors flex items-center justify-center gap-2"
                 >
-                  <ShieldCheck className="w-4 h-4" />
+                  <ShieldCheck className="w-4 h-4 rtl:-scale-x-100" />
                   {t('reports.view_report')}
                 </button>
               </motion.div>

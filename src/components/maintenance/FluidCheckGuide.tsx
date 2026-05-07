@@ -16,7 +16,7 @@ export default function FluidCheckGuide() {
 
   const handleAskAI = (fluid: FluidInfo) => {
     navigate('/dashboard/ai-mechanic', {
-      state: { initialIssue: `Fluid check question: ${fluid.name} — guidance needed` }
+      state: { initialIssue: `Fluid check question: ${t(fluid.nameKey)} — guidance needed` }
     })
   }
 
@@ -58,8 +58,8 @@ export default function FluidCheckGuide() {
                   <IconComp className="w-4.5 h-4.5" style={{ color: fluid.color, width: 18, height: 18 }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-black text-on-surface">{fluid.name}</p>
-                  <p className="text-[11px] text-muted font-medium truncate">{fluid.location}</p>
+                  <p className="text-[13px] font-black text-on-surface">{t(fluid.nameKey)}</p>
+                  <p className="text-[11px] text-muted font-medium truncate">{t(fluid.locationKey)}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <div className="w-3 h-3 rounded-full border-2 border-white/50 shadow-sm"
@@ -85,7 +85,7 @@ export default function FluidCheckGuide() {
                           style={{ background: fluid.color }} />
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">{t('maintenance.fluid_guide_tool.normal_appearance')}</p>
-                          <p className="text-xs text-on-surface font-medium">{fluid.normalColor}</p>
+                          <p className="text-xs text-on-surface font-medium">{t(`${fluid.nameKey.replace('.name', '')}.normal_appearance`)}</p>
                         </div>
                       </div>
 
@@ -94,7 +94,7 @@ export default function FluidCheckGuide() {
                         <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">{t('maintenance.fluid_guide_tool.how_to_check')}</p>
                         <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-500/10 rounded-2xl p-4">
                           <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                          <p className="text-xs text-blue-800 dark:text-blue-300 font-medium leading-relaxed">{fluid.howToCheck}</p>
+                          <p className="text-xs text-blue-800 dark:text-blue-300 font-medium leading-relaxed">{t(fluid.howToCheckKey)}</p>
                         </div>
                       </div>
 
@@ -102,7 +102,7 @@ export default function FluidCheckGuide() {
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">{t('maintenance.fluid_guide_tool.warning_signs')}</p>
                         <div className="space-y-1.5">
-                          {fluid.warningSigns.map((sign, i) => (
+                          {(t(fluid.warningSignsKey, { returnObjects: true }) as string[]).map((sign, i) => (
                             <div key={i} className="flex items-center gap-2">
                               <AlertCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
                               <span className="text-xs text-muted font-medium">{sign}</span>
@@ -116,7 +116,7 @@ export default function FluidCheckGuide() {
                         <ShieldAlert className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400 mb-1">{t('maintenance.fluid_guide_tool.do_not')}</p>
-                          <p className="text-xs text-red-700 dark:text-red-300 font-medium leading-relaxed">{fluid.doNot}</p>
+                          <p className="text-xs text-red-700 dark:text-red-300 font-medium leading-relaxed">{t(fluid.doNotKey)}</p>
                         </div>
                       </div>
 
@@ -125,7 +125,7 @@ export default function FluidCheckGuide() {
                         <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">{t('maintenance.fluid_guide_tool.see_mechanic')}</p>
-                          <p className="text-xs text-muted font-medium leading-relaxed">{fluid.seeAMechanic}</p>
+                          <p className="text-xs text-muted font-medium leading-relaxed">{t(fluid.seeAMechanicKey)}</p>
                         </div>
                       </div>
 
