@@ -37,7 +37,7 @@ export default function Dashboard() {
   const [maintenanceStatuses, setMaintenanceStatuses] = useState<MaintenanceStatus[]>([])
   const [healthScore, setHealthScore] = useState<any>(null)
   
-  const firstName = user?.email?.split('@')[0] ?? 'Driver'
+  const firstName = user?.email?.split('@')[0] ?? t('common.driver')
 
   useEffect(() => {
     if (user) fetchDefaultVehicle()

@@ -1,11 +1,13 @@
 import { Loader2, ArrowLeft, ShieldCheck, Clock, FileText } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 export default function Reports() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [reports, setReports] = useState<any[]>([])
@@ -47,10 +49,10 @@ export default function Reports() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display font-black text-navy tracking-tight italic mb-2">
-            Diagnostic Reports
+            {t('reports.title')}
           </h1>
           <p className="text-sm font-medium text-slate-500">
-            View your official AI diagnostic assessments.
+            {t('reports.subtitle')}
           </p>
         </div>
       </div>
@@ -60,13 +62,13 @@ export default function Reports() {
           <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <FileText className="w-8 h-8 text-slate-300" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">No Reports Yet</h3>
-          <p className="text-slate-500 mb-6">You haven't generated any diagnostic reports yet.</p>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">{t('reports.empty_title')}</h3>
+          <p className="text-slate-500 mb-6">{t('reports.empty_desc')}</p>
           <Link 
             to="/dashboard/ai-mechanic" 
             className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-navy text-white text-xs font-bold uppercase tracking-widest shadow-xl shadow-navy/20 hover:scale-105 transition-transform"
           >
-            Start Diagnosis
+            {t('reports.start_diagnosis')}
           </Link>
         </div>
       ) : (
@@ -89,7 +91,7 @@ export default function Reports() {
                   <div className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${
                     diag.canDrive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
                   }`}>
-                    {diag.canDrive ? 'Safe' : 'Danger'}
+                    {diag.canDrive ? t('reports.status_safe') : t('reports.status_danger')}
                   </div>
                 </div>
 
@@ -108,7 +110,7 @@ export default function Reports() {
                   className="w-full py-3 rounded-xl bg-slate-50 text-navy text-xs font-black uppercase tracking-widest group-hover:bg-navy group-hover:text-white transition-colors flex items-center justify-center gap-2"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  View Report
+                  {t('reports.view_report')}
                 </button>
               </motion.div>
             )

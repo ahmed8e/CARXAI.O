@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { 
   User, Mail, Shield, 
   ShieldAlert, LogOut,
   Globe, 
   HelpCircle, Camera,
-  History, X, Loader2, Navigation, Wrench, ChevronRight,
+  History, X, Loader2, ChevronRight,
   CreditCard, Info, Zap
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -31,13 +32,15 @@ function SettingsRow({
   title, 
   subtitle, 
   onClick, 
-  isLocked = false 
+  isLocked = false,
+  t
 }: { 
   icon: any, 
   title: string, 
   subtitle: string, 
   onClick?: () => void,
-  isLocked?: boolean
+  isLocked?: boolean,
+  t: any
 }) {
   return (
     <button 
@@ -57,7 +60,7 @@ function SettingsRow({
       <div className="flex items-center gap-4">
         {isLocked ? (
           <div className="px-3 py-1 rounded-lg bg-blue-50 text-[9px] font-black uppercase tracking-widest text-blue-600 border border-blue-100 flex items-center gap-1.5 shadow-sm shadow-blue-500/5">
-            <CreditCard className="w-3 h-3" /> Coming Soon
+            <CreditCard className="w-3 h-3" /> {t('settings.coming_soon')}
           </div>
         ) : (
           <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
@@ -104,6 +107,7 @@ function ContentSheet({ title, icon: Icon, children, onClose }: { title: string,
 
 export default function MyAccount() {
   const { user, signOut, updatePassword } = useAuth()
+  const { t, i18n } = useTranslation()
   const { subscription, loading: loadingSub } = useSubscription()
   const navigate = useNavigate()
   
@@ -116,7 +120,7 @@ export default function MyAccount() {
   const [profileData, setProfileData] = useState({
     fullName: '',
     phoneNumber: '',
-    preferredLanguage: 'English (US)'
+    preferredLanguage: i18n.language
   })
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loadingActivity, setLoadingActivity] = useState(false)
@@ -171,7 +175,7 @@ export default function MyAccount() {
         data: { avatar_url: url }
       })
 
-      setFeedback({ type: 'success', message: 'Profile photo updated successfully!' })
+      setFeedback({ type: 'success', message: t('settings.photo_success') })
       setTimeout(() => window.location.reload(), 1000)
       
     } catch (error: any) {
@@ -198,7 +202,7 @@ export default function MyAccount() {
     setProfileData({
       fullName: (profile as any)?.full_name || metadata?.full_name || user.email?.split('@')[0] || 'User',
       phoneNumber: (profile as any)?.phone_number || metadata?.phone_number || '',
-      preferredLanguage: (profile as any)?.preferred_language || metadata?.preferred_language || 'English (US)'
+      preferredLanguage: (profile as any)?.preferred_language || metadata?.preferred_language || i18n.language
     })
   }
 
@@ -266,7 +270,7 @@ export default function MyAccount() {
         throw new Error(errData.error || 'Failed to update profile');
       }
 
-      setFeedback({ type: 'success', message: 'Profile updated successfully!' })
+      setFeedback({ type: 'success', message: t('settings.profile_success') })
       setTimeout(() => window.location.reload(), 1500)
     } catch (err: any) {
       console.error('Update error:', err)
@@ -279,11 +283,11 @@ export default function MyAccount() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
     if (passFields.newPassword !== passFields.confirmPassword) {
-      setFeedback({ type: 'error', message: 'Passwords do not match.' })
+      setFeedback({ type: 'error', message: t('settings.passwords_mismatch') })
       return
     }
     if (passFields.newPassword.length < 8) {
-      setFeedback({ type: 'error', message: 'Password must be at least 8 characters.' })
+      setFeedback({ type: 'error', message: t('settings.password_too_short') })
       return
     }
 
@@ -295,7 +299,7 @@ export default function MyAccount() {
     if (error) {
       setFeedback({ type: 'error', message: error.message })
     } else {
-      setFeedback({ type: 'success', message: 'Password updated successfully!' })
+      setFeedback({ type: 'success', message: t('settings.password_success') })
       setPassFields({ newPassword: '', confirmPassword: '' })
       setTimeout(() => setIsUpdatingPass(false), 1500)
     }
@@ -325,8 +329,8 @@ export default function MyAccount() {
       <div className="max-w-4xl mx-auto relative z-10">
         <header className="flex items-center justify-between mb-12 py-2">
            <div className="space-y-1">
-             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Account Settings</h1>
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Personal Information & Preferences</p>
+             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('settings.title')}</h1>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.subtitle')}</p>
            </div>
            <button 
              onClick={() => navigate('/dashboard')}
@@ -378,7 +382,7 @@ export default function MyAccount() {
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1">
                  <div className="px-4 py-2 rounded-xl bg-white border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-widest shadow-sm">
-                   Join Date <span className="text-slate-900 ml-1">{new Date(user?.created_at || Date.now()).getFullYear()}</span>
+                   {t('settings.join_date')} <span className="text-slate-900 ml-1">{new Date(user?.created_at || Date.now()).getFullYear()}</span>
                  </div>
               </div>
             </div>
@@ -387,63 +391,70 @@ export default function MyAccount() {
 
         <div className="grid gap-10">
             {/* 2. Account Settings Group */}
-            <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">Account Management</h3>
+             <div className="space-y-6">
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.account_management')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={User} 
-                  title="Profile Details" 
-                  subtitle="Update your personal information" 
+                  title={t('settings.profile_details')} 
+                  subtitle={t('settings.profile_details_sub')} 
                   onClick={() => setIsEditingProfile(true)}
+                  t={t}
                 />
                 <SettingsRow 
                   icon={Shield} 
-                  title="Security & Password" 
-                  subtitle="Manage your account protection" 
+                  title={t('settings.security')} 
+                  subtitle={t('settings.security_sub')} 
                   onClick={() => setIsUpdatingPass(true)}
+                  t={t}
                 />
                 <SettingsRow 
                   icon={CreditCard} 
-                  title="Billing & Subscription" 
-                  subtitle="Manage your premium access" 
+                  title={t('settings.billing')} 
+                  subtitle={t('settings.billing_sub')} 
                   onClick={() => setActiveSection('billing')}
+                  t={t}
                 />
               </div>
             </div>
 
             {/* 3. System Preferences Group */}
             <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">App Settings</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.app_settings')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={Globe} 
-                  title="Language" 
-                  subtitle={`Set to ${profileData.preferredLanguage}`} 
+                  title={t('settings.language')} 
+                  subtitle={`${t('settings.set_to')} ${profileData.preferredLanguage === 'ar' ? 'العربية' : profileData.preferredLanguage === 'fr' ? 'Français' : 'English'}`} 
                   onClick={() => setIsEditingProfile(true)}
+                  t={t}
                 />
                 <SettingsRow 
                    icon={History} 
-                   title="Activity History" 
-                   subtitle="Your diagnoses and search history" 
+                   title={t('settings.activity')} 
+                   subtitle={t('settings.activity_sub')} 
                    onClick={() => setActiveSection('activity')}
+                   t={t}
                 />
               </div>
             </div>
 
             {/* 4. Support & Info Group */}
             <div className="space-y-6">
-              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">Resources</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 ml-6">{t('settings.resources')}</h3>
               <div className="bg-white border border-slate-200 rounded-[40px] shadow-sm overflow-hidden">
                 <SettingsRow 
                   icon={HelpCircle} 
-                  title="Help & Support" 
-                  subtitle="Get assistance from our team" 
+                  title={t('settings.support')} 
+                  subtitle={t('settings.support_sub')} 
                   onClick={() => setActiveSection('support')}
+                  t={t}
                 />
                 <SettingsRow 
                   icon={Info} 
-                  title="About Car Safety" 
+                  title={t('settings.about')} 
                   subtitle="Version 2.4.0 (Official Build)" 
+                  t={t}
                 />
               </div>
             </div>
@@ -459,8 +470,8 @@ export default function MyAccount() {
                     <LogOut className="w-6 h-6" />
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-red-600 transition-colors">Sign Out</p>
-                    <p className="text-[11px] font-medium text-red-500/50 uppercase tracking-widest">End Session</p>
+                    <p className="font-bold text-red-600 transition-colors">{t('settings.sign_out')}</p>
+                    <p className="text-[11px] font-medium text-red-500/50 uppercase tracking-widest">{t('settings.end_session')}</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-red-300 group-hover:translate-x-1 transition-transform" />
@@ -471,50 +482,50 @@ export default function MyAccount() {
           {/* Render Activity or Support as Sheets if active */}
           <AnimatePresence>
             {activeSection === 'activity' && (
-              <ContentSheet title="Activity History" icon={History} onClose={() => setActiveSection('profile')}>
+              <ContentSheet title={t('settings.history_title')} icon={History} onClose={() => setActiveSection('profile')}>
                 {loadingActivity ? (
                   <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <Loader2 className="w-10 h-10 text-navy animate-spin" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Updating History...</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('settings.updating_history')}</p>
                   </div>
                 ) : activities.length > 0 ? (
                   <div className="space-y-4">
                     {activities.map((act) => (
-                      <div key={act.id} className="bg-slate-50 dark:bg-white/5 p-6 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center gap-6">
-                         <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-sm">
+                      <div key={act.id} className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center gap-6">
+                         <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
                            <ActivityIcon type={act.type} />
                          </div>
                          <div className="flex-1 min-w-0">
-                           <h4 className="font-bold text-slate-900 dark:text-white truncate text-sm">{act.title}</h4>
+                           <h4 className="font-bold text-slate-900 truncate text-sm">{act.title}</h4>
                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{act.date} • {act.status}</p>
                          </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-slate-400 font-bold uppercase tracking-widest text-xs">No activity found</div>
+                  <div className="text-center py-12 text-slate-400 font-bold uppercase tracking-widest text-xs">{t('settings.no_activity')}</div>
                 )}
               </ContentSheet>
             )}
 
             {activeSection === 'support' && (
-              <ContentSheet title="Support" icon={HelpCircle} onClose={() => setActiveSection('profile')}>
-                 <div className="bg-blue-50 dark:bg-blue-900/10 p-8 rounded-[40px] text-center space-y-6">
-                    <h3 className="text-2xl font-display font-black text-navy italic">Need assistance?</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Our expert team and AI diagnostics are available 24/7 to help with any vehicle or app issues.</p>
-                    <button className="w-full py-4 rounded-2xl bg-navy text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-navy/30">Contact Support Team</button>
+              <ContentSheet title={t('settings.support_title')} icon={HelpCircle} onClose={() => setActiveSection('profile')}>
+                 <div className="bg-blue-50 p-8 rounded-[40px] text-center space-y-6">
+                    <h3 className="text-2xl font-display font-black text-navy italic">{t('settings.need_help')}</h3>
+                    <p className="text-sm text-slate-600 font-medium">{t('settings.support_desc')}</p>
+                    <button className="w-full py-4 rounded-2xl bg-navy text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-navy/30">{t('settings.contact_support')}</button>
                  </div>
               </ContentSheet>
             )}
             {activeSection === 'billing' && (
-              <ContentSheet title="Subscription Details" icon={Zap} onClose={() => setActiveSection('profile')}>
+              <ContentSheet title={t('settings.billing')} icon={Zap} onClose={() => setActiveSection('profile')}>
                 <div className="space-y-8">
                   {/* Premium Plan Header */}
                   <div className="p-8 rounded-[40px] bg-slate-50 border border-slate-100 flex flex-col items-center text-center gap-4 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
                       <Zap className="w-32 h-32 -mr-10 -mt-10" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] relative z-10">Current Plan</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] relative z-10">{t('settings.current_plan')}</p>
                     <h3 className="text-5xl font-display font-black text-slate-900 tracking-tighter uppercase italic relative z-10">
                       {loadingSub ? '...' : (subscription?.planType || 'Free')}
                     </h3>
@@ -523,16 +534,16 @@ export default function MyAccount() {
                       {!loadingSub && subscription?.status === 'active' ? (
                         <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-widest">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Active Subscription
+                          {t('settings.active_sub_label')}
                         </div>
                       ) : !loadingSub && subscription?.status === 'trialing' ? (
                         <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-black uppercase tracking-widest">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                          Trial Period
+                          {t('settings.trial_period')}
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 text-[10px] font-black uppercase tracking-widest">
-                          {subscription?.status === 'expired' ? 'Expired' : 'Standard Access'}
+                          {subscription?.status === 'expired' ? t('settings.expired') : t('settings.standard_access')}
                         </div>
                       )}
                     </div>
@@ -541,22 +552,22 @@ export default function MyAccount() {
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 gap-6 px-4">
                     <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</p>
-                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? 'Checking...' : (subscription?.status || 'None')}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.status')}</p>
+                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.status || 'None')}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Billing Cycle</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.billing_cycle')}</p>
                       <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.billingCycle || 'One-time')}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Started On</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.started_on')}</p>
                       <p className="text-base font-bold text-slate-900">
                         {loadingSub ? '...' : (subscription?.startDate ? new Date(subscription.startDate).toLocaleDateString() : 'N/A')}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                        {subscription?.status === 'cancelled' ? 'Ends On' : 'Renewal Date'}
+                        {subscription?.status === 'cancelled' ? t('settings.ends_on') : t('settings.renewal_date')}
                       </p>
                       <p className="text-base font-bold text-slate-900 font-display">
                         {loadingSub ? '...' : (subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString() : 'Never')}
@@ -571,7 +582,7 @@ export default function MyAccount() {
                       className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
                     >
                       <Zap className="w-4 h-4" fill="currentColor" />
-                      Upgrade Plan
+                      {t('settings.upgrade_plan')}
                     </button>
                     <p className="text-center mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                       Managed via Car Safety Support
@@ -590,13 +601,13 @@ export default function MyAccount() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsEditingProfile(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }} className="relative bg-white w-full max-w-xl rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden border-t sm:border border-slate-200">
                <div className="p-8 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-20">
-                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">Edit Profile</h2>
+                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">{t('settings.edit_profile')}</h2>
                   <button onClick={() => setIsEditingProfile(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
                </div>
                <form id="profile-form" onSubmit={handleUpdateProfile} className="p-8 space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.full_name')}</label>
                       <input 
                         required 
                         type="text" 
@@ -606,7 +617,7 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.phone')}</label>
                       <input 
                         type="tel" 
                         value={profileData.phoneNumber} 
@@ -615,15 +626,19 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Preferred Language</label>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.pref_lang')}</label>
                       <select 
                         value={profileData.preferredLanguage} 
-                        onChange={e => setProfileData(prev => ({ ...prev, preferredLanguage: e.target.value }))}
+                        onChange={e => {
+                          const newLang = e.target.value;
+                          setProfileData(prev => ({ ...prev, preferredLanguage: newLang }));
+                          i18n.changeLanguage(newLang);
+                        }}
                         className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none"
                       >
-                         <option>English (US)</option>
-                         <option>French</option>
-                         <option>Spanish</option>
+                         <option value="en">English</option>
+                         <option value="fr">Français</option>
+                         <option value="ar">العربية</option>
                       </select>
                     </div>
                   </div>
@@ -640,7 +655,7 @@ export default function MyAccount() {
                     className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
                   >
                     {formLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-                    {formLoading ? 'Saving...' : 'Save Changes'}
+                    {formLoading ? t('settings.saving') : t('settings.save_changes')}
                   </button>
                </form>
             </motion.div>
@@ -652,7 +667,7 @@ export default function MyAccount() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsUpdatingPass(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 100 }} className="relative bg-white w-full max-w-xl rounded-t-[40px] sm:rounded-[40px] shadow-2xl overflow-hidden border-t sm:border border-slate-200">
                <div className="p-8 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-20">
-                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">Security</h2>
+                  <h2 className="text-2xl font-display font-black text-slate-900 italic tracking-tight">{t('settings.security')}</h2>
                   <button onClick={() => setIsUpdatingPass(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X className="w-6 h-6 text-slate-400" /></button>
                </div>
                <form onSubmit={handleUpdatePassword} className="p-8 space-y-6">
@@ -662,12 +677,12 @@ export default function MyAccount() {
                           <Shield className="w-4 h-4 text-blue-600" />
                        </div>
                        <div className="flex-1">
-                          <p className="text-[11px] text-blue-600 font-bold leading-relaxed mb-3 pt-1">Enhance your account security with a strong password.</p>
+                          <p className="text-[11px] text-blue-600 font-bold leading-relaxed mb-3 pt-1">{t('settings.password_security_hint')}</p>
                           <PasswordRequirement password={passFields.newPassword} />
                        </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">New Password</label>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.new_password')}</label>
                       <input 
                         required 
                         type="password" 
@@ -677,7 +692,7 @@ export default function MyAccount() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Confirm New Password</label>
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('settings.confirm_password')}</label>
                       <input 
                         required 
                         type="password" 
@@ -700,7 +715,7 @@ export default function MyAccount() {
                     className="w-full py-5 rounded-3xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-[1.02] hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
                   >
                     {formLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-                    {formLoading ? 'Updating' : 'Update Password'}
+                    {formLoading ? t('settings.updating') : t('settings.update_password')}
                   </button>
                </form>
             </motion.div>

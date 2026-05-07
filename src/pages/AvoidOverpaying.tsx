@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, AlertTriangle, ShieldAlert, ArrowLeft, Car, Wrench, DollarSign, MessageSquare, Mic, Bot, Camera, X, CheckCircle, Copy, ExternalLink, Zap, TrendingDown, TrendingUp, Info, Layout } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -28,8 +29,8 @@ interface AIResult {
 
 const STATUS = {
   fair: { 
-    label: 'Fair Price', 
-    badge: 'Verified Fair', 
+    label: 'app.overpaying.verdict.fair', 
+    badge: 'app.overpaying.verdict.fair_badge', 
     bar: 'from-emerald-500 to-emerald-400', 
     icon: ShieldCheck, 
     ring: 'ring-emerald-500/10', 
@@ -37,8 +38,8 @@ const STATUS = {
     text: 'text-emerald-600' 
   },
   expensive: { 
-    label: 'Slightly High', 
-    badge: 'Caution Advised', 
+    label: 'app.overpaying.verdict.expensive', 
+    badge: 'app.overpaying.verdict.expensive_badge', 
     bar: 'from-amber-500 to-amber-400', 
     icon: AlertTriangle, 
     ring: 'ring-amber-500/10', 
@@ -46,8 +47,8 @@ const STATUS = {
     text: 'text-amber-600' 
   },
   overpriced: { 
-    label: 'Overpriced', 
-    badge: 'Significant Overcharge', 
+    label: 'app.overpaying.verdict.overpriced', 
+    badge: 'app.overpaying.verdict.overpriced_badge', 
     bar: 'from-rose-500 to-rose-400', 
     icon: ShieldAlert, 
     ring: 'ring-rose-500/10', 
@@ -57,14 +58,15 @@ const STATUS = {
 }
 
 const RISK = {
-  low: { label: 'Low Risk', cls: 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-500/20' },
-  medium: { label: 'Medium Risk', cls: 'text-amber-600 bg-amber-50 ring-1 ring-amber-500/20' },
-  high: { label: 'High Risk', cls: 'text-rose-600 bg-rose-50 ring-1 ring-rose-500/20' },
+  low: { label: 'app.overpaying.risk.low', cls: 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-500/20' },
+  medium: { label: 'app.overpaying.risk.medium', cls: 'text-amber-600 bg-amber-50 ring-1 ring-amber-500/20' },
+  high: { label: 'app.overpaying.risk.high', cls: 'text-rose-600 bg-rose-50 ring-1 ring-rose-500/20' },
 }
 
 const fade = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10 } }
 
 export default function AvoidOverpaying() {
+  const { t } = useTranslation()
   const { user, session } = useAuth()
   const [carModel, setCarModel] = useState('')
   const [problemDesc, setProblemDesc] = useState('')
@@ -131,7 +133,7 @@ export default function AvoidOverpaying() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!carModel && !problemDesc && !imagePreview) { setErrorMsg('Please describe the problem or upload a photo.'); return }
+    if (!carModel && !problemDesc && !imagePreview) { setErrorMsg(t('app.overpaying.error_empty')); return }
     setIsChecking(true); setErrorMsg('')
     try { const data = await callAI(); setResult(data); setStep('results') }
     catch (err: any) { setErrorMsg(err.message) }
@@ -188,8 +190,8 @@ export default function AvoidOverpaying() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-0.5">Price Intelligence</p>
-            <h1 className="text-sm font-black text-slate-900 uppercase tracking-wider">Avoid Overpaying</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-0.5">{t('app.overpaying.price_intelligence')}</p>
+            <h1 className="text-sm font-black text-slate-900 uppercase tracking-wider">{t('nav.overpaying')}</h1>
           </div>
           <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 border border-blue-100/50 shadow-sm">
             <ShieldCheck className="w-5 h-5 text-blue-600" />
@@ -206,11 +208,11 @@ export default function AvoidOverpaying() {
               <div className="text-center py-4">
                 <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100/50 px-4 py-1.5 rounded-full mb-6 shadow-sm">
                   <Zap className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Expert AI Analysis</span>
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{t('app.overpaying.expert_analysis')}</span>
                 </div>
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Check Your Quote</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">{t('app.overpaying.title')}</h2>
                 <p className="text-sm text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
-                  Verify repair costs, estimate fair pricing, and spot overcharging in seconds.
+                  {t('app.overpaying.subtitle')}
                 </p>
               </div>
 
@@ -225,14 +227,14 @@ export default function AvoidOverpaying() {
                   {/* Image Upload */}
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">
-                      <Camera className="w-4 h-4 text-blue-500" />Photo of Quote / Damage
-                      <span className="ml-auto font-bold text-slate-300 normal-case tracking-normal">Optional</span>
+                      <Camera className="w-4 h-4 text-blue-500" />{t('app.overpaying.photo_label')}
+                      <span className="ml-auto font-bold text-slate-300 normal-case tracking-normal">{t('common.optional')}</span>
                     </label>
                     <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onloadend = () => setImagePreview(r.result as string); r.readAsDataURL(f) }} />
                     {!imagePreview ? (
                       <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-blue-600 transition-all group">
                         <Camera className="w-6 h-6 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Tap to upload receipt or photo</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">{t('app.overpaying.upload_prompt')}</span>
                       </button>
                     ) : (
                       <div className="relative h-40 rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
@@ -247,25 +249,25 @@ export default function AvoidOverpaying() {
                   {/* Vehicle */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                      <Car className="w-4 h-4 text-blue-500" />Your Vehicle
-                      {carModel && <span className="ml-auto text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Auto-filled</span>}
+                      <Car className="w-4 h-4 text-blue-500" />{t('app.overpaying.vehicle_label')}
+                      {carModel && <span className="ml-auto text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">{t('app.overpaying.auto_filled')}</span>}
                     </label>
-                    <input type="text" placeholder="e.g. 2019 Honda Civic" value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
+                    <input type="text" placeholder={t('app.overpaying.vehicle_placeholder')} value={carModel} onChange={e => setCarModel(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                   </div>
 
                   {/* Problem */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                      <Wrench className="w-4 h-4 text-blue-500" />Problem Description
+                      <Wrench className="w-4 h-4 text-blue-500" />{t('app.overpaying.problem_label')}
                     </label>
-                    <textarea placeholder="e.g. Needs front brake pads and rotors replaced..." value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all resize-none shadow-sm" />
+                    <textarea placeholder={t('app.overpaying.problem_placeholder')} value={problemDesc} onChange={e => setProblemDesc(e.target.value)} rows={3} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all resize-none shadow-sm" />
                   </div>
 
                   {/* Price + Region */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                        <DollarSign className="w-4 h-4 text-blue-500" />Quoted Price
+                        <DollarSign className="w-4 h-4 text-blue-500" />{t('app.overpaying.price_label')}
                       </label>
                       <div className="relative">
                         <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
@@ -274,9 +276,9 @@ export default function AvoidOverpaying() {
                     </div>
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                        <Info className="w-4 h-4 text-blue-500" />Region
+                        <Info className="w-4 h-4 text-blue-500" />{t('app.overpaying.region_label')}
                       </label>
-                      <input type="text" placeholder="e.g. Texas" value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
+                      <input type="text" placeholder={t('app.overpaying.region_placeholder')} value={region} onChange={e => setRegion(e.target.value)} className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-4 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-400/5 outline-none transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
@@ -284,9 +286,9 @@ export default function AvoidOverpaying() {
                 <button type="submit" disabled={isChecking} className="group relative w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/25 flex items-center justify-center gap-3 active:scale-[0.98] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                   {isChecking ? (
-                    <><div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />Running Analysis...</>
+                    <><div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />{t('app.overpaying.running_analysis')}</>
                   ) : (
-                    <><Bot className="w-5 h-5" />Run AI Price Analysis</>
+                    <><Bot className="w-5 h-5" />{t('app.overpaying.run_analysis')}</>
                   )}
                 </button>
               </form>
@@ -303,22 +305,22 @@ export default function AvoidOverpaying() {
                 <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-4 ${s.bg} border border-slate-100 shadow-sm transition-transform hover:scale-110`}>
                   <StatusIcon className={`w-10 h-10 ${s.text}`} />
                 </div>
-                <span className={`text-[10px] font-black uppercase tracking-[0.3em] mb-2 px-3 py-1 rounded-full ${s.bg} ${s.text}`}>{s.badge}</span>
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-2">{s.label}</h2>
+                <span className={`text-[10px] font-black uppercase tracking-[0.3em] mb-2 px-3 py-1 rounded-full ${s.bg} ${s.text}`}>{t(s.badge)}</span>
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-2">{t(s.label)}</h2>
                 
                 {result.overpay_percent > 0 && (
                   <div className="inline-flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-2xl mb-2">
                     <TrendingUp className="w-5 h-5 text-rose-500" />
-                    <span className="text-rose-600 font-black text-xl">+{result.overpay_percent}% above market</span>
+                    <span className="text-rose-600 font-black text-xl">+{result.overpay_percent}% {t('app.overpaying.above_market')}</span>
                   </div>
                 )}
                 
                 <div className="mt-6 w-full flex items-center justify-between bg-slate-50 border border-slate-100 rounded-3xl p-5">
                   <div className="text-left">
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Detected Issue</p>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">{t('app.overpaying.detected_issue')}</p>
                     <p className="text-base font-black text-slate-900 leading-tight">{result.detected_issue}</p>
                   </div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm ${RISK[result.risk_level].cls}`}>{RISK[result.risk_level].label}</span>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-sm ${RISK[result.risk_level].cls}`}>{t(RISK[result.risk_level].label)}</span>
                 </div>
               </div>
 
@@ -326,13 +328,13 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><DollarSign className="w-5 h-5 text-blue-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Market Comparison</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.market_comparison')}</h3>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: 'Parts Cost', val: result.market_breakdown?.parts_range ?? '—', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-                    { label: 'Labor Cost', val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-600', bg: 'bg-blue-50' },
-                    { label: 'Fair Total', val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                    { label: t('app.overpaying.parts_cost'), val: result.market_breakdown?.parts_range ?? '—', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                    { label: t('app.overpaying.labor_cost'), val: result.market_breakdown?.labor_range ?? '—', color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { label: t('app.overpaying.fair_total'), val: result.market_breakdown?.total_range ?? result.fair_price_range, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                   ].map(({ label, val, color, bg }) => (
                     <div key={label} className={`${bg} rounded-2xl p-4 text-center border border-white shadow-sm`}>
                       <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider mb-1.5">{label}</p>
@@ -343,7 +345,7 @@ export default function AvoidOverpaying() {
                 {result.overpriced_component && (
                   <div className="mt-5 flex items-center gap-3 bg-rose-50 border border-rose-100/50 rounded-2xl px-4 py-3">
                     <TrendingDown className="w-5 h-5 text-rose-500 shrink-0" />
-                    <p className="text-xs text-rose-700 font-bold leading-tight">Expert analysis suggests <span className="font-black underline uppercase">{result.overpriced_component}</span> costs are significantly inflated.</p>
+                    <p className="text-xs text-rose-700 font-bold leading-tight">{t('app.overpaying.expert_suggestion', { component: t(`app.overpaying.${result.overpriced_component}`) })}</p>
                   </div>
                 )}
               </div>
@@ -352,11 +354,11 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm"><Bot className="w-5 h-5 text-emerald-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">AI Pricing Intelligence</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.ai_intelligence')}</h3>
                 </div>
                 <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{result.explanation}</p>
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5">Actionable Next Step</p>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5">{t('app.overpaying.next_step_label')}</p>
                   <p className="text-sm font-bold text-slate-900 leading-snug">{result.next_steps}</p>
                 </div>
               </div>
@@ -367,7 +369,7 @@ export default function AvoidOverpaying() {
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-sm"><ShieldAlert className="w-6 h-6 text-white" /></div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">Scam Warning</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70 mb-1">{t('app.overpaying.scam_warning_label')}</p>
                       <p className="text-sm font-bold leading-relaxed">{result.scam_warning}</p>
                     </div>
                   </div>
@@ -378,7 +380,7 @@ export default function AvoidOverpaying() {
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm"><MessageSquare className="w-5 h-5 text-indigo-600" /></div>
-                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Negotiation Scripts</h3>
+                  <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.negotiation_scripts')}</h3>
                 </div>
                 
                 <div className="relative bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-5 group">
@@ -407,7 +409,7 @@ export default function AvoidOverpaying() {
                 <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm"><Layout className="w-5 h-5 text-blue-600" /></div>
-                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">Part Savings Guide</h3>
+                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-widest">{t('app.overpaying.parts_savings')}</h3>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
                     {result.cheaper_parts_sources.map((src, i) => (
@@ -422,8 +424,8 @@ export default function AvoidOverpaying() {
 
               {/* Live Assistant (Apple Glass UI) */}
               <div className="bg-white/40 backdrop-blur-2xl border border-white rounded-[40px] p-8 shadow-2xl shadow-slate-200/50 flex flex-col items-center">
-                <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em] mb-1">Live Assistant</h3>
-                <p className="text-xs text-slate-400 font-bold text-center max-w-[220px] mb-6">Need immediate help? Record the mechanic's explanation for instant AI audit.</p>
+                <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em] mb-1">{t('app.overpaying.live_assistant')}</h3>
+                <p className="text-xs text-slate-400 font-bold text-center max-w-[220px] mb-6">{t('app.overpaying.live_desc')}</p>
                 
                 {messages.length > 0 && (
                   <div className="w-full space-y-3 mb-8 bg-slate-50/50 border border-slate-100 p-4 rounded-3xl max-h-56 overflow-y-auto scrollbar-hide shadow-inner">
@@ -446,11 +448,11 @@ export default function AvoidOverpaying() {
                   </button>
                 </div>
                 
-                <p className="text-[10px] uppercase font-black tracking-[0.3em] mt-5 text-slate-400">{isTranscribing ? 'Analyzing Voice...' : isRecording ? 'Stop Recording' : 'Start Audit'}</p>
+                <p className="text-[10px] uppercase font-black tracking-[0.3em] mt-5 text-slate-400">{isTranscribing ? t('app.overpaying.analyzing_voice') : isRecording ? t('app.overpaying.stop_recording') : t('app.overpaying.start_audit')}</p>
               </div>
 
               <button onClick={reset} className="w-full bg-white border border-slate-200 hover:border-blue-400 text-slate-500 hover:text-blue-600 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-[0.98] shadow-sm">
-                Check Another Quote
+                {t('app.overpaying.check_another')}
               </button>
             </motion.div>
           )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { 
   Car, Plus, Edit2, Trash2, 
   CheckCircle2, Loader2,
@@ -14,6 +15,7 @@ import VehicleAddModal from '../components/VehicleAddModal'
 type Vehicle = Database['public']['Tables']['vehicles']['Row']
 
 export default function Vehicles() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [loading, setLoading] = useState(false)
@@ -51,7 +53,7 @@ export default function Vehicles() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this vehicle?')) return
+    if (!confirm(t('app.vehicles.delete_confirm'))) return
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`/api/vehicles?id=${id}`, {
@@ -95,10 +97,10 @@ export default function Vehicles() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-navy animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-navy/70">Garage Manager</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-navy/70">{t('app.vehicles.manager')}</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface italic tracking-tight">My Vehicles</h1>
-          <p className="text-muted/70 font-medium mt-2">Manage your fleet for precise AI diagnosis and maintenance.</p>
+          <h1 className="text-4xl md:text-5xl font-display font-black text-on-surface italic tracking-tight">{t('app.vehicles.title')}</h1>
+          <p className="text-muted/70 font-medium mt-2">{t('app.vehicles.track_desc')}</p>
         </div>
 
         <motion.button
@@ -107,29 +109,29 @@ export default function Vehicles() {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
         >
-          <Plus className="w-5 h-5" /> Add New Vehicle
+          <Plus className="w-5 h-5" /> {t('app.vehicles.add_button')}
         </motion.button>
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Loader2 className="w-10 h-10 text-navy animate-spin" />
-          <p className="text-xs font-black uppercase tracking-widest text-muted">Loading your garage...</p>
+          <p className="text-xs font-black uppercase tracking-widest text-muted">{t('app.vehicles.loading_garage')}</p>
         </div>
       ) : vehicles.length === 0 ? (
         <div className="bg-surface dark:bg-surface-low border-2 border-dashed border-overlay rounded-[32px] p-20 text-center">
           <div className="w-20 h-20 rounded-full bg-surface-low dark:bg-surface-high/40 border border-overlay hover:bg-surface-high transition-all text-left font-bold text-on-surface/80 flex items-center justify-between group">
             <Car className="w-10 h-10 text-muted" />
           </div>
-          <h3 className="text-2xl font-display font-bold text-on-surface mb-2">Your Garage is Empty</h3>
+          <h3 className="text-2xl font-display font-bold text-on-surface mb-2">{t('app.vehicles.add_first')}</h3>
           <p className="text-muted max-w-md mx-auto mb-8 font-medium">
-            Add your first vehicle to unlock accurate AI mechanic assessments specifically for your car.
+            {t('app.vehicles.track_desc')}
           </p>
           <button
             onClick={() => handleOpenModal()}
             className="px-8 py-3 rounded-xl bg-navy/5 text-navy font-bold hover:bg-navy/10 transition-colors"
           >
-            Start by adding a vehicle
+            {t('app.vehicles.add_button')}
           </button>
         </div>
       ) : (
@@ -152,7 +154,7 @@ export default function Vehicles() {
                 </div>
                 {v.is_default && (
                   <div className="px-3 py-1 rounded-full bg-navy text-[10px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 shadow-lg shadow-navy/20">
-                    <ShieldCheck className="w-3 h-3" /> Active
+                    <ShieldCheck className="w-3 h-3" /> {t('app.vehicles.active_badge')}
                   </div>
                 )}
               </div>
@@ -189,11 +191,11 @@ export default function Vehicles() {
                     onClick={() => handleSetDefault(v)}
                     className="flex-1 px-4 py-2.5 rounded-xl bg-surface-low dark:bg-surface-high/40 text-[10px] font-black uppercase tracking-widest text-muted hover:bg-navy hover:text-white transition-all underline-offset-4"
                   >
-                    Switch to this
+                    {t('app.vehicles.make_primary')}
                   </button>
                 ) : (
                   <div className="flex-1 text-[10px] font-black uppercase tracking-widest text-navy text-center flex items-center justify-center gap-1 font-display">
-                    <CheckCircle2 className="w-3 h-3" /> Current Diagnosis Car
+                    <CheckCircle2 className="w-3 h-3" /> {t('app.vehicles.default')}
                   </div>
                 )}
                 <button

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   Car, X, Search, ChevronRight,
   CheckCircle2, AlertCircle, Loader2, RotateCcw,
@@ -37,6 +38,7 @@ const defaultForm = (hasVehicles: boolean) => ({
 })
 
 export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehicle }: VehicleAddModalProps) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState<SelectionStep>('BRAND')
   const [searchTerm, setSearchTerm] = useState('')
@@ -82,19 +84,19 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
   const currentIdx = stepsOrder.indexOf(currentStep)
 
   const stepLabel = {
-    BRAND: 'Select your vehicle brand.',
-    MODEL: `Select your ${formData.make} model.`,
-    YEAR: `What model year is your ${formData.make} ${formData.model}?`,
-    REVIEW: 'Review and confirm your vehicle information.',
+    BRAND: t('app.vehicles.modal.brand_label'),
+    MODEL: t('app.vehicles.modal.model_label', { make: formData.make }),
+    YEAR: t('app.vehicles.modal.year_label', { make: formData.make, model: formData.model }),
+    REVIEW: t('app.vehicles.modal.review_label'),
   }[currentStep]
 
   const handleSave = async () => {
     if (!formData.make || !formData.model || !formData.year) {
-      setError('Please fill in Brand, Model, and Year.')
+      setError(t('app.vehicles.modal.error_fill'))
       return
     }
     if (!user?.id) {
-      setError('You must be logged in to save a vehicle.')
+      setError(t('app.vehicles.modal.error_login'))
       return
     }
 
@@ -120,10 +122,6 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
         throw new Error(errData.error || 'Failed to save vehicle');
       }
 
-      // Since we need the saved vehicle object for onSaved, 
-      // but our API currently just returns success, 
-      // we'll assume the data we sent is what was saved.
-      // In a real scenario, the API should return the saved object.
       const savedVehicle = { ...formData, id: editingVehicle?.id || 'new-id', user_id: user.id } as Vehicle;
 
       onClose()
@@ -161,7 +159,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
           <div className="p-8 pb-4 flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-display font-black text-slate-900 italic tracking-tight">
-                {editingVehicle ? 'Edit Vehicle' : 'Add Your Vehicle'}
+                {editingVehicle ? t('app.vehicles.modal.edit_title') : t('app.vehicles.modal.add_title')}
               </h2>
               <p className="text-slate-500 font-medium text-sm mt-1">{stepLabel}</p>
             </div>
@@ -201,7 +199,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Search brands..."
+                    placeholder={t('app.vehicles.modal.search_brands')}
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
@@ -231,7 +229,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     }}
                     className="px-4 py-4 rounded-xl bg-blue-50 border border-blue-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-blue-600"
                   >
-                    Enter "{searchTerm || 'Other'}" manually
+                    {t('app.vehicles.modal.enter_manually', { name: searchTerm || 'Other' })}
                   </button>
                 </div>
               </div>
@@ -245,7 +243,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     onClick={() => setCurrentStep('BRAND')}
                     className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500"
                   >
-                    ← Back to Brand
+                    {t('app.vehicles.modal.back_to_brand')}
                   </button>
                   <span className="text-sm font-bold text-slate-500">{formData.make}</span>
                 </div>
@@ -253,7 +251,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    placeholder={`Search ${formData.make} models...`}
+                    placeholder={t('app.vehicles.modal.search_models', { make: formData.make })}
                     className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
@@ -283,7 +281,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     }}
                     className="px-4 py-4 rounded-xl bg-blue-50 border border-blue-100 hover:border-blue-500/30 hover:bg-white transition-all text-left font-bold text-blue-600"
                   >
-                    Enter "{searchTerm || 'Other'}" manually
+                    {t('app.vehicles.modal.enter_manually', { name: searchTerm || 'Other' })}
                   </button>
                 </div>
               </div>
@@ -297,7 +295,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     onClick={() => setCurrentStep('MODEL')}
                     className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500"
                   >
-                    ← Back to Model
+                    {t('app.vehicles.modal.back_to_model')}
                   </button>
                   <span className="text-sm font-bold text-slate-500">
                     {formData.make} {formData.model}
@@ -342,7 +340,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     onClick={() => setCurrentStep('BRAND')}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-700"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Change
+                    <RotateCcw className="w-3.5 h-3.5" /> {t('app.vehicles.modal.change')}
                   </button>
                 </div>
 
@@ -350,7 +348,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
-                      <Fuel className="w-3.5 h-3.5" /> Fuel Type
+                      <Fuel className="w-3.5 h-3.5" /> {t('app.vehicles.modal.fuel_type')}
                     </label>
                     <select
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 appearance-none text-sm"
@@ -362,7 +360,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   </div>
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
-                      <Settings className="w-3.5 h-3.5" /> Gearbox
+                      <Settings className="w-3.5 h-3.5" /> {t('app.vehicles.modal.gearbox')}
                     </label>
                     <select
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 appearance-none text-sm"
@@ -374,7 +372,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   </div>
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
-                      <Gauge className="w-3.5 h-3.5" /> Mileage (km)
+                      <Gauge className="w-3.5 h-3.5" /> {t('app.vehicles.modal.mileage')}
                     </label>
                     <input
                       type="number"
@@ -385,27 +383,27 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                   </div>
                   <div>
                     <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
-                      <Hash className="w-3.5 h-3.5" /> Plate Number
+                      <Hash className="w-3.5 h-3.5" /> {t('app.vehicles.modal.plate_number')}
                     </label>
                     <input
                       type="text"
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase text-sm"
                       value={formData.plate_number}
                       onChange={e => setFormData({ ...formData, plate_number: e.target.value })}
-                      placeholder="e.g. AB-123-CD"
+                      placeholder={t('app.vehicles.modal.plate_placeholder')}
                     />
                   </div>
                   <div className="col-span-2">
                     <div className="flex items-center justify-between mb-2 ml-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">VIN</label>
-                      <span className="text-[10px] font-bold text-blue-600/60 italic uppercase tracking-wider">optional · improves accuracy</span>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('app.vehicles.modal.vin')}</label>
+                      <span className="text-[10px] font-bold text-blue-600/60 italic uppercase tracking-wider">{t('app.vehicles.modal.vin_hint')}</span>
                     </div>
                     <input
                       type="text"
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500/30 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase text-sm"
                       value={formData.vin}
                       onChange={e => setFormData({ ...formData, vin: e.target.value })}
-                      placeholder="17-digit VIN number"
+                      placeholder={t('app.vehicles.modal.vin_placeholder')}
                     />
                   </div>
                 </div>
@@ -422,8 +420,8 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     onChange={e => setFormData({ ...formData, is_default: e.target.checked })}
                   />
                   <div>
-                    <p className="text-sm font-bold text-slate-700 leading-tight">Use as active vehicle</p>
-                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">AI Mechanic will use this car for diagnosis</p>
+                    <p className="text-sm font-bold text-slate-700 leading-tight">{t('app.vehicles.modal.use_as_active')}</p>
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">{t('app.vehicles.modal.active_hint')}</p>
                   </div>
                 </label>
 
@@ -432,7 +430,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     onClick={onClose}
                     className="flex-1 py-4 rounded-3xl border border-slate-200 bg-white text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
                   >
-                    Cancel
+                    {t('app.vehicles.modal.cancel')}
                   </button>
                   <button
                     onClick={handleSave}
@@ -442,7 +440,7 @@ export default function VehicleAddModal({ isOpen, onClose, onSaved, editingVehic
                     {isSaving
                       ? <Loader2 className="w-4 h-4 animate-spin" />
                       : <CheckCircle2 className="w-4 h-4" />}
-                    {editingVehicle ? 'Update Vehicle' : 'Confirm & Save'}
+                    {editingVehicle ? t('app.vehicles.modal.update') : t('app.vehicles.modal.confirm_save')}
                   </button>
                 </div>
               </div>

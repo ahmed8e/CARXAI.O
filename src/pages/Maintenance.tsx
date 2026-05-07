@@ -167,7 +167,7 @@ export default function Maintenance() {
     return (
       <div className="p-8 max-w-xl mx-auto text-center mt-16 bg-[#f8fafc] min-h-screen">
         <div className="w-20 h-20 bg-white border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm"><Car className="w-10 h-10 text-slate-300" /></div>
-        <h2 className="text-2xl font-black text-slate-900 mb-2">{t('app.garage.no_vehicles')}</h2>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">{t('app.dashboard.garage_empty')}</h2>
         <p className="text-slate-500 mb-8 font-medium">{t('maintenance.no_vehicles_desc')}</p>
         <Link to="/dashboard/vehicles" className="inline-block px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all">{t('maintenance.go_to_garage')}</Link>
       </div>
@@ -230,41 +230,41 @@ export default function Maintenance() {
                     className="overflow-hidden bg-white/60 backdrop-blur-xl border border-white rounded-[32px] shadow-xl shadow-slate-200/30 px-6"
                   >
                     <div className="py-6 space-y-5">
-                      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Vehicle Settings</h3>
+                      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t('maintenance.vehicle_settings')}</h3>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Current Mileage</label>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">{t('maintenance.current_mileage')}</label>
                           <input type="number" value={mileage} onChange={e => setMileage(Number(e.target.value))}
                             className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-4 py-3 font-bold text-slate-900 text-sm outline-none focus:border-blue-400" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Avg mi/month</label>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">{t('maintenance.avg_miles_month')}</label>
                           <input type="number" value={prefs.avgMilesPerMonth} onChange={e => setPrefs(p => ({ ...p, avgMilesPerMonth: Number(e.target.value) }))}
                             className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-4 py-3 font-bold text-slate-900 text-sm outline-none focus:border-blue-400" />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Driving Style</label>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">{t('maintenance.driving_style')}</label>
                           <select value={prefs.drivingStyle} onChange={e => setPrefs(p => ({ ...p, drivingStyle: e.target.value as any }))}
                             className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-400">
-                            <option value="city">City</option>
-                            <option value="highway">Highway</option>
-                            <option value="mixed">Mixed</option>
+                            <option value="city">{t('maintenance.driving_styles.city')}</option>
+                            <option value="highway">{t('maintenance.driving_styles.highway')}</option>
+                            <option value="mixed">{t('maintenance.driving_styles.mixed')}</option>
                           </select>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Climate</label>
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">{t('maintenance.climate')}</label>
                           <select value={prefs.region} onChange={e => setPrefs(p => ({ ...p, region: e.target.value as any }))}
                             className="w-full bg-slate-50 border border-slate-200/60 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 outline-none focus:border-blue-400">
-                            <option value="hot">Hot</option>
-                            <option value="cold">Cold</option>
-                            <option value="temperate">Temperate</option>
+                            <option value="hot">{t('maintenance.climates.hot')}</option>
+                            <option value="cold">{t('maintenance.climates.cold')}</option>
+                            <option value="temperate">{t('maintenance.climates.temperate')}</option>
                           </select>
                         </div>
                       </div>
                       <button onClick={savePrefs} disabled={saving} className="w-full py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
-                        {saving ? 'Saving...' : 'Update Details'}
+                        {saving ? t('common.saving') : t('maintenance.update_details')}
                       </button>
                     </div>
                   </motion.div>
@@ -274,7 +274,7 @@ export default function Maintenance() {
               {/* ── Compact Health Card ── */}
               <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl shadow-slate-200/30 flex items-center justify-between">
                 <div>
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Health Score</p>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t('app.dashboard.health_score')}</p>
                    <div className="flex items-end gap-2">
                       <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">{healthScore.total}</span>
                       <span className="text-sm font-bold text-slate-500 mb-1">/100</span>
@@ -300,7 +300,7 @@ export default function Maintenance() {
                 className="w-full flex items-center justify-center gap-3 py-5 bg-slate-900 text-white rounded-2xl shadow-xl shadow-slate-900/20 active:scale-[0.98] transition-all"
               >
                 <Plus className="w-5 h-5" />
-                <span className="text-xs font-black uppercase tracking-widest">Log Service Record</span>
+                <span className="text-xs font-black uppercase tracking-widest">{t('maintenance.add_record')}</span>
               </button>
 
               {/* ── Urgent & Upcoming (Compact) ── */}
@@ -309,7 +309,7 @@ export default function Maintenance() {
                   <div className="flex items-center justify-between px-2">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-500" />
-                      <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Urgent Action</h2>
+                      <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('maintenance.urgent_action')}</h2>
                     </div>
                   </div>
                   <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[28px] shadow-xl shadow-slate-200/30 overflow-hidden">
@@ -323,7 +323,7 @@ export default function Maintenance() {
                   <div className="flex items-center justify-between px-2">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-amber-500" />
-                      <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Upcoming</h2>
+                      <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('maintenance.upcoming')}</h2>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -334,20 +334,20 @@ export default function Maintenance() {
                     ))}
                   </div>
                   <button onClick={() => setView('full-plan')} className="w-full py-4 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-blue-600 shadow-sm active:scale-95 transition-all">
-                     View Full Maintenance Plan
+                     {t('maintenance.view_full_plan')}
                   </button>
                 </div>
               )}
 
               {/* ── Feature Navigation Grid ── */}
               <div>
-                 <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 px-2">Maintenance Tools</h2>
-                 <div className="grid grid-cols-2 gap-3">
+                 <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 px-2">{t('maintenance.tools')}</h2>
+                  <div className="grid grid-cols-2 gap-3">
                     {[
-                      { id: 'history', label: 'History', icon: History, sub: 'Service records', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
-                      { id: 'seasonal', label: 'Seasonal', icon: Sun, sub: 'Weather guides', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-                      { id: 'fluids', label: 'Fluids', icon: Droplets, sub: 'Self-check guide', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-                      { id: 'advisor', label: 'Worth Fixing?', icon: Scale, sub: 'Repair vs Value', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+                      { id: 'history', label: t('maintenance.history'), icon: History, sub: t('maintenance.tool_subs.history'), color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
+                      { id: 'seasonal', label: t('maintenance.seasonal'), icon: Sun, sub: t('maintenance.tool_subs.seasonal'), color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+                      { id: 'fluids', label: t('maintenance.fluids'), icon: Droplets, sub: t('maintenance.tool_subs.fluids'), color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+                      { id: 'advisor', label: t('maintenance.advisor'), icon: Scale, sub: t('maintenance.tool_subs.advisor'), color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
                     ].map(f => (
                       <button 
                         key={f.id} 
@@ -384,11 +384,11 @@ export default function Maintenance() {
               </button>
               <div>
                 <h1 className="text-lg font-black text-slate-900 tracking-tight leading-tight">
-                  {view === 'history' && 'Service History'}
-                  {view === 'seasonal' && 'Seasonal Checks'}
-                  {view === 'fluids' && 'Fluid Guide'}
-                  {view === 'advisor' && 'Worth Fixing'}
-                  {view === 'full-plan' && 'Maintenance Plan'}
+                  {view === 'history' && t('maintenance.history_title')}
+                  {view === 'seasonal' && t('maintenance.seasonal_title')}
+                  {view === 'fluids' && t('maintenance.fluids_title')}
+                  {view === 'advisor' && t('maintenance.advisor')}
+                  {view === 'full-plan' && t('maintenance.plan_title')}
                 </h1>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   {vehicle?.year} {vehicle?.make} {vehicle?.model}
@@ -402,10 +402,10 @@ export default function Maintenance() {
                 <div className="space-y-6">
                   <div className="flex gap-3">
                     <button onClick={handleExport} className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 shadow-sm rounded-[20px] text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-blue-600 active:scale-95 transition-all">
-                      <Download className="w-4 h-4" /> Export PDF
+                      <Download className="w-4 h-4" /> {t('maintenance.export_pdf')}
                     </button>
                     <button onClick={() => setShowAddModal(true)} className="flex-1 flex items-center justify-center gap-2 py-4 bg-slate-900 text-white shadow-xl shadow-slate-900/20 rounded-[20px] text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">
-                      <Plus className="w-4 h-4" /> Add Record
+                      <Plus className="w-4 h-4" /> {t('maintenance.add_record')}
                     </button>
                   </div>
                   <div className="bg-white/60 backdrop-blur-xl border border-white rounded-[32px] p-2 shadow-xl shadow-slate-200/30">
@@ -421,7 +421,7 @@ export default function Maintenance() {
                        <Sun className="w-5 h-5 text-amber-500" />
                     </div>
                     <div>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Region: {prefs.region}</p>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('maintenance.climate')}: {t(`maintenance.climates.${prefs.region}`)}</p>
                        <p className="text-sm font-bold text-slate-900">Customized climate checks</p>
                     </div>
                   </div>
@@ -448,7 +448,7 @@ export default function Maintenance() {
               {view === 'full-plan' && (
                 <div className="space-y-8">
                    <section>
-                      <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">Complete Schedule</h2>
+                      <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">{t('maintenance.complete_schedule')}</h2>
                       <div className="space-y-4">
                         {statuses.map(s => (
                           <div key={s.item.id} className="bg-white/60 backdrop-blur-xl border border-white rounded-[28px] shadow-xl shadow-slate-200/30 overflow-hidden">
@@ -462,10 +462,9 @@ export default function Maintenance() {
                          <Info className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="text-xs font-black text-blue-900 uppercase tracking-widest mb-1">Data Sources</h3>
+                        <h3 className="text-xs font-black text-blue-900 uppercase tracking-widest mb-1">{t('maintenance.data_sources')}</h3>
                         <p className="text-xs text-blue-800/70 font-medium leading-relaxed">
-                          This plan is generated from industry standards and your vehicle profile. 
-                          Actual needs may vary. Always consult your owner's manual.
+                          {t('maintenance.disclaimer_text')}
                         </p>
                       </div>
                    </div>

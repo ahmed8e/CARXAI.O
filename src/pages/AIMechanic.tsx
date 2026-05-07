@@ -1517,7 +1517,7 @@ ${diagnosticHistory}
                                                 className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
                                               >
                                                 <Activity className="w-4 h-4 text-navy/40" />
-                                                Drive w/ Caution
+                                                {t('app.mechanic.drive_caution')}
                                               </motion.button>
                                             </>
                                           )}
@@ -1531,7 +1531,7 @@ ${diagnosticHistory}
                                                 className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
                                               >
                                                 <Activity className="w-4 h-4 text-white/90" />
-                                                Monitor Issue
+                                                {t('app.mechanic.monitor_issue')}
                                               </motion.button>
                                             </>
                                           )}
@@ -1553,7 +1553,7 @@ ${diagnosticHistory}
                                 {isAdvanced && (
                                   <div className="flex items-center gap-2 mb-3">
                                     <Activity className="w-4 h-4 text-[#0073e7]" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0073e7]">Diagnostic Interrogation</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0073e7]">{t('app.mechanic.diagnostic_interrogation')}</span>
                                   </div>
                                 )}
                                 <div className="space-y-3">
@@ -1639,11 +1639,11 @@ ${diagnosticHistory}
                       <div className="flex items-center gap-2 mb-1">
                         <Loader2 className="w-3 h-3 text-navy animate-spin" />
                         <span className="text-[10px] font-bold uppercase tracking-widest text-navy/60">
-                          {streamingMessage ? 'Live Analysis' : 'Connecting to Systems'}
+                          {streamingMessage ? t('app.mechanic.streaming') : t('app.mechanic.connecting')}
                         </span>
                       </div>
                       <p className="text-sm leading-relaxed text-slate-600 font-medium">
-                        {streamingMessage || 'Initializing diagnostic modules...'}
+                        {streamingMessage || t('app.mechanic.initializing_modules')}
                       </p>
                     </div>
                   </div>
@@ -1655,7 +1655,7 @@ ${diagnosticHistory}
                       className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy/5 border border-navy/10 w-fit ml-2"
                     >
                       <AudioLines className="w-3 h-3 text-navy animate-pulse" />
-                      <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">Preparing voice...</span>
+                      <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">{t('app.mechanic.preparing_voice')}</span>
                     </motion.div>
                   )}
                 </div>
@@ -1687,7 +1687,7 @@ ${diagnosticHistory}
                 ))}
               </div>
               <span className="text-[10px] font-black uppercase tracking-widest text-navy">
-                {status === 'playing' ? 'Premium Voice Active' : 'Generating Voice...'}
+                {status === 'playing' ? t('app.mechanic.voice_active') : t('app.mechanic.generating_voice')}
               </span>
             </motion.div>
           )}
@@ -1784,7 +1784,7 @@ ${diagnosticHistory}
                           style={{ height: 16, transformOrigin: 'center' }}
                         />
                       ))}
-                      <span className="ml-3 text-[10px] font-display font-black text-blue-600 uppercase tracking-widest italic animate-pulse">Listening...</span>
+                      <span className="ml-3 text-[10px] font-display font-black text-blue-600 uppercase tracking-widest italic animate-pulse">{t('app.mechanic.listening_label')}</span>
                     </motion.div>
                   ) : (
                     <motion.textarea
@@ -1803,7 +1803,7 @@ ${diagnosticHistory}
                           sendMessage(input)
                         }
                       }}
-                      placeholder="Describe your issue or ask a question..."
+                      placeholder={t('app.mechanic.placeholder')}
                       rows={1}
                       style={{ minHeight: 24, maxHeight: 200 }}
                       className="w-full bg-transparent outline-none resize-none

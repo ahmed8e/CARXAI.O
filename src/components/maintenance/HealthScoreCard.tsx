@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { Shield, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Shield, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
 import type { HealthCategory } from '../../data/maintenanceData'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   score: number
@@ -15,7 +16,17 @@ const STATUS_COLORS = {
   risk: { bg: 'bg-red-500', text: 'text-red-600', ring: 'ring-red-500/20' },
 }
 
-export default function HealthScoreCard({ score, label, categories }: Props) {
+const CAT_KEY_MAP: Record<string, string> = {
+  'Engine': 'engine',
+  'Brakes': 'brakes',
+  'Tires': 'tires',
+  'Fluids': 'fluids',
+  'Battery / Electrical': 'battery',
+  'Maintenance Consistency': 'consistency'
+}
+
+export default function HealthScoreCard({ score, categories }: Props) {
+  const { t } = useTranslation()
   const overall = score >= 85 ? 'excellent' : score >= 65 ? 'good' : score >= 40 ? 'attention' : 'risk'
   const colors = STATUS_COLORS[overall]
   const circumference = 2 * Math.PI * 54
@@ -26,7 +37,7 @@ export default function HealthScoreCard({ score, label, categories }: Props) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
         <Shield className="w-5 h-5 text-navy" />
-        <h3 className="text-sm font-black uppercase tracking-widest text-on-surface">Car Health Score</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest text-on-surface">{t('maintenance.health_card.title')}</h3>
       </div>
 
       {/* Score Ring */}
@@ -61,13 +72,12 @@ export default function HealthScoreCard({ score, label, categories }: Props) {
             ) : (
               <TrendingDown className="w-3.5 h-3.5" />
             )}
-            <span className="text-[11px] font-black uppercase tracking-wider">{label}</span>
+            <span className="text-[11px] font-black uppercase tracking-wider">
+              {t(`maintenance.status_labels.${overall}`)}
+            </span>
           </div>
           <p className="text-xs text-muted font-medium leading-relaxed">
-            {overall === 'excellent' ? 'Your vehicle is in great shape. Keep it up!' :
-             overall === 'good' ? 'Looking good. A few items need attention soon.' :
-             overall === 'attention' ? 'Several maintenance items need attention.' :
-             'Multiple overdue services. Schedule maintenance soon.'}
+            {t(`maintenance.health_card.messages.${overall}`)}
           </p>
         </div>
       </div>
@@ -77,9 +87,12 @@ export default function HealthScoreCard({ score, label, categories }: Props) {
         {categories.map((cat) => {
           const pct = Math.round((cat.score / cat.maxScore) * 100)
           const catColors = STATUS_COLORS[cat.status]
+          const catKey = CAT_KEY_MAP[cat.label] || 'other'
           return (
             <div key={cat.label} className="flex items-center gap-3">
-              <span className="text-[11px] font-bold text-muted w-[120px] truncate">{cat.label}</span>
+              <span className="text-[11px] font-bold text-muted w-[120px] truncate">
+                {catKey !== 'other' ? t(`maintenance.health_card.categories.${catKey}`) : cat.label}
+              </span>
               <div className="flex-1 h-2 rounded-full bg-surface-low dark:bg-surface-highest/30 overflow-hidden">
                 <motion.div
                   className={`h-full rounded-full ${catColors.bg}`}

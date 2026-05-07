@@ -31,18 +31,27 @@ i18n.on('languageChanged', (lng) => {
   document.documentElement.dir = dir;
   document.documentElement.lang = lng;
   
-  // Save to body for CSS targeting if needed
+  // Update body classes for CSS targeting
   if (lng === 'ar') {
     document.body.classList.add('rtl');
+    document.body.classList.remove('ltr');
   } else {
+    document.body.classList.add('ltr');
     document.body.classList.remove('rtl');
   }
+  
+  // Persist to localStorage (Detector might handle this but being explicit is safer)
+  localStorage.setItem('i18nextLng', lng);
 });
 
 // Initial set
 const initialLng = i18n.language || 'en';
 document.documentElement.dir = initialLng === 'ar' ? 'rtl' : 'ltr';
 document.documentElement.lang = initialLng;
-if (initialLng === 'ar') document.body.classList.add('rtl');
+if (initialLng === 'ar') {
+  document.body.classList.add('rtl');
+} else {
+  document.body.classList.add('ltr');
+}
 
 export default i18n;

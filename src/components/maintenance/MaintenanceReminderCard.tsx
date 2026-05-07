@@ -6,41 +6,42 @@ import {
   BatteryMedium, CircleDot, ShieldAlert
 } from 'lucide-react'
 import type { MaintenanceStatus, ServiceStatus } from '../../data/maintenanceData'
+import { useTranslation } from 'react-i18next'
 
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Droplets, Wind, Thermometer, BatteryMedium, CircleDot, ShieldAlert
 }
 
 const STATUS_CONFIG: Record<ServiceStatus, {
-  label: string
+  key: string
   bannerBg: string
   bannerText: string
   border: string
   icon: React.ComponentType<any>
 }> = {
   overdue: {
-    label: 'Overdue',
+    key: 'overdue',
     bannerBg: 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20',
     bannerText: 'text-red-600 dark:text-red-400',
     border: 'border-red-200 dark:border-red-500/30',
     icon: AlertCircle,
   },
   due: {
-    label: 'Due Now',
+    key: 'due_now',
     bannerBg: 'bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20',
     bannerText: 'text-amber-600 dark:text-amber-400',
     border: 'border-amber-200 dark:border-amber-500/30',
     icon: Activity,
   },
   coming_soon: {
-    label: 'Coming Soon',
+    key: 'coming_soon',
     bannerBg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20',
     bannerText: 'text-blue-600 dark:text-blue-400',
     border: 'border-blue-200 dark:border-blue-500/30',
     icon: Activity,
   },
   good: {
-    label: 'Good',
+    key: 'all_good',
     bannerBg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20',
     bannerText: 'text-emerald-600 dark:text-emerald-400',
     border: 'border-overlay',
@@ -55,6 +56,7 @@ interface Props {
 }
 
 export default function MaintenanceReminderCard({ status, currentMileage, onLogService }: Props) {
+  const { t, i18n } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const [logMileage, setLogMileage] = useState(currentMileage)
   const [logging, setLogging] = useState(false)
@@ -64,7 +66,8 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
   const StatusIcon = cfg.icon
   const ItemIcon = ICON_MAP[status.item.icon] || Droplets
 
-  const dueDateStr = status.nextDueDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const locale = i18n.language === 'ar' ? 'ar-SA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  const dueDateStr = status.nextDueDate.toLocaleDateString(locale, { month: 'short', year: 'numeric' })
 
   const handleLog = () => {
     setLogging(true)
@@ -87,13 +90,13 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
         <div className="flex items-center gap-2">
           <StatusIcon className={`w-3.5 h-3.5 ${cfg.bannerText}`} />
           <span className={`text-[10px] font-black uppercase tracking-widest ${cfg.bannerText}`}>
-            {cfg.label}
+            {t(`maintenance.status_labels.${cfg.key}`)}
           </span>
         </div>
         <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
           {status.item.intervalMiles > 0
-            ? `Next: ${status.nextDueMileage.toLocaleString()} mi`
-            : `Due: ${dueDateStr}`}
+            ? t('maintenance.reminder_card.next_service', { mileage: status.nextDueMileage.toLocaleString() })
+            : t('maintenance.reminder_card.due_date', { date: dueDateStr })}
         </span>
       </div>
 
@@ -116,7 +119,7 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
               </p>
               {status.item.intervalMiles > 0 && (
                 <p className="text-[10px] text-muted/60 font-bold mt-1">
-                  Est. cost: ${status.item.costLow}–${status.item.costHigh}
+                  {t('maintenance.reminder_card.est_cost', { low: status.item.costLow, high: status.item.costHigh })}
                 </p>
               )}
             </div>
@@ -141,14 +144,14 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
                   <div className="flex gap-3">
                     <ShieldCheck className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">Anti-Scam Tip</p>
+                      <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">{t('maintenance.reminder_card.anti_scam')}</p>
                       <p className="text-xs text-muted leading-relaxed">{status.item.antiScamNote}</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">Risk if Delayed</p>
+                      <p className="text-[10px] font-black text-on-surface uppercase tracking-wider mb-1">{t('maintenance.reminder_card.risk_delayed')}</p>
                       <p className="text-xs text-muted leading-relaxed">{status.item.riskIfDelayed}</p>
                     </div>
                   </div>
@@ -157,7 +160,7 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
                 {/* Log Service */}
                 <div>
                   <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-2">
-                    Log as Completed
+                    {t('maintenance.reminder_card.log_title')}
                   </p>
                   <div className="flex gap-2">
                     <input
@@ -165,14 +168,14 @@ export default function MaintenanceReminderCard({ status, currentMileage, onLogS
                       value={logMileage}
                       onChange={e => setLogMileage(Number(e.target.value))}
                       className="flex-1 bg-surface-low dark:bg-surface-highest/30 border border-overlay rounded-xl px-3 py-2 text-sm font-bold text-on-surface outline-none focus:border-navy text-center"
-                      placeholder="Mileage at service"
+                      placeholder={t('maintenance.reminder_card.mileage_label')}
                     />
                     <button
                       onClick={handleLog}
                       disabled={logging || done}
                       className="px-4 py-2 bg-navy text-white rounded-xl text-xs font-black uppercase tracking-widest disabled:opacity-60 hover:brightness-110 transition-all active:scale-95 whitespace-nowrap"
                     >
-                      {done ? '✓ Logged' : logging ? 'Saving...' : 'Log Service'}
+                      {done ? t('maintenance.reminder_card.logged') : logging ? t('maintenance.reminder_card.saving') : t('maintenance.save_button')}
                     </button>
                   </div>
                 </div>

@@ -50,6 +50,7 @@ export default function MechanicReport({
   isLimitReached,
   incrementUsage
 }: MechanicReportProps) {
+  const { t } = useTranslation()
   const { isPro } = useSubscription()
   const [profile, setProfile] = useState<any>(null)
   const [vehicle, setVehicle] = useState<Vehicle | null>(activeVehicle || null)
@@ -89,7 +90,7 @@ export default function MechanicReport({
       } else {
         setProfile({
           full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
-          phone: (settings as any)?.phone_number || user.user_metadata?.phone_number || 'Not provided'
+          phone: (settings as any)?.phone_number || user.user_metadata?.phone_number || t('reports.modal.not_provided')
         })
       }
 
@@ -117,9 +118,9 @@ export default function MechanicReport({
 
 
   const copySummary = () => {
-    const text = `Car Safety Mechanic Report ${token}\n\nVehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\nDiagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\nLikely Cause: ${diagnosis.likelyCause || 'Ongoing analysis'}\nRecommended Action: ${diagnosis.next_step}`
+    const text = `${t('reports.modal.title')} ${token}\n\n${t('reports.modal.vehicle_spec')}: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\n${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\n${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}\n${t('reports.modal.action_required')}: ${diagnosis.next_step}`
     navigator.clipboard.writeText(text)
-    alert('Report summary copied to clipboard!')
+    alert(t('reports.modal.summary_copied'))
   }
 
   const handleShare = async () => {
@@ -140,12 +141,12 @@ export default function MechanicReport({
       vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
       diagnosis_data: diagnosis,
       messages: messages,
-      customer_data: {
-        email: user?.email,
-        name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'Customer'
-      },
-      summary: `Diagnostic report for ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. Issue: ${diagnosis.issueName || 'Issue detected'}. Likely cause: ${diagnosis.likelyCause || 'Seeking clarification'}. Recommended action: ${diagnosis.next_step}`
-    }
+        customer_data: {
+          email: user?.email,
+          name: user?.user_metadata?.full_name || user?.user_metadata?.name || t('reports.modal.member')
+        },
+        summary: `${t('reports.modal.title')} for ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. ${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}. ${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}. ${t('reports.modal.action_required')}: ${diagnosis.next_step}`
+      }
 
     // Only add report_id if it exists to link to history, but the system doesn't require it
     if (currentReportId) {
@@ -185,8 +186,8 @@ export default function MechanicReport({
       const executeClipboardFallback = async () => {
         try {
           console.log('[Car Safety Share Flow] 7. Attempting Clipboard Fallback...')
-          await navigator.clipboard.writeText(`Car Safety Mechanic Report\n\nIssue: ${diagnosis.issueName || 'Diagnostic Assessment'}\nView report: ${shareUrl}`)
-          alert('Public report link copied to clipboard!')
+          await navigator.clipboard.writeText(`${t('reports.modal.title')}\n\n${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}\nView report: ${shareUrl}`)
+          alert(t('reports.modal.summary_copied'))
           console.log('[Car Safety Share Flow] 8. Clipboard success')
         } catch (clipErr) {
           console.error('[Car Safety Share Flow] 8. Clipboard failed as well:', clipErr)
@@ -217,7 +218,7 @@ export default function MechanicReport({
       if (err?.code === '42P01') {
         alert("Database structure missing. Please run the SQL migrations in Supabase to create the `shared_reports` table.")
       } else {
-        alert(`There was an issue creating the share link. Please try again. Detailed error: ${err.message || 'Unknown Error'}`)
+        alert(t('overpaying.error_calculating')) // Reuse a general error
       }
     } finally {
       console.log('[Car Safety Share Flow] 10. Flow completes, cleaning up state')
@@ -287,7 +288,7 @@ export default function MechanicReport({
                 <Logo size="100%" />
               </div>
               <div className="flex flex-col">
-                <h2 className="text-xl font-display font-bold text-slate-900 tracking-tight">Mechanic Report</h2>
+                <h2 className="text-xl font-display font-bold text-slate-900 tracking-tight">{t('reports.modal.title')}</h2>
                 <div className="flex items-center gap-3 mt-0.5">
                   <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     <Hash className="w-3 h-3" /> {token}
@@ -317,7 +318,7 @@ export default function MechanicReport({
           <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-12 pb-24 bg-white">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-24">
-                <AILoader text="Assembling Report" />
+                <AILoader text={t('common.analyzing')} />
               </div>
             ) : (
               <>
@@ -327,20 +328,20 @@ export default function MechanicReport({
                   <div className="lg:col-span-1 space-y-6">
                     <div className="flex items-center gap-2 mb-2">
                       <User className="w-4 h-4 text-[#0070E0]" />
-                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Customer Data</h3>
+                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{t('reports.modal.customer_data')}</h3>
                     </div>
                     
                     <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 space-y-5">
                       <div>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</p>
-                        <p className="text-[15px] font-bold text-slate-900">{profile?.full_name || user.email?.split('@')[0] || 'Verified Member'}</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.full_name')}</p>
+                        <p className="text-[15px] font-bold text-slate-900">{profile?.full_name || user.email?.split('@')[0] || t('reports.modal.member')}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone Number</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.phone_number')}</p>
                         <p className="text-[15px] font-bold text-slate-900">{profile?.phone}</p>
                       </div>
                       <div className="pt-2">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Record Email</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.record_email')}</p>
                         <p className="text-xs font-bold text-slate-600 truncate">{user.email}</p>
                       </div>
                     </div>
@@ -350,40 +351,40 @@ export default function MechanicReport({
                   <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center gap-2 mb-2">
                       <Car className="w-4 h-4 text-[#0070E0]" />
-                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Vehicle Specification</h3>
+                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{t('reports.modal.vehicle_spec')}</h3>
                     </div>
 
                     <div className="p-8 rounded-3xl bg-slate-50 border border-slate-100">
                       {vehicle ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-12">
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Brand & Model</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.brand_model')}</p>
                             <p className="text-[15px] font-bold text-slate-900 leading-tight">{vehicle.make} {vehicle.model}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Model Year</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.model_year')}</p>
                             <p className="text-[15px] font-bold text-slate-900">{vehicle.year}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Plate Number</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.plate_number')}</p>
                             <p className="text-[15px] font-bold text-slate-900 tracking-widest">{vehicle.plate_number || '---'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Engine Type</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.engine_type')}</p>
                             <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.engine_type || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Gearbox</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.gearbox')}</p>
                             <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.gearbox || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Mileage</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.mileage')}</p>
                             <p className="text-[15px] font-bold text-slate-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : '---'}</p>
                           </div>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center py-6">
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No vehicle data on file</p>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('reports.modal.no_vehicle_data')}</p>
                         </div>
                       )}
                     </div>
@@ -396,7 +397,7 @@ export default function MechanicReport({
                     <div className="w-8 h-8 rounded-xl bg-[#0070E0]/5 flex items-center justify-center border border-[#0070E0]/10">
                       <ShieldAlert className="w-4 h-4 text-[#0070E0]" />
                     </div>
-                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Official Diagnostic Analysis</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{t('reports.modal.analysis_title')}</h3>
                   </div>
 
                   <div className="grid lg:grid-cols-12 gap-8">
@@ -407,9 +408,9 @@ export default function MechanicReport({
                         <div className="absolute top-0 right-0 p-4 opacity-5">
                           <Info className="w-16 h-16 text-[#0070E0]" />
                         </div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Issue Reported by User</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{t('reports.modal.issue_reported')}</p>
                         <p className="text-xl font-display font-medium text-slate-900 italic leading-relaxed relative z-10">
-                          "{messages.find(m => m.role === 'user')?.content || 'Vehicle performance issue reported'}"
+                          "{messages.find(m => m.role === 'user')?.content || t('reports.modal.issue_reported_fallback')}"
                         </p>
                       </div>
 
@@ -420,9 +421,9 @@ export default function MechanicReport({
                         <div className="grid md:grid-cols-2 gap-10 relative z-10">
                           <div className="space-y-8">
                             <div>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Professional Diagnosis</p>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{t('reports.modal.prof_diagnosis')}</p>
                               <h4 className="text-3xl font-display font-black tracking-tight italic mb-2 text-[#0E1B39]">
-                                {diagnosis.issueName || 'Diagnostic Assessment'}
+                                {diagnosis.issueName || t('reports.modal.analysis_title')}
                               </h4>
                               {diagnosis.urgencyLevel && (
                                 <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
@@ -437,16 +438,16 @@ export default function MechanicReport({
                             </div>
 
                             <div>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Likely Root Cause</p>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{t('reports.modal.likely_cause')}</p>
                               <p className="text-lg text-[#0E1B39]/90 leading-relaxed font-medium">
-                                {diagnosis.likelyCause || 'Ongoing professional analysis...'}
+                                {diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}
                               </p>
                             </div>
                           </div>
 
                           <div className="space-y-6">
                             <div className="p-7 rounded-3xl bg-white shadow-sm border border-[#0070E0]/20">
-                              <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-3">Action Required Now</p>
+                              <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-3">{t('reports.modal.action_required')}</p>
                               <p className="text-base font-bold text-slate-900 leading-snug">
                                 {diagnosis.next_step}
                               </p>
@@ -459,7 +460,7 @@ export default function MechanicReport({
                                   : 'bg-red-50 text-red-600 border-red-100'
                               }`}>
                                 {diagnosis.can_drive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-                                {diagnosis.can_drive ? 'Safe to Drive' : 'Do Not Drive'}
+                                {diagnosis.can_drive ? t('reports.modal.safe_to_drive') : t('reports.modal.do_not_drive')}
                               </div>
                             </div>
                           </div>
@@ -472,8 +473,8 @@ export default function MechanicReport({
                                <Logo size="100%" />
                             </div>
                             <div>
-                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Certified AI Assessment</p>
-                              <p className="text-[10px] font-bold text-slate-500 uppercase">Verification ID: {token}</p>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('reports.modal.cert_seal')}</p>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase">{t('reports.modal.verification_id')}: {token}</p>
                             </div>
                           </div>
                           <div className="hidden md:block">
@@ -490,7 +491,7 @@ export default function MechanicReport({
                 {/* 7. Attached Media */}
                 {messages.some(m => m.imageUrl) && (
                   <div className="space-y-6 pt-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Attached Evidence</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">{t('reports.modal.evidence')}</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {messages.filter(m => m.imageUrl).map((m, idx) => (
                         <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-105">
@@ -505,9 +506,9 @@ export default function MechanicReport({
                 <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex gap-4">
                   <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
                   <div>
-                    <h5 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Disclaimer</h5>
+                    <h5 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">{t('reports.modal.disclaimer')}</h5>
                     <p className="text-xs text-red-900/60 font-medium leading-relaxed">
-                      This is a preliminary AI-generated report for informational purposes. While highly accurate, this report does not replace a physical inspection. A certified mechanic must confirm the final diagnosis before performing repairs.
+                      {t('reports.modal.disclaimer_text')}
                     </p>
                   </div>
                 </div>
@@ -529,7 +530,7 @@ export default function MechanicReport({
                   >
                     {/* Sophisticated White Sheen Sweep */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                    <Download className="w-5 h-5 stroke-[2.5]" /> Download Official PDF
+                    <Download className="w-5 h-5 stroke-[2.5]" /> {t('reports.modal.download_pdf')}
                   </motion.button>
                 </div>
 
@@ -543,7 +544,7 @@ export default function MechanicReport({
                     className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${sharing || isLimitReached ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#0070E0]'}`}
                   >
                     {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : isLimitReached ? <Lock className="w-4 h-4" /> : <Share2 className="w-4 h-4" />} 
-                    {sharing ? 'Sharing...' : isLimitReached ? 'Limit Reached' : 'Share Report'}
+                    {sharing ? t('reports.modal.sharing') : isLimitReached ? t('reports.modal.limit_reached') : t('reports.modal.share_report')}
                   </motion.button>
                   <motion.button 
                     whileHover={{ y: -1, boxShadow: '0 8px 30px rgba(0,0,0,0.06)', borderColor: '#0070E0' }}
@@ -551,7 +552,7 @@ export default function MechanicReport({
                     onClick={copySummary}
                     className="flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-8 py-4.5 rounded-[20px] bg-white border border-[#E2E8F0] text-[#0E1B39] text-[10px] font-bold uppercase tracking-widest transition-all duration-300"
                   >
-                    <Copy className="w-4 h-4" /> Copy Summary
+                    <Copy className="w-4 h-4" /> {t('reports.modal.copy_summary')}
                   </motion.button>
                 </div>
                 {isLimitReached && (

@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Droplets, Thermometer, ShieldAlert, RotateCw, Droplet, Cog, ChevronDown, AlertCircle, BotMessageSquare, Info } from 'lucide-react'
 import { FLUID_GUIDE, type FluidInfo } from '../../data/maintenanceData'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Droplets, Thermometer, ShieldAlert, RotateCw, Droplet, Cog
 }
 
 export default function FluidCheckGuide() {
+  const { t } = useTranslation()
   const [selected, setSelected] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -27,14 +29,14 @@ export default function FluidCheckGuide() {
             <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h3 className="text-base font-black text-on-surface tracking-tight">Fluid Check Guide</h3>
-            <p className="text-[11px] text-muted font-medium">General guide — verify with your owner's manual</p>
+            <h3 className="text-base font-black text-on-surface tracking-tight">{t('maintenance.fluid_guide_tool.title')}</h3>
+            <p className="text-[11px] text-muted font-medium">{t('maintenance.fluid_guide_tool.subtitle')}</p>
           </div>
         </div>
         <div className="mt-3 flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 rounded-2xl px-3 py-2.5">
           <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
           <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium">
-            This is a general guide. Locations may vary by vehicle. Always check when the engine is cold unless noted.
+            {t('maintenance.fluid_guide_tool.disclaimer')}
           </p>
         </div>
       </div>
@@ -82,14 +84,14 @@ export default function FluidCheckGuide() {
                         <div className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5 border border-white/20 shadow-sm"
                           style={{ background: fluid.color }} />
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">Normal Color / Appearance</p>
+                          <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">{t('maintenance.fluid_guide_tool.normal_appearance')}</p>
                           <p className="text-xs text-on-surface font-medium">{fluid.normalColor}</p>
                         </div>
                       </div>
 
                       {/* How to Check */}
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">How to Check</p>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">{t('maintenance.fluid_guide_tool.how_to_check')}</p>
                         <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-500/10 rounded-2xl p-4">
                           <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                           <p className="text-xs text-blue-800 dark:text-blue-300 font-medium leading-relaxed">{fluid.howToCheck}</p>
@@ -98,7 +100,7 @@ export default function FluidCheckGuide() {
 
                       {/* Warning Signs */}
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">Warning Signs</p>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-2">{t('maintenance.fluid_guide_tool.warning_signs')}</p>
                         <div className="space-y-1.5">
                           {fluid.warningSigns.map((sign, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -113,7 +115,7 @@ export default function FluidCheckGuide() {
                       <div className="flex items-start gap-3 bg-red-50 dark:bg-red-500/10 rounded-2xl p-4">
                         <ShieldAlert className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400 mb-1">⚠ Do Not</p>
+                          <p className="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400 mb-1">{t('maintenance.fluid_guide_tool.do_not')}</p>
                           <p className="text-xs text-red-700 dark:text-red-300 font-medium leading-relaxed">{fluid.doNot}</p>
                         </div>
                       </div>
@@ -122,7 +124,7 @@ export default function FluidCheckGuide() {
                       <div className="flex items-start gap-3 bg-surface-low dark:bg-surface-highest/30 rounded-2xl p-4">
                         <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">See a Mechanic If</p>
+                          <p className="text-[10px] font-black uppercase tracking-wider text-muted mb-1">{t('maintenance.fluid_guide_tool.see_mechanic')}</p>
                           <p className="text-xs text-muted font-medium leading-relaxed">{fluid.seeAMechanic}</p>
                         </div>
                       </div>
@@ -134,7 +136,7 @@ export default function FluidCheckGuide() {
                           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-navy/5 hover:bg-navy/10 text-navy transition-colors"
                         >
                           <BotMessageSquare className="w-3.5 h-3.5" />
-                          <span className="text-[11px] font-black uppercase tracking-wider">Ask AI About This</span>
+                          <span className="text-[11px] font-black uppercase tracking-wider">{t('maintenance.fluid_guide_tool.ask_ai')}</span>
                         </button>
                       </div>
                     </div>

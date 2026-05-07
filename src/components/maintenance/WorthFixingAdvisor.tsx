@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Scale, Car, Gauge, DollarSign, Wrench, AlertCircle, CheckCircle2, RefreshCw, TrendingDown, TrendingUp } from 'lucide-react'
 import { evaluateRepair, type RepairDecision } from '../../data/maintenanceData'
+import { useTranslation } from 'react-i18next'
 
-const CONDITIONS = ['Excellent', 'Good', 'Fair', 'Poor']
+const CONDITIONS = ['excellent', 'good', 'fair', 'poor']
 const REPAIR_TYPES = [
-  'Engine Repair', 'Brake Repair', 'Transmission Repair', 'Suspension / Steering',
-  'AC / Heating', 'Electrical / Battery', 'Exhaust System', 'Timing Belt / Chain',
-  'Head Gasket', 'Radiator / Cooling', 'Tires / Wheels', 'Body / Cosmetic', 'Other'
+  'engine', 'brake', 'transmission', 'suspension',
+  'ac', 'electrical', 'exhaust', 'timing',
+  'gasket', 'radiator', 'tires', 'body', 'other'
 ]
 
 const VERDICT_CONFIG: Record<RepairDecision['verdict'], {
@@ -23,10 +24,11 @@ const VERDICT_CONFIG: Record<RepairDecision['verdict'], {
 }
 
 export default function WorthFixingAdvisor() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({
     make: '', model: '', year: new Date().getFullYear(),
     mileage: 0, carValue: 0, repairCost: 0,
-    repairType: '', condition: 'Good', yearsToKeep: 3,
+    repairType: '', condition: 'good', yearsToKeep: 3,
   })
   const [result, setResult] = useState<RepairDecision | null>(null)
   const [loading, setLoading] = useState(false)
@@ -43,7 +45,7 @@ export default function WorthFixingAdvisor() {
         mileage: form.mileage,
         carYear: form.year,
         repairType: form.repairType,
-        condition: form.condition.toLowerCase(),
+        condition: form.condition,
         yearsToKeep: form.yearsToKeep,
       })
       setResult(decision)
@@ -62,8 +64,8 @@ export default function WorthFixingAdvisor() {
             <Scale className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
           <div>
-            <h3 className="text-base font-black text-on-surface tracking-tight">Is This Worth Fixing?</h3>
-            <p className="text-[11px] text-muted font-medium">Smart repair decision advisor</p>
+            <h3 className="text-base font-black text-on-surface tracking-tight">{t('maintenance.advisor_tool.title')}</h3>
+            <p className="text-[11px] text-muted font-medium">{t('maintenance.advisor_tool.subtitle')}</p>
           </div>
         </div>
       </div>
@@ -72,19 +74,19 @@ export default function WorthFixingAdvisor() {
         {/* Car Details */}
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Make</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">{t('maintenance.advisor_tool.make')}</label>
             <input type="text" placeholder="Toyota"
               value={form.make} onChange={e => set('make', e.target.value)}
               className="w-full bg-surface-low dark:bg-surface-highest/30 border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy" />
           </div>
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Model</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">{t('maintenance.advisor_tool.model')}</label>
             <input type="text" placeholder="Camry"
               value={form.model} onChange={e => set('model', e.target.value)}
               className="w-full bg-surface-low dark:bg-surface-highest/30 border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy" />
           </div>
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Year</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">{t('maintenance.advisor_tool.year')}</label>
             <input type="number" placeholder="2018"
               value={form.year || ''} onChange={e => set('year', Number(e.target.value))}
               className="w-full bg-surface-low dark:bg-surface-highest/30 border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy" />
@@ -95,7 +97,7 @@ export default function WorthFixingAdvisor() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">
-              <Gauge className="inline w-3 h-3 mr-1" />Current Mileage
+              <Gauge className="inline w-3 h-3 mr-1" />{t('maintenance.advisor_tool.mileage')}
             </label>
             <input type="number" placeholder="95,000"
               value={form.mileage || ''} onChange={e => set('mileage', Number(e.target.value))}
@@ -103,7 +105,7 @@ export default function WorthFixingAdvisor() {
           </div>
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">
-              <Car className="inline w-3 h-3 mr-1" />Est. Car Value ($)
+              <Car className="inline w-3 h-3 mr-1" />{t('maintenance.advisor_tool.car_value')}
             </label>
             <input type="number" placeholder="8,500"
               value={form.carValue || ''} onChange={e => set('carValue', Number(e.target.value))}
@@ -115,17 +117,21 @@ export default function WorthFixingAdvisor() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">
-              <Wrench className="inline w-3 h-3 mr-1" />Repair Type
+              <Wrench className="inline w-3 h-3 mr-1" />{t('maintenance.advisor_tool.repair_type')}
             </label>
             <select value={form.repairType} onChange={e => set('repairType', e.target.value)}
               className="w-full bg-surface-low dark:bg-surface-highest/30 border border-overlay rounded-xl px-3 py-2.5 text-sm font-bold text-on-surface outline-none focus:border-navy">
-              <option value="">Select...</option>
-              {REPAIR_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              <option value="">{t('maintenance.advisor_tool.select_repair')}</option>
+              {REPAIR_TYPES.map(type => (
+                <option key={type} value={type}>
+                  {t(`maintenance.advisor_tool.repair_types.${type}`)}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">
-              <DollarSign className="inline w-3 h-3 mr-1" />Repair Quote ($)
+              <DollarSign className="inline w-3 h-3 mr-1" />{t('maintenance.advisor_tool.repair_quote')}
             </label>
             <input type="number" placeholder="1,200"
               value={form.repairCost || ''} onChange={e => set('repairCost', Number(e.target.value))}
@@ -136,7 +142,7 @@ export default function WorthFixingAdvisor() {
         {/* Ratio indicator */}
         {form.carValue > 0 && form.repairCost > 0 && (
           <div className="bg-surface-low dark:bg-surface-highest/30 rounded-2xl px-4 py-3 flex items-center justify-between">
-            <span className="text-xs font-bold text-muted">Repair vs. Car Value</span>
+            <span className="text-xs font-bold text-muted">{t('maintenance.advisor_tool.repair_vs_value')}</span>
             <span className={`text-sm font-black ${ratio > 75 ? 'text-red-500' : ratio > 50 ? 'text-amber-500' : 'text-emerald-500'}`}>
               {ratio}%
             </span>
@@ -146,7 +152,7 @@ export default function WorthFixingAdvisor() {
         {/* Condition & Keep Duration */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">Car Condition</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">{t('maintenance.advisor_tool.car_condition')}</label>
             <div className="flex gap-1.5 flex-wrap">
               {CONDITIONS.map(c => (
                 <button key={c}
@@ -156,14 +162,14 @@ export default function WorthFixingAdvisor() {
                       ? 'bg-navy text-white'
                       : 'bg-surface-low dark:bg-surface-highest/30 border border-overlay text-muted hover:border-navy/30'
                   }`}>
-                  {c}
+                  {t(`maintenance.advisor_tool.conditions.${c}`)}
                 </button>
               ))}
             </div>
           </div>
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1.5">
-              Plan to Keep (Years)
+              {t('maintenance.advisor_tool.plan_to_keep')}
             </label>
             <div className="flex gap-1.5">
               {[1, 2, 3, 5, '5+'].map(y => (
@@ -187,7 +193,7 @@ export default function WorthFixingAdvisor() {
           disabled={loading || !form.repairType || !form.carValue || !form.repairCost}
           className="w-full py-3.5 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-sm disabled:opacity-50 hover:brightness-110 transition-all active:scale-[0.98] shadow-lg shadow-navy/20"
         >
-          {loading ? 'Analyzing...' : 'Check Repair Decision'}
+          {loading ? t('maintenance.advisor_tool.analyzing') : t('maintenance.advisor_tool.check_decision')}
         </button>
 
         {/* Result */}
@@ -204,7 +210,7 @@ export default function WorthFixingAdvisor() {
                   const V = VERDICT_CONFIG[result.verdict].icon
                   return <V className="w-5 h-5" />
                 })()}
-                <span className="text-base font-black">{result.title}</span>
+                <span className="text-base font-black">{t(`maintenance.advisor_tool.verdicts.${result.verdict}`)}</span>
               </div>
               <ul className="space-y-2">
                 {result.reasons.map((r, i) => (

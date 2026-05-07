@@ -3,15 +3,16 @@ import { motion } from 'framer-motion'
 import { Sun, Snowflake, MapPin, AlertCircle, Info, Zap, BotMessageSquare } from 'lucide-react'
 import type { SeasonalChecklistData, ChecklistItem } from '../../data/maintenanceData'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Sun, Snowflake, MapPin
 }
 
 const WARNING_CONFIG = {
-  critical: { label: 'Critical', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-500/10', icon: AlertCircle },
-  warning: { label: 'Important', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: Zap },
-  info: { label: 'Recommended', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10', icon: Info },
+  critical: { key: 'critical', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-500/10', icon: AlertCircle },
+  warning: { key: 'warning', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: Zap },
+  info: { key: 'info', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10', icon: Info },
 }
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
+  const { t } = useTranslation()
   const [items, setItems] = useState<ChecklistItem[]>(checklist.items)
   const [expanded, setExpanded] = useState(true)
   const navigate = useNavigate()
@@ -56,7 +58,9 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
           </div>
           <div>
             <h3 className="text-sm font-black text-on-surface tracking-tight">{checklist.title}</h3>
-            <p className="text-[10px] text-muted font-medium">{done}/{total} completed</p>
+            <p className="text-[10px] text-muted font-medium">
+              {t('maintenance.seasonal_tool.completed', { done, total })}
+            </p>
           </div>
         </div>
 
@@ -118,7 +122,7 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
                       </span>
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${warnCfg.bg} ${warnCfg.color}`}>
                         <WarnIcon className="w-2.5 h-2.5" />
-                        {warnCfg.label}
+                        {t(`maintenance.seasonal_tool.warning_levels.${warnCfg.key}`)}
                       </span>
                     </div>
                     <p className="text-[11px] text-muted font-medium leading-relaxed">{item.description}</p>
@@ -130,7 +134,7 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
                     className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-navy/5 hover:bg-navy/10 text-navy transition-colors"
                   >
                     <BotMessageSquare className="w-3.5 h-3.5" />
-                    <span className="text-[9px] font-black uppercase tracking-wider">Ask AI</span>
+                    <span className="text-[9px] font-black uppercase tracking-wider">{t('maintenance.seasonal_tool.ask_ai')}</span>
                   </button>
                 </div>
               </div>

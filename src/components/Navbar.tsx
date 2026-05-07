@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Menu, User, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react'
 import { BrandLockup } from './ui/Brand'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -14,6 +15,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onMenuClick, showNavLinks = false, transparent = false }: NavbarProps) {
+  const { t } = useTranslation()
   const { user, signOut } = useAuth()
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
@@ -42,12 +44,12 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
       {showNavLinks && (
         <div className="hidden md:flex items-center gap-8">
           {[
-            { name: 'Features', id: 'features' },
-            { name: 'How it Works', id: 'how-it-works' },
-            { name: 'Guides', id: 'guides', path: '/guides' },
-            { name: 'Reviews', id: 'reviews' },
-            { name: 'Pricing', id: 'pricing' },
-            { name: 'FAQ', id: 'faq' },
+            { name: t('landing.nav.features'), id: 'features' },
+            { name: t('landing.nav.how_it_works'), id: 'how-it-works' },
+            { name: t('landing.nav.guides'), id: 'guides', path: '/guides' },
+            { name: t('landing.nav.reviews'), id: 'reviews' },
+            { name: t('landing.nav.pricing'), id: 'pricing' },
+            { name: t('landing.nav.faq'), id: 'faq' },
           ].map((link) => (
             <Link 
               key={link.id}
@@ -83,7 +85,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                 ) : userInitial}
               </div>
-              <span className="hidden sm:block text-xs font-bold text-on-surface/80 group-hover:text-navy transition-colors">My Profile</span>
+              <span className="hidden sm:block text-xs font-bold text-on-surface/80 group-hover:text-navy transition-colors">{t('common.my_profile')}</span>
               <ChevronDown className={`hidden sm:block w-3.5 h-3.5 text-muted group-hover:text-navy transition-transform duration-300 ${accountMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -96,7 +98,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   className="absolute right-[-8px] top-full mt-4 w-60 bg-surface/98 dark:bg-surface-low backdrop-blur-3xl rounded-[32px] border border-overlay shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[70] overflow-hidden p-2"
                 >
                   <div className="px-3 py-3 mb-1 border-b border-overlay">
-                    <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5 px-1">Account</p>
+                    <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5 px-1">{t('auth.account')}</p>
                     <div className="flex items-center gap-2.5 px-1">
                        <div className="w-8 h-8 rounded-full bg-surface-low dark:bg-surface-low/80 border border-overlay flex items-center justify-center text-navy font-bold text-xs overflow-hidden">
                          {user?.user_metadata?.avatar_url ? (
@@ -113,15 +115,15 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   <div className="space-y-0.5">
                     <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
                       <LayoutDashboard className="w-4 h-4 text-muted group-hover:text-navy" />
-                      <span className="text-xs font-bold">Dashboard</span>
+                      <span className="text-xs font-bold">{t('nav.dashboard')}</span>
                     </Link>
                     <Link to="/my-account" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-on-surface/70 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
                       <User className="w-4 h-4 text-muted group-hover:text-navy" />
-                      <span className="text-xs font-bold">My Account</span>
+                      <span className="text-xs font-bold">{t('common.my_account')}</span>
                     </Link>
                     <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all text-left">
                       <LogOut className="w-4 h-4" />
-                      <span className="text-xs font-bold">Sign Out</span>
+                      <span className="text-xs font-bold">{t('common.logout')}</span>
                     </button>
                   </div>
                 </motion.div>
@@ -130,8 +132,8 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link to="/login?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">Sign In</Link>
-            <Link to="/login" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">Start Free</Link>
+            <Link to="/login?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy px-3 transition-colors">{t('auth.login.button')}</Link>
+            <Link to="/login" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">{t('auth.signup.button')}</Link>
           </div>
         )}
         

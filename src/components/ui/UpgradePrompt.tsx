@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Crown, X, ArrowRight, ShieldCheck } from 'lucide-react'
 import ShieldWrenchIcon from './ShieldWrenchIcon'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface UpgradePromptProps {
   isOpen: boolean
@@ -10,6 +11,7 @@ interface UpgradePromptProps {
 }
 
 export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleUpgrade = () => {
@@ -75,14 +77,14 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
               {/* Content Section */}
               <div className="text-center space-y-4 mb-10">
                 <h3 className="text-[26px] font-display font-black text-navy tracking-tight leading-tight italic uppercase">
-                  Unlock <br />
-                  <span className="text-on-surface tracking-tighter not-italic font-black">local assistance</span>
+                  {t('upgrade_prompt.title_part1')} <br />
+                  <span className="text-on-surface tracking-tighter not-italic font-black">{t('upgrade_prompt.title_part2')}</span>
                 </h3>
                 <p className="text-[14px] text-slate-500 font-medium leading-relaxed px-2">
-                  Upgrade your plan to access Mechanic and Towing options, with smarter nearby support and a better assistance experience.
+                  {t('upgrade_prompt.description')}
                 </p>
                 <p className="text-[11px] font-black uppercase tracking-widest text-navy/40 italic">
-                  Premium plans give you access to more advanced local help features.
+                  {t('upgrade_prompt.premium_note')}
                 </p>
               </div>
 
@@ -96,7 +98,7 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
                     <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                       <ShieldWrenchIcon className="w-5 h-5" />
                     </div>
-                    <span className="font-bold text-[15px] tracking-tight">Upgrade Plan</span>
+                    <span className="font-bold text-[15px] tracking-tight">{t('upgrade_prompt.upgrade_button')}</span>
                   </div>
                   <ArrowRight className="w-4 h-4 text-white/40 group-hover:translate-x-1 group-hover:text-white transition-all" />
                 </button>
@@ -105,7 +107,7 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
                   onClick={onClose}
                   className="w-full py-4 text-[11px] font-black uppercase tracking-[0.2em] text-muted/60 hover:text-on-surface transition-colors"
                 >
-                  Maybe Later
+                  {t('upgrade_prompt.maybe_later')}
                 </button>
               </div>
 
@@ -113,8 +115,7 @@ export default function UpgradePrompt({ isOpen, onClose }: UpgradePromptProps) {
               <div className="mt-8 pt-6 border-t border-slate-50 flex items-start gap-3">
                  <ShieldCheck className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                  <p className="text-[10px] font-bold text-muted leading-relaxed uppercase tracking-wide opacity-70">
-                   Benefit: Precision nearby <br />
-                   mechanic & towing results
+                   {t('upgrade_prompt.benefit')}
                  </p>
               </div>
             </div>
