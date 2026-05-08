@@ -82,84 +82,93 @@ const CHAT_SEQUENCE = (t: any) => [
 ];
 
 // Render a single user message - Messenger Style
-const UserBubble = ({ msg }: { msg: any }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95, y: 8 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-    className="flex flex-col items-end gap-2"
-  >
-      {msg.image && (
-        <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md aspect-video bg-slate-100">
-          <img 
-            src={msg.image.replace('.png', '.webp')} 
-            alt="Dashboard scan" 
-            className="w-full h-auto object-cover max-h-[130px]" 
-            width={340}
-            height={130}
-            fetchPriority="high"
-          />
-        </div>
-      )}
-    <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-[4px] bg-[#0084FF] text-white text-[11px] font-medium leading-relaxed shadow-sm">
-      {msg.content}
-    </div>
-  </motion.div>
-);
+const UserBubble = ({ msg }: { msg: any }) => {
+  const { t } = useTranslation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      className="flex flex-col items-end gap-2"
+    >
+        {msg.image && (
+          <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-md aspect-video bg-slate-100">
+            <img 
+              src={msg.image.replace('.png', '.webp')} 
+              alt={t('mechanic.analyzing_photo')} 
+              className="w-full h-auto object-cover max-h-[130px]" 
+              width={340}
+              height={130}
+              fetchPriority="high"
+            />
+          </div>
+        )}
+      <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-[4px] bg-[#0084FF] text-white text-[11px] font-medium leading-relaxed shadow-sm">
+        {msg.content}
+      </div>
+    </motion.div>
+  );
+};
 
 // Render a single AI message - Messenger Style
-const AiBubble = ({ msg }: { msg: any }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95, y: 8 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-    className="flex flex-col items-start"
-  >
-    <div className="flex items-center gap-2 mb-1.5 opacity-60">
-      <div className="w-4.5 h-4.5 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
-        <Bot size={11} />
+const AiBubble = ({ msg }: { msg: any }) => {
+  const { t } = useTranslation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      className="flex flex-col items-start"
+    >
+      <div className="flex items-center gap-2 mb-1.5 opacity-60">
+        <div className="w-4.5 h-4.5 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shadow-sm">
+          <Bot size={11} />
+        </div>
+        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{t('nav.mechanic')}</span>
       </div>
-      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Car Safety Assistant</span>
-    </div>
-    <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tl-[4px] bg-[#F0F2F5] text-[#1C1E21] text-[11px] font-medium leading-relaxed border border-slate-100/50">
-      {msg.content}
-    </div>
-    {msg.action && (
-      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 text-emerald-600 mt-2.5 shadow-sm">
-        <CheckCircle size={10} />
-        <span className="text-[7px] font-bold uppercase tracking-widest">Analysis Linked</span>
+      <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tl-[4px] bg-[#F0F2F5] text-[#1C1E21] text-[11px] font-medium leading-relaxed border border-slate-100/50">
+        {msg.content}
       </div>
-    )}
-  </motion.div>
-);
+      {msg.action && (
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 text-emerald-600 mt-2.5 shadow-sm">
+          <CheckCircle size={10} />
+          <span className="text-[7px] font-bold uppercase tracking-widest">{msg.action}</span>
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 // Render the diagnostic report card - Premium Messenger Style
-const DiagnosticCard = ({ msg }: { msg: any }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.98, y: 12 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-    className="p-4 rounded-[24px] bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col gap-3 relative overflow-hidden ring-1 ring-slate-50"
-  >
-    <div className="flex items-center justify-between mb-0.5">
-      <div className="flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#0084FF] animate-pulse" />
-        <span className="text-[8px] font-black text-[#0084FF] uppercase tracking-widest">Report Ready</span>
+const DiagnosticCard = ({ msg }: { msg: any }) => {
+  const { t } = useTranslation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      className="p-4 rounded-[24px] bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col gap-3 relative overflow-hidden ring-1 ring-slate-50"
+    >
+      <div className="flex items-center justify-between mb-0.5">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#0084FF] animate-pulse" />
+          <span className="text-[8px] font-black text-[#0084FF] uppercase tracking-widest">{t('landing.demo.report_ready')}</span>
+        </div>
+        <div className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-[7px] font-black uppercase tracking-wider border border-orange-100/50">
+          {msg.severity} {t('landing.demo.priority')}
+        </div>
       </div>
-      <div className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-[7px] font-black uppercase tracking-wider border border-orange-100/50">
-        {msg.severity} Priority
+      <h4 className="font-display font-bold text-[12px] leading-tight text-slate-900 pr-4">{msg.finding}</h4>
+      <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-100/50 text-[9px] text-slate-600 font-medium leading-relaxed">
+        {msg.advice}
       </div>
-    </div>
-    <h4 className="font-display font-bold text-[12px] leading-tight text-slate-900 pr-4">{msg.finding}</h4>
-    <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-100/50 text-[9px] text-slate-600 font-medium leading-relaxed">
-      {msg.advice}
-    </div>
-    <button className="w-full py-2.5 rounded-xl bg-[#0084FF] text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 active:scale-[0.98] transition-all text-[9px] font-black uppercase tracking-widest">
-      <FileText size={11} />
-      Full Report
-    </button>
-  </motion.div>
-);
+      <button className="w-full py-2.5 rounded-xl bg-[#0084FF] text-white flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 active:scale-[0.98] transition-all text-[9px] font-black uppercase tracking-widest">
+        <FileText size={11} />
+        {t('landing.demo.full_report')}
+      </button>
+    </motion.div>
+  );
+};
 
 // Refined delays for a snappy replay feel
 const MESSAGE_DELAYS = [
@@ -238,7 +247,7 @@ const ScrollChatDemo = () => {
               </div>
               <div className="flex flex-col leading-none">
                 <Wordmark size="sm" className="mb-0.5" />
-                <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-wider">Live Replay</span>
+                <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-wider">{t('landing.demo.live_replay')}</span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -264,7 +273,7 @@ const ScrollChatDemo = () => {
           {/* Static Clean Input Bar */}
           <div className="px-4 py-4 bg-white border-t border-slate-50 mt-auto pb-8">
             <div className="h-10 w-full rounded-full bg-[#F0F2F5] flex items-center px-4 gap-3 text-slate-400 opacity-60">
-              <span className="text-[10px] font-medium flex-1">Recorded Session Replay</span>
+              <span className="text-[10px] font-medium flex-1">{t('landing.demo.session_replay')}</span>
               <div className="flex items-center gap-3">
                 <Mic size={14} className="text-slate-300" />
                 <div className="w-7 h-7 rounded-full bg-[#E4E6EB] flex items-center justify-center text-white scale-90">
@@ -284,57 +293,57 @@ const ScrollChatDemo = () => {
   )
 }
 
-const features = [
-  { icon: Activity, title: 'AI Diagnosis', desc: 'Instant breakdown analysis' },
-  { icon: Zap, title: 'Warning Light Help', desc: 'Understand dashboard alerts' },
-  { icon: ShieldAlert, title: 'Urgency Detection', desc: 'Know if it\'s an emergency' },
-  { icon: ImagePlus, title: 'Photo Analysis', desc: 'AI visual damage check' },
-  { icon: DollarSign, title: 'Avoid Overpaying', desc: 'Verify repair cost estimates' },
-  { icon: LayoutDashboard, title: 'Vehicle History', desc: 'Track all previous reports' },
-  { icon: CheckCircle2, title: 'Clear Guidance', desc: 'Step-by-step next steps' },
-  { icon: Bot, title: '24/7 AI Assistant', desc: 'Expert help anytime, anywhere' },
+const features = (t: any) => [
+  { icon: Activity, title: t('landing.features.mechanic'), desc: t('landing.features.mechanic_desc') },
+  { icon: Zap, title: t('landing.features.overpaying'), desc: t('landing.features.overpaying_desc') },
+  { icon: ShieldAlert, title: t('landing.how_it_works.step2.title'), desc: t('landing.how_it_works.step2.desc') },
+  { icon: ImagePlus, title: t('landing.how_it_works.step1.title'), desc: t('landing.how_it_works.step1.desc') },
+  { icon: DollarSign, title: t('overpaying.title'), desc: t('overpaying.subtitle') },
+  { icon: LayoutDashboard, title: t('reports.title'), desc: t('reports.subtitle') },
+  { icon: CheckCircle2, title: t('landing.how_it_works.step3.title'), desc: t('landing.how_it_works.step3.desc') },
+  { icon: Bot, title: t('landing.features.mechanic'), desc: t('landing.features.mechanic_desc') },
 ]
 
-const reviews = [
-  { name: 'Jason M.', car: 'Toyota RAV4 • Sensor Fault', rating: 5, text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', date: '1 month ago', image: '/JBJ RIV 1.jpg' },
-  { name: 'Jessica W.', car: 'BMW 3 Series • Warning Light', rating: 5, text: 'Car Safety helped me understand the warning light in seconds and showed me the right next step without confusing jargon.', date: '3 weeks ago', image: '/JBJ RIV 2.jpg' },
-  { name: 'Sarah J.', car: 'VW Golf • Overheating', rating: 5, text: 'My temperature gauge spiked. The AI told me exactly what to check safely and explained the risks of driving further.', date: '2 weeks ago', image: '/JBJ RIV 3.jpg' },
-  { name: 'Michael B.', car: 'Audi A3 • No-Start Issue', rating: 5, text: 'Simple, clear, and actually useful. My car wouldn\'t turn over, and the breakdown analysis pointed right to the battery instead of the starter.', date: '1 month ago', image: '/JBJ RIV 4.jpg' },
-  { name: 'Ryan K.', car: 'Peugeot 208 • Strange Noise', rating: 5, text: 'I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week.', date: '2 months ago', image: '/JBJ RIV 6.jpg' },
+const reviews = (t: any) => [
+  { name: t('landing.reviews_section.items.jason.name'), car: t('landing.reviews_section.items.jason.car'), rating: 5, text: t('landing.reviews_section.items.jason.text'), date: t('landing.reviews_section.date_1m'), image: '/JBJ RIV 1.jpg' },
+  { name: t('landing.reviews_section.items.jessica.name'), car: t('landing.reviews_section.items.jessica.car'), rating: 5, text: t('landing.reviews_section.items.jessica.text'), date: t('landing.reviews_section.date_3w'), image: '/JBJ RIV 2.jpg' },
+  { name: t('landing.reviews_section.items.sarah.name'), car: t('landing.reviews_section.items.sarah.car'), rating: 5, text: t('landing.reviews_section.items.sarah.text'), date: t('landing.reviews_section.date_2w'), image: '/JBJ RIV 3.jpg' },
+  { name: t('landing.reviews_section.items.michael.name'), car: t('landing.reviews_section.items.michael.car'), rating: 5, text: t('landing.reviews_section.items.michael.text'), date: t('landing.reviews_section.date_1m'), image: '/JBJ RIV 4.jpg' },
+  { name: t('landing.reviews_section.items.ryan.name'), car: t('landing.reviews_section.items.ryan.car'), rating: 5, text: t('landing.reviews_section.items.ryan.text'), date: t('landing.reviews_section.date_2m'), image: '/JBJ RIV 6.jpg' },
 ]
 
-const faqData = [
+const faqData = (t: any) => [
   {
-    question: "Is the diagnosis accurate?",
-    answer: "Our system provides highly accurate estimates based on real-world car issues and data. While it’s very reliable, we always recommend confirming with a certified professional."
+    question: t('landing.faq_section.items.accuracy.question'),
+    answer: t('landing.faq_section.items.accuracy.answer')
   },
   {
-    question: "Is this service free?",
-    answer: "Yes, the basic diagnosis is completely free. Additional premium features may be added in the future."
+    question: t('landing.faq_section.items.free.question'),
+    answer: t('landing.faq_section.items.free.answer')
   },
   {
-    question: "How long does it take?",
-    answer: "Less than 60 seconds. Just answer a few questions and get your results instantly."
+    question: t('landing.faq_section.items.time.question'),
+    answer: t('landing.faq_section.items.time.answer')
   },
   {
-    question: "What types of cars are supported?",
-    answer: "We support most common car brands and models, including petrol, diesel, and hybrid vehicles."
+    question: t('landing.faq_section.items.cars.question'),
+    answer: t('landing.faq_section.items.cars.answer')
   },
   {
-    question: "What should I do after getting the result?",
-    answer: "You’ll receive a detailed diagnostic report with next steps, potential costs, and safety advice."
+    question: t('landing.faq_section.items.next_steps.question'),
+    answer: t('landing.faq_section.items.next_steps.answer')
   },
   {
-    question: "Is my data safe?",
-    answer: "Yes, your information is secure and never shared with third parties without your consent."
+    question: t('landing.faq_section.items.safety.question'),
+    answer: t('landing.faq_section.items.safety.answer')
   },
   {
-    question: "What if the diagnosis is wrong?",
-    answer: "Our system gives the most likely causes, but cars can be complex. Always confirm with a professional for final verification."
+    question: t('landing.faq_section.items.wrong.question'),
+    answer: t('landing.faq_section.items.wrong.answer')
   },
   {
-    question: "Does it work on mobile?",
-    answer: "Absolutely. Our platform is fully optimized for mobile devices."
+    question: t('landing.faq_section.items.mobile.question'),
+    answer: t('landing.faq_section.items.mobile.answer')
   }
 ]
 
@@ -604,7 +613,7 @@ export default function Landing() {
               style={{ opacity: initialFadeOut }}
               className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             >
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Scroll for more</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('landing.hero.scroll_more')}</span>
               <motion.div 
                 animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -617,14 +626,14 @@ export default function Landing() {
         <section id="problem" className="relative py-20 md:py-24 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">The Problem</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.problem.badge')}</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold mb-12 tracking-tight leading-tight text-on-surface">Car trouble gets <br className="md:hidden" /> stressful fast</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold mb-12 tracking-tight leading-tight text-on-surface">{t('landing.problem.title')}</h2>
             <div className="grid md:grid-cols-3 gap-5 w-full">
               {[
-                { title: 'Confusing warning lights', desc: 'Hard to understand fast', icon: ShieldAlert },
-                { title: 'Expensive diagnostics', desc: 'Simple answers cost too much', icon: DollarSign },
-                { title: 'Hard to find help', desc: 'You lose time when it matters', icon: Clock }
+                { title: t('landing.problem.items.lights.title'), desc: t('landing.problem.items.lights.desc'), icon: ShieldAlert },
+                { title: t('landing.problem.items.costs.title'), desc: t('landing.problem.items.costs.desc'), icon: DollarSign },
+                { title: t('landing.problem.items.help.title'), desc: t('landing.problem.items.help.desc'), icon: Clock }
               ].map((prob, i) => (
                 <div key={i} className="group p-6 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all text-left flex flex-col items-start gap-4 h-full">
                   <div className="w-12 h-12 rounded-2xl bg-[#0070E0]/5 flex items-center justify-center border border-[#0070E0]/10 group-hover:bg-[#0070E0] group-hover:text-white transition-all duration-300">
@@ -637,7 +646,7 @@ export default function Landing() {
                 </div>
               ))}
             </div>
-            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">Car Safety gives you immediate clarity and helps you avoid overpaying.</p>
+            <p className="text-navy font-black mt-12 text-sm tracking-[0.2em] uppercase opacity-80">{t('landing.problem.clarity_note')}</p>
           </div>
         </section>
 
@@ -651,11 +660,10 @@ export default function Landing() {
                 viewport={{ once: true, margin: "-100px" }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md"
               >
-                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">How It Works</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.how_it_works.badge')}</span>
               </motion.div>
               <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight leading-[1.1] text-slate-900 max-w-3xl">
-                From Confusion to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-[#0070E0]">Clarity</span> — <br className="hidden md:block" />
-                in Seconds
+                {t('landing.how_it_works.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-[#0070E0]">{t('landing.how_it_works.title_part2')}</span> {t('landing.how_it_works.title_part3')}
               </h2>
             </div>
             
@@ -671,8 +679,8 @@ export default function Landing() {
                 <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0070E0] mb-6 flex items-center justify-center border border-blue-100/50 group-hover:scale-110 transition-transform">
                   <Camera className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Upload a Photo <br/> or Sound</h3>
-                <p className="text-slate-500 font-medium leading-relaxed mb-6">Show us the problem — no technical skills needed.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">{t('landing.how_it_works.step1.title')}</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">{t('landing.how_it_works.step1.desc')}</p>
                 <div className="mt-auto pt-6 border-t border-slate-50 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
                     <Mic className="w-4 h-4 text-slate-500" />
@@ -694,8 +702,8 @@ export default function Landing() {
                 <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 mb-6 flex items-center justify-center border border-amber-100/50 group-hover:scale-110 transition-transform">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">See the Real Problem + Risk Level</h3>
-                <p className="text-slate-500 font-medium leading-relaxed mb-6">We identify the issue exactly and show how serious it is right now.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">{t('landing.how_it_works.step2.title')}</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">{t('landing.how_it_works.step2.desc')}</p>
                 
                 <div className="mt-auto pt-6 border-t border-slate-50">
                   <div className="flex items-center gap-2">
@@ -704,9 +712,9 @@ export default function Landing() {
                     <div className="flex-1 h-2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)]" />
                   </div>
                   <div className="flex justify-between mt-2.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                    <span>Safe</span>
-                    <span>Warning</span>
-                    <span className="text-red-500">Dangerous</span>
+                    <span>{t('landing.how_it_works.step2.safe')}</span>
+                    <span>{t('landing.how_it_works.step2.warning')}</span>
+                    <span className="text-red-500">{t('landing.how_it_works.step2.dangerous')}</span>
                   </div>
                 </div>
               </motion.div>
@@ -722,8 +730,8 @@ export default function Landing() {
                 <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-6 flex items-center justify-center border border-emerald-100/50 group-hover:scale-110 transition-transform">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Know What <br/> to Do Next</h3>
-                <p className="text-slate-500 font-medium leading-relaxed mb-6">See if you can keep driving, get cost estimates, and access your full report.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">{t('landing.how_it_works.step3.title')}</h3>
+                <p className="text-slate-500 font-medium leading-relaxed mb-6">{t('landing.how_it_works.step3.desc')}</p>
                 
                 <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-100">
@@ -736,7 +744,7 @@ export default function Landing() {
                     </div>
                     <span className="text-[11px] font-black text-slate-700">4.8</span>
                   </div>
-                  <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-100/50">Top-Rated</span>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-100/50">{t('landing.how_it_works.step3.top_rated')}</span>
                 </div>
               </motion.div>
             </div>
@@ -749,23 +757,23 @@ export default function Landing() {
               className="max-w-2xl mx-auto text-center mt-20 pt-10 border-t border-slate-200/60"
             >
               <p className="text-xl md:text-2xl font-bold text-slate-800 mb-10 leading-snug">
-                We don’t just detect the problem — we tell you <span className="text-[#0070E0]">how serious it is</span> and what to do next.
+                {t('landing.how_it_works.summary')}
               </p>
               
               <button 
                 onClick={() => navigate('/login')} 
                 className="group relative inline-flex items-center justify-center gap-2.5 px-10 py-5 rounded-[20px] font-black uppercase tracking-widest text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-[0.98]"
               >
-                Check Now
+                {t('landing.how_it_works.cta')}
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </button>
 
               <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                <span>Free</span>
+                <span>{t('landing.how_it_works.footer.free')}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                <span>60 Seconds</span>
+                <span>{t('landing.how_it_works.footer.time')}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                <span>No Sign-up</span>
+                <span>{t('landing.how_it_works.footer.no_signup')}</span>
               </div>
             </motion.div>
 
@@ -785,13 +793,13 @@ export default function Landing() {
         <section id="features" className="relative py-20 md:py-24 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Platform Features</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.features_section.badge')}</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">Everything you need</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Smart assistance at every turn.</p>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface">{t('landing.features_section.title')}</h2>
+            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">{t('landing.features_section.subtitle')}</p>
             <div className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-muted">
               <div className="w-8 h-px bg-overlay" />
-              Swipe to explore
+              {t('landing.features_section.swipe')}
               <div className="w-8 h-px bg-overlay" />
             </div>
           </div>
@@ -837,13 +845,13 @@ export default function Landing() {
           <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
                <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
-               <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">Symptom Library</span>
+               <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.guides.badge')}</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A] mb-6">
-              Common problems we help <span className="text-[#0070E0]">diagnose.</span>
+              {t('landing.guides.title_part1')} <span className="text-[#0070E0]">{t('landing.guides.title_part2')}</span>
             </h2>
             <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl">
-              Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Car Safety can help.
+              {t('landing.guides.desc')}
             </p>
           </div>
           <Suspense fallback={<div className="h-[600px] w-full animate-pulse-slow bg-slate-50/50 rounded-[4rem]" />}>
@@ -855,14 +863,14 @@ export default function Landing() {
         <section id="reviews" className="relative py-24 md:py-24 px-0 bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 mb-12 md:mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Trusted by Drivers</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.reviews_section.badge')}</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">What drivers say <br className="md:hidden" /> about Car Safety</h2>
-            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">Real experiences from our community of supported drivers.</p>
+            <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface italic">{t('landing.reviews_section.title')}</h2>
+            <p className="text-muted text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6">{t('landing.reviews_section.subtitle')}</p>
           </div>
 
           <Suspense fallback={<div className="h-96 w-full animate-pulse-slow" />}>
-            <ReviewsSlider reviews={reviews} />
+            <ReviewsSlider reviews={reviews(t)} />
           </Suspense>
         </section>
 
@@ -876,14 +884,14 @@ export default function Landing() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
                 <HelpCircle className="w-3.5 h-3.5 text-navy" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Help Center</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.faq_section.badge')}</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">Common Questions</h2>
-              <p className="text-muted text-lg md:text-xl font-medium">Everything you need to know about Car Safety.</p>
+              <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-on-surface mb-6">{t('landing.faq_section.title')}</h2>
+              <p className="text-muted text-lg md:text-xl font-medium">{t('landing.faq_section.subtitle')}</p>
             </div>
 
             <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-2 md:p-4">
-              {faqData.map((faq, index) => (
+              {faqData(t).map((faq, index) => (
                 <FAQItem 
                   key={index}
                   question={faq.question}
@@ -900,22 +908,22 @@ export default function Landing() {
         <section className="relative py-24 md:py-28 px-6 text-center flex flex-col items-center bg-slate-50/60 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
           <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">Get Started</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.cta_final.badge')}</span>
             </div>
-            <h2 className="text-4xl md:text-7xl font-display font-bold mb-8 leading-tight tracking-tight text-on-surface">Ready for clarity and <br className="hidden md:block" /> peace of mind?</h2>
-            <p className="text-muted text-xl md:text-2xl font-medium mb-14 max-w-2xl mx-auto">Get AI diagnostics, clear step-by-step guidance, and nearby provider discovery in one smart platform.</p>
+            <h2 className="text-4xl md:text-7xl font-display font-bold mb-8 leading-tight tracking-tight text-on-surface">{t('landing.cta_final.title')}</h2>
+            <p className="text-muted text-xl md:text-2xl font-medium mb-14 max-w-2xl mx-auto">{t('landing.cta_final.subtitle')}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
               <button 
                 onClick={() => navigate('/login')}
                 className="w-full sm:w-auto px-10 py-5 rounded-[20px] font-black uppercase tracking-wider text-white text-[15px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 hover:-translate-y-1 hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)] active:scale-95"
               >
-                Start Free Trial
+                {t('landing.cta_final.button')}
               </button>
                <button 
                 onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto px-10 py-5 rounded-2xl border border-overlay bg-surface dark:bg-surface-high/40 text-on-surface font-bold hover:bg-surface-low transition-all"
               >
-                Learn More
+                {t('landing.cta_final.learn_more')}
               </button>
             </div>
           </div>

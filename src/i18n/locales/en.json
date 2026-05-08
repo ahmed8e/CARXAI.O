@@ -7,6 +7,8 @@
     "edit": "Edit",
     "add": "Add",
     "na": "N/A",
+    "unknown": "Unknown",
+    "for": "for",
     "vehicle": "Vehicle",
     "generated": "Generated",
     "loading": "Loading...",
@@ -67,16 +69,191 @@
       "cta_demo": "View Pricing",
       "trust_drivers": "Trusted by drivers",
       "trust_results": "Instant results",
-      "trust_signup": "No signup required"
+      "trust_signup": "No signup required",
+      "scroll_more": "Scroll for more"
+    },
+    "demo": {
+      "msg1": "My dashboard has a yellow ABS light and a weird grinding sound when I brake. Is it safe?",
+      "msg2": "I can help with that. The ABS light combined with grinding sounds usually indicates a brake system issue. Could you tell me if the brake pedal feels different?",
+      "msg3": "Yes, it feels a bit spongy and takes longer to stop.",
+      "msg4": "That's important. Spongy brakes often mean air in the lines or a fluid leak. Please avoid high speeds.",
+      "msg5": "Should I go to a shop now?",
+      "msg6": "Based on the symptoms, yes. I'm finalizing your diagnostic report now with safety steps.",
+      "analysis_complete": "Analysis Complete",
+      "report_ready": "Report Ready",
+      "medium": "Medium",
+      "finding": "Brake System Fault Detected",
+      "advice": "Potential air in brake lines or worn pads. Safe for a slow drive to a nearby shop, but avoid highways.",
+      "live_replay": "Live Replay",
+      "session_replay": "Recorded Session Replay",
+      "full_report": "Full Report",
+      "priority": "Priority"
+    },
+    "problem": {
+      "badge": "The Problem",
+      "title": "Car trouble gets stressful fast",
+      "clarity_note": "Car Safety gives you immediate clarity and helps you avoid overpaying.",
+      "items": {
+        "lights": {
+          "title": "Confusing warning lights",
+          "desc": "Hard to understand fast"
+        },
+        "costs": {
+          "title": "Expensive diagnostics",
+          "desc": "Simple answers cost too much"
+        },
+        "help": {
+          "title": "Hard to find help",
+          "desc": "You lose time when it matters"
+        }
+      }
+    },
+    "how_it_works": {
+      "badge": "How It Works",
+      "title_part1": "From Confusion to",
+      "title_part2": "Clarity",
+      "title_part3": "— in Seconds",
+      "step1": {
+        "title": "Upload a Photo or Sound",
+        "desc": "Show us the problem — no technical skills needed."
+      },
+      "step2": {
+        "title": "See the Real Problem + Risk Level",
+        "desc": "We identify the issue exactly and show how serious it is right now.",
+        "safe": "Safe",
+        "warning": "Warning",
+        "dangerous": "Dangerous"
+      },
+      "step3": {
+        "title": "Know What to Do Next",
+        "desc": "See if you can keep driving, get cost estimates, and access your full report.",
+        "top_rated": "Top-Rated"
+      },
+      "summary": "We don’t just detect the problem — we tell you how serious it is and what to do next.",
+      "cta": "Check Now",
+      "footer": {
+        "free": "Free",
+        "time": "60 Seconds",
+        "no_signup": "No Sign-up"
+      }
+    },
+    "features_section": {
+      "badge": "Platform Features",
+      "title": "Everything you need",
+      "subtitle": "Smart assistance at every turn.",
+      "swipe": "Swipe to explore"
+    },
+    "guides": {
+      "badge": "Symptom Library",
+      "title_part1": "Common problems we help",
+      "title_part2": "diagnose.",
+      "desc": "Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Car Safety can help."
+    },
+    "reviews_section": {
+      "badge": "Trusted by Drivers",
+      "title": "What drivers say about Car Safety",
+      "subtitle": "Real experiences from our community of supported drivers.",
+      "date_1m": "1 month ago",
+      "date_3w": "3 weeks ago",
+      "date_2w": "2 weeks ago",
+      "date_2m": "2 months ago",
+      "items": {
+        "jason": {
+          "name": "Jason M.",
+          "car": "Toyota RAV4 • Sensor Fault",
+          "text": "Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English."
+        },
+        "jessica": {
+          "name": "Jessica W.",
+          "car": "BMW 3 Series • Warning Light",
+          "text": "Car Safety helped me understand the warning light in seconds and showed me the right next step without confusing jargon."
+        },
+        "sarah": {
+          "name": "Sarah J.",
+          "car": "VW Golf • Overheating",
+          "text": "My temperature gauge spiked. The AI told me exactly what to check safely and explained the risks of driving further."
+        },
+        "michael": {
+          "name": "Michael B.",
+          "car": "Audi A3 • No-Start Issue",
+          "text": "Simple, clear, and actually useful. My car wouldn't turn over, and the breakdown analysis pointed right to the battery instead of the starter."
+        },
+        "ryan": {
+          "name": "Ryan K.",
+          "car": "Peugeot 208 • Strange Noise",
+          "text": "I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week."
+        }
+      }
+    },
+    "faq_section": {
+      "badge": "Help Center",
+      "title": "Common Questions",
+      "subtitle": "Everything you need to know about Car Safety.",
+      "items": {
+        "accuracy": {
+          "question": "Is the diagnosis accurate?",
+          "answer": "Our system provides highly accurate estimates based on real-world car issues and data. While it’s very reliable, we always recommend confirming with a certified professional."
+        },
+        "free": {
+          "question": "Is this service free?",
+          "answer": "Yes, the basic diagnosis is completely free. Additional premium features may be added in the future."
+        },
+        "time": {
+          "question": "How long does it take?",
+          "answer": "Less than 60 seconds. Just answer a few questions and get your results instantly."
+        },
+        "cars": {
+          "question": "What types of cars are supported?",
+          "answer": "We support most common car brands and models, including petrol, diesel, and hybrid vehicles."
+        },
+        "next_steps": {
+          "question": "What should I do after getting the result?",
+          "answer": "You’ll receive a detailed diagnostic report with next steps, potential costs, and safety advice."
+        },
+        "safety": {
+          "question": "Is my data safe?",
+          "answer": "Yes, your information is secure and never shared with third parties without your consent."
+        },
+        "wrong": {
+          "question": "What if the diagnosis is wrong?",
+          "answer": "Our system gives the most likely causes, but cars can be complex. Always confirm with a professional for final verification."
+        },
+        "mobile": {
+          "question": "Does it work on mobile?",
+          "answer": "Absolutely. Our platform is fully optimized for mobile devices."
+        }
+      }
+    },
+    "cta_final": {
+      "badge": "Get Started",
+      "title": "Ready for clarity and peace of mind?",
+      "subtitle": "Get AI diagnostics, clear step-by-step guidance, and nearby provider discovery in one smart platform.",
+      "button": "Start Free Trial",
+      "learn_more": "Learn More"
+    },
+    "footer": {
+      "description": "Your personal AI mechanic for clear diagnostics, nearby help, and smarter next steps. Empowering drivers with clarity since 2024.",
+      "secure_badge": "Verified Secure Diagnostics",
+      "platform": "Platform",
+      "resources": "Resources",
+      "contact": "Contact",
+      "hq": "Headquarters",
+      "email_us": "Email Us",
+      "phone": "Phone",
+      "copyright": "© {{year}} Car Safety. Built for clarity and peace of mind.",
+      "disclaimer": "Car Safety provides digital diagnostics and guidance. Repairs and towing are handled by independent third-party providers.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "back_to_top": "Back to Top",
+      "how_it_began": "How Car Safety Began",
+      "documentation": "Documentation",
+      "tech_support": "Technical Support"
     },
     "features": {
-      "title": "Everything you need for your car",
-      "mechanic": "AI Mechanic",
-      "mechanic_desc": "Instant expert diagnostics for any car noise or dashboard light.",
-      "maintenance": "Smart Maintenance",
-      "maintenance_desc": "Automated schedules tailored to your driving habits.",
-      "overpaying": "Avoid Overpaying",
-      "overpaying_desc": "Verify repair costs and avoid mechanic scams."
+      "mechanic": "Smart Mechanic",
+      "mechanic_desc": "Instant analysis of faults and sounds.",
+      "overpaying": "Save Money",
+      "overpaying_desc": "Ensure fair repair pricing every time."
     }
   },
   "auth": {
@@ -211,6 +388,52 @@
     "generating_voice": "Generating voice...",
     "listening_label": "Listening...",
     "stop_recording": "Stop Recording",
+    "labels": {
+      "high_fidelity": "High-fidelity diagnostic intelligence.",
+      "ready_analysis": "Ready for analysis",
+      "fast_answer": "Fast Answer",
+      "expert": "Expert",
+      "config_required": "Configuration Required",
+      "add_vehicle_details": "Add Vehicle Details",
+      "vehicle_accuracy_desc": "Enable vehicle-specific logic for 34% more accurate results",
+      "diagnostic_target": "Diagnostic Target",
+      "active": "Active",
+      "mileage": "Mileage",
+      "not_set": "Not Set",
+      "system_status": "System Status",
+      "ready_scan": "Ready for Scan",
+      "fast_diagnostic": "Fast Diagnostic",
+      "safety_status": "Safety Status",
+      "drive_caution": "Drive with Caution",
+      "stop_immediately": "Stop Immediately",
+      "generate_official_report": "Generate Official Report",
+      "check_repair_costs": "Check Estimated Repair Costs",
+      "switch_expert": "Switch to Expert mode",
+      "master_tech_analysis": "Master Technician Analysis",
+      "ai_analysis": "AI Diagnostic Analysis",
+      "detected_symbol": "Detected Symbol",
+      "dashboard_text": "Dashboard Text",
+      "safe_drive_caution": "Safe to drive cautiously",
+      "stop_drive_immediately": "Stop driving immediately",
+      "in_depth_analysis": "In-depth Analysis",
+      "recommended_action": "Recommended Action",
+      "generate_detailed_report": "Generate Detailed Report",
+      "need_more_details": "Need More Details",
+      "diagnostic_report": "Diagnostic Report",
+      "logic_assessment": "Logic-based diagnostic assessment.",
+      "no_explanation": "No detailed explanation provided.",
+      "safety_status_desc": "Safety status based on detected symptoms.",
+      "consult_pro": "Consult a professional for further verification.",
+      "followup_prompt": "Please answer the follow-up question so I can refine the diagnosis.",
+      "expert_answer": "Master Technician Analysis",
+      "diagnosis_unavailable": "Diagnosis Unavailable",
+      "connection_error": "I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.",
+      "check_connection": "Please check your internet connection and try submitting your request again in a few moments.",
+      "connection_interrupted": "Connection to diagnostic server interrupted.",
+      "listening_trouble": "I am having trouble connecting to my diagnostic systems right now.",
+      "insufficient_evidence": "Insufficient diagnostic evidence.",
+      "diagnostic_interrogation": "Diagnostic Interrogation"
+    },
     "fallbacks": {
       "flat_tire": {
         "title": "Flat Tire Detected",
@@ -242,31 +465,36 @@
       },
       "leak": {
         "title": "Fluid Leak Detected",
-        "cause": "Leaks can range from engine oil to coolant or brake fluid.",
-        "explanation": "Loss of vital fluids can lead to component failure or loss of braking/steering capability.",
-        "next_step": "Identify the color of the fluid and check levels before driving. Do not drive if it is brake fluid.",
-        "summary": "I detected a fluid leak. You should check your fluid levels before driving further."
+        "cause": "Damaged hose, gasket failure, or cracked reservoir.",
+        "explanation": "Losing vital fluids like oil or coolant will lead to mechanical failure or overheating.",
+        "next_step": "Identify the fluid color and check levels. Do not drive if the leak is severe.",
+        "summary": "You have a visible leak. Check your fluid levels before driving."
       },
       "smoke": {
-        "title": "Burning or Smoke Detected",
-        "cause": "Could be electrical short, leaking oil on hot exhaust, or stuck brake.",
-        "explanation": "Burning smells or smoke are signs of excessive heat or friction and pose a fire risk.",
-        "next_step": "Pull over safely and investigate source. Avoid driving until the cause is identified.",
-        "summary": "I detected a burning smell or smoke. This is a potential fire hazard, please stop safely."
+        "title": "Smoke or Burning Smell",
+        "cause": "Electrical short, oil leak on hot manifold, or stuck brake caliper.",
+        "explanation": "Smoke indicates an active fire risk or severe mechanical friction.",
+        "next_step": "Stop immediately and turn off the engine. Evacuate the vehicle if smoke is coming from the cabin.",
+        "summary": "Smoke or burning smells are emergency signals. Stop driving immediately."
       },
       "noise": {
-        "title": "Mechanical Noise Issue",
-        "cause": "Likely worn brake pads, a failing wheel bearing, or a loose belt.",
-        "explanation": "Most noises are early warning signs, but safe for a cautious drive to a mechanic.",
-        "next_step": "Listen for when the noise changes (turning, braking) and book a diagnostic check.",
-        "summary": "That strange noise sounds like a mechanical component wearing out. Get it looked at soon."
+        "title": "Unusual Mechanical Noise",
+        "cause": "Worn bearings, loose belts, or failing suspension components.",
+        "explanation": "Noises are early warning signs of part failure. Ignoring them leads to more expensive repairs.",
+        "next_step": "Try to identify if the noise changes with speed or engine RPM. Schedule an inspection.",
+        "summary": "Your car is making an unusual noise. It's best to have it inspected soon."
       },
       "damage": {
-        "title": "Vehicle Damage Assessment",
-        "cause": "Physical impact or collision.",
-        "explanation": "Structural damage or impact may have affected internal components or safety systems.",
-        "next_step": "Check for fluid leaks and ensure no parts are rubbing against tires before attempting to drive.",
-        "summary": "I detected potential vehicle damage. Please check safety systems before driving."
+        "title": "Visible External Damage",
+        "cause": "Impact, collision, or road debris.",
+        "explanation": "External damage may hide internal structural or mechanical issues.",
+        "next_step": "Check for fluid leaks and ensure no parts are rubbing against tires.",
+        "summary": "Visible damage detected. Check for leaks and tire clearance."
+      },
+      "unreadable_photo": {
+        "title": "Unreadable Dashboard Photo",
+        "explanation": "We couldn't read this dashboard photo with confidence. The image might be blurry, too dark, or incomplete.",
+        "next_step": "Please upload a clear, close-up photo of your dashboard or describe the warning light in text."
       }
     }
   },
@@ -308,13 +536,27 @@
     "expert_suggestion": "Expert Tip: Your quote for {{component}} is significantly high.",
     "check_another": "Check Another Quote",
     "error_empty": "Please provide more details or a photo.",
+    "error_calculating": "An error occurred while calculating the price estimate. Please try again.",
     "detected_issue": "Detected Issue",
     "parts": "parts",
     "labor": "labor",
     "both": "both parts and labor",
     "above_market": "Above Market",
+    "market_comparison": "Market Comparison",
+    "ai_intelligence": "AI Intelligence",
+    "next_step_label": "Next Step",
+    "scam_warning_label": "Potential Scam Alert",
+    "negotiation_scripts": "Negotiation Scripts",
+    "parts_savings": "Parts Savings",
+    "live_assistant": "Live Assistant",
+    "live_desc": "Talk to me about your quote.",
+    "analyzing_voice": "Analyzing voice...",
+    "stop_recording": "Stop Recording",
+    "start_audit": "Start Voice Audit",
     "verdict": {
       "fair": "Fair Price",
+      "fair_badge": "Safe to Buy",
+      "expensive": "Expensive",
       "expensive_badge": "Caution Advised",
       "overpriced": "Overpriced",
       "overpriced_badge": "Significant Overcharge"
@@ -328,8 +570,27 @@
   "maintenance": {
     "title": "Maintenance",
     "add_record": "Log Service Record",
+    "add_record_title": "Log Service Record",
     "add_record_desc": "Log completed maintenance",
     "log_desc": "Record details for your vehicle",
+    "form": {
+      "service_type": "Service Type",
+      "select_service": "Select service...",
+      "describe_service": "Describe the service...",
+      "date": "Date",
+      "cost": "Service Cost",
+      "shop": "Garage / Shop",
+      "shop_placeholder": "Name of the garage...",
+      "parts_replaced": "Parts Replaced",
+      "parts_placeholder": "e.g. Front brake pads, oil filter...",
+      "warranty": "Warranty",
+      "warranty_placeholder": "e.g. 6 months, 10,000 km...",
+      "notes": "Notes",
+      "notes_placeholder": "Details about the service...",
+      "receipt_upload": "Upload Receipt",
+      "receipt_coming_soon": "Scanning receipts coming soon",
+      "save_record": "Save Record"
+    },
     "service_type": "Service Type",
     "mileage": "Kilometers/Mileage",
     "date": "Date",
@@ -411,6 +672,53 @@
       "seasonal": "Weather guides",
       "fluids": "Self-check guide",
       "advisor": "Repair vs Value"
+    },
+    "seasonal_tool": {
+      "warning_levels": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "good": "Good"
+      },
+      "ask_ai": "Ask AI Mechanic",
+      "checklists": {
+        "summer": {
+          "title": "Summer Maintenance",
+          "items": {
+            "s1": { "label": "Cooling System", "description": "Check coolant levels and hose condition." },
+            "s2": { "label": "Tire Pressure", "description": "Tires expand in heat; adjust to recommended PSI." },
+            "s3": { "label": "AC Refrigerant", "description": "Ensure the air is cold and blowing strong." },
+            "s4": { "label": "Oil Level", "description": "Check engine oil viscosity and level." },
+            "s5": { "label": "Wiper Blades", "description": "Ensure rubber isn't cracked or dried out." },
+            "s6": { "label": "Battery", "description": "Extreme heat affects battery fluids." },
+            "s7": { "label": "Air Filters", "description": "Clean or replace cabin and engine filters." },
+            "s8": { "label": "Brake Fluids", "description": "Ensure no leaks or low levels." }
+          }
+        },
+        "winter": {
+          "title": "Winter Maintenance",
+          "items": {
+            "w1": { "label": "Antifreeze", "description": "Ensure correct coolant concentration." },
+            "w2": { "label": "Battery Power", "description": "Check battery voltage for cold starts." },
+            "w3": { "label": "Tires", "description": "Ensure tread depth for traction in rain/ice." },
+            "w4": { "label": "Heating System", "description": "Ensure heater and defroster are working." },
+            "w5": { "label": "Lights", "description": "Ensure all bulbs are working for low visibility." },
+            "w6": { "label": "Washer Fluid", "description": "Use a winter-blend fluid that won't freeze." },
+            "w7": { "label": "Belts and Hoses", "description": "Cold makes rubber brittle and prone to cracking." }
+          }
+        },
+        "roadtrip": {
+          "title": "Road Trip Checklist",
+          "items": {
+            "r1": { "label": "Spare Tire", "description": "Ensure it's inflated and jack kit is present." },
+            "r2": { "label": "Brakes", "description": "Full inspection of pads and rotors." },
+            "r3": { "label": "Fluids", "description": "Ensure all vital fluids are topped off." },
+            "r4": { "label": "Lights", "description": "Check signals, brakes, and headlights." },
+            "r5": { "label": "Wipers", "description": "Don't risk driving in rain with bad blades." },
+            "r6": { "label": "Emergency Kit", "description": "Check first aid and warning triangle." },
+            "r7": { "label": "Engine", "description": "General check for any noises or vibrations." }
+          }
+        }
+      }
     },
     "status_labels": {
       "all_good": "All Good",
@@ -633,111 +941,66 @@
     "subtitle": "View your official AI diagnostic assessments.",
     "empty_title": "No reports yet",
     "empty_desc": "You haven't generated any diagnostic reports yet.",
-    "start_diagnosis": "Start Diagnosis",
-    "status_safe": "Safe",
-    "status_danger": "Danger",
-    "view_report": "View Report",
+    "health_report": "Health Report",
+    "cost_analysis": "Cost Analysis",
+    "export_pdf": "Export PDF",
     "modal": {
-      "title": "Mechanic Report",
-      "customer_data": "Customer Data",
+      "title": "Official AI Mechanic Report",
+      "not_provided": "Not provided",
+      "vehicle_spec": "Vehicle Specification",
+      "prof_diagnosis": "Professional Diagnosis",
+      "analysis_title": "Diagnostic Assessment",
+      "likely_cause": "Most Likely Cause",
+      "likely_cause_placeholder": "Ongoing analysis...",
+      "action_required": "Action Required",
+      "summary_copied": "Summary copied to clipboard!",
+      "member": "Member",
+      "customer_data": "Customer Information",
       "full_name": "Full Name",
       "phone_number": "Phone Number",
-      "record_email": "Email Address",
-      "vehicle_spec": "Vehicle Specification",
-      "brand_model": "Make & Model",
+      "record_email": "Record Email",
+      "brand_model": "Brand & Model",
       "model_year": "Model Year",
       "plate_number": "Plate Number",
       "engine_type": "Engine Type",
       "gearbox": "Gearbox",
-      "mileage": "Mileage",
-      "no_vehicle_data": "No vehicle data on file",
-      "analysis_title": "Official Diagnostic Analysis",
-      "issue_reported": "Reported Issue",
-      "prof_diagnosis": "Professional Diagnosis",
-      "likely_cause": "Likely Root Cause",
-      "action_required": "Action Required Now",
+      "mileage": "Current Mileage",
+      "no_vehicle_data": "No vehicle data available",
+      "issue_reported": "Issue Reported by Customer",
+      "issue_reported_fallback": "No specific issue description provided.",
       "safe_to_drive": "Safe to Drive",
       "do_not_drive": "Do Not Drive",
-      "cert_seal": "Certified AI Assessment",
+      "cert_seal": "AI Certification Seal",
       "verification_id": "Verification ID",
       "evidence": "Attached Evidence",
-      "disclaimer": "Disclaimer",
-      "disclaimer_text": "This is a preliminary AI-generated report for informational purposes. While highly accurate, this report does not replace a physical inspection. A certified mechanic should confirm the final diagnosis before repairs.",
+      "disclaimer": "Diagnostic Disclaimer",
+      "disclaimer_text": "This report is generated by AI based on provided symptoms. While highly accurate, it is not a physical inspection. Always verify with a certified mechanic before major repairs.",
       "download_pdf": "Download Official PDF",
-      "share_report": "Share Report",
       "sharing": "Sharing...",
-      "copy_summary": "Copy Summary",
       "limit_reached": "Limit Reached",
-      "summary_copied": "Report summary copied to clipboard!",
-      "member": "Certified Member",
-      "not_provided": "Not Provided"
+      "share_report": "Share Report",
+      "copy_summary": "Copy Summary",
+      "copy_error_manual": "Your report is ready, but we couldn't copy the link automatically. Please manually copy this url: ",
+      "generated_by": "Document generated by",
+      "ai_engine_v4": "Automotive Intelligence Engine v4.0",
+      "pro_limit_reached": "Monthly report limit reached (15/month). ",
+      "free_limit_reached": "Free report shared. Next reset in 5 hours. ",
+      "upgrade_link": "Upgrade for more sharing.",
+      "listen_diagnosis": "Diagnosis: {{issue}}. Summary: {{summary}}. Safety check: {{safety}}. Danger level: {{danger}}. Recommended next step: {{next}}."
     }
   },
   "settings": {
-    "title": "Account Settings",
-    "subtitle": "Personal Information & Preferences",
-    "join_date": "Join Date",
-    "account_management": "Account Management",
+    "title": "Settings",
+    "subtitle": "Profile and Preferences",
     "profile_details": "Profile Details",
-    "profile_details_sub": "Update your personal information",
-    "security": "Security & Password",
-    "security_sub": "Manage your account protection",
-    "billing": "Billing & Subscription",
-    "billing_sub": "Manage your premium access",
-    "app_settings": "App Settings",
+    "security": "Security",
+    "billing": "Billing",
     "language": "Language",
-    "activity": "Activity History",
-    "activity_sub": "Your diagnoses and search history",
-    "resources": "Resources",
-    "support": "Help & Support",
-    "support_sub": "Get assistance from our team",
-    "about": "About Car Safety",
-    "sign_out": "Sign Out",
-    "end_session": "End Session",
-    "edit_profile": "Edit Profile",
-    "full_name": "Full Name",
-    "phone": "Phone Number",
-    "pref_lang": "Preferred Language",
-    "save_changes": "Save Changes",
-    "saving": "Saving...",
-    "new_password": "New Password",
-    "confirm_password": "Confirm New Password",
-    "update_password": "Update Password",
-    "updating": "Updating...",
-    "history_title": "Activity History",
-    "updating_history": "Updating History...",
-    "no_activity": "No activity found",
-    "support_title": "Support",
-    "need_help": "Need assistance?",
-    "support_desc": "Our expert team and AI diagnostics are available 24/7 to help with any vehicle or app issues.",
-    "contact_support": "Contact Support Team",
-    "current_plan": "Current Plan",
-    "active_sub": "Active Subscription",
-    "trial": "Trial Period",
-    "standard_access": "Standard Access",
-    "expired": "Expired",
-    "billing_cycle": "Billing Cycle",
-    "started_on": "Started On",
-    "renewal_date": "Renewal Date",
-    "upgrade_plan": "Upgrade Plan",
-    "coming_soon": "Coming Soon",
-    "set_to": "Set to",
-    "status": "Status",
-    "ends_on": "Ends On",
-    "password_security_hint": "Enhance your account security with a strong password.",
-    "passwords_mismatch": "Passwords do not match.",
-    "password_too_short": "Password must be at least 8 characters.",
-    "photo_success": "Profile photo updated successfully!",
-    "profile_success": "Profile updated successfully!",
-    "password_success": "Password updated successfully!"
+    "sign_out": "Sign out",
+    "save_changes": "Save Changes"
   },
   "upgrade_prompt": {
-    "title_part1": "Unlock",
-    "title_part2": "Full Access",
-    "description": "Upgrade your plan to access premium AI diagnostics and priority expert reports.",
-    "premium_note": "Premium plans give you access to more advanced maintenance & AI features.",
-    "upgrade_button": "Upgrade Plan",
-    "maybe_later": "Maybe Later",
-    "benefit": "Benefit: High-precision AI analysis & detailed cost breakdowns"
+    "title": "Upgrade for Premium Features",
+    "button": "Upgrade Now"
   }
 }

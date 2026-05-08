@@ -436,7 +436,7 @@ export default function AIMechanic() {
     const nextStep =
       parsed.next_step ||
       (needsFollowup
-        ? 'Please answer the follow-up question so I can refine the diagnosis.'
+        ? t('mechanic.labels.followup_prompt')
         : null)
 
     const hasUsableCore = !!(issueName || explanation || needsFollowup)
@@ -450,18 +450,18 @@ export default function AIMechanic() {
     return {
       ...parsed,
       mode: inferredMode || 'expert_answer',
-      issueName: issueName || 'Diagnostic Report',
-      normalized_issue: parsed.normalized_issue || issueName || 'Diagnostic Report',
-      likelyCause: explanation || 'Logic-based diagnostic assessment.',
-      explanation: explanation || 'No detailed explanation provided.',
+      issueName: issueName || t('mechanic.labels.diagnostic_report'),
+      normalized_issue: parsed.normalized_issue || issueName || t('mechanic.labels.diagnostic_report'),
+      likelyCause: explanation || t('mechanic.labels.logic_assessment'),
+      explanation: explanation || t('mechanic.labels.no_explanation'),
       severity,
       urgencyLevel:
         (severity === 'high' || parsed.tow_recommended) && canDrive === false
           ? 'stop_driving'
           : severity,
       can_drive: canDrive,
-      driveWhy: explanation || parsed.driveWhy || 'Safety status based on detected symptoms.',
-      next_step: nextStep || 'Consult a professional for further verification.',
+      driveWhy: explanation || parsed.driveWhy || t('mechanic.labels.safety_status_desc'),
+      next_step: nextStep || t('mechanic.labels.consult_pro'),
       needs_followup: needsFollowup,
       followup_questions: followupQuestions,
       towingRecommended: !!(parsed.tow_recommended ?? parsed.towingRecommended),
@@ -489,25 +489,25 @@ export default function AIMechanic() {
 
   const buildSoftFallback = (imageUrl?: string): DiagnosticResult => ({
     mode: 'expert_answer',
-    issueName: imageUrl ? 'Unreadable Dashboard Photo' : 'Need More Details',
-    normalized_issue: imageUrl ? 'Unreadable Dashboard Photo' : 'Need More Details',
+    issueName: imageUrl ? t('mechanic.fallbacks.unreadable_photo.title') : t('mechanic.labels.need_more_details'),
+    normalized_issue: imageUrl ? t('mechanic.fallbacks.unreadable_photo.title') : t('mechanic.labels.need_more_details'),
     explanation: imageUrl
-      ? 'We could not confidently read this dashboard photo. The image may be blurry, dark, or incomplete.'
-      : 'I need a few more details to refine the diagnosis.',
+      ? t('mechanic.fallbacks.unreadable_photo.explanation')
+      : t('mechanic.labels.need_more_details'),
     can_drive: true,
     severity: 'medium',
     urgencyLevel: 'medium',
     next_step: imageUrl
-      ? 'Please upload a clearer close-up dashboard photo or describe the warning light in text.'
-      : 'Describe when the issue happens, any noises, smells, warning lights, and whether the car still starts normally.',
-    driveWhy: 'Insufficient diagnostic evidence.',
+      ? t('mechanic.fallbacks.unreadable_photo.next_step')
+      : t('mechanic.labels.followup_prompt'),
+    driveWhy: t('mechanic.labels.insufficient_evidence'),
     mechanicRecommended: true,
     towingRecommended: false,
     tow_recommended: false,
     needs_followup: true,
     followup_questions: imageUrl
-      ? ['Can you upload a clearer close-up photo of the dashboard?']
-      : ['When exactly does the issue happen, and what warning lights are on?'],
+      ? [t('mechanic.fallbacks.unreadable_photo.next_step')]
+      : [t('mechanic.labels.followup_prompt')],
   })
 
   const resolveAdvancedOutcome = (
@@ -876,13 +876,13 @@ ${diagnosticHistory}
 
             issueData = {
               ...parsed,
-              issueName: parsed.issue_title || parsed.normalized_issue || parsed.issueName || (isFollowup ? 'Seeking Clarification...' : 'Diagnostic Report'),
-              likelyCause: parsed.explanation || parsed.likelyCause || 'Logic-based diagnostic assessment.',
+              issueName: parsed.issue_title || parsed.normalized_issue || parsed.issueName || (isFollowup ? t('mechanic.labels.need_more_details') : t('mechanic.labels.diagnostic_report')),
+              likelyCause: parsed.explanation || parsed.likelyCause || t('mechanic.labels.logic_assessment'),
               urgencyLevel: mappedUrgency as 'low' | 'medium' | 'high' | 'stop_driving',
-              driveWhy: parsed.explanation || parsed.driveWhy || 'Safety status based on detected symptoms.',
+              driveWhy: parsed.explanation || parsed.driveWhy || t('mechanic.labels.safety_status_desc'),
               severity: (rawSeverity === 'emergency' ? 'high' : rawSeverity) as 'low' | 'medium' | 'high',
               can_drive: typeof parsed.can_drive === 'boolean' ? parsed.can_drive : true,
-              next_step: parsed.next_step || (isFollowup ? 'Please respond to the clarification question.' : 'Consult a professional for further verification.'),
+              next_step: parsed.next_step || (isFollowup ? t('mechanic.labels.followup_prompt') : t('mechanic.labels.consult_pro')),
               towingRecommended: parsed.tow_recommended || parsed.towingRecommended || false
             }
 
@@ -916,7 +916,7 @@ ${diagnosticHistory}
           issueData = textFallback || buildSoftFallback(finalImageUrl)
 
           finalDisplayContent = issueData?.needs_followup
-            ? (issueData?.explanation || 'I need more information to continue.')
+            ? (issueData?.explanation || t('mechanic.labels.need_more_details'))
             : (issueData?.explanation || issueData?.likelyCause || '')
         }
         const assistantMsg: Message = {
@@ -998,16 +998,16 @@ ${diagnosticHistory}
       } catch (err) {
         console.error('AI Error:', err)
         const errorResult: DiagnosticResult = {
-          issueName: 'Diagnosis Unavailable',
-          likelyCause: 'I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.',
-          explanation: 'I am currently unable to reach the diagnostic analysis server. This could be due to a network interruption or temporary service maintenance.',
+          issueName: t('mechanic.labels.diagnosis_unavailable'),
+          likelyCause: t('mechanic.labels.connection_error'),
+          explanation: t('mechanic.labels.connection_error'),
           urgencyLevel: 'medium',
-          next_step: 'Please check your internet connection and try submitting your request again in a few moments.',
+          next_step: t('mechanic.labels.check_connection'),
           can_drive: true,
-          driveWhy: 'Connection to diagnostic server interrupted.',
+          driveWhy: t('mechanic.labels.connection_interrupted'),
           mechanicRecommended: false,
           towingRecommended: false,
-          spokenSummary: 'I am having trouble connecting to my diagnostic systems right now.'
+          spokenSummary: t('mechanic.labels.listening_trouble')
         }
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -1127,11 +1127,11 @@ ${diagnosticHistory}
                     <ShieldWrenchIcon className="w-8 h-8 text-navy relative z-20" />
                   </div>
                 </div>
-                <h2 className="text-3xl font-display font-[900] text-navy tracking-tight mb-3">AI Mechanic</h2>
+                <h2 className="text-3xl font-display font-[900] text-navy tracking-tight mb-3">{t('mechanic.title')}</h2>
                 <div className="w-10 h-1 bg-gradient-to-r from-transparent via-navy/10 to-transparent mx-auto mb-4" />
                 <p className="text-[15px] font-semibold text-slate-500 max-w-[280px] mx-auto leading-relaxed tracking-tight">
-                  High-fidelity diagnostic intelligence. <br />
-                  <span className="text-navy/40 text-[11px] font-black uppercase tracking-[0.2em]">Ready for analysis</span>
+                  {t('mechanic.labels.high_fidelity')} <br />
+                  <span className="text-navy/40 text-[11px] font-black uppercase tracking-[0.2em]">{t('mechanic.labels.ready_analysis')}</span>
                 </p>
               </motion.div>
 
@@ -1153,7 +1153,7 @@ ${diagnosticHistory}
                     className={`relative z-10 flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-500 hover:text-navy/70'}`}
                   >
                     <Zap className={`w-3.5 h-3.5 ${responseMode === 'fast_answer' ? 'text-[#0073e7]' : 'text-slate-400'}`} />
-                    Fast Answer
+                    {t('mechanic.labels.fast_answer')}
                   </button>
                   <button
                     onClick={() => {
@@ -1166,7 +1166,7 @@ ${diagnosticHistory}
                     className={`relative z-10 flex-1 py-2.5 text-[11px] font-black uppercase tracking-wider transition-colors duration-300 flex items-center justify-center gap-2 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-500 hover:text-navy/70'}`}
                   >
                     <Activity className={`w-3.5 h-3.5 ${responseMode === 'expert_answer' ? 'text-indigo-600' : 'text-slate-400'}`} />
-                    Expert
+                    {t('mechanic.labels.expert')}
                     {!isAdvanced && <div className="hidden ml-1 px-1.5 py-0.5 rounded-full bg-[#0073e7]/10 text-[#0073e7] text-[7px] font-black md:inline-block">PRO</div>}
                   </button>
                 </div>
@@ -1200,10 +1200,10 @@ ${diagnosticHistory}
 
                           <div className="text-left">
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Configuration Required</span>
+                              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">{t('mechanic.labels.config_required')}</span>
                             </div>
-                            <h4 className="text-[19px] font-black text-navy leading-none mb-2 tracking-tight">Add Vehicle Details</h4>
-                            <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">Enable vehicle-specific logic for 34% more accurate results</p>
+                            <h4 className="text-[19px] font-black text-navy leading-none mb-2 tracking-tight">{t('mechanic.labels.add_vehicle_details')}</h4>
+                            <p className="text-[12px] font-semibold text-slate-500 leading-snug max-w-[190px]">{t('mechanic.labels.vehicle_accuracy_desc')}</p>
                           </div>
                         </div>
 
@@ -1232,9 +1232,9 @@ ${diagnosticHistory}
                           
                           <div className="text-left flex-1">
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#0073e7]">Diagnostic Target</span>
+                              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#0073e7]">{t('mechanic.labels.diagnostic_target')}</span>
                               <div className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Active</span>
+                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">{t('mechanic.labels.active')}</span>
                               </div>
                             </div>
                             <h4 className="text-[20px] font-black text-navy leading-none tracking-tight">
@@ -1245,14 +1245,14 @@ ${diagnosticHistory}
 
                         <div className="w-full grid grid-cols-2 gap-3">
                           <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100/60 flex flex-col justify-center">
-                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Mileage</span>
-                            <span className="text-[13px] font-bold text-navy tracking-tight">{activeVehicle.mileage ? `${activeVehicle.mileage.toLocaleString()} mi` : 'Not Set'}</span>
+                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{t('mechanic.labels.mileage')}</span>
+                            <span className="text-[13px] font-bold text-navy tracking-tight">{activeVehicle.mileage ? `${activeVehicle.mileage.toLocaleString()} mi` : t('mechanic.labels.not_set')}</span>
                           </div>
                           <div className="bg-emerald-50/30 rounded-2xl p-3 border border-emerald-100/50 flex flex-col justify-center">
-                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600/50 mb-1">System Status</span>
+                            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600/50 mb-1">{t('mechanic.labels.system_status')}</span>
                             <div className="flex items-center gap-1.5">
                               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="text-[12px] font-bold text-emerald-700 tracking-tight">Ready for Scan</span>
+                              <span className="text-[12px] font-bold text-emerald-700 tracking-tight">{t('mechanic.labels.ready_scan')}</span>
                             </div>
                           </div>
                         </div>
@@ -1305,7 +1305,7 @@ ${diagnosticHistory}
                                     <div className="pr-2">
                                       <div className="flex items-center gap-1.5 mb-2">
                                         <Zap className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">Fast Diagnostic</span>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600">{t('mechanic.labels.fast_diagnostic')}</span>
                                       </div>
                                       <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">
                                         {msg.issueData.normalized_issue || msg.issueData.issueName}
@@ -1326,9 +1326,9 @@ ${diagnosticHistory}
                                         {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                                       </div>
                                       <div>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Safety Status</p>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">{t('mechanic.labels.safety_status')}</p>
                                         <p className="text-[18px] font-black leading-none uppercase tracking-tight">
-                                          {msg.issueData.can_drive ? 'Drive with Caution' : 'Stop Immediately'}
+                                          {msg.issueData.can_drive ? t('mechanic.labels.drive_caution') : t('mechanic.labels.stop_immediately')}
                                         </p>
                                       </div>
                                     </div>
@@ -1353,7 +1353,7 @@ ${diagnosticHistory}
                                       className="w-full flex items-center justify-center gap-3 px-6 py-5 rounded-[22px] bg-navy text-white text-[13px] font-black uppercase tracking-[0.15em] shadow-xl shadow-navy/20 border border-white/10"
                                     >
                                       <FileText className="w-5 h-5 text-white/70" />
-                                      Generate Official Report
+                                      {t('mechanic.labels.generate_official_report')}
                                     </motion.button>
 
                                     <div className="pt-2">
@@ -1363,7 +1363,7 @@ ${diagnosticHistory}
                                         className="w-full flex items-center justify-center gap-2 px-3 py-4 rounded-[18px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-navy text-[11px]"
                                       >
                                         <RefreshCw className="w-4 h-4 text-navy/30" />
-                                        Check Estimated Repair Costs
+                                        {t('mechanic.labels.check_repair_costs')}
                                       </motion.button>
                                     </div>
                                     
@@ -1389,7 +1389,7 @@ ${diagnosticHistory}
                                       }}
                                       className="text-[10px] font-black uppercase tracking-widest text-[#0073e7] opacity-40 hover:opacity-100 transition-opacity"
                                     >
-                                      Switch to Expert mode
+                                      {t('mechanic.labels.switch_expert')}
                                     </button>
                                   </div>
                                   </div>
@@ -1400,7 +1400,7 @@ ${diagnosticHistory}
                                     <div className="pr-2">
                                       <span className={`text-[10px] font-black uppercase tracking-[0.2em] block mb-2 ${msg.issueData.mode === 'expert_answer' ? 'text-[#0073e7] flex items-center gap-1.5' : 'text-navy/30'}`}>
                                         {msg.issueData.mode === 'expert_answer' && <Activity className="w-3.5 h-3.5" />}
-                                        {msg.issueData.mode === 'expert_answer' ? 'Master Technician Analysis' : 'AI Diagnostic Analysis'}
+                                        {msg.issueData.mode === 'expert_answer' ? t('mechanic.labels.master_tech_analysis') : t('mechanic.labels.ai_analysis')}
                                       </span>
                                       <h3 className="text-[24px] leading-tight font-display font-black text-navy tracking-tight">{msg.issueData.normalized_issue || msg.issueData.issueName}</h3>
                                     </div>
@@ -1418,7 +1418,7 @@ ${diagnosticHistory}
                                             <Aperture className="w-5 h-5 text-navy/40" />
                                           </div>
                                           <div>
-                                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Detected Symbol</p>
+                                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{t('mechanic.labels.detected_symbol')}</p>
                                             <p className="text-[14px] font-bold text-navy leading-none">{msg.issueData.warning_light_name}</p>
                                           </div>
                                         </div>
@@ -1429,7 +1429,7 @@ ${diagnosticHistory}
                                             <FileText className="w-5 h-5 text-navy/40" />
                                           </div>
                                           <div>
-                                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Dashboard Text</p>
+                                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{t('mechanic.labels.dashboard_text')}</p>
                                             <p className="text-[14px] font-bold text-navy leading-tight">“{msg.issueData.fault_message_text}”</p>
                                           </div>
                                         </div>
@@ -1451,9 +1451,9 @@ ${diagnosticHistory}
                                           {msg.issueData.can_drive ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                                         </div>
                                         <div className="flex-1">
-                                          <p className="text-[10px] font-black uppercase tracking-widest text-navy/30 mb-1">Safety Status</p>
+                                          <p className="text-[10px] font-black uppercase tracking-widest text-navy/30 mb-1">{t('mechanic.labels.safety_status')}</p>
                                           <p className={`text-[16px] font-black leading-tight ${msg.issueData.can_drive ? 'text-emerald-700' : 'text-rose-700'}`}>
-                                            {msg.issueData.can_drive ? 'Safe to drive cautiously' : 'Stop driving immediately'}
+                                            {msg.issueData.can_drive ? t('mechanic.labels.safe_drive_caution') : t('mechanic.labels.stop_drive_immediately')}
                                           </p>
                                         </div>
                                       </div>
@@ -1464,7 +1464,7 @@ ${diagnosticHistory}
                                   <div className="pt-6 border-t border-slate-100 px-1">
                                     <div className="flex items-center gap-2 mb-3 text-navy/30">
                                       <Activity className="w-4 h-4" />
-                                      <span className="text-[10px] font-black uppercase tracking-widest">In-depth Analysis</span>
+                                      <span className="text-[10px] font-black uppercase tracking-widest">{t('mechanic.labels.in_depth_analysis')}</span>
                                     </div>
                                     <p className="text-[17px] font-medium text-slate-600 leading-[1.6] tracking-tight">
                                       {msg.issueData.explanation || msg.issueData.likelyCause}
@@ -1494,7 +1494,7 @@ ${diagnosticHistory}
                                       className="w-full flex items-center justify-center gap-3 px-6 py-6 rounded-[24px] bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[14px] font-black uppercase tracking-[0.15em] shadow-[0_20px_48px_-12px_rgba(0,112,224,0.35)] active:brightness-90 transition-all border border-white/10 ring-1 ring-white/10"
                                     >
                                       <FileText className="w-5.5 h-5.5 text-white/90" />
-                                      <span className="font-display">Generate Detailed Report</span>
+                                      <span className="font-display">{t('mechanic.labels.generate_detailed_report')}</span>
                                     </motion.button>
 
                                     {/* Dynamic Action Priority */}
@@ -1517,7 +1517,7 @@ ${diagnosticHistory}
                                                 className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-white/40 backdrop-blur-md border border-slate-200/50 text-navy text-[11px] shadow-sm shadow-slate-200/40 order-2"
                                               >
                                                 <Activity className="w-4 h-4 text-navy/40" />
-                                                {t('app.mechanic.drive_caution')}
+                                                {t('mechanic.labels.drive_caution')}
                                               </motion.button>
                                             </>
                                           )}
@@ -1531,7 +1531,7 @@ ${diagnosticHistory}
                                                 className="flex items-center justify-center gap-2.5 px-4 py-4.5 rounded-[20px] font-black uppercase tracking-wider transition-all bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] text-white text-[13px] shadow-[0_15px_35px_-10px_rgba(0,112,224,0.4)] border border-white/20 order-1"
                                               >
                                                 <Activity className="w-4 h-4 text-white/90" />
-                                                {t('app.mechanic.monitor_issue')}
+                                                {t('mechanic.labels.monitor_issue')}
                                               </motion.button>
                                             </>
                                           )}
@@ -1553,7 +1553,7 @@ ${diagnosticHistory}
                                 {isAdvanced && (
                                   <div className="flex items-center gap-2 mb-3">
                                     <Activity className="w-4 h-4 text-[#0073e7]" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0073e7]">{t('app.mechanic.diagnostic_interrogation')}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#0073e7]">{t('mechanic.labels.diagnostic_interrogation')}</span>
                                   </div>
                                 )}
                                 <div className="space-y-3">
@@ -1639,11 +1639,11 @@ ${diagnosticHistory}
                       <div className="flex items-center gap-2 mb-1">
                         <Loader2 className="w-3 h-3 text-navy animate-spin" />
                         <span className="text-[10px] font-bold uppercase tracking-widest text-navy/60">
-                          {streamingMessage ? t('app.mechanic.streaming') : t('app.mechanic.connecting')}
+                          {streamingMessage ? t('mechanic.labels.streaming') : t('mechanic.labels.connecting')}
                         </span>
                       </div>
                       <p className="text-sm leading-relaxed text-slate-600 font-medium">
-                        {streamingMessage || t('app.mechanic.initializing_modules')}
+                        {streamingMessage || t('mechanic.labels.initializing_modules')}
                       </p>
                     </div>
                   </div>
@@ -1655,7 +1655,7 @@ ${diagnosticHistory}
                       className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy/5 border border-navy/10 w-fit ml-2"
                     >
                       <AudioLines className="w-3 h-3 text-navy animate-pulse" />
-                      <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">{t('app.mechanic.preparing_voice')}</span>
+                      <span className="text-[10px] font-bold text-navy/70 uppercase tracking-wider">{t('mechanic.labels.preparing_voice')}</span>
                     </motion.div>
                   )}
                 </div>
@@ -1687,7 +1687,7 @@ ${diagnosticHistory}
                 ))}
               </div>
               <span className="text-[10px] font-black uppercase tracking-widest text-navy">
-                {status === 'playing' ? t('app.mechanic.voice_active') : t('app.mechanic.generating_voice')}
+                {status === 'playing' ? t('mechanic.labels.voice_active') : t('mechanic.labels.generating_voice')}
               </span>
             </motion.div>
           )}
@@ -1784,7 +1784,7 @@ ${diagnosticHistory}
                           style={{ height: 16, transformOrigin: 'center' }}
                         />
                       ))}
-                      <span className="ml-3 text-[10px] font-display font-black text-blue-600 uppercase tracking-widest italic animate-pulse">{t('app.mechanic.listening_label')}</span>
+                      <span className="ml-3 text-[10px] font-display font-black text-blue-600 uppercase tracking-widest italic animate-pulse">{t('mechanic.labels.listening_label')}</span>
                     </motion.div>
                   ) : (
                     <motion.textarea

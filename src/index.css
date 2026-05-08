@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
 @theme {
   --color-navy: #0070E0;
@@ -100,7 +100,7 @@
     background: var(--color-soft);
     color: var(--color-on-surface);
     transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
@@ -110,6 +110,12 @@
     min-height: 100dvh;
     overflow-x: hidden;
     width: 100%;
+  }
+
+  /* Premium Arabic Typography */
+  body[dir="rtl"], body.rtl {
+    font-family: 'IBM Plex Sans Arabic', 'Cairo', system-ui, -apple-system, sans-serif;
+    line-height: 1.8;
   }
 
   body::before {
@@ -125,6 +131,26 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+
+  body[dir="rtl"] h1, body[dir="rtl"] h2, body[dir="rtl"] h3, 
+  body[dir="rtl"] h4, body[dir="rtl"] h5, body[dir="rtl"] h6,
+  body.rtl h1, body.rtl h2, body.rtl h3, 
+  body.rtl h4, body.rtl h5, body.rtl h6 {
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  /* Force Arabic fonts for specific utility classes in RTL */
+  body[dir="rtl"] .font-display, body.rtl .font-display {
+    font-family: 'Cairo', sans-serif !important;
+  }
+
+  body[dir="rtl"] .font-sans, body.rtl .font-sans {
+    font-family: 'IBM Plex Sans Arabic', sans-serif !important;
   }
 }
 

@@ -85,7 +85,7 @@ export default function MechanicReport({
       if (profileVal) {
         setProfile({
           ...(profileVal as object),
-          phone: (settings as any)?.phone_number || user.user_metadata?.phone_number || 'Not provided'
+          phone: (settings as any)?.phone_number || user.user_metadata?.phone_number || t('reports.modal.not_provided')
         })
       } else {
         setProfile({
@@ -118,7 +118,7 @@ export default function MechanicReport({
 
 
   const copySummary = () => {
-    const text = `${t('reports.modal.title')} ${token}\n\n${t('reports.modal.vehicle_spec')}: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\n${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}\nSeverity: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\n${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}\n${t('reports.modal.action_required')}: ${diagnosis.next_step}`
+    const text = `${t('reports.modal.title')} ${token}\n\n${t('reports.modal.vehicle_spec')}: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}\n\n${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}\n${t('mechanic.labels.safety_status')}: ${getUrgencyBadge(diagnosis.urgencyLevel || 'low')}\n${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}\n${t('reports.modal.action_required')}: ${diagnosis.next_step}`
     navigator.clipboard.writeText(text)
     alert(t('reports.modal.summary_copied'))
   }
@@ -138,14 +138,14 @@ export default function MechanicReport({
     const payload: any = {
       token: token,
       created_by: user?.id,
-      vehicle_data: vehicle || { make: 'Unknown', model: 'Unknown', year: '' },
+      vehicle_data: vehicle || { make: t('common.unknown'), model: t('common.unknown'), year: '' },
       diagnosis_data: diagnosis,
       messages: messages,
         customer_data: {
           email: user?.email,
           name: user?.user_metadata?.full_name || user?.user_metadata?.name || t('reports.modal.member')
         },
-        summary: `${t('reports.modal.title')} for ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. ${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}. ${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}. ${t('reports.modal.action_required')}: ${diagnosis.next_step}`
+        summary: `${t('reports.modal.title')} ${t('common.for')} ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}. ${t('reports.modal.prof_diagnosis')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}. ${t('reports.modal.likely_cause')}: ${diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder')}. ${t('reports.modal.action_required')}: ${diagnosis.next_step}`
       }
 
     // Only add report_id if it exists to link to history, but the system doesn't require it
@@ -175,8 +175,8 @@ export default function MechanicReport({
 
       const shareUrl = `${window.location.origin}/shared-report/${token}`
       const shareData = {
-        title: `Car Safety Mechanic Report - ${diagnosis.issueName || 'Diagnostic Assessment'}`,
-        text: `Diagnostic report for ${vehicle?.make || 'Unknown'} ${vehicle?.model || 'car'}. Issue: ${diagnosis.issueName || 'Issue detected'}.`,
+        title: `${t('reports.modal.title')} - ${diagnosis.issueName || t('reports.modal.analysis_title')}`,
+        text: `${t('reports.modal.analysis_title')} ${t('common.for')} ${vehicle?.make || t('common.unknown')} ${vehicle?.model || t('common.vehicle')}. ${t('mechanic.labels.safety_status')}: ${diagnosis.issueName || t('reports.modal.analysis_title')}.`,
         url: shareUrl
       }
 
@@ -191,7 +191,7 @@ export default function MechanicReport({
           console.log('[Car Safety Share Flow] 8. Clipboard success')
         } catch (clipErr) {
           console.error('[Car Safety Share Flow] 8. Clipboard failed as well:', clipErr)
-          alert(`Your report is ready, but we couldn't copy the link automatically. Please manually copy this url: ${shareUrl}`)
+          alert(`${t('reports.modal.copy_error_manual')} ${shareUrl}`)
         }
       }
 
@@ -216,9 +216,7 @@ export default function MechanicReport({
     } catch (err: any) {
       console.error('[Car Safety Share Flow] Fatal Error:', err)
       if (err?.code === '42P01') {
-        alert("Database structure missing. Please run the SQL migrations in Supabase to create the `shared_reports` table.")
-      } else {
-        alert(t('overpaying.error_calculating')) // Reuse a general error
+        alert(t('overpaying.error_calculating')) 
       }
     } finally {
       console.log('[Car Safety Share Flow] 10. Flow completes, cleaning up state')
@@ -303,7 +301,13 @@ export default function MechanicReport({
             <div className="flex items-center gap-2">
               <ListenButton 
                 currentAudioRef={currentAudioRef}
-                text={`Diagnosis: ${diagnosis.issueName || 'Diagnostic Assessment'}. Summary: ${diagnosis.likelyCause || 'Ongoing analysis'}. Safety check: ${diagnosis.can_drive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${diagnosis.driveWhy || ''}. Danger level: ${(diagnosis.urgencyLevel || 'low').replace('_', ' ')}. Recommended next step: ${diagnosis.next_step}`}
+                text={t('reports.modal.listen_diagnosis', {
+                  issue: diagnosis.issueName || t('reports.modal.analysis_title'),
+                  summary: diagnosis.likelyCause || t('reports.modal.likely_cause_placeholder'),
+                  safety: diagnosis.can_drive ? t('reports.modal.safe_to_drive') : t('reports.modal.do_not_drive'),
+                  danger: (diagnosis.urgencyLevel || 'low').replace('_', ' '),
+                  next: diagnosis.next_step
+                })}
               />
               <button 
                 onClick={onClose}
@@ -371,15 +375,15 @@ export default function MechanicReport({
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.engine_type')}</p>
-                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.engine_type || 'N/A'}</p>
+                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.engine_type || t('common.na')}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.gearbox')}</p>
-                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.gearbox || 'N/A'}</p>
+                            <p className="text-[13px] font-bold text-slate-600 uppercase">{vehicle.gearbox || t('common.na')}</p>
                           </div>
                           <div>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('reports.modal.mileage')}</p>
-                            <p className="text-[15px] font-bold text-slate-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : '---'}</p>
+                            <p className="text-[15px] font-bold text-slate-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} ${t('maintenance.mileage_unit')}` : '---'}</p>
                           </div>
                         </div>
                       ) : (
@@ -479,7 +483,7 @@ export default function MechanicReport({
                           </div>
                           <div className="hidden md:block">
                              <p className="text-[8px] italic text-slate-400 flex items-center gap-1">
-                               Document generated by <Wordmark size="sm" className="opacity-80 scale-75 origin-left" /> Automotive Intelligence Engine v4.0
+                                {t('reports.modal.generated_by')} <Wordmark size="sm" className="opacity-80 scale-75 origin-left" /> {t('reports.modal.ai_engine_v4')}
                              </p>
                           </div>
                         </div>
@@ -495,7 +499,7 @@ export default function MechanicReport({
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {messages.filter(m => m.imageUrl).map((m, idx) => (
                         <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-105">
-                          <img src={m.imageUrl} alt="Diagnosis Evidence" className="w-full h-full object-cover" />
+                          <img src={m.imageUrl} alt={t('reports.modal.evidence')} className="w-full h-full object-cover" />
                         </div>
                       ))}
                     </div>
@@ -559,10 +563,10 @@ export default function MechanicReport({
                   <div className="mt-4 text-center">
                     <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
                       {isPro 
-                        ? "Monthly report limit reached (15/month). " 
-                        : "Free report shared. Next reset in 5 hours. "}
+                        ? t('reports.modal.pro_limit_reached')
+                        : t('reports.modal.free_limit_reached')}
                       <span className="text-[#0070E0] cursor-pointer" onClick={() => window.location.href='/choose-plan'}>
-                        Upgrade for more sharing.
+                        {t('reports.modal.upgrade_link')}
                       </span>
                     </p>
                   </div>
