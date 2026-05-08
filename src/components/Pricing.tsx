@@ -192,7 +192,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                     {/* Price */}
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-5xl font-bold text-slate-900 tracking-tight tabular-nums">
-                        {t('common.currency_symbol') === 'ر.س' ? '' : '$'}<NumberFlow value={price} className="font-bold" />{t('common.currency_symbol') === 'ر.س' ? ' ' + t('common.currency_symbol') : ''}
+                        $<NumberFlow value={price} className="font-bold" />
                       </span>
                       <div className="flex flex-col items-start">
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">/ {t('landing.pricing_section.billing.monthly').toLowerCase()}</span>

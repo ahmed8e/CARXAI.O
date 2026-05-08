@@ -174,7 +174,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           
           {/* Language Switcher */}
           <div className="ps-1">
-            <LanguageSelector className="w-full" />
+            <LanguageSelector className="w-full" dropdownPosition="top" />
           </div>
 
           {/* Profile card */}

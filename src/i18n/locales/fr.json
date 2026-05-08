@@ -23,7 +23,7 @@
     "optional": "Optionnel",
     "my_profile": "Mon Profil",
     "my_account": "Mon Compte",
-    "currency_symbol": "€",
+    "currency_symbol": "$",
     "version": "Version {{version}} (Build Officiel)"
   },
   "languages": {

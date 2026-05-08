@@ -25,7 +25,7 @@
     "optional": "اختياري",
     "my_profile": "ملفي الشخصي",
     "my_account": "حسابي",
-    "currency_symbol": "ر.س",
+    "currency_symbol": "$",
     "version": "الإصدار {{version}} (رسمي)"
   },
   "languages": {

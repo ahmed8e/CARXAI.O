@@ -33,21 +33,30 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
 
   return (
-    <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] start-1/2 -translate-x-1/2 rtl:translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-6 py-2.5 ${transparent ? 'bg-surface/20 dark:bg-black/40' : 'bg-surface/90 dark:bg-surface-low/90'} backdrop-blur-2xl border border-overlay rounded-full shadow-lg transition-all duration-300`}>
-      <Link to={user ? "/dashboard" : "/"} className="group shrink-0">
-        <BrandLockup size="lg" className="group-hover:scale-[1.02] transition-transform" />
-      </Link>
+    <nav className={`fixed top-[calc(1rem_+_env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-6xl flex items-center justify-between px-4 sm:px-6 py-2 ${transparent ? 'bg-surface/20 dark:bg-black/40' : 'bg-surface/90 dark:bg-surface-low/90'} backdrop-blur-3xl border border-overlay rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-300`}>
+      
+      {/* Left Area: Hamburger (Mobile) + Logo */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Mobile menu trigger */}
+        <button 
+          onClick={onMenuClick}
+          className="p-2 rounded-full hover:bg-surface-high dark:hover:bg-surface-high/40 transition-colors text-muted md:hidden"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
 
-      {/* Story Link placeholder if needed later */}
+        <Link to={user ? "/dashboard" : "/"} className="group shrink-0">
+          <BrandLockup size="md" className="group-hover:scale-[1.02] transition-transform" />
+        </Link>
+      </div>
 
       {/* Center Nav Links (Desktop Landing only) */}
       {showNavLinks && (
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-1 lg:gap-4 bg-surface-high/20 dark:bg-black/20 p-1 rounded-full border border-overlay/50">
           {[
             { name: t('landing.nav.features'), id: 'features' },
             { name: t('landing.nav.how_it_works'), id: 'how-it-works' },
             { name: t('landing.nav.guides'), id: 'guides', path: '/guides' },
-            { name: t('landing.nav.reviews'), id: 'reviews' },
             { name: t('landing.nav.pricing'), id: 'pricing' },
             { name: t('landing.nav.faq'), id: 'faq' },
           ].map((link) => (
@@ -60,7 +69,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth' }); 
                 }
               }} 
-              className="text-xs font-bold text-muted hover:text-navy transition-colors uppercase tracking-widest"
+              className="px-3 py-1.5 text-[10px] lg:text-[11px] font-black text-muted hover:text-navy hover:bg-surface dark:hover:bg-surface-low rounded-full transition-all uppercase tracking-widest"
             >
               {link.name}
             </Link>
@@ -68,17 +77,21 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         </div>
       )}
 
-      {/* Right Actions */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      {/* Right Actions: Language Switcher + Account */}
+      <div className="flex items-center gap-1.5 sm:gap-3">
         
         {/* Language Selector */}
-        <LanguageSelector className="hidden sm:block" />
+        <LanguageSelector 
+          className="flex-shrink-0" 
+          dropdownPosition="bottom" 
+          variant={window.innerWidth < 640 ? 'minimal' : 'full'} 
+        />
 
         {user ? (
           <div className="relative" ref={accountMenuRef}>
             <button 
               onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-              className="flex items-center gap-2.5 p-1 pe-3.5 rounded-full border border-overlay bg-surface dark:bg-surface-high/40 hover:border-navy/30 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:shadow-md transition-all group shadow-sm"
+              className="flex items-center gap-2.5 p-1 pe-1 sm:pe-3.5 rounded-full border border-overlay bg-surface dark:bg-surface-high/40 hover:border-navy/30 hover:bg-surface-high dark:hover:bg-surface-high/60 hover:shadow-md transition-all group shadow-sm"
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white font-display font-bold text-[10px] shadow-sm overflow-hidden">
                 {user?.user_metadata?.avatar_url ? (
@@ -95,7 +108,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute end-[-8px] top-full mt-4 w-60 bg-surface/98 dark:bg-surface-low backdrop-blur-3xl rounded-[32px] border border-overlay shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[70] overflow-hidden p-2"
+                  className="absolute end-[-4px] top-full mt-4 w-60 bg-surface/98 dark:bg-surface-low backdrop-blur-3xl rounded-[32px] border border-overlay shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[70] overflow-hidden p-2"
                 >
                   <div className="px-3 py-3 mb-1 border-b border-overlay">
                     <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5 ps-1">{t('auth.account')}</p>
@@ -131,19 +144,11 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
             </AnimatePresence>
           </div>
         ) : (
-          <div className="flex items-center gap-4">
-            <Link to="/login?mode=login" className="hidden sm:block text-sm font-bold text-on-surface/70 hover:text-navy ps-3 transition-colors">{t('auth.login.button')}</Link>
-            <Link to="/login" className="px-6 py-2.5 rounded-full bg-[#0F172A] text-white text-[13px] font-black shadow-xl hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center">{t('auth.signup.button')}</Link>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link to="/login?mode=login" className="hidden sm:block text-[13px] font-bold text-on-surface/70 hover:text-navy ps-3 transition-colors">{t('auth.login.button')}</Link>
+            <Link to="/login" className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-navy text-white text-[12px] sm:text-[13px] font-black shadow-lg shadow-navy/20 hover:bg-navy/90 hover:-translate-y-0.5 transition-all flex items-center justify-center whitespace-nowrap">{t('auth.signup.button')}</Link>
           </div>
         )}
-        
-        {/* Mobile menu trigger / Dashboard sidebar trigger */}
-        <button 
-          onClick={onMenuClick}
-          className="p-2 rounded-full hover:bg-surface-high dark:hover:bg-surface-high/60 transition-colors text-muted md:hidden"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
       </div>
     </nav>
   )
