@@ -293,7 +293,8 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                       <p className="text-lg md:text-xl font-black text-[#0E3882]">{value}</p>
                     </div>
                   ))}
-                        {/* Specialties */}
+                </div>
+                {/* Specialties */}
                 <div className="space-y-4 text-left">
                   <div>
                     <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">{t('landing.trust_section.expert.specialties_label')}</p>
