@@ -102,8 +102,8 @@ export const BrandLockup: React.FC<LockupProps> = ({
   };
 
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <div className={`rounded-[25%] overflow-hidden shadow-lg shadow-navy/10`}>
+    <div className={`flex items-center gap-3 ${className}`}>
+      <div className={`rounded-xl overflow-hidden shadow-sm shadow-navy/5 border border-slate-100/50`}>
         <Logo size={logoSizes[size]} />
       </div>
       <Wordmark size={size} light={light} />
