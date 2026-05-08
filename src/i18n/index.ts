@@ -16,13 +16,18 @@ i18n
       ar: { translation: ar },
     },
     fallbackLng: 'en',
+    supportedLngs: ['en', 'fr', 'ar'],
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['querystring', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+      lookupQuerystring: 'lng',
       caches: ['localStorage'],
+      // Only use the base language code (e.g., 'fr' instead of 'fr-FR')
+      convertDetectedLanguage: (lng) => lng.split('-')[0],
     },
+    load: 'languageOnly',
   });
 
 // Handle RTL for Arabic

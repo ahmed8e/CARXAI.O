@@ -200,7 +200,7 @@ export default function MyAccount() {
       .single()
 
     setProfileData({
-      fullName: (profile as any)?.full_name || metadata?.full_name || user.email?.split('@')[0] || 'User',
+      fullName: (profile as any)?.full_name || metadata?.full_name || user.email?.split('@')[0] || t('common.driver'),
       phoneNumber: (profile as any)?.phone_number || metadata?.phone_number || '',
       preferredLanguage: (profile as any)?.preferred_language || metadata?.preferred_language || i18n.language
     })
@@ -226,10 +226,10 @@ export default function MyAccount() {
         chats.forEach((chat: any) => merged.push({
           id: chat.id,
           type: 'diagnosis',
-          title: `AI Diagnosis: ${chat.issue_name || 'Vehicle Issue'}`,
-          date: new Date(chat.created_at).toLocaleDateString(),
+          title: `${t('settings.activity_diagnosis')}${chat.issue_name || t('settings.activity_vehicle_issue')}`,
+          date: new Date(chat.created_at).toLocaleDateString(i18n.language),
           timestamp: chat.created_at,
-          status: chat.urgency_level || 'Completed'
+          status: chat.urgency_level || t('settings.activity_completed')
         }))
       }
 
@@ -312,7 +312,7 @@ export default function MyAccount() {
   }
 
   const userInitial = profileData.fullName?.[0]?.toUpperCase() || user?.email?.[0].toUpperCase() || 'U'
-  const userName = profileData.fullName || user?.email?.split('@')[0] || 'User'
+  const userName = profileData.fullName || user?.email?.split('@')[0] || t('common.driver')
 
   const ActivityIcon = ({ type }: { type: ActivityItem['type'] }) => {
     switch (type) {
@@ -453,7 +453,7 @@ export default function MyAccount() {
                 <SettingsRow 
                   icon={Info} 
                   title={t('settings.about')} 
-                  subtitle="Version 2.4.0 (Official Build)" 
+                  subtitle={t('settings.version')} 
                   t={t}
                 />
               </div>
@@ -527,7 +527,7 @@ export default function MyAccount() {
                     </div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] relative z-10">{t('settings.current_plan')}</p>
                     <h3 className="text-5xl font-display font-black text-slate-900 tracking-tighter uppercase italic relative z-10">
-                      {loadingSub ? '...' : (subscription?.planType || 'Free')}
+                      {loadingSub ? '...' : (subscription?.planType || t('pricing.free'))}
                     </h3>
                     
                     <div className="relative z-10">
@@ -553,16 +553,16 @@ export default function MyAccount() {
                   <div className="grid grid-cols-2 gap-6 px-4">
                     <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.status')}</p>
-                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.status || 'None')}</p>
+                      <p className="text-[base] font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.status || t('common.na'))}</p>
                     </div>
                     <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.billing_cycle')}</p>
-                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.billingCycle || 'One-time')}</p>
+                      <p className="text-base font-bold text-slate-900 capitalize">{loadingSub ? '...' : (subscription?.billingCycle || t('common.na'))}</p>
                     </div>
                     <div className="space-y-1 text-start">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('settings.started_on')}</p>
                       <p className="text-base font-bold text-slate-900">
-                        {loadingSub ? '...' : (subscription?.startDate ? new Date(subscription.startDate).toLocaleDateString() : 'N/A')}
+                        {loadingSub ? '...' : (subscription?.startDate ? new Date(subscription.startDate).toLocaleDateString(i18n.language) : t('common.na'))}
                       </p>
                     </div>
                     <div className="space-y-1 text-start">
@@ -570,7 +570,7 @@ export default function MyAccount() {
                         {subscription?.status === 'cancelled' ? t('settings.ends_on') : t('settings.renewal_date')}
                       </p>
                       <p className="text-base font-bold text-slate-900 font-display">
-                        {loadingSub ? '...' : (subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString() : 'Never')}
+                        {loadingSub ? '...' : (subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString(i18n.language) : t('common.never'))}
                       </p>
                     </div>
                   </div>
@@ -585,7 +585,7 @@ export default function MyAccount() {
                       {t('settings.upgrade_plan')}
                     </button>
                     <p className="text-center mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      Managed via Car Safety Support
+                      {t('settings.managed_by')}
                     </p>
                   </div>
                 </div>

@@ -7,6 +7,8 @@
     "edit": "Modifier",
     "add": "Ajouter",
     "na": "N/A",
+    "unknown": "Inconnu",
+    "for": "pour",
     "vehicle": "Véhicule",
     "generated": "Généré",
     "loading": "Chargement...",
@@ -15,7 +17,7 @@
     "back": "Retour",
     "continue": "Continuer",
     "settings": "Paramètres",
-    "logout": "Déconnexion",
+    "logout": "Se déconnecter",
     "search": "Rechercher...",
     "no_data": "Aucune donnée trouvée",
     "available_24_7": "Disponible 24/7",
@@ -23,8 +25,9 @@
     "optional": "Optionnel",
     "my_profile": "Mon Profil",
     "my_account": "Mon Compte",
-    "currency_symbol": "$",
-    "version": "Version {{version}} (Build Officiel)"
+    "currency_symbol": "€",
+    "version": "Version {{version}} (Build officiel)",
+    "never": "Jamais"
   },
   "languages": {
     "en": "Anglais",
@@ -32,11 +35,11 @@
     "fr": "Français"
   },
   "nav": {
-    "dashboard": "Tableau de Bord",
+    "dashboard": "Tableau de bord",
     "garage": "Garage",
     "mechanic": "Mécanicien IA",
     "maintenance": "Entretien",
-    "overpaying": "Vérif. Prix",
+    "overpaying": "Vérification Prix",
     "reports": "Rapports",
     "settings": "Paramètres",
     "home": "Accueil",
@@ -59,435 +62,529 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Diagnostic auto instantané",
-      "title_line1": "Arrêtez de surpayer",
-      "title_line2": "vos réparations.",
-      "subtitle": "Diagnostiquez votre problème en 30 secondes — sans visite au garage.",
+      "badge": "Intelligence Automobile",
+      "title_line1": "Aide auto fiable,",
+      "title_line2": "instantanément.",
+      "subtitle": "Arrêtez de deviner et commencez à réparer. Notre mécanicien IA vous donne des conseils et un diagnostic expert en quelques secondes.",
       "cta_start": "Démarrer le diagnostic gratuit",
-      "cta_demo": "Voir les tarifs",
-      "trust_drivers": "Approuvé par les conducteurs",
+      "cta_demo": "Voir comment ça marche",
+      "trust_drivers": "+5k Conducteurs",
       "trust_results": "Résultats instantanés",
-      "trust_signup": "Sans inscription"
+      "trust_signup": "Sans inscription",
+      "scroll_more": "Défiler pour en savoir plus"
+    },
+    "demo": {
+      "msg1": "Mon tableau de bord affiche un voyant ABS jaune et un bruit de frottement bizarre quand je freine. Est-ce sûr ?",
+      "msg2": "Je peux vous aider. Un voyant ABS combiné à des bruits de frottement indique généralement un problème de système de freinage. Pourriez-vous me dire si la pédale de frein semble différente ?",
+      "msg3": "Oui, elle semble un peu spongieuse et le freinage prend plus de temps.",
+      "msg4": "C'est important. Des freins spongieux signifient souvent de l'air dans les conduites ou une fuite de liquide. Veuillez éviter les vitesses élevées.",
+      "msg5": "Dois-je aller au garage maintenant ?",
+      "msg6": "D'après les symptômes, oui. Je finalise votre rapport de diagnostic maintenant avec les étapes de sécurité.",
+      "analysis_complete": "Analyse terminée",
+      "report_ready": "Rapport prêt",
+      "medium": "Moyen",
+      "finding": "Défaut du système de freinage détecté",
+      "advice": "Présence potentielle d'air dans les conduites de frein ou plaquettes usées. Sûr pour un trajet lent vers un garage proche, mais évitez les autoroutes.",
+      "live_replay": "Replay en direct",
+      "session_replay": "Démarrer une session ci-dessous...",
+      "full_report": "Rapport complet",
+      "priority": "Priorité"
+    },
+    "problem": {
+      "badge": "La Réalité",
+      "title": "De la confusion à la clarté en quelques secondes",
+      "items": {
+        "lights": {
+          "title": "Voyants d'alerte",
+          "desc": "Comprenez exactement ce que votre voiture essaie de vous dire."
+        },
+        "costs": {
+          "title": "Évitez de trop payer",
+          "desc": "Connaissez le juste prix des réparations avant de vous rendre au garage."
+        },
+        "help": {
+          "title": "Assistance 24/7",
+          "desc": "Logique de mécanicien expert disponible dès que vous en avez besoin."
+        }
+      },
+      "clarity_note": "Tout ce dont vous avez besoin pour rester en sécurité sur la route"
+    },
+    "how_it_works": {
+      "badge": "Processus Simple",
+      "title_part1": "Comment Car Safety",
+      "title_part2": "vous",
+      "title_part3": "protège",
+      "step1": {
+        "title": "Décrivez ou montrez",
+        "desc": "Dites-nous les symptômes ou téléchargez une photo de vos voyants de tableau de bord."
+      },
+      "step2": {
+        "title": "Analyse IA",
+        "desc": "Notre moteur analyse les données en utilisant des millions de points de réparation et une logique de mécanicien.",
+        "safe": "Sûr",
+        "warning": "Avertissement",
+        "dangerous": "Critique"
+      },
+      "step3": {
+        "title": "Obtenez des conseils d'expert",
+        "desc": "Recevez un rapport détaillé avec les causes, l'urgence et les coûts de réparation estimés.",
+        "top_rated": "Mieux noté"
+      },
+      "summary": "Les conseils d'expert dont vous avez besoin, livrés en quelques secondes.",
+      "cta": "Démarrer maintenant",
+      "footer": {
+        "free": "Gratuit pour commencer",
+        "time": "Prend 2 mins",
+        "no_signup": "Sans inscription"
+      }
+    },
+    "trust_section": {
+      "badge": "Logique de diagnostic éprouvée",
+      "title_part1": "Conçu avec un",
+      "title_part2": "esprit d'expert",
+      "stats": {
+        "accuracy_label": "Précision",
+        "accuracy_sub": "du diagnostic",
+        "support_label": "Support",
+        "support_sub": "fiable"
+      },
+      "subtitle": "Car Safety est conçu pour guider les conducteurs exactement comme le fait un maître technicien : comprendre les symptômes, évaluer l'urgence et vous aider à prendre la bonne décision en toute confiance.",
+      "story_cta": "Comment Car Safety est né",
+      "social_proof_label": "Témoignages de vrais conducteurs",
+      "reactions": {
+        "relate": "Je m'y reconnais",
+        "powerful": "Puissant",
+        "respect": "Respect"
+      },
+      "drivers_connected": "{{count}} conducteurs connectés à cette histoire",
+      "points": {
+        "p1": {
+          "title": "Réflexion axée sur les symptômes",
+          "desc": "Évaluation basée sur la logique des symptômes, pas seulement sur la correspondance de mots-clés."
+        },
+        "p2": {
+          "title": "Conseils guidés par l'urgence",
+          "desc": "Différencie les problèmes de sécurité critiques des inconvénients mineurs."
+        },
+        "p3": {
+          "title": "Étapes suivantes claires",
+          "desc": "Conseils exploitables que vous pouvez suivre immédiatement."
+        }
+      },
+      "expert": {
+        "role": "Expert principal",
+        "name": "Lukas Schneider",
+        "title": "Spécialiste principal en diagnostic",
+        "stats": {
+          "exp_label": "Expérience",
+          "exp_value": "14+ ans",
+          "cases_label": "Cas",
+          "cases_value": "5 200+"
+        },
+        "specialties_label": "Spécialités de base",
+        "specialties": {
+          "s1": "Diagnostics électriques",
+          "s2": "Analyse des pannes moteur"
+        },
+        "quote": "Logique de diagnostic inspirée de l'atelier pour les voyants d'alerte, les problèmes de démarrage, les pannes électriques et les symptômes de panne.",
+        "verified_badge": "Vérifié par un expert",
+        "engine_label": "Moteur d'expert"
+      }
+    },
+    "brands": {
+      "badge": "Confiance & Compatibilité",
+      "title_part1": "Compatible avec les véhicules",
+      "title_part2": "sur lesquels les gens comptent",
+      "desc": "Car Safety fournit des diagnostics experts pour toutes les grandes marques automobiles — des citadines de tous les jours aux séries premium."
+    },
+    "features_section": {
+      "badge": "Fonctionnalités",
+      "title": "Tout ce dont vous avez besoin",
+      "subtitle": "Une boîte à outils complète pour le propriétaire de voiture moderne.",
+      "swipe": "Balayer pour explorer"
+    },
+    "guides": {
+      "badge": "Bibliothèque de symptômes",
+      "title_part1": "Problèmes courants que nous",
+      "title_part2": "aidons à diagnostiquer",
+      "desc": "Explorez notre bibliothèque complète de symptômes automobiles et de guides de diagnostic.",
+      "read_more": "Lire le guide complet",
+      "guide_num": "Guide {{num}}",
+      "symptoms": {
+        "badge": "Bibliothèque de diagnostic",
+        "guide_label": "Guide",
+        "read_full_guide": "Lire le guide complet",
+        "shakes_braking": {
+          "label": "La voiture tremble au freinage",
+          "desc": "S'agit-il de disques voilés ou d'autre chose ? Apprenez les signes."
+        },
+        "smell_gas": {
+          "label": "Pourquoi ma voiture sent-elle l'essence ?",
+          "desc": "Un contrôle de sécurité critique pour les fuites de carburant et plus encore."
+        },
+        "wont_crank": {
+          "label": "La voiture ne démarre pas",
+          "desc": "Rien ne se passe quand vous tournez la clé ? Commencez ici."
+        },
+        "abs_light": {
+          "label": "Le voyant ABS est allumé",
+          "desc": "Comprendre la défaillance du système antiblocage et la sécurité."
+        },
+        "oil_light": {
+          "label": "Voyant d'huile sur le tableau de bord",
+          "desc": "Pourquoi vous devriez arrêter de conduire immédiatement."
+        },
+        "lights_work_no_start": {
+          "label": "La voiture ne démarre pas mais les phares fonctionnent",
+          "desc": "Différencier les problèmes de batterie d'une panne de démarreur."
+        }
+      }
+    },
+    "reviews_section": {
+      "badge": "Approuvé par les conducteurs",
+      "title": "Ce que les conducteurs disent de Car Safety",
+      "title_short": "Ne vous contentez pas de nous croire sur parole.",
+      "subtitle": "Expériences réelles de notre communauté de conducteurs soutenus.",
+      "show_less": "Afficher moins",
+      "read_more": "Lire plus",
+      "date_1m": "il y a 1 mois",
+      "date_3w": "il y a 3 semaines",
+      "date_2w": "il y a 2 semaines",
+      "date_2m": "il y a 2 mois",
+      "items": {
+        "jason": {
+          "name": "Jason M.",
+          "car": "Toyota RAV4 • Défaut capteur",
+          "text": "M'a évité une visite inutile au garage. Il a analysé la photo de mon tableau de bord instantanément et a expliqué le problème du capteur en français simple."
+        },
+        "jessica": {
+          "name": "Jessica W.",
+          "car": "BMW Série 3 • Voyant d'alerte",
+          "text": "Car Safety m'a aidé à comprendre le voyant d'alerte en quelques secondes et m'a montré la bonne étape à suivre sans jargon confus."
+        },
+        "sarah": {
+          "name": "Sarah J.",
+          "car": "VW Golf • Surchauffe",
+          "text": "Ma jauge de température a grimpé en flèche. L'IA m'a dit exactement quoi vérifier en toute sécurité et a expliqué les risques de continuer à conduire."
+        },
+        "michael": {
+          "name": "Michael B.",
+          "car": "Audi A3 • Problème de démarrage",
+          "text": "Simple, clair et vraiment utile. Ma voiture ne démarrait pas, et l'analyse de panne a pointé directement vers la batterie au lieu du démarreur."
+        },
+        "ryan": {
+          "name": "Ryan K.",
+          "car": "Peugeot 208 • Bruit étrange",
+          "text": "J'ai téléchargé un clip audio de 10 secondes d'un bruit de frottement. Il a correctement identifié des plaquettes de frein usées et m'a dit de les changer cette semaine."
+        }
+      }
+    },
+    "pricing_section": {
+      "badge": "Choisissez votre forfait",
+      "title_part1": "Une aide auto plus intelligente,",
+      "title_part2": "votre budget",
+      "subtitle": "D'un simple contrôle gratuit à une expérience complète de mécanicien IA — choisissez le forfait qui correspond à votre façon de conduire.",
+      "billing": {
+        "monthly": "Mensuel",
+        "yearly": "Annuel",
+        "save": "-20%",
+        "billed_annually": "Facturé annuellement"
+      },
+      "plans": {
+        "free": {
+          "name": "Gratuit",
+          "tagline": "Essayez, sans engagement",
+          "description": "Accès IA de base pour commencer le diagnostic automobile.",
+          "cta": "Démarrer gratuitement",
+          "includes_header": "Le forfait Gratuit comprend :",
+          "features": {
+            "f1": "2 messages IA toutes les 5 heures",
+            "f2": "1 analyse d'image toutes les 5 heures",
+            "f3": "1 partage de rapport toutes les 5 heures",
+            "f4": "Accès de base au mécanicien IA"
+          },
+          "includes": {
+            "i1": "Mode Réponse Rapide",
+            "i2": "Analyse photo du tableau de bord",
+            "i3": "Génération de rapport de diagnostic"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "tagline": "Pour les conducteurs fréquents & propriétaires",
+          "description": "Chat IA illimité avec des conseils plus intelligents et des rapports étendus.",
+          "cta": "Démarrer l'essai gratuit",
+          "trial": "Essai gratuit de 3 jours",
+          "includes_header": "Tout ce qui est dans Gratuit, plus :",
+          "features": {
+            "f1": "Sessions de chat IA illimitées",
+            "f2": "Analyse complète d'images & tableau de bord",
+            "f3": "15 rapports partageables / mois",
+            "f4": "Protection Évitez de trop payer",
+            "f5": "Support standard"
+          },
+          "includes": {
+            "i1": "Mode Réponse Expert",
+            "i2": "Entrée vocale (micro)",
+            "i3": "Flux de suivi avancé"
+          }
+        },
+        "advanced": {
+          "name": "Avancé",
+          "tagline": "L'expérience complète du mécanicien IA",
+          "description": "Puissance de diagnostic complète avec IA d'image, voix et analyse Expert.",
+          "cta": "Passer à l'Avancé",
+          "badge": "Le plus puissant",
+          "includes_header": "Tout ce qui est dans Pro, plus :",
+          "features": {
+            "f1": "Modes Réponse Rapide + Expert",
+            "f2": "Logique de diagnostic avancée",
+            "f3": "Diagnostic basé sur l'image",
+            "f4": "Entrée vocale & synthèse vocale",
+            "f5": "Flux de suivi structuré",
+            "f6": "Support prioritaire"
+          },
+          "includes": {
+            "i1": "Partage de rapports illimité",
+            "i2": "Estimation avancée des coûts"
+          }
+        }
+      },
+      "footer_note": "Commencez gratuitement · Améliorez à tout moment via WhatsApp",
+      "trust": {
+        "cancel": "Annulez à tout moment",
+        "no_fees": "Aucun frais caché",
+        "limits": "Limites claires",
+        "instant": "Accès instantané"
+      }
+    },
+    "faq_section": {
+      "badge": "Centre d'aide",
+      "title": "Questions courantes",
+      "subtitle": "Tout ce que vous devez savoir sur Car Safety.",
+      "items": {
+        "accuracy": {
+          "question": "Le diagnostic est-il précis ?",
+          "answer": "Notre système fournit des estimations très précises basées sur des problèmes et des données réelles de voitures. Bien qu'il soit très fiable, nous recommandons toujours de confirmer auprès d'un professionnel certifié."
+        },
+        "free": {
+          "question": "Ce service est-il gratuit ?",
+          "answer": "Oui, le diagnostic de base est totalement gratuit. Des fonctionnalités premium supplémentaires pourront être ajoutées à l'avenir."
+        },
+        "time": {
+          "question": "Combien de temps cela prend-il ?",
+          "answer": "Moins de 60 secondes. Répondez simplement à quelques questions et obtenez vos résultats instantanément."
+        },
+        "cars": {
+          "question": "Quels types de voitures sont supportés ?",
+          "answer": "Nous supportons la plupart des marques et modèles de voitures courants, y compris les véhicules essence, diesel et hybrides."
+        },
+        "next_steps": {
+          "question": "Que dois-je faire après avoir obtenu le résultat ?",
+          "answer": "Vous recevrez un rapport de diagnostic détaillé avec les étapes suivantes, les coûts potentiels et des conseils de sécurité."
+        },
+        "safety": {
+          "question": "Mes données sont-elles en sécurité ?",
+          "answer": "Oui, vos informations sont sécurisées et ne sont jamais partagées avec des tiers sans votre consentement."
+        },
+        "wrong": {
+          "question": "Que se passe-t-il si le diagnostic est faux ?",
+          "answer": "Notre système donne les causes les plus probables, mais les voitures peuvent être complexes. Confirmez toujours auprès d'un professionnel pour une vérification finale."
+        },
+        "mobile": {
+          "question": "Cela fonctionne-t-il sur mobile ?",
+          "answer": "Absolument. Notre plateforme est entièrement optimisée pour les appareils mobiles."
+        }
+      }
+    },
+    "cta_final": {
+      "badge": "Démarrer",
+      "title": "Prêt pour la clarté et la tranquillité d'esprit ?",
+      "subtitle": "Obtenez des diagnostics IA, des conseils clairs étape par étape et découvrez des prestataires à proximité dans une seule plateforme intelligente.",
+      "button": "Démarrer l'essai gratuit",
+      "learn_more": "En savoir plus"
+    },
+    "footer": {
+      "description": "Votre mécanicien IA personnel pour des diagnostics clairs, une aide à proximité et des étapes suivantes plus intelligentes. Autonomiser les conducteurs avec clarté depuis 2024.",
+      "secure_badge": "Diagnostics sécurisés vérifiés",
+      "platform": "Plateforme",
+      "resources": "Ressources",
+      "contact": "Contact",
+      "hq": "Siège social",
+      "email_us": "Écrivez-nous",
+      "phone": "Téléphone",
+      "copyright": "© {{year}} Car Safety. Conçu pour la clarté et la tranquillité d'esprit.",
+      "disclaimer": "Car Safety fournit des diagnostics et des conseils numériques. Les réparations et le remorquage sont gérés par des prestataires tiers indépendants.",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "back_to_top": "Retour en haut",
+      "how_it_began": "Comment Car Safety a commencé",
+      "documentation": "Documentation",
+      "tech_support": "Support technique",
+      "join_name": "Rejoignez Car Safety."
     },
     "features": {
-      "title": "Tout ce dont vous avez besoin",
-      "mechanic": "Mécanicien IA",
-      "mechanic_desc": "Diagnostic expert instantané pour tout bruit ou voyant moteur.",
-      "maintenance": "Entretien Intelligent",
-      "maintenance_desc": "Calendriers automatisés adaptés à votre conduite.",
-      "overpaying": "Éviter les Surcoûts",
-      "overpaying_desc": "Vérifiez les devis et évitez les arnaques des garages."
+      "mechanic": "Mécanicien Intelligent",
+      "mechanic_desc": "Analyse instantanée des pannes et des bruits.",
+      "overpaying": "Économisez de l'argent",
+      "overpaying_desc": "Assurez un prix de réparation juste à chaque fois.",
+      "signup_link": "S'inscrire"
+    },
+    "pricing_disclaimer": "Tous les prix sont en USD ($). Les frais apparaîtront sur votre relevé sous le nom CAR SAFETY.",
+    "advisor": {
+      "title": "Conseiller en maintenance intelligent",
+      "desc": "Obtenez des recommandations d'experts basées sur l'historique et le kilométrage de votre véhicule.",
+      "start_advisor": "Démarrer le contrôle d'entretien",
+      "no_cars": "Aucun véhicule trouvé pour l'analyse.",
+      "analyzing": "Analyse de la santé du véhicule...",
+      "high_priority": "Priorité haute",
+      "med_priority": "Modérée",
+      "low_priority": "Normale",
+      "mileage_label": "Kilométrage du véhicule",
+      "mileage_placeholder": "ex: 85 000",
+      "check_button": "Vérifier la santé",
+      "critical_header": "Attention critique requise",
+      "critical_desc": "Ces éléments doivent être vérifiés dès que possible pour éviter une panne ou des réparations coûteuses.",
+      "regular_header": "Entretien recommandé",
+      "regular_desc": "Éléments standards basés sur votre kilométrage actuel et le temps écoulé depuis le dernier entretien.",
+      "preventive_header": "Soins préventifs",
+      "preventive_desc": "Éléments à long terme pour que votre voiture fonctionne correctement pendant des années.",
+      "why_label": "Pourquoi est-ce recommandé ?",
+      "action_label": "Comment gérer cela ?"
+    }
+  },
+  "legal": {
+    "privacy_title": "Politique de confidentialité",
+    "terms_title": "Conditions d'utilisation",
+    "last_updated": "Dernière mise à jour : 31 mars 2026",
+    "privacy": {
+      "s1_title": "1. Informations que nous collectons",
+      "s1_desc": "Nous collectons les informations que vous nous fournissez directement lorsque vous créez un compte, soumettez une demande de diagnostic de véhicule, téléchargez des photos ou communiquez avec nous.",
+      "s2_title": "2. Comment nous utilisons vos informations",
+      "s2_desc": "Nous utilisons les informations que nous collectons pour fournir, maintenir et améliorer nos services de diagnostic IA, pour traiter les transactions et pour vous envoyer des avis techniques et des messages d'assistance.",
+      "s3_title": "3. Sécurité des données",
+      "s3_desc": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger la sécurité de vos informations personnelles. Cependant, veuillez noter qu'aucune méthode de transmission sur Internet n'est sûre à 100 %."
+    },
+    "terms": {
+      "s1_title": "1. Acceptation des conditions",
+      "s1_desc": "En accédant à Car Safety et en l'utilisant, vous acceptez d'être lié par ces conditions d'utilisation. Si vous n'êtes pas d'accord avec une partie de ces conditions, vous ne pouvez pas utiliser notre service.",
+      "s2_title": "2. Description du service",
+      "s2_desc": "Car Safety propose des diagnostics automobiles alimentés par l'IA. Les résultats du diagnostic sont générés par intelligence artificielle sur la base des entrées de l'utilisateur et des photos, et doivent être vérifiés par des professionnels certifiés avant des réparations majeures.",
+      "s3_title": "3. Abonnements et paiements",
+      "s3_desc": "Certaines fonctionnalités nécessitent un abonnement payant. Vous serez facturé à l'avance sur une base récurrente conformément à votre plan d'abonnement. Vous pouvez annuler votre abonnement à tout moment.",
+      "s4_title": "4. Avis de non-responsabilité des garanties",
+      "s4_desc": "Notre service est fourni « tel quel » et « selon disponibilité » sans aucune garantie ni condition, expresse, implicite ou légale. Nous ne garantissons pas que les diagnostics de l'IA seront exacts à 100 % ou adaptés à votre situation mécanique spécifique."
     }
   },
   "auth": {
     "account": "Compte",
     "login": {
-      "title": "Bon retour",
-      "subtitle": "Connectez-vous à votre compte",
-      "email": "Adresse E-mail",
+      "title": "Bon retour parmi nous",
+      "subtitle": "Connectez-vous à votre tableau de bord AI Mechanic",
+      "button": "Se Connecter",
+      "email": "Adresse e-mail",
       "password": "Mot de passe",
-      "button": "Se connecter",
-      "no_account": "Pas de compte ?",
-      "signup_link": "S'inscrire gratuitement"
+      "remember_me": "Se souvenir de moi",
+      "or_continue": "Ou continuer avec",
+      "forgot_password": "Oublié ?"
     },
     "signup": {
-      "title": "Créer un compte",
-      "subtitle": "Commencez votre voyage vers une conduite sûre",
+      "title": "Commencer",
+      "subtitle": "Rejoignez des milliers de conducteurs utilisant Car Safety",
+      "button": "Créer un Compte",
       "full_name": "Nom complet",
-      "email": "Adresse E-mail",
       "password": "Mot de passe",
-      "button": "Créer le compte",
-      "has_account": "Déjà un compte ?",
-      "login_link": "Se connecter"
-    }
-  },
-  "dashboard": {
-    "welcome": "Bienvenue,",
-    "greeting_question": "Comment pouvons-nous vous aider\navec votre voiture ?",
-    "checking_systems": "Vérification des systèmes...",
-    "no_vehicle_found": "Aucun véhicule principal trouvé",
-    "add_vehicle_prompt": "Ajoutez un véhicule pour débloquer les diagnostics IA et le suivi d'entretien.",
-    "go_to_garage": "Aller au Garage",
-    "engine_ready": "Moteur IA prêt",
-    "system_health": "Santé Système",
-    "health_optimal": "Santé optimale",
-    "health_issues": "Problèmes détectés",
-    "active_vehicle": "Véhicule Actif",
-    "maintenance_status": "État de l'Entretien",
-    "overdue": "En retard",
-    "upcoming": "À venir",
-    "healthy": "Sain",
-    "vehicle_overview": "Aperçu du Véhicule",
-    "add_service": "Ajouter Service",
-    "diagnostic_analysis": "Diagnostics IA",
-    "smart_maintenance": "Entretien Intelligent",
-    "verify_costs": "Vérifier les Coûts",
-    "action_required": "Action Requise",
-    "quick_actions": "Actions Rapides",
-    "health_score": "Score de Santé",
-    "recent_activity": "Activité Récente",
-    "garage_empty": "Le garage est vide",
-    "add_vehicle": "Ajouter votre véhicule",
-    "urgent_attention": "Attention Urgente",
-    "more_urgent": "+{{count}} de plus",
-    "quick_diagnostics": "Diagnostics Rapides",
-    "diagnostics": {
-      "engine": "Voyant Moteur",
-      "start": "Démarre Pas",
-      "noise": "Bruit Étrange",
-      "battery": "Batterie",
-      "brakes": "Freins"
-    }
-  },
-  "vehicles": {
-    "manager": "Gestion du Garage",
-    "title": "Mes Véhicules",
-    "add_first": "Votre garage est vide",
-    "track_desc": "Gérez votre flotte pour des diagnostics et un entretien précis.",
-    "add_button": "Ajouter un véhicule",
-    "loading_garage": "Chargement du Garage...",
-    "active_badge": "Actif",
-    "edit": "Modifier",
-    "delete": "Retirer",
-    "make_primary": "Utiliser celui-ci",
-    "default": "Véhicule de diagnostic actuel",
-    "year": "Année",
-    "vin": "N° de Châssis",
-    "kilometers": "Kilomètres",
-    "fuel_type": "Carburant",
-    "delete_confirm": "Voulez-vous vraiment retirer ce véhicule ?",
-    "modal": {
-      "add_title": "Ajouter votre véhicule",
-      "edit_title": "Modifier le véhicule",
-      "brand_label": "Choisissez la marque.",
-      "model_label": "Choisissez le modèle {{make}}.",
-      "year_label": "Année du modèle {{make}} {{model}} ?",
-      "review_label": "Vérifiez les informations.",
-      "search_brands": "Rechercher une marque...",
-      "search_models": "Rechercher un modèle {{make}}...",
-      "enter_manually": "Entrer \"{{name}}\" manuellement",
-      "back_to_brand": "← Retour aux marques",
-      "back_to_model": "← Retour aux modèles",
-      "change": "Changer",
-      "fuel_type": "Carburant",
-      "gearbox": "Boîte de vitesses",
-      "mileage": "Kilométrage (km)",
-      "plate_number": "Plaque d'immatriculation",
-      "vin": "Numéro VIN",
-      "vin_hint": "Optionnel · Améliore la précision",
-      "vin_placeholder": "VIN à 17 caractères",
-      "plate_placeholder": "ex: AB-123-CD",
-      "use_as_active": "Définir comme actif",
-      "active_hint": "Le mécanicien IA utilisera cette voiture",
-      "cancel": "Annuler",
-      "update": "Mettre à jour",
-      "confirm_save": "Confirmer & Enregistrer",
-      "error_fill": "Veuillez remplir marque, modèle et année.",
-      "error_login": "Connectez-vous pour enregistrer."
-    }
-  },
-  "mechanic": {
-    "title": "Mécanicien IA",
-    "header": "Assistant Diagnostic Expert",
-    "placeholder": "Décrivez un bruit, un voyant...",
-    "streaming": "Analyse en direct",
-    "connecting": "Connexion aux systèmes",
-    "disclaimer": "Les conseils IA sont indicatifs. Consultez un professionnel.",
-    "vague_response": "Ne vous inquiétez pas — je suis là pour aider.\n\nPour mieux vous guider :\n**Que fait (ou ne fait pas) votre voiture ?**\n\nExemple : un bruit étrange, un voyant allumé, du mal à démarrer.",
-    "analyzing_photo": "Analyse de la photo...",
-    "analyzing_systems": "Analyse des systèmes...",
-    "engine_online": "Moteur de diagnostic en ligne",
-    "how_help": "Décrivez le problème...",
-    "listening": "Écoute...",
-    "recording": "Enregistrement...",
-    "typing": "Réflexion...",
-    "send": "Envoyer",
-    "drive_caution": "Conduisez prudemment",
-    "monitor_issue": "Surveiller",
-    "diagnostic_interrogation": "Interrogatoire Diagnostic",
-    "initializing_modules": "Initialisation des modules...",
-    "preparing_voice": "Préparation de la voix...",
-    "voice_active": "Voix Premium Active",
-    "generating_voice": "Génération de la voix...",
-    "listening_label": "Écoute en cours...",
-    "stop_recording": "Arrêter l'enregistrement",
-    "fallbacks": {
-      "flat_tire": {
-        "title": "Pneu à plat détecté",
-        "cause": "Une crevaison due à des débris sur la route ou une valve défectueuse.",
-        "explanation": "Rouler avec un pneu à plat endommagera définitivement votre jante et peut causer une perte de contrôle du véhicule.",
-        "next_step": "Arrêtez-vous immédiatement dans un endroit sûr et remplacez-le par la roue de secours ou appelez une dépanneuse professionnelle.",
-        "summary": "Vous avez un pneu à plat. Arrêtez de conduire immédiatement pour rester en sécurité et protéger vos jantes."
-      },
-      "battery": {
-        "title": "Défaillance potentielle de la batterie",
-        "cause": "Bornes corrodées, vieillissement de la batterie ou problème d'alternateur.",
-        "explanation": "Le moteur manque de puissance pour démarrer ou peut caler de manière inattendue.",
-        "next_step": "Vérifiez la corrosion des bornes de la batterie et tentez un démarrage avec des câbles de haute qualité.",
-        "summary": "Votre batterie est probablement en cause. Essayez un démarrage avec des câbles ou vérifiez les connexions."
-      },
-      "engine_light": {
-        "title": "Témoin de contrôle moteur",
-        "cause": "Varie d'un bouchon de réservoir mal fermé à un dysfonctionnement d'un capteur critique.",
-        "explanation": "Le véhicule est généralement sûr pour un court trajet jusqu'à un garage, sauf si le témoin clignote.",
-        "next_step": "Assurez-vous que votre bouchon de réservoir est bien serré et faites effectuer un scan OBD-II rapidement.",
-        "summary": "Le témoin moteur est allumé. Il est généralement sûr de conduire sur une courte distance, mais ne l'ignorez pas."
-      },
-      "overheating": {
-        "title": "Alerte de surchauffe moteur",
-        "cause": "Niveau de liquide de refroidissement bas, durite percée ou pompe à eau défaillante.",
-        "explanation": "Une chaleur excessive fera fondre les composants du moteur, entraînant sa destruction totale.",
-        "next_step": "Rangez-vous et coupez le moteur IMMÉDIATEMENT. N'ouvrez pas le capot si de la vapeur est présente.",
-        "summary": "Votre moteur surchauffe. Arrêtez-vous immédiatement pour éviter une reconstruction totale du moteur."
-      },
-      "leak": {
-        "title": "Fuite de liquide détectée",
-        "cause": "Les fuites peuvent aller de l'huile moteur au liquide de refroidissement ou de frein.",
-        "explanation": "La perte de fluides vitaux peut entraîner une défaillance des composants ou une perte de freinage/direction.",
-        "next_step": "Identifiez la couleur du liquide et vérifiez les niveaux avant de conduire. Ne conduisez pas s'il s'agit de liquide de frein.",
-        "summary": "J'ai détecté une fuite de liquide. Vous devriez vérifier vos niveaux avant de continuer à rouler."
-      },
-      "smoke": {
-        "title": "Brûlé ou fumée détectée",
-        "cause": "Peut être un court-circuit électrique, une fuite d'huile sur l'échappement chaud ou un frein bloqué.",
-        "explanation": "Les odeurs de brûlé ou la fumée sont des signes de chaleur excessive ou de friction et posent un risque d'incendie.",
-        "next_step": "Arrêtez-vous en sécurité et recherchez la source. Évitez de conduire avant d'avoir identifié la cause.",
-        "summary": "J'ai détecté une odeur de brûlé ou de la fumée. C'est un risque d'incendie potentiel, veuillez vous arrêter en sécurité."
-      },
-      "noise": {
-        "title": "Problème de bruit mécanique",
-        "cause": "Probablement des plaquettes de frein usées, un roulement de roue défaillant ou une courroie détendue.",
-        "explanation": "La plupart des bruits sont des signes avant-coureurs, mais permettent une conduite prudente jusqu'au garage.",
-        "next_step": "Écoutez quand le bruit change (virage, freinage) et prenez rendez-vous pour un diagnostic.",
-        "summary": "Ce bruit étrange semble indiquer l'usure d'un composant mécanique. Faites-le vérifier rapidement."
-      },
-      "damage": {
-        "title": "Évaluation des dommages du véhicule",
-        "cause": "Impact physique ou collision.",
-        "explanation": "Les dommages structurels ou l'impact peuvent avoir affecté les composants internes ou les systèmes de sécurité.",
-        "next_step": "Vérifiez les fuites de liquide et assurez-vous qu'aucune pièce ne frotte contre les pneus avant de rouler.",
-        "summary": "J'ai détecté des dommages potentiels. Veuillez vérifier les systèmes de sécurité avant de conduire."
-      }
-    }
-  },
-  "overpaying": {
-    "title": "Analyse de Prix IA",
-    "subtitle": "Arrêtez de payer trop cher pour vos réparations. Notre IA analyse vos devis par rapport au marché local instantanément.",
-    "price_intelligence": "Intelligence Prix",
-    "expert_analysis": "Analyse IA Experte",
-    "photo_label": "Photo du Devis ou de la Pièce",
-    "upload_prompt": "Uploader une Photo",
-    "vehicle_label": "Modèle du Véhicule",
-    "vehicle_placeholder": "ex: 2018 Toyota Camry",
-    "auto_filled": "Rempli Auto",
-    "problem_label": "Nom de la Réparation",
-    "problem_placeholder": "ex: Remplacement plaquettes de frein",
-    "price_label": "Prix Devisé",
-    "region_label": "Votre Région",
-    "region_placeholder": "ex: Paris, France",
-    "run_analysis": "Lancer l'Analyse",
-    "running_analysis": "Analyse du Marché...",
-    "expert_suggestion": "Conseil Expert : Votre devis pour {{component}} est significativement élevé.",
-    "check_another": "Vérifier un autre devis",
-    "error_empty": "Veuillez fournir plus de détails ou une photo.",
-    "detected_issue": "Problème Détecté",
-    "parts": "pièces",
-    "labor": "main d'œuvre",
-    "both": "pièces et main d'œuvre",
-    "above_market": "Au-dessus du Marché",
-    "verdict": {
-      "fair": "Prix Équitable",
-      "fair_badge": "Bonne Affaire",
-      "expensive": "Cher",
-      "expensive_badge": "Prix Élevé",
-      "overpriced": "Surfacturé",
-      "overpriced_badge": "Alerte Prix"
+      "confirm_password": "Confirmer le mot de passe",
+      "success_message": "Compte créé ! Veuillez vérifier votre e-mail pour confirmer et vous connecter.",
+      "passwords_mismatch": "Les mots de passe ne correspondent pas",
+      "password_too_short": "Le mot de passe doit comporter au moins 8 caractères"
     },
-    "risk": {
-      "low": "Risque Faible",
-      "medium": "Risque Moyen",
-      "high": "Risque Élevé"
-    },
-    "market_comparison": "Comparaison Marché",
-    "parts_cost": "Coût Pièces",
-    "labor_cost": "Main d'œuvre",
-    "fair_total": "Total Équitable",
-    "ai_intelligence": "Intelligence IA",
-    "next_step_label": "Étape Stratégique",
-    "scam_warning_label": "Alerte Surfacturation",
-    "negotiation_scripts": "Suite de Négociation",
-    "parts_savings": "Sources de Pièces Alternatives",
-    "live_assistant": "Assistant de Négociation en Direct",
-    "live_desc": "Parlez à l'IA pendant que vous êtes au garage pour des conseils en temps réel.",
-    "analyzing_voice": "Écoute de votre voix...",
-    "stop_recording": "Arrêter l'Enregistrement",
-    "start_audit": "Démarrer l'Audit"
-  },
-  "maintenance": {
-    "title": "Entretien",
-    "add_record": "Enregistrer Entretien",
-    "add_record_desc": "Journal d'entretien",
-    "log_desc": "Détails de l'intervention",
-    "service_type": "Type de Service",
-    "mileage": "Kilométrage",
-    "date": "Date",
-    "cost": "Coût",
-    "shop_name": "Garage / Enseigne",
-    "notes": "Notes",
-    "parts": "Pièces remplacées",
-    "warranty": "Garantie",
-    "select_service": "Choisir service...",
-    "custom_service": "Nom personnalisé",
-    "mileage_placeholder": "Kilométrage actuel...",
-    "cost_placeholder": "Coût total...",
-    "shop_placeholder": "Nom du garage...",
-    "notes_placeholder": "Détails...",
-    "save_button": "Enregistrer",
-    "saving": "Enregistrement...",
-    "battery_overdue": "Contrôle Batterie en Retard",
-    "history": "Historique",
-    "seasonal": "Checks Saisonniers",
-    "fluids": "Guide Liquides",
-    "advisor": "Réparer ?",
-    "export": "Exporter Rapport",
-    "no_vehicles_desc": "Ajoutez un véhicule pour suivre l'entretien.",
-    "go_to_garage": "Aller au Garage",
-    "urgent_action": "Action Urgente",
-    "upcoming": "À venir",
-    "vehicle_settings": "Paramètres Véhicule",
-    "current_mileage": "Kilométrage actuel",
-    "avg_miles_month": "Km/mois moyen",
-    "driving_style": "Style de conduite",
-    "climate": "Climat",
-    "tools": "Outils Entretien",
-    "history_title": "Historique",
-    "seasonal_title": "Checks Saisonniers",
-    "fluids_title": "Liquides",
-    "plan_title": "Plan d'Entretien",
-    "export_pdf": "Exporter PDF",
-    "complete_schedule": "Calendrier Complet",
-    "climate_checks_desc": "Vérifications climatiques",
-    "history_empty": "Aucun enregistrement",
-    "history_empty_desc": "Enregistrez votre premier entretien pour créer l'historique.",
-    "records": "Interventions",
-    "total_spent": "Dépenses totales",
-    "mileage_unit": "km",
-    "data_sources": "Sources de données",
-    "disclaimer_text": "Plan basé sur les standards constructeurs.",
-    "view_full_plan": "Voir plan complet",
-    "update_details": "Modifier détails",
-    "save_changes": "Enregistrer",
-    "service_types": {
-      "oil_change": "Vidange Huile",
-      "tire_rotation": "Permutation Pneus",
-      "brake_inspection": "Contrôle Freins",
-      "brake_pads": "Changement Plaquettes",
-      "air_filter": "Filtre à Air",
-      "battery_check": "Contrôle Batterie",
-      "coolant_flush": "Liquide Refroidissement",
-      "transmission": "Entretien Transmission",
-      "alignment": "Parallélisme",
-      "wheel_balance": "Équilibrage",
-      "spark_plugs": "Bougies d'allumage",
-      "belt_replacement": "Courroies",
-      "ac_service": "Entretien Clim",
-      "full_inspection": "Révision complète",
-      "other": "Autre"
-    },
-    "driving_styles": {
-      "city": "Ville",
-      "highway": "Autoroute",
-      "mixed": "Mixte"
-    },
-    "climates": {
-      "hot": "Chaud",
-      "cold": "Froid",
-      "temperate": "Tempéré"
-    },
-    "tool_subs": {
-      "history": "Journal de bord",
-      "seasonal": "Guides météo",
-      "fluids": "Contrôles visuels",
-      "advisor": "Aide décision"
-    },
-    "status_labels": {
-      "all_good": "Tout va bien",
-      "overdue": "En retard",
-      "due_now": "À faire",
-      "coming_soon": "Bientôt",
-      "excellent": "Excellent",
-      "good": "Bon",
-      "attention": "À surveiller",
-      "high_risk": "Risque élevé"
-    },
-    "status_explanations": {
-      "good_miles": "Prochain service dans ~{{miles}} km ou {{months}} mois.",
-      "good_date": "Prochain service dans ~{{months}} mois.",
-      "overdue_miles": "Retard de {{miles}} km. À faire rapidement.",
-      "overdue_days": "Retard de {{days}} jours. À faire rapidement.",
-      "due_now_miles": "D'ici {{miles}} km ou {{days}} jours.",
-      "due_now_days": "D'ici {{days}} jours.",
-      "coming_soon_miles": "Bientôt d'ici {{miles}} km ou {{months}} mois.",
-      "coming_soon_date": "Bientôt dans ~{{months}} mois."
-    },
-    "health_card": {
-      "title": "Score de Santé",
-      "messages": {
-        "excellent": "Votre véhicule est en pleine forme !",
-        "good": "Plutôt bien. Quelques points à surveiller.",
-        "attention": "Plusieurs points d'entretien requis.",
-        "risk": "Entretien en retard. Planifiez vite."
-      },
-      "categories": {
-        "engine": "Moteur",
-        "brakes": "Freins",
-        "tires": "Pneus",
-        "fluids": "Liquides",
-        "battery": "Batterie / Élec",
-        "consistency": "Régularité Entretien"
-      }
-    },
-    "reminder_card": {
-      "next_service": "Prochain: {{mileage}} km",
-      "due_date": "Échéance: {{date}}",
-      "est_cost": "Est. Coût: {{low}}–{{high}} €",
-      "anti_scam": "Astuce Anti-Arnaque",
-      "risk_delayed": "Risque Retard",
-      "log_title": "Marquer comme fait",
-      "mileage_label": "Km lors du service",
-      "logged": "✓ Enregistré",
-      "saving": "Enregistrement..."
-    },
-    "anti_scam": {
-      "oil_change": "Le rinçage moteur est rarement utile. L'huile synthétique dure plus longtemps.",
-      "tire_rotation": "Le gonflage à l'azote est souvent un surcoût inutile.",
-      "brake_inspection": "On peut souvent rectifier les disques plutôt que les changer systématiquement.",
-      "air_filter": "Faites-le vous-même en 2 min pour 15€.",
-      "battery_check": "Beaucoup de centres testent gratuitement la batterie.",
-      "coolant_check": "Vidange tous les 50-80k km seulement."
-    },
-    "risk_delayed": {
-      "oil_change": "Usure moteur, calamine, surconsommation, risque de casse.",
-      "tire_rotation": "Usure inégale, durée de vie pneus réduite, moins de tenue de route.",
-      "brake_inspection": "Distance de freinage allongée, risque de défaillance.",
-      "air_filter": "Perte de puissance, surconsommation.",
-      "battery_check": "Panne de démarrage subite.",
-      "coolant_check": "Surchauffe, joint de culasse."
+    "reviews": {
+      "r1_text": "M'a évité une visite inutile au garage. Il a analysé la photo de mon tableau de bord instantanément et a expliqué le problème du capteur en français simple.",
+      "r1_role": "Conducteur quotidien",
+      "r2_text": "Ma jauge de température a grimpé en flèche. L'IA m'a dit exactement quoi vérifier en toute sécurité et m'a aidé à trouver une dépanneuse à proximité immédiatement.",
+      "r2_role": "Navetteur",
+      "r3_text": "Simple, clair et vraiment utile. Ma voiture ne démarrait pas, et l'analyse de la panne a pointé directement vers la batterie.",
+      "r3_role": "Propriétaire de voiture"
     }
   },
   "settings": {
-    "title": "Paramètres",
-    "subtitle": "Infos personnelles & Préférences",
-    "profile_details": "Détails Profil",
-    "profile_details_sub": "Gérez vos informations",
+    "title": "Mon Compte",
+    "subtitle": "Gestion du compte et préférences",
+    "profile_details": "Détails du profil",
+    "profile_details_sub": "Nom, email et téléphone",
     "security": "Sécurité",
-    "security_sub": "Mot de passe et protection",
-    "billing": "Facturation",
-    "billing_sub": "Abonnement Premium",
-    "language": "Langue",
+    "security_sub": "Mot de passe et sessions actives",
+    "billing": "Abonnement",
+    "billing_sub": "Gérer le plan et les factures",
+    "language": "Langue de l'application",
+    "activity": "Activité récente",
+    "activity_sub": "Votre historique de diagnostic",
+    "support": "Centre d'assistance",
+    "support_sub": "Docs d'aide et contact",
+    "about": "À propos de Car Safety",
+    "version": "Version 2.4.0 (Build officiel)",
     "sign_out": "Se déconnecter",
-    "save_changes": "Enregistrer",
-    "profile_success": "Profil mis à jour !",
-    "password_success": "Mot de passe modifié !"
+    "end_session": "Mettre fin à votre session actuelle",
+    "history_title": "Historique d'activité",
+    "no_activity": "Aucune activité récente trouvée.",
+    "support_title": "Besoin d'aide ?",
+    "support_desc": "Notre équipe est là pour vous aider pour toute question ou problème technique.",
+    "contact_support": "Contacter l'assistance",
+    "current_plan": "Plan actuel",
+    "active_sub_label": "Abonnement actif",
+    "trial_period": "Période d'essai",
+    "expired": "Expiré",
+    "standard_access": "Accès standard",
+    "status": "Statut",
+    "billing_cycle": "Cycle de facturation",
+    "started_on": "Commencé le",
+    "renewal_date": "Date de renouvellement",
+    "ends_on": "Se termine le",
+    "upgrade_plan": "Améliorer le plan",
+    "managed_by": "Géré via l'assistance Car Safety",
+    "edit_profile": "Modifier le profil",
+    "full_name": "Nom complet",
+    "phone": "Numéro de téléphone",
+    "pref_lang": "Langue préférée",
+    "save_changes": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "update_password": "Mettre à jour le mot de passe",
+    "updating": "Mise à jour...",
+    "coming_soon": "À venir",
+    "password_security_hint": "Utilisez au moins 8 caractères avec un mélange de lettres et de chiffres.",
+    "activity_diagnosis": "Diagnostic IA : ",
+    "activity_vehicle_issue": "Problème du véhicule",
+    "activity_completed": "Terminé"
+  },
+  "reports": {
+    "modal": {
+      "title": "Rapport de diagnostic",
+      "listen_diagnosis": "Diagnostic : {{issue}}. Résumé : {{summary}}. Contrôle de sécurité : {{safety}}. Prochaine étape recommandée : {{next}}",
+      "safety_safe": "Vous pouvez continuer à conduire prudemment",
+      "safety_unsafe": "Arrêtez-vous immédiatement",
+      "vehicle_spec": "Infos véhicule",
+      "model_year": "Année",
+      "analysis_title": "Résultat du diagnostic IA",
+      "action_required": "Prochaine étape recommandée",
+      "safe_to_drive": "Sûr à conduire",
+      "do_not_drive": "Ne pas conduire",
+      "join_prompt": "Vous voulez générer vos propres rapports IA ?"
+    }
+  },
+  "dashboard": {
+    "securing_access": "Sécurisation de l'accès...",
+    "urgent_attention": "Attention urgente",
+    "more_urgent": "+{{count}} autres problèmes",
+    "quick_diagnostics": "Diagnostics rapides",
+    "diagnostics": {
+      "engine": "Voyant moteur",
+      "start": "Ne démarre pas",
+      "noise": "Bruit étrange",
+      "battery": "Problème batterie",
+      "brakes": "Bruit de freins"
+    }
   }
 }

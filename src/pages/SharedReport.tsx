@@ -10,19 +10,22 @@ import { supabase } from '../lib/supabase'
 import { getUrgencyBadge } from '../lib/utils'
 import ListenButton from '../components/ui/ListenButton'
 import ErrorBoundary from '../components/ErrorBoundary'
+import { useTranslation } from 'react-i18next'
 
 export default function SharedReport() {
   const { shareId, token } = useParams()
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [reportData, setReportData] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
   const currentAudioRef = useRef<HTMLAudioElement | null>(null)
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.dir() === 'rtl'
 
   useEffect(() => {
     async function fetchSharedReport() {
       const activeIdentifier = token || shareId
       if (!activeIdentifier) {
-        setError('Invalid share link.')
+        setError(t('common.error'))
         setLoading(false)
         return
       }
@@ -38,7 +41,7 @@ export default function SharedReport() {
           .single()
 
         if (fetchErr) throw fetchErr
-        if (!data) throw new Error('Report not found')
+        if (!data) throw new Error(t('reports.empty_title'))
 
         setReportData(data)
         
@@ -46,7 +49,7 @@ export default function SharedReport() {
 
       } catch (err) {
         console.error('Error fetching shared report:', err)
-        setError('This shared report link is invalid or has expired.')
+        setError(t('reports.empty_desc'))
       } finally {
         setLoading(false)
       }
@@ -66,13 +69,13 @@ export default function SharedReport() {
   if (error || !reportData) {
     return (
       <div className="min-h-screen bg-[#F4F7FF] flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">Report Not Found</h2>
+        <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">{t('reports.empty_title')}</h2>
         <p className="text-slate-600 mb-8">{error}</p>
         <Link 
           to="/"
           className="px-6 py-3 bg-[#0070E0] text-white rounded-xl font-bold transition-all hover:scale-105"
         >
-          Go to Homepage
+          {t('common.back')}
         </Link>
       </div>
     )
@@ -95,7 +98,7 @@ export default function SharedReport() {
               to="/register"
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0E3882] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#0A2A66] transition-colors"
             >
-              Create Free Account <ArrowRight className="w-4 h-4" />
+              {t('auth.signup.button')} <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             </Link>
           </div>
         </nav>
@@ -111,16 +114,22 @@ export default function SharedReport() {
             <div className="px-8 py-8 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <h1 className="text-2xl font-display font-black text-[#0E1B39] tracking-tight mb-2">
-                  Diagnostic Report
+                  {t('reports.modal.title')}
                 </h1>
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  ID: {reportData.share_id} <span className="w-1 h-1 bg-slate-300 rounded-full" /> {new Date(reportData.created_at).toLocaleDateString()}
+                  ID: {reportData.share_id} <span className="w-1 h-1 bg-slate-300 rounded-full" /> {new Date(reportData.created_at).toLocaleDateString(i18n.language)}
                 </p>
               </div>
               
               <ListenButton 
                 currentAudioRef={currentAudioRef}
-                text={`Diagnosis: ${diagnosis.issueName}. Summary: ${diagnosis.likelyCause}. Safety check: ${diagnosis.canDrive ? 'You can keep driving, but be careful.' : 'No, do not drive. Stop as soon as it is safe.'} ${diagnosis.driveWhy}. Danger level: ${diagnosis.urgencyLevel.replace('_', ' ')}. Recommended next step: ${diagnosis.nextStep}`}
+                text={t('reports.modal.listen_diagnosis', { 
+                  issue: diagnosis.issueName, 
+                  summary: diagnosis.likelyCause, 
+                  safety: diagnosis.canDrive ? t('reports.modal.safety_safe') : t('reports.modal.safety_unsafe'),
+                  danger: diagnosis.urgencyLevel,
+                  next: diagnosis.nextStep 
+                })}
               />
             </div>
 
@@ -131,11 +140,11 @@ export default function SharedReport() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                       <Car className="w-4 h-4 text-[#0070E0]" />
-                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Vehicle Info</h3>
+                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{t('reports.modal.vehicle_spec')}</h3>
                   </div>
                   <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
                       <p className="text-lg font-bold text-slate-900 mb-1">{vehicle.make} {vehicle.model}</p>
-                      <p className="text-sm font-medium text-slate-500">Year: {vehicle.year}</p>
+                      <p className="text-sm font-medium text-slate-500">{t('reports.modal.model_year')}: {vehicle.year}</p>
                   </div>
                 </div>
               </div>
@@ -148,7 +157,7 @@ export default function SharedReport() {
                 
                 <div className="relative z-10 space-y-8">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">AI Diagnosis Result</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{t('reports.modal.analysis_title')}</p>
                     <h4 className="text-3xl font-display font-black tracking-tight italic mb-3 text-[#0E1B39]">
                       {diagnosis.issueName}
                     </h4>
@@ -171,7 +180,7 @@ export default function SharedReport() {
                   </div>
 
                   <div className="p-6 rounded-3xl bg-white border border-[#0070E0]/20 shadow-sm">
-                    <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-2">Recommended Next Step</p>
+                    <p className="text-[10px] font-bold text-[#0070E0] uppercase tracking-widest mb-2">{t('reports.modal.action_required')}</p>
                     <p className="text-base font-bold text-slate-900">{diagnosis.nextStep}</p>
                   </div>
 
@@ -182,7 +191,7 @@ export default function SharedReport() {
                         : 'bg-red-50 text-red-600 border-red-100'
                     }`}>
                       {diagnosis.canDrive ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
-                      {diagnosis.canDrive ? 'Safe to Drive' : 'Do Not Drive'}
+                      {diagnosis.canDrive ? t('reports.modal.safe_to_drive') : t('reports.modal.do_not_drive')}
                     </div>
 
 
@@ -194,7 +203,7 @@ export default function SharedReport() {
           </motion.div>
           
           <div className="mt-8 text-center">
-              <p className="text-sm font-medium text-slate-500">Want to generate your own AI reports? <Link to="/register" className="text-[#0070E0] hover:underline font-bold">Join Car Safety.</Link></p>
+              <p className="text-sm font-medium text-slate-500">{t('reports.modal.join_prompt', { defaultValue: 'Want to generate your own AI reports?' })} <Link to="/register" className="text-[#0070E0] hover:underline font-bold">{t('landing.footer.join_name', { defaultValue: 'Join Car Safety.' })}</Link></p>
           </div>
         </main>
 

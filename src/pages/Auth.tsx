@@ -5,18 +5,20 @@ import { Eye, EyeOff, CheckCircle, Star, Quote } from 'lucide-react'
 import { BrandLockup } from '../components/ui/Brand'
 import { useAuth } from '../contexts/AuthContext'
 import { PasswordRequirement } from '../components/ui/PasswordRequirement'
+import { useTranslation } from 'react-i18next'
 
 const reviews = [
-  { name: 'Jason M.', car: 'Toyota RAV4', text: 'Saved me from an unnecessary garage visit. It analyzed my dashboard photo instantly and explained the sensor issue in plain English.', role: 'Daily Driver' },
-  { name: 'Sarah J.', car: 'VW Golf', text: 'My temperature gauge spiked. The AI told me exactly what to check safely and helped me find a nearby tow truck immediately.', role: 'Commuter' },
-  { name: 'Michael B.', car: 'Audi A3', text: 'Simple, clear, and actually useful. My car wouldn\'t turn over, and the breakdown analysis pointed right to the battery.', role: 'Car Owner' },
+  { name: 'Jason M.', car: 'Toyota RAV4', text: 'auth.reviews.r1_text', role: 'auth.reviews.r1_role' },
+  { name: 'Sarah J.', car: 'VW Golf', text: 'auth.reviews.r2_text', role: 'auth.reviews.r2_role' },
+  { name: 'Michael B.', car: 'Audi A3', text: 'auth.reviews.r3_text', role: 'auth.reviews.r3_role' },
 ]
 
 export default function Auth() {
   const [searchParams] = useSearchParams()
-  const { user, signIn, signUp, signInWithOAuth } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation()
+  const { user, signIn, signUp, signInWithOAuth } = useAuth()
 
   const from = (location.state as any)?.from?.pathname ?? '/dashboard'
 
@@ -81,11 +83,11 @@ export default function Auth() {
     
     if (mode === 'register') {
       if (password.length < 8) {
-        setError('Password must be at least 8 characters')
+        setError(t('auth.signup.password_too_short'))
         return
       }
       if (password !== confirmPassword) {
-        setError('Passwords do not match')
+        setError(t('auth.signup.passwords_mismatch'))
         return
       }
     }
@@ -111,7 +113,7 @@ export default function Auth() {
           navigate('/onboarding-location')
         } else {
           setIsSuccess(true)
-          setSuccessMessage('Account created! Please check your email to confirm and sign in.')
+          setSuccessMessage(t('auth.signup.success_message'))
         }
       }
     }
@@ -135,10 +137,10 @@ export default function Auth() {
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
           <div className="mb-10">
             <h1 className="text-3xl md:text-4xl font-display font-black text-on-surface mb-3 tracking-tight">
-              {mode === 'login' ? 'Welcome back' : 'Get started'}
+              {mode === 'login' ? t('auth.login.title') : t('auth.signup.title')}
             </h1>
             <p className="text-muted font-medium text-base">
-              {mode === 'login' ? 'Log in to your AI Mechanic dashboard' : 'Join thousands of drivers using Car Safety'}
+              {mode === 'login' ? t('auth.login.subtitle') : t('auth.signup.subtitle')}
             </p>
           </div>
 
@@ -149,13 +151,13 @@ export default function Auth() {
                 onClick={() => setMode('login')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'login' ? 'bg-white text-navy shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
               >
-                Sign In
+                {t('auth.login.button')}
               </button>
               <button
                 onClick={() => setMode('register')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${mode === 'register' ? 'bg-white text-navy shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
               >
-                Register
+                {t('auth.signup.button')}
               </button>
             </div>
 
@@ -189,11 +191,11 @@ export default function Auth() {
                     transition={{ duration: 0.2 }}
                     className="space-y-1.5"
                   >
-                    <label className="text-[13px] font-bold text-slate-700 ml-1">Full Name</label>
+                    <label className="text-[13px] font-bold text-slate-700 ml-1">{t('auth.signup.full_name')}</label>
                     <input
                       type="text"
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none"
-                      placeholder="Enter your name"
+                      placeholder={t('common.search')}
                       value={fullName}
                       onChange={e => setFullName(e.target.value)}
                       required={mode === 'register'}
@@ -203,10 +205,10 @@ export default function Auth() {
               </AnimatePresence>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-bold text-slate-700 ml-1">Email address</label>
+                <label className="text-[13px] font-bold text-slate-700 ml-1">{t('auth.login.email')}</label>
                 <input
                   type="email"
-                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none text-start"
                   placeholder="name@company.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -216,17 +218,17 @@ export default function Auth() {
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center ml-1">
-                  <label className="text-[13px] font-bold text-slate-700">Password</label>
+                  <label className="text-[13px] font-bold text-slate-700">{t('auth.login.password')}</label>
                   {mode === 'login' && (
-                    <Link to="/forgot-password" className="text-[12px] text-navy font-bold hover:underline">
-                      Forgot?
+                    <Link to="/forgot-password" title={t('auth.login.forgot_password')} className="text-[#0070E0] hover:underline transition-colors font-bold text-[13px]">
+                      {t('auth.login.forgot_password', { defaultValue: 'Forgot?' })}
                     </Link>
                   )}
                 </div>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none pr-12"
+                    className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none pr-12 text-start"
                     placeholder="••••••••"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -256,7 +258,7 @@ export default function Auth() {
                     transition={{ duration: 0.2 }}
                     className="space-y-1.5"
                   >
-                    <label className="text-[13px] font-bold text-slate-700 ml-1">Confirm Password</label>
+                    <label className="text-[13px] font-bold text-slate-700 ml-1">{t('auth.signup.password')}</label>
                     <input
                       type="password"
                       className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-on-surface text-sm font-medium focus:bg-white focus:border-navy focus:ring-4 focus:ring-navy/5 transition-all outline-none"
@@ -280,7 +282,7 @@ export default function Auth() {
                     />
                     <CheckCircle className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                   </div>
-                  <span className="text-sm font-semibold text-slate-500 group-hover:text-on-surface transition-colors select-none">Remember me</span>
+                  <span className="text-sm font-semibold text-slate-500 group-hover:text-on-surface transition-colors select-none">{t('auth.login.remember_me')}</span>
                 </label>
               )}
 
@@ -292,9 +294,9 @@ export default function Auth() {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
+                    {t('common.saving')}
                   </span>
-                ) : mode === 'login' ? 'Sign In' : 'Create Account'}
+                ) : mode === 'login' ? t('auth.login.button') : t('auth.signup.button')}
               </button>
             </form>
 
@@ -302,7 +304,7 @@ export default function Auth() {
               <div className="space-y-4">
                 <div className="relative flex items-center justify-center py-2">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                  <span className="relative px-4 bg-white text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Or continue with</span>
+                  <span className="relative px-4 bg-white text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('auth.login.or_continue')}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {GOOGLE_AUTH_ENABLED && <button type="button" onClick={() => signInWithOAuth('google')} className="flex items-center justify-center py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all font-bold text-xs gap-3"><svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</button>}
@@ -315,9 +317,9 @@ export default function Auth() {
 
         {/* Footer info */}
         <div className="mt-12 lg:mt-24 text-[11px] font-medium text-slate-400 flex flex-wrap gap-x-6 gap-y-2">
-          <span>&copy; 2026 Car Safety</span>
-          <Link to="/privacy" className="hover:text-navy hover:underline transition-colors">Privacy</Link>
-          <Link to="/terms" className="hover:text-navy hover:underline transition-colors">Terms</Link>
+          <span>&copy; {new Date().getFullYear()} {t('landing.footer.copyright_name', { defaultValue: 'Car Safety' })}</span>
+          <Link to="/privacy" className="hover:text-navy hover:underline transition-colors">{t('landing.footer.privacy')}</Link>
+          <Link to="/terms" className="hover:text-navy hover:underline transition-colors">{t('landing.footer.terms')}</Link>
         </div>
       </div>
 
@@ -344,10 +346,10 @@ export default function Auth() {
           <div className="mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
               <Star className="w-3 h-3 text-brand-blue" fill="currentColor" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/90">Trusted by over 5,000 drivers</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/90">{t('landing.hero.trust_drivers')}</span>
             </div>
             <h2 className="text-4xl xl:text-5xl font-display font-black text-white leading-[1.1] tracking-tight italic">
-              Don't just take <br/>our word for it.
+              {t('landing.reviews_section.title_short', { defaultValue: "Don't just take our word for it." })}
             </h2>
           </div>
 
@@ -371,7 +373,7 @@ export default function Auth() {
                     </div>
                     
                     <p className="text-lg md:text-[20px] font-medium text-white/90 leading-relaxed mb-8 italic">
-                      "{reviews[activeReview].text}"
+                      "{t(reviews[activeReview].text)}"
                     </p>
 
                     <div className="mt-auto flex items-center gap-4">
@@ -380,7 +382,7 @@ export default function Auth() {
                       </div>
                       <div>
                         <p className="text-white font-black text-sm">{reviews[activeReview].name}</p>
-                        <p className="text-white/40 text-[11px] font-black uppercase tracking-wider">{reviews[activeReview].car} &bull; {reviews[activeReview].role}</p>
+                        <p className="text-white/40 text-[11px] font-black uppercase tracking-wider">{reviews[activeReview].car} &bull; {t(reviews[activeReview].role)}</p>
                       </div>
                     </div>
                   </div>
@@ -393,11 +395,11 @@ export default function Auth() {
           <div className="grid grid-cols-2 gap-6 mt-16 pt-12 border-t border-white/10">
             <div>
               <p className="text-white font-black text-2xl mb-1">98%</p>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-tight">Diagnostic<br/>Accuracy</p>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-tight">{t('landing.trust_section.stats.accuracy_label', { defaultValue: 'Diagnostic' })}<br/>{t('landing.trust_section.stats.accuracy_sub', { defaultValue: 'Accuracy' })}</p>
             </div>
             <div>
               <p className="text-white font-black text-2xl mb-1">24/7</p>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-tight">Reliable<br/>Support</p>
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-tight">{t('landing.trust_section.stats.support_label', { defaultValue: 'Reliable' })}<br/>{t('landing.trust_section.stats.support_sub', { defaultValue: 'Support' })}</p>
             </div>
           </div>
         </div>

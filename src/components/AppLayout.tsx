@@ -257,7 +257,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <div className="absolute inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-sm z-[100]">
               <div className="flex flex-col items-center gap-4">
                 <LayoutDashboard className="w-10 h-10 text-navy animate-pulse" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40">Securing Access...</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-navy/40">{t('dashboard.securing_access')}</p>
               </div>
             </div>
           ) : isExpired ? (
