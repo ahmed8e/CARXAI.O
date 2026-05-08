@@ -1,6 +1,7 @@
 import { InfiniteSlider } from '@/components/ui/infinite-slider'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 import {
   siBmw,
@@ -88,6 +89,8 @@ function BrandLogo({ id, label, path, color, scale = 1 }: Brand) {
 // ── Section ───────────────────────────────────────────────────────────────
 
 export default function BrandSlider() {
+  const { t } = useTranslation()
+
   return (
     <section
       className="relative w-full py-16 md:py-28 overflow-hidden"
@@ -121,19 +124,18 @@ export default function BrandSlider() {
             style={{ background: 'rgba(0,112,224,0.08)', border: '1px solid rgba(0,112,224,0.15)' }}
           >
             <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">
-              Trust &amp; Compatibility
+              {t('landing.brands.badge')}
             </span>
           </div>
 
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-[#0F172A] mb-5 tracking-tight">
-            Compatible with the vehicles{' '}
+            {t('landing.brands.title_part1')}{' '}
             <br className="hidden md:block" />
-            <span className="text-[#0070E0]">people rely&nbsp;on</span>
+            <span className="text-[#0070E0]">{t('landing.brands.title_part2')}</span>
           </h2>
 
           <p className="text-[#64748B] text-base md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-            Car Safety delivers expert diagnostics across every major automotive
-            brand — from everyday city cars to premium series.
+            {t('landing.brands.desc')}
           </p>
         </motion.div>
       </div>

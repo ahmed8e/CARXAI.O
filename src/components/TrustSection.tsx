@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion'
 import { Bot, ShieldAlert, CheckCircle2, ShieldCheck, Zap, ChevronRight, Heart, BadgeCheck } from 'lucide-react'
 import { useStoryReactions } from '../hooks/useStoryReactions'
+import { useTranslation } from 'react-i18next'
 
 export interface TrustSectionProps {
   onStoryClick: () => void;
 }
 
 export default function TrustSection({ onStoryClick }: TrustSectionProps) {
+  const { t } = useTranslation();
   const { totalEngaged, counts } = useStoryReactions('car safety-origin');
 
   return (
@@ -21,7 +23,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
           style={{ background: 'rgba(0,112,224,0.06)', border: '1px solid rgba(0,112,224,0.12)' }}
         >
           <ShieldCheck className="w-3 h-3 text-[#0070E0]" />
-          <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">Trusted Diagnostic Logic</span>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-[#0070E0] font-black">{t('landing.trust_section.badge')}</span>
         </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -30,8 +32,8 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
           transition={{ delay: 0.1 }}
           className="text-4xl md:text-6xl font-display font-bold tracking-tight text-[#0F172A]"
         >
-          Built with the mindset of <br className="md:hidden" />
-          <span className="text-[#0070E0]">an experienced mechanic</span>
+          {t('landing.trust_section.title_part1')} <br className="md:hidden" />
+          <span className="text-[#0070E0]">{t('landing.trust_section.title_part2')}</span>
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -40,7 +42,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
           transition={{ delay: 0.2 }}
           className="text-[#64748B] text-lg md:text-xl font-medium max-w-2xl mx-auto mt-6 leading-relaxed"
         >
-          Car Safety was designed to guide drivers the way a skilled mechanic would think: understanding symptoms, checking urgency, and helping users take the right next step with confidence.
+          {t('landing.trust_section.subtitle')}
         </motion.p>
 
         {/* Story Trigger & Social Proof */}
@@ -59,7 +61,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
             }}
           >
             <Zap size={15} className="text-[#0070E0] shrink-0" fill="currentColor" />
-            How Car Safety Was Born
+            {t('landing.trust_section.story_cta')}
             <div className="w-px h-3 bg-slate-200 mx-1 group-hover:bg-[#0070E0]/30 transition-colors" />
             <ChevronRight size={14} className="text-[#0E3882]/40 group-hover:translate-x-1 group-hover:text-[#0070E0] transition-all" />
           </motion.button>
@@ -80,7 +82,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                 className="block h-[1px] w-5"
                 style={{ background: 'linear-gradient(to right, transparent, rgba(14,56,130,0.12))' }}
               />
-              Voices from real drivers
+              {t('landing.trust_section.social_proof_label')}
               <span
                 className="block h-[1px] w-5"
                 style={{ background: 'linear-gradient(to left, transparent, rgba(14,56,130,0.12))' }}
@@ -93,7 +95,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                 .sort((a, b) => b[1] - a[1])
                 .map(([type, count], idx) => {
                   const Icon = type === 'relate' ? Heart : type === 'powerful' ? Zap : ShieldCheck;
-                  const label = type === 'relate' ? 'I relate' : type === 'powerful' ? 'Powerful' : 'Respect';
+                  const label = t(`landing.trust_section.reactions.${type}`);
                   const isTop = idx === 0;
                   const formatted = count >= 1000 ? (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(count);
 
@@ -156,7 +158,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                   letterSpacing: '0.04em',
                 }}
               >
-                {totalEngaged.toLocaleString()} drivers connected with this story
+                {t('landing.trust_section.drivers_connected', { count: totalEngaged.toLocaleString() })}
               </p>
             )}
           </motion.div>
@@ -173,18 +175,18 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
               {[
                 {
                   icon: Bot,
-                  title: 'Symptom-first thinking',
-                  desc: 'Logic-based symptom assessment, not keyword matching.',
+                  title: t('landing.trust_section.points.p1.title'),
+                  desc: t('landing.trust_section.points.p1.desc'),
                 },
                 {
                   icon: ShieldAlert,
-                  title: 'Urgency guidance',
-                  desc: 'Differentiates critical situations from minor issues.',
+                  title: t('landing.trust_section.points.p2.title'),
+                  desc: t('landing.trust_section.points.p2.desc'),
                 },
                 {
                   icon: CheckCircle2,
-                  title: 'Clear next steps',
-                  desc: 'Actionable guidance you can follow immediately.',
+                  title: t('landing.trust_section.points.p3.title'),
+                  desc: t('landing.trust_section.points.p3.desc'),
                 },
               ].map((pt, i) => (
                 <motion.div
@@ -266,16 +268,19 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.14em] mb-1.5"
                       style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.2)' }}
                     >
-                      Lead Expert
+                      {t('landing.trust_section.expert.role')}
                     </div>
-                    <div className="text-lg md:text-xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">Lukas Schneider</div>
-                    <p className="text-[#0070E0] font-bold uppercase tracking-[0.12em] text-[9px] md:text-[10px]">Senior Diagnostic Specialist</p>
+                    <div className="text-lg md:text-xl font-display font-black text-[#0F172A] tracking-tight leading-none mb-1">{t('landing.trust_section.expert.name')}</div>
+                    <p className="text-[#0070E0] font-bold uppercase tracking-[0.12em] text-[9px] md:text-[10px]">{t('landing.trust_section.expert.title')}</p>
                   </div>
                 </div>
 
                 {/* Metrics */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                  {[{ label: 'Experience', value: '14+ Years' }, { label: 'Cases', value: '5,200+' }].map(({ label, value }) => (
+                  {[
+                    { label: t('landing.trust_section.expert.stats.exp_label'), value: t('landing.trust_section.expert.stats.exp_value') },
+                    { label: t('landing.trust_section.expert.stats.cases_label'), value: t('landing.trust_section.expert.stats.cases_value') }
+                  ].map(({ label, value }) => (
                     <div
                       key={label}
                       className="relative overflow-hidden p-3.5 md:p-4 rounded-2xl"
@@ -288,14 +293,12 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                       <p className="text-lg md:text-xl font-black text-[#0E3882]">{value}</p>
                     </div>
                   ))}
-                </div>
-
-                {/* Specialties */}
+                        {/* Specialties */}
                 <div className="space-y-4 text-left">
                   <div>
-                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">Core Specialties</p>
+                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">{t('landing.trust_section.expert.specialties_label')}</p>
                     <div className="flex flex-wrap gap-2">
-                      {['Electrical diagnostics', 'Engine fault analysis'].map((spec, idx) => (
+                      {[t('landing.trust_section.expert.specialties.s1'), t('landing.trust_section.expert.specialties.s2')].map((spec, idx) => (
                         <span
                           key={idx}
                           className="px-3 py-1.5 rounded-xl text-[10px] md:text-[11px] font-bold whitespace-nowrap"
@@ -310,12 +313,12 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                       ))}
                     </div>
                   </div>
-
+ 
                   <blockquote
                     className="pl-4 text-[12.5px] md:text-[13px] text-[#64748B] font-medium leading-relaxed italic"
                     style={{ borderLeft: '2px solid rgba(0,112,224,0.18)' }}
                   >
-                    "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms."
+                    "{t('landing.trust_section.expert.quote')}"
                   </blockquote>
                 </div>
               </div>
@@ -339,8 +342,8 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                   <CheckCircle2 className="w-3 h-3 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-white font-black text-[8px] md:text-[9px] leading-tight uppercase tracking-wider">Expert Verified</p>
-                  <p className="text-white/50 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">Expert Engine</p>
+                  <p className="text-white font-black text-[8px] md:text-[9px] leading-tight uppercase tracking-wider">{t('landing.trust_section.expert.verified_badge')}</p>
+                  <p className="text-white/50 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">{t('landing.trust_section.expert.engine_label')}</p>
                 </div>
               </div>
             </motion.div>

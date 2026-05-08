@@ -13,57 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useNavigate } from "react-router-dom";
-
-const SYMPTOMS = [
-  {
-    id: "shakes-braking",
-    label: "Car shakes when braking",
-    icon: ActivityIcon,
-    image: "/symptoms/Car shakes when braking.webp",
-    description: "Is it warped rotors or something else? Learn the signs.",
-    slug: "/guides/symptoms/car-shakes-when-braking",
-  },
-  {
-    id: "smell-gas",
-    label: "Why does my car smell like gas?",
-    icon: FuelStationIcon,
-    image: "/symptoms/smell-gas.webp",
-    description: "A critical safety check for fuel leaks and more.",
-    slug: "/guides/symptoms/car-smells-like-gas",
-  },
-  {
-    id: "wont-crank",
-    label: "Car won’t crank",
-    icon: Settings01Icon,
-    image: "/symptoms/wont-crank.webp",
-    description: "Nothing happens when you turn the key? Start here.",
-    slug: "/guides/starting-battery/car-wont-crank",
-  },
-  {
-    id: "abs-light",
-    label: "ABS light is on",
-    icon: Alert01Icon,
-    image: "/symptoms/ABS light is on.webp",
-    description: "Understanding anti-lock system failure and safety.",
-    slug: "/guides/warning-lights/abs-light",
-  },
-  {
-    id: "oil-light",
-    label: "Oil light on dashboard",
-    icon: DashboardSquare01Icon,
-    image: "/symptoms/oil-light.webp",
-    description: "Why you should stop driving immediately.",
-    slug: "/guides/warning-lights/oil-light-in-car",
-  },
-  {
-    id: "lights-work-no-start",
-    label: "Car won’t start but lights work",
-    icon: BatteryCharging01Icon,
-    image: "/symptoms/lights-work-no-start.webp",
-    description: "Differentiating battery issues from starter failure.",
-    slug: "/guides/starting-battery/wont-start-but-lights-come-on",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const AUTO_PLAY_INTERVAL = 4000;
 const ITEM_HEIGHT = 65;
@@ -74,9 +24,61 @@ const wrap = (min: number, max: number, v: number) => {
 };
 
 export function SymptomCarousel() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
+
+  const SYMPTOMS = [
+    {
+      id: "shakes-braking",
+      label: t('landing.guides.symptoms.shakes_braking.label'),
+      icon: ActivityIcon,
+      image: "/symptoms/Car shakes when braking.webp",
+      description: t('landing.guides.symptoms.shakes_braking.desc'),
+      slug: "/guides/symptoms/car-shakes-when-braking",
+    },
+    {
+      id: "smell-gas",
+      label: t('landing.guides.symptoms.smell_gas.label'),
+      icon: FuelStationIcon,
+      image: "/symptoms/smell-gas.webp",
+      description: t('landing.guides.symptoms.smell_gas.desc'),
+      slug: "/guides/symptoms/car-smells-like-gas",
+    },
+    {
+      id: "wont-crank",
+      label: t('landing.guides.symptoms.wont_crank.label'),
+      icon: Settings01Icon,
+      image: "/symptoms/wont-crank.webp",
+      description: t('landing.guides.symptoms.wont_crank.desc'),
+      slug: "/guides/starting-battery/car-wont-crank",
+    },
+    {
+      id: "abs-light",
+      label: t('landing.guides.symptoms.abs_light.label'),
+      icon: Alert01Icon,
+      image: "/symptoms/ABS light is on.webp",
+      description: t('landing.guides.symptoms.abs_light.desc'),
+      slug: "/guides/warning-lights/abs-light",
+    },
+    {
+      id: "oil-light",
+      label: t('landing.guides.symptoms.oil_light.label'),
+      icon: DashboardSquare01Icon,
+      image: "/symptoms/oil-light.webp",
+      description: t('landing.guides.symptoms.oil_light.desc'),
+      slug: "/guides/warning-lights/oil-light-in-car",
+    },
+    {
+      id: "lights-work-no-start",
+      label: t('landing.guides.symptoms.lights_work_no_start.label'),
+      icon: BatteryCharging01Icon,
+      image: "/symptoms/lights-work-no-start.webp",
+      description: t('landing.guides.symptoms.lights_work_no_start.desc'),
+      slug: "/guides/starting-battery/wont-start-but-lights-come-on",
+    },
+  ];
 
   const currentIndex =
     ((step % SYMPTOMS.length) + SYMPTOMS.length) % SYMPTOMS.length;
@@ -240,7 +242,7 @@ export function SymptomCarousel() {
                         className="absolute inset-x-0 bottom-0 p-8 pt-32 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end pointer-events-none"
                       >
                         <div className="bg-[#0070E0] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] w-fit shadow-lg mb-3">
-                          Guide {index + 1}
+                          {t('landing.guides.symptoms.guide_label')} {index + 1}
                         </div>
                         <h3 className="text-white font-bold text-2xl leading-tight mb-2 tracking-tight">
                           {symptom.label}
@@ -250,7 +252,7 @@ export function SymptomCarousel() {
                         </p>
                         
                         <div className="mt-6 flex items-center gap-2 text-white text-[10px] font-black uppercase tracking-widest opacity-0 group-hover/card:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/card:translate-y-0">
-                          Read Full Guide <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">→</span>
+                          {t('landing.guides.symptoms.read_full_guide')} <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">→</span>
                         </div>
                       </motion.div>
                     )}
@@ -265,7 +267,7 @@ export function SymptomCarousel() {
                   >
                     <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_12px_#ef4444]" />
                     <span className="text-white/90 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Diagnostic Library
+                      {t('landing.guides.symptoms.badge')}
                     </span>
                   </div>
                 </motion.div>

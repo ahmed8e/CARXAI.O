@@ -54,22 +54,22 @@
   "landing": {
     "nav": {
       "features": "Features",
-      "how_it_works": "How it works",
+      "how_it_works": "How it Works",
       "pricing": "Pricing",
       "reviews": "Reviews",
       "faq": "FAQ",
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Instant Car Diagnosis",
-      "title_line1": "Stop Overpaying for",
-      "title_line2": "Car Repairs.",
-      "subtitle": "Diagnose your car problem in 30 seconds — no shop visit needed.",
-      "cta_start": "Start Free Diagnosis",
-      "cta_demo": "View Pricing",
-      "trust_drivers": "Trusted by drivers",
-      "trust_results": "Instant results",
-      "trust_signup": "No signup required",
+      "badge": "Automotive Intelligence",
+      "title_line1": "Reliable car help,",
+      "title_line2": "instantly.",
+      "subtitle": "Stop guessing and start fixing. Our AI mechanic gives you expert automotive advice and diagnosis in seconds.",
+      "cta_start": "Start Diagnosis Free",
+      "cta_demo": "See How it Works",
+      "trust_drivers": "5k+ Drivers",
+      "trust_results": "Instant Results",
+      "trust_signup": "No Signup Required",
       "scroll_more": "Scroll for more"
     },
     "demo": {
@@ -85,74 +85,160 @@
       "finding": "Brake System Fault Detected",
       "advice": "Potential air in brake lines or worn pads. Safe for a slow drive to a nearby shop, but avoid highways.",
       "live_replay": "Live Replay",
-      "session_replay": "Recorded Session Replay",
+      "session_replay": "Start a session below...",
       "full_report": "Full Report",
       "priority": "Priority"
     },
     "problem": {
-      "badge": "The Problem",
-      "title": "Car trouble gets stressful fast",
-      "clarity_note": "Car Safety gives you immediate clarity and helps you avoid overpaying.",
+      "badge": "The Reality",
+      "title": "From Confusion to Clarity in Seconds",
       "items": {
         "lights": {
-          "title": "Confusing warning lights",
-          "desc": "Hard to understand fast"
+          "title": "Warning Lights",
+          "desc": "Understand exactly what your car is trying to tell you."
         },
         "costs": {
-          "title": "Expensive diagnostics",
-          "desc": "Simple answers cost too much"
+          "title": "Avoid Overpaying",
+          "desc": "Know the fair price for repairs before visiting a shop."
         },
         "help": {
-          "title": "Hard to find help",
-          "desc": "You lose time when it matters"
+          "title": "24/7 Assistance",
+          "desc": "Expert mechanic logic available whenever you need it."
         }
-      }
+      },
+      "clarity_note": "Everything you need to stay safe on the road"
     },
     "how_it_works": {
-      "badge": "How It Works",
-      "title_part1": "From Confusion to",
-      "title_part2": "Clarity",
-      "title_part3": "— in Seconds",
+      "badge": "Simple Process",
+      "title_part1": "How Car Safety",
+      "title_part2": "Protects",
+      "title_part3": "You",
       "step1": {
-        "title": "Upload a Photo or Sound",
-        "desc": "Show us the problem — no technical skills needed."
+        "title": "Describe or Show",
+        "desc": "Tell us the symptoms or upload a photo of your dashboard warning lights."
       },
       "step2": {
-        "title": "See the Real Problem + Risk Level",
-        "desc": "We identify the issue exactly and show how serious it is right now.",
+        "title": "AI Analysis",
+        "desc": "Our engine analyzes the data using millions of repair points and mechanic logic.",
         "safe": "Safe",
         "warning": "Warning",
-        "dangerous": "Dangerous"
+        "dangerous": "Critical"
       },
       "step3": {
-        "title": "Know What to Do Next",
-        "desc": "See if you can keep driving, get cost estimates, and access your full report.",
-        "top_rated": "Top-Rated"
+        "title": "Get Expert Advice",
+        "desc": "Receive a detailed report with causes, urgency, and estimated repair costs.",
+        "top_rated": "Top Rated"
       },
-      "summary": "We don’t just detect the problem — we tell you how serious it is and what to do next.",
-      "cta": "Check Now",
+      "summary": "The expert guidance you need, delivered in seconds.",
+      "cta": "Get Started Now",
       "footer": {
-        "free": "Free",
-        "time": "60 Seconds",
-        "no_signup": "No Sign-up"
+        "free": "Free to start",
+        "time": "Takes 2 mins",
+        "no_signup": "No signup required"
       }
     },
+    "trust_section": {
+      "badge": "Trusted Diagnostic Logic",
+      "title_part1": "Designed with an",
+      "title_part2": "Expert Mindset",
+      "subtitle": "Car Safety is built to guide drivers exactly how a master technician thinks: understanding symptoms, assessing urgency, and helping you take the next right step with confidence.",
+      "story_cta": "How Car Safety was born",
+      "social_proof_label": "Voices from real drivers",
+      "reactions": {
+        "relate": "I relate",
+        "powerful": "Powerful",
+        "respect": "Respect"
+      },
+      "drivers_connected": "{{count}} drivers connected with this story",
+      "points": {
+        "p1": {
+          "title": "Symptoms-First Thinking",
+          "desc": "Logic-driven assessment based on symptoms, not just keyword matching."
+        },
+        "p2": {
+          "title": "Urgency-Guided Advice",
+          "desc": "Differentiates between critical safety issues and minor inconveniences."
+        },
+        "p3": {
+          "title": "Clear Next Steps",
+          "desc": "Actionable guidance you can follow immediately."
+        }
+      },
+      "expert": {
+        "role": "Lead Expert",
+        "name": "Lukas Schneider",
+        "title": "Senior Diagnostic Specialist",
+        "stats": {
+          "exp_label": "Experience",
+          "exp_value": "14+ Years",
+          "cases_label": "Cases",
+          "cases_value": "5,200+"
+        },
+        "specialties_label": "Core Specialties",
+        "specialties": {
+          "s1": "Electrical Diagnostics",
+          "s2": "Engine Fault Analysis"
+        },
+        "quote": "Workshop-inspired diagnostic logic for warning lights, no-start issues, electrical faults, and breakdown symptoms.",
+        "verified_badge": "Expert Verified",
+        "engine_label": "Expert Engine"
+      }
+    },
+    "brands": {
+      "badge": "Trust & Compatibility",
+      "title_part1": "Compatible with the vehicles",
+      "title_part2": "people rely on",
+      "desc": "Car Safety delivers expert diagnostics across every major automotive brand — from everyday city cars to premium series."
+    },
     "features_section": {
-      "badge": "Platform Features",
+      "badge": "Features",
       "title": "Everything you need",
-      "subtitle": "Smart assistance at every turn.",
+      "subtitle": "A complete toolkit for the modern car owner.",
       "swipe": "Swipe to explore"
     },
     "guides": {
       "badge": "Symptom Library",
-      "title_part1": "Common problems we help",
-      "title_part2": "diagnose.",
-      "desc": "Browse our high-trust guides for common symptoms and warning lights. Learn what they mean, how urgent they are, and how Car Safety can help."
+      "title_part1": "Common problems we",
+      "title_part2": "help diagnose",
+      "desc": "Explore our comprehensive library of automotive symptoms and diagnostic guides.",
+      "read_more": "Read Full Guide",
+      "guide_num": "Guide {{num}}",
+      "symptoms": {
+        "badge": "Diagnostic Library",
+        "guide_label": "Guide",
+        "read_full_guide": "Read Full Guide",
+        "shakes_braking": {
+          "label": "Car shakes when braking",
+          "desc": "Is it warped rotors or something else? Learn the signs."
+        },
+        "smell_gas": {
+          "label": "Why does my car smell like gas?",
+          "desc": "A critical safety check for fuel leaks and more."
+        },
+        "wont_crank": {
+          "label": "Car won’t crank",
+          "desc": "Nothing happens when you turn the key? Start here."
+        },
+        "abs_light": {
+          "label": "ABS light is on",
+          "desc": "Understanding anti-lock system failure and safety."
+        },
+        "oil_light": {
+          "label": "Oil light on dashboard",
+          "desc": "Why you should stop driving immediately."
+        },
+        "lights_work_no_start": {
+          "label": "Car won’t start but lights work",
+          "desc": "Differentiating battery issues from starter failure."
+        }
+      }
     },
     "reviews_section": {
       "badge": "Trusted by Drivers",
       "title": "What drivers say about Car Safety",
       "subtitle": "Real experiences from our community of supported drivers.",
+      "show_less": "Show less",
+      "read_more": "Read more",
       "date_1m": "1 month ago",
       "date_3w": "3 weeks ago",
       "date_2w": "2 weeks ago",
@@ -183,6 +269,85 @@
           "car": "Peugeot 208 • Strange Noise",
           "text": "I uploaded a 10-second audio clip of a grinding sound. It correctly identified worn brake pads and told me to get them changed this week."
         }
+      }
+    },
+    "pricing_section": {
+      "badge": "Choose Your Plan",
+      "title_part1": "Smarter car help,",
+      "title_part2": "your budget",
+      "subtitle": "From a quick free check to a full AI mechanic experience — pick the plan that fits how you drive.",
+      "billing": {
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "save": "-20%",
+        "billed_annually": "Billed annually"
+      },
+      "plans": {
+        "free": {
+          "name": "Free",
+          "tagline": "Try it out, no commitment",
+          "description": "Basic AI access to get started with automotive diagnosis.",
+          "cta": "Get Started Free",
+          "includes_header": "Free includes:",
+          "features": {
+            "f1": "2 AI messages every 5 hours",
+            "f2": "1 image analysis every 5 hours",
+            "f3": "1 report share every 5 hours",
+            "f4": "Basic AI mechanic access"
+          },
+          "includes": {
+            "i1": "Fast Answer mode",
+            "i2": "Dashboard photo analysis",
+            "i3": "Diagnostic report generation"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "tagline": "For frequent drivers & car owners",
+          "description": "Unlimited AI chat with smarter guidance and expanded reports.",
+          "cta": "Start Free Trial",
+          "trial": "3-Day Free Trial",
+          "includes_header": "Everything in Free, plus:",
+          "features": {
+            "f1": "Unlimited AI chat sessions",
+            "f2": "Full image & dashboard analysis",
+            "f3": "15 shareable reports / month",
+            "f4": "Avoid Overpaying protection",
+            "f5": "Standard support"
+          },
+          "includes": {
+            "i1": "Expert Answer mode",
+            "i2": "Voice input (microphone)",
+            "i3": "Advanced follow-up flow"
+          }
+        },
+        "advanced": {
+          "name": "Advanced",
+          "tagline": "The complete AI mechanic experience",
+          "description": "Full diagnostic power with image AI, voice, and Expert analysis.",
+          "cta": "Get Advanced",
+          "badge": "Most Powerful",
+          "includes_header": "Everything in Pro, plus:",
+          "features": {
+            "f1": "Fast + Expert Answer modes",
+            "f2": "Advanced diagnostic logic",
+            "f3": "Image-based diagnosis",
+            "f4": "Voice input & TTS readback",
+            "f5": "Structured follow-up flow",
+            "f6": "Priority support"
+          },
+          "includes": {
+            "i1": "Unlimited report sharing",
+            "i2": "Advanced cost estimation"
+          }
+        }
+      },
+      "footer_note": "Start free · Upgrade anytime via WhatsApp",
+      "trust": {
+        "cancel": "Cancel anytime",
+        "no_fees": "No hidden fees",
+        "limits": "Clear limits",
+        "instant": "Instant access"
       }
     },
     "faq_section": {

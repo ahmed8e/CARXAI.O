@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from './ui/card'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { SaaSAnalytics } from '../lib/analytics'
+import { useTranslation } from 'react-i18next'
 
 
 type BillingCycleType = 'monthly' | 'yearly'
@@ -22,6 +23,7 @@ import { plans } from '../lib/plans'
 
 // ── Billing toggle ────────────────────────────────────────────────────────────
 function BillingToggle({ value, onChange }: { value: BillingCycleType; onChange: (v: BillingCycleType) => void }) {
+  const { t } = useTranslation()
   return (
     <div className="flex justify-center">
       <div className="relative flex items-center w-fit rounded-full bg-white border border-slate-200 shadow-sm p-1.5 gap-1">
@@ -41,10 +43,10 @@ function BillingToggle({ value, onChange }: { value: BillingCycleType; onChange:
               />
             )}
             <span className="relative flex items-center gap-2">
-              {cycle === 'yearly' ? 'Yearly' : 'Monthly'}
+              {cycle === 'yearly' ? t('landing.pricing_section.billing.yearly') : t('landing.pricing_section.billing.monthly')}
               {cycle === 'yearly' && (
                 <span className="rounded-full bg-emerald-50 border border-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-600">
-                  −20%
+                  {t('landing.pricing_section.billing.save')}
                 </span>
               )}
             </span>
@@ -58,6 +60,7 @@ function BillingToggle({ value, onChange }: { value: BillingCycleType; onChange:
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Pricing({ mode = 'onboarding', currentSubscription }: PricingProps) {
+  const { t } = useTranslation()
   const [billingCycle, setBillingCycle] = useState<BillingCycleType>('yearly')
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -108,7 +111,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 border border-[#0070E0]/15 bg-[#0070E0]/6"
           >
             <Zap className="w-3.5 h-3.5 text-[#0070E0]" fill="currentColor" />
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#0070E0] font-black">Choose Your Plan</span>
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#0070E0] font-black">{t('landing.pricing_section.badge')}</span>
           </motion.div>
 
           <motion.h2
@@ -118,9 +121,9 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
             transition={{ delay: 0.07 }}
             className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-5 leading-[1.1]"
           >
-            Smarter car help,{' '}
+            {t('landing.pricing_section.title_part1')}{' '}
             <span className="inline-block border border-dashed border-[#0070E0]/60 bg-[#0070E0]/5 px-3 py-1 rounded-xl text-[#0070E0]">
-              your budget
+              {t('landing.pricing_section.title_part2')}
             </span>
           </motion.h2>
 
@@ -131,7 +134,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
             transition={{ delay: 0.14 }}
             className="text-slate-500 text-base md:text-lg font-medium max-w-lg mx-auto mb-10 leading-relaxed"
           >
-            From a quick free check to a full AI mechanic experience — pick the plan that fits how you drive.
+            {t('landing.pricing_section.subtitle')}
           </motion.p>
 
           <motion.div
@@ -171,7 +174,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                   {isPopular && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0070E0] text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-[#0070E0]/30">
                       <ShieldWrenchIcon className="w-3 h-3" />
-                      {plan.badgeLabel}
+                      {t(`landing.pricing_section.plans.${plan.id}.badge`)}
                     </div>
                   )}
 
@@ -179,21 +182,23 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                     {/* Plan name + tagline */}
                     <div className="mb-5">
                       <h3 className={`text-2xl font-bold mb-1 ${isPopular ? 'text-[#0070E0]' : 'text-slate-900'}`}>
-                        {plan.name}
+                        {t(`landing.pricing_section.plans.${plan.id}.name`)}
                       </h3>
-                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">{plan.tagline}</p>
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                        {t(`landing.pricing_section.plans.${plan.id}.tagline`)}
+                      </p>
                     </div>
 
                     {/* Price */}
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-5xl font-bold text-slate-900 tracking-tight tabular-nums">
-                        $<NumberFlow value={price} className="font-bold" />
+                        {t('common.currency_symbol') === 'ر.س' ? '' : '$'}<NumberFlow value={price} className="font-bold" />{t('common.currency_symbol') === 'ر.س' ? ' ' + t('common.currency_symbol') : ''}
                       </span>
                       <div className="flex flex-col items-start">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">/ mo</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">/ {t('landing.pricing_section.billing.monthly').toLowerCase()}</span>
                         {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
                           <span className="mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded leading-none">
-                            Billed annually
+                            {t('landing.pricing_section.billing.billed_annually')}
                           </span>
                         )}
                       </div>
@@ -204,13 +209,13 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                       <div className="mt-3 flex items-center gap-2">
                         <div className="h-px flex-grow bg-slate-100" />
                         <span className="text-[10px] font-black text-[#0070E0] uppercase tracking-[0.18em] whitespace-nowrap">
-                          {plan.trial}
+                          {t(`landing.pricing_section.plans.${plan.id}.trial`)}
                         </span>
                         <div className="h-px flex-grow bg-slate-100" />
                       </div>
                     )}
 
-                    <p className="mt-3 text-sm text-slate-500 leading-relaxed">{plan.description}</p>
+                    <p className="mt-3 text-sm text-slate-500 leading-relaxed">{t(`landing.pricing_section.plans.${plan.id}.description`)}</p>
                   </CardHeader>
 
                   <CardContent className="px-7 pb-8 flex flex-col flex-grow">
@@ -226,7 +231,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                       }`}
                     >
                       <MessageSquare className="w-4 h-4" />
-                      {plan.cta}
+                      {t(`landing.pricing_section.plans.${plan.id}.cta`)}
                     </motion.button>
 
                     {/* Key features */}
@@ -243,7 +248,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                           <span className={`text-sm font-medium leading-snug ${
                             feature.highlight ? 'text-slate-800' : 'text-slate-600'
                           }`}>
-                            {feature.text}
+                            {t(`landing.pricing_section.plans.${plan.id}.features.${feature.key}`)}
                           </span>
                         </li>
                       ))}
@@ -252,7 +257,7 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                     {/* Divider + includes list */}
                     <div className="mt-auto pt-5 border-t border-slate-100 space-y-3">
                       <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                        {plan.includes[0]}
+                        {t(`landing.pricing_section.plans.${plan.id}.includes_header`)}
                       </h4>
                       <ul className="space-y-2.5">
                         {plan.includes.slice(1).map((item, idx) => (
@@ -264,7 +269,9 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
                             }`}>
                               <Check className={`w-3 h-3 ${isPopular ? 'text-[#0070E0]' : 'text-emerald-500'}`} strokeWidth={3} />
                             </span>
-                            <span className="text-sm text-slate-600">{item}</span>
+                            <span className="text-sm text-slate-600">
+                              {t(`landing.pricing_section.plans.${plan.id}.includes.i${idx + 1}`)}
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -287,18 +294,18 @@ export default function Pricing({ mode = 'onboarding', currentSubscription }: Pr
           {/* Primary Row: Separated for hierarchy */}
           <div className="flex flex-col items-center gap-2">
             <p className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.3em] text-center">
-              Start free · Upgrade anytime via WhatsApp
+              {t('landing.pricing_section.footer_note')}
             </p>
             <div className="w-12 h-px bg-slate-100" />
           </div>
 
-          {/* Trust Grid: 2 columns on mobile, flex on desktop */}
+           {/* Trust Grid: 2 columns on mobile, flex on desktop */}
           <div className="grid grid-cols-2 md:flex md:items-center justify-center gap-x-8 gap-y-6 md:gap-12 w-full max-w-2xl px-4">
             {[
-              { title: 'Cancel anytime', icon: ShieldCheck },
-              { title: 'No hidden fees', icon: Lock },
-              { title: 'Clear limits', icon: Check },
-              { title: 'Instant access', icon: AiSparkleIcon },
+              { title: t('landing.pricing_section.trust.cancel'), icon: ShieldCheck },
+              { title: t('landing.pricing_section.trust.no_fees'), icon: Lock },
+              { title: t('landing.pricing_section.trust.limits'), icon: Check },
+              { title: t('landing.pricing_section.trust.instant'), icon: AiSparkleIcon },
             ].map((trust, idx) => (
               <div key={idx} className="flex items-center gap-3 text-slate-500 justify-center md:justify-start">
                 <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">

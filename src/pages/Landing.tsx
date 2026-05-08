@@ -824,7 +824,7 @@ export default function Landing() {
               }}
               style={{ width: "fit-content" }}
             >
-              {[...features, ...features, ...features].map((feature, i) => (
+              {[...features(t), ...features(t), ...features(t)].map((feature, i) => (
                 <article 
                   key={i} 
                   className="flex-shrink-0 w-[280px] p-10 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all group"
