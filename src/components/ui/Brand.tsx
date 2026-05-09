@@ -74,7 +74,7 @@ export const Wordmark: React.FC<WordmarkProps> = ({
   };
 
   return (
-    <span className={`font-sans font-bold tracking-[-0.05em] select-none ${sizeClasses[size]} ${light ? 'text-white' : 'text-on-surface'} ${className}`}>
+    <span className={`font-sans font-bold tracking-tight select-none whitespace-nowrap ${sizeClasses[size]} ${light ? 'text-white' : 'text-slate-900'} ${className}`}>
       Car <span className="text-[#0070E0]">Safety</span>
     </span>
   );
