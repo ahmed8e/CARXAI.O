@@ -62,19 +62,21 @@
     },
     "hero": {
       "badge": "New: AI Mechanic 2.0",
-      "title": "Stop guessing what’s wrong with your car.",
-      "subtitle": "Get instant AI diagnosis, safety guidance, and repair cost warnings before you overpay.",
+      "title": "Understand your car's problem before you overpay.",
+      "subtitle": "Instant AI diagnosis, clear safety guidance, and repair cost warnings so you know exactly what to do before heading to the shop.",
       "cta_start": "Start Free Diagnosis",
       "cta_demo": "See How It Works",
       "trust_row": "5K+ drivers helped · 4.9/5 rating · No sign-up required",
       "scroll_more": "Scroll for more",
       "cards": {
-        "estimate": "Repair Estimate",
+        "estimate": "Repair Cost Estimate",
         "price": "$185 - $320",
         "scan": "AI Scan",
-        "ready": "Report Ready",
-        "safe_drive": "Safe to Drive?",
-        "no": "NO"
+        "ready": "Diagnosis Report Ready",
+        "safe_drive": "Is it safe to drive?",
+        "no": "No, Danger",
+        "risk_label": "Risk Level",
+        "risk_value": "HIGH"
       }
     },
     "demo": {

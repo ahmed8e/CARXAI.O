@@ -487,32 +487,34 @@ export default function Landing() {
           )}
         </AnimatePresence>
         <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen w-full flex items-center justify-center pt-[80px] md:pt-0 pb-16 px-6 overflow-hidden">
-          {/* Subtle Background Elements */}
-          <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-50/40 rounded-full blur-[120px] -z-10" />
-          <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-indigo-50/30 rounded-full blur-[140px] -z-10" />
+          {/* Premium Background Ambiance */}
+          <div className="absolute top-0 inset-x-0 h-[1000px] pointer-events-none -z-10 overflow-hidden">
+            <div className="absolute top-[-10%] left-[10%] w-[40%] h-[40%] bg-blue-50/40 rounded-full blur-[120px] animate-pulse-slow" />
+            <div className="absolute top-[20%] right-[5%] w-[35%] h-[35%] bg-indigo-50/30 rounded-full blur-[100px]" />
+          </div>
 
-          <div className="max-w-[1440px] mx-auto w-full relative z-10">
-            <div className="grid lg:grid-cols-[1.1fr,0.9fr] gap-12 lg:gap-24 items-center">
+          <div className="max-w-[1440px] mx-auto w-full relative z-10 px-6 md:px-12">
+            <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-center">
               
-              {/* Left Column: Core Value Proposition */}
+              {/* Content Column (Right in RTL) */}
               <motion.div 
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center lg:text-start flex flex-col items-center lg:items-start"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="text-center lg:text-start flex flex-col items-center lg:items-start relative"
               >
-                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 border border-blue-100 bg-blue-50/50 backdrop-blur-md">
-                  <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center">
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 bg-blue-50/80 backdrop-blur-md border border-blue-100/50 shadow-sm shadow-blue-500/5">
+                  <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <Zap className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
                 </div>
 
-                <h1 className="font-display font-black text-5xl md:text-7xl xl:text-[84px] leading-[1.05] mb-8 text-slate-900 tracking-tight">
+                <h1 className="font-display font-black text-5xl md:text-7xl xl:text-[88px] leading-[1.02] mb-8 text-slate-900 tracking-tight">
                   {t('landing.hero.title')}
                 </h1>
 
-                <p className="text-slate-500 text-lg md:text-xl xl:text-2xl mb-12 max-w-2xl font-medium leading-relaxed">
+                <p className="text-slate-500 text-lg md:text-xl xl:text-2xl mb-12 max-w-2xl font-medium leading-relaxed opacity-90">
                   {t('landing.hero.subtitle')}
                 </p>
 
@@ -521,7 +523,7 @@ export default function Landing() {
                     onClick={() => navigate('/login?mode=register')} 
                     className="w-full sm:w-auto relative group"
                   >
-                    <div className="relative px-10 py-6 flex items-center justify-center gap-3 rounded-2xl font-black uppercase tracking-widest text-white text-[15px] transition-all duration-500 bg-[#0070E0] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] border border-white/20 group-hover:-translate-y-1.5 group-hover:shadow-[0_25px_50px_-10px_rgba(0,112,224,0.5)] active:scale-95">
+                    <div className="relative px-12 py-6 flex items-center justify-center gap-3 rounded-[24px] font-black uppercase tracking-widest text-white text-[15px] transition-all duration-500 bg-[#0070E0] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] border border-white/20 group-hover:-translate-y-1.5 group-hover:shadow-[0_30px_60px_-10px_rgba(0,112,224,0.5)] active:scale-95">
                       {t('landing.hero.cta_start')}
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                     </div>
@@ -529,117 +531,119 @@ export default function Landing() {
 
                   <button 
                     onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} 
-                    className="w-full sm:w-auto px-10 py-6 rounded-2xl border border-slate-200 bg-white text-slate-700 font-black text-[15px] uppercase tracking-widest hover:border-[#0070E0]/30 hover:text-[#0070E0] transition-all duration-500 shadow-sm active:scale-95"
+                    className="w-full sm:w-auto px-10 py-6 rounded-[24px] border border-slate-200 bg-white text-slate-700 font-black text-[15px] uppercase tracking-widest hover:border-[#0070E0]/40 hover:text-[#0070E0] transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-slate-100 active:scale-95"
                   >
                     {t('landing.hero.cta_demo')}
                   </button>
                 </div>
 
-                {/* Trust Row */}
-                <div className="flex flex-col sm:flex-row items-center gap-5 pt-4 border-t border-slate-100 w-full sm:w-auto lg:w-full">
-                  <div className="flex items-center -space-x-2.5">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center shadow-sm overflow-hidden">
+                {/* Trust Row - Refined */}
+                <div className="flex flex-col sm:flex-row items-center gap-6 pt-10 border-t border-slate-100 w-full lg:w-full">
+                  <div className="flex items-center -space-x-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="w-11 h-11 rounded-full border-[3px] border-white bg-slate-100 flex items-center justify-center shadow-md overflow-hidden ring-1 ring-slate-100">
                         <img src={`/JBJ RIV ${i}.jpg`} alt="User" className="w-full h-full object-cover" />
                       </div>
                     ))}
                   </div>
                   <div className="text-center sm:text-start">
-                    <div className="flex items-center justify-center sm:justify-start gap-1 mb-0.5">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1.5">
                       {[1, 2, 3, 4, 5].map((i) => (
-                        <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       ))}
+                      <span className="ms-2 text-xs font-black text-slate-900">4.9/5</span>
                     </div>
-                    <p className="text-xs font-bold text-slate-500">{t('landing.hero.trust_row')}</p>
+                    <p className="text-[13px] font-bold text-slate-400 tracking-tight">{t('landing.hero.trust_row')}</p>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Right Column: Integrated Mockup & Cards */}
+              {/* Visual Column (Left in RTL) */}
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.2 }}
-                className="relative flex justify-center lg:justify-end"
+                initial={{ opacity: 0, scale: 0.95, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="relative flex justify-center lg:justify-center items-center"
               >
-                <div className="relative z-20">
+                {/* Product Preview Container */}
+                <div className="relative z-20 group">
+                   <div className="absolute -inset-10 bg-blue-500/5 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10" />
                    <ScrollChatDemo />
+
+                   {/* Floating Cards - Tightly clustered around the phone */}
+                   
+                   {/* Risk Level Card */}
+                   <motion.div 
+                     initial={{ opacity: 0, x: 30 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     transition={{ delay: 0.9 }}
+                     className="absolute -top-4 -right-12 lg:-right-20 z-30 p-4.5 rounded-[24px] bg-white/95 backdrop-blur-xl border border-red-100/50 shadow-[0_25px_50px_-15px_rgba(220,38,38,0.18)] animate-float-slow ring-1 ring-red-50/50"
+                   >
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center shadow-inner">
+                         <ShieldAlert className="w-5.5 h-5.5" />
+                       </div>
+                       <div className="pe-2">
+                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{t('landing.hero.cards.risk_label')}</p>
+                         <p className="text-[13px] font-black text-red-600">{t('landing.hero.cards.risk_value')}</p>
+                       </div>
+                     </div>
+                   </motion.div>
+
+                   {/* Repair Cost Card */}
+                   <motion.div 
+                     initial={{ opacity: 0, x: -30 }}
+                     animate={{ opacity: 1, x: 0 }}
+                     transition={{ delay: 1.1 }}
+                     className="absolute top-[25%] -left-12 lg:-left-24 z-30 p-4.5 rounded-[24px] bg-white/95 backdrop-blur-xl border border-blue-100/50 shadow-[0_25px_50px_-15px_rgba(0,112,224,0.18)] animate-float ring-1 ring-blue-50/50"
+                   >
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0070E0] flex items-center justify-center shadow-inner">
+                         <DollarSign className="w-5.5 h-5.5" />
+                       </div>
+                       <div className="pe-2">
+                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{t('landing.hero.cards.estimate')}</p>
+                         <p className="text-[15px] font-black text-slate-900">{t('landing.hero.cards.price')}</p>
+                       </div>
+                     </div>
+                   </motion.div>
+
+                   {/* Report Ready Card */}
+                   <motion.div 
+                     initial={{ opacity: 0, y: 30 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 1.3 }}
+                     className="absolute bottom-[15%] -right-10 lg:-right-24 z-30 p-5 rounded-[28px] bg-[#0F172A] border border-white/10 shadow-[0_30px_60px_-10px_rgba(0,0,0,0.4)] animate-float-slow ring-1 ring-white/5"
+                   >
+                     <div className="flex items-center gap-4">
+                       <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shadow-inner">
+                         <CheckCircle className="w-6 h-6" />
+                       </div>
+                       <div className="pe-4">
+                         <p className="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none mb-1.5">{t('landing.hero.cards.scan')}</p>
+                         <p className="text-[13px] font-black text-white uppercase tracking-tight">{t('landing.hero.cards.ready')}</p>
+                       </div>
+                     </div>
+                   </motion.div>
+
+                   {/* Safe to Drive? Card */}
+                   <motion.div 
+                     initial={{ opacity: 0, y: -30 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: 1.5 }}
+                     className="absolute -bottom-8 -left-8 lg:-left-12 z-40 p-4.5 rounded-[24px] bg-amber-50/95 backdrop-blur-xl border border-amber-100 shadow-[0_20px_40px_-10px_rgba(180,83,9,0.15)] animate-float ring-1 ring-amber-200/20"
+                   >
+                      <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-2xl bg-white text-amber-600 flex items-center justify-center shadow-sm border border-amber-100/50">
+                         <AlertTriangle className="w-5.5 h-5.5" />
+                       </div>
+                       <div className="pe-2">
+                         <p className="text-[9px] font-black text-amber-700/50 uppercase tracking-widest leading-none mb-1.5">{t('landing.hero.cards.safe_drive')}</p>
+                         <p className="text-[13px] font-black text-amber-800">{t('landing.hero.cards.no')}</p>
+                       </div>
+                     </div>
+                   </motion.div>
                 </div>
-
-                {/* Floating Insight Cards - Compact & Connected */}
-                
-                {/* Risk Level Card */}
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="absolute -top-6 lg:-top-10 right-0 lg:-right-12 z-30 p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-red-100 shadow-[0_20px_40px_-15px_rgba(220,38,38,0.15)] animate-float-slow"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
-                      <ShieldAlert className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Risk Level</p>
-                      <p className="text-xs font-black text-red-600">CRITICAL</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Repair Cost Card */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className="absolute top-1/3 -left-4 lg:-left-20 z-30 p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_20px_40px_-15px_rgba(0,112,224,0.15)] animate-float"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#0070E0] flex items-center justify-center">
-                      <DollarSign className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.estimate')}</p>
-                      <p className="text-sm font-black text-slate-900">{t('landing.hero.cards.price')}</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Report Ready Card */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2 }}
-                  className="absolute bottom-12 -right-4 lg:-right-16 z-30 p-4 rounded-2xl bg-[#0F172A] border border-white/10 shadow-2xl animate-float-slow"
-                >
-                  <div className="flex items-center gap-3 pr-4">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.scan')}</p>
-                      <p className="text-xs font-black text-white uppercase">{t('landing.hero.cards.ready')}</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Safe to Drive? Card */}
-                <motion.div 
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.4 }}
-                  className="absolute -bottom-4 left-0 lg:-left-8 z-30 p-4 rounded-2xl bg-amber-50 border border-amber-100 shadow-lg animate-float"
-                >
-                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                      <AlertTriangle className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-amber-700/60 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.safe_drive')}</p>
-                      <p className="text-xs font-black text-amber-800">{t('landing.hero.cards.no')}</p>
-                    </div>
-                  </div>
-                </motion.div>
-
               </motion.div>
             </div>
           </div>
