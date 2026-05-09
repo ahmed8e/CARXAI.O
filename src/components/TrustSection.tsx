@@ -170,7 +170,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
         <div className="grid lg:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-start">
 
           {/* Left Column: Trust Value Propositions */}
-          <div className="flex flex-col items-start text-left">
+          <div className="flex flex-col items-start text-start">
             <div className="space-y-6 md:space-y-8">
               {[
                 {
@@ -263,7 +263,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                     </div>
                   </div>
 
-                  <div className="text-left flex-1 min-w-0">
+                  <div className="text-start flex-1 min-w-0">
                     <div
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[8px] md:text-[9px] font-black uppercase tracking-[0.14em] mb-1.5"
                       style={{ background: 'linear-gradient(135deg, #0070E0, #005BB5)', boxShadow: '0 2px 8px rgba(0,112,224,0.2)' }}
@@ -295,7 +295,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                   ))}
                 </div>
                 {/* Specialties */}
-                <div className="space-y-4 text-left">
+                <div className="space-y-4 text-start">
                   <div>
                     <p className="text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-[#64748B] font-black mb-2.5">{t('landing.trust_section.expert.specialties_label')}</p>
                     <div className="flex flex-wrap gap-2">
@@ -342,7 +342,7 @@ export default function TrustSection({ onStoryClick }: TrustSectionProps) {
                 <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-3 h-3 text-white" />
                 </div>
-                <div className="text-left">
+                <div className="text-start">
                   <p className="text-white font-black text-[8px] md:text-[9px] leading-tight uppercase tracking-wider">{t('landing.trust_section.expert.verified_badge')}</p>
                   <p className="text-white/50 text-[7px] md:text-[8px] font-bold uppercase tracking-wider">{t('landing.trust_section.expert.engine_label')}</p>
                 </div>

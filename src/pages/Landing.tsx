@@ -351,7 +351,7 @@ const FAQItem = ({ question, answer, isOpen, onClick }: { question: string, answ
   <div className="border-b border-slate-100 last:border-0 px-6">
     <button
       onClick={onClick}
-      className="w-full py-6 flex items-center justify-between gap-4 text-left group"
+      className="w-full py-6 flex items-center justify-between gap-4 text-start group"
     >
       <span className={`text-base md:text-lg font-bold transition-colors duration-300 ${isOpen ? 'text-[#0070E0]' : 'text-slate-900 group-hover:text-[#0070E0]'}`}>
         {question}
@@ -499,7 +499,7 @@ export default function Landing() {
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center lg:text-left flex flex-col items-center lg:items-start"
+                className="text-center lg:text-start flex flex-col items-center lg:items-start"
               >
                 <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 border border-blue-100 bg-blue-50/50 backdrop-blur-md">
                   <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center">
@@ -544,7 +544,7 @@ export default function Landing() {
                       </div>
                     ))}
                   </div>
-                  <div className="text-center sm:text-left">
+                  <div className="text-center sm:text-start">
                     <div className="flex items-center justify-center sm:justify-start gap-1 mb-0.5">
                       {[1, 2, 3, 4, 5].map((i) => (
                         <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -598,8 +598,8 @@ export default function Landing() {
                       <DollarSign className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Repair Estimate</p>
-                      <p className="text-sm font-black text-slate-900">$185 – $320</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.estimate')}</p>
+                      <p className="text-sm font-black text-slate-900">{t('landing.hero.cards.price')}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -616,8 +616,8 @@ export default function Landing() {
                       <CheckCircle className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">AI Scan</p>
-                      <p className="text-xs font-black text-white uppercase">Report Ready</p>
+                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.scan')}</p>
+                      <p className="text-xs font-black text-white uppercase">{t('landing.hero.cards.ready')}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -634,8 +634,8 @@ export default function Landing() {
                       <AlertTriangle className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-amber-700/60 uppercase tracking-widest leading-none mb-1">Safe to Drive?</p>
-                      <p className="text-xs font-black text-amber-800">NO</p>
+                      <p className="text-[9px] font-black text-amber-700/60 uppercase tracking-widest leading-none mb-1">{t('landing.hero.cards.safe_drive')}</p>
+                      <p className="text-xs font-black text-amber-800">{t('landing.hero.cards.no')}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -658,7 +658,7 @@ export default function Landing() {
                 { title: t('landing.problem.items.costs.title'), desc: t('landing.problem.items.costs.desc'), icon: DollarSign },
                 { title: t('landing.problem.items.help.title'), desc: t('landing.problem.items.help.desc'), icon: Clock }
               ].map((prob, i) => (
-                <div key={i} className="group p-6 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all text-left flex flex-col items-start gap-4 h-full">
+                <div key={i} className="group p-6 rounded-[32px] bg-white border border-slate-100 shadow-sm hover:border-[#0070E0]/20 hover:shadow-xl transition-all text-start flex flex-col items-start gap-4 h-full">
                   <div className="w-12 h-12 rounded-2xl bg-[#0070E0]/5 flex items-center justify-center border border-[#0070E0]/10 group-hover:bg-[#0070E0] group-hover:text-white transition-all duration-300">
                     <prob.icon className="w-6 h-6 text-[#0070E0] group-hover:text-white" />
                   </div>
@@ -865,7 +865,7 @@ export default function Landing() {
 
         {/* Symptom Library Carousel */}
         <section id="guides" className="relative py-24 md:py-24 px-6 bg-[#F8FAFC]/50 backdrop-blur-sm border-t border-slate-100 overflow-hidden">
-          <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-left">
+          <div className="max-w-6xl mx-auto px-6 mb-12 text-center lg:text-start">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-6 bg-blue-50 border border-blue-100">
                <Activity className="w-3.5 h-3.5 text-[#0070E0]" />
                <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.guides.badge')}</span>
