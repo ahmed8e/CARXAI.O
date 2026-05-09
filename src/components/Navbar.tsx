@@ -43,8 +43,8 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
   ]
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[60] h-16 sm:h-20 flex items-center transition-all duration-500 ${transparent ? 'bg-transparent' : 'bg-white/70 backdrop-blur-xl border-b border-slate-100/50 shadow-sm'}`}>
-      <div className="w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <nav className={`fixed top-0 left-0 right-0 z-[60] h-16 md:h-24 flex items-center transition-all duration-700 ${transparent ? 'bg-transparent' : 'bg-white/80 backdrop-blur-2xl border-b border-slate-100/40 shadow-[0_2px_15px_-10px_rgba(0,0,0,0.05)]'}`}>
+      <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
         
         {/* Left: Logo & Mobile Toggle */}
         <div className="flex items-center gap-4">
@@ -56,13 +56,13 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           </button>
 
           <Link to={user ? "/dashboard" : "/"} className="flex items-center group transition-transform active:scale-95">
-            <BrandLockup size="md" className="scale-90 sm:scale-100" />
+            <BrandLockup size="lg" className="scale-90 md:scale-110" />
           </Link>
         </div>
 
         {/* Center: Elegant Inline Navigation */}
         {showNavLinks && (
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1.5 p-1.5 rounded-full bg-slate-50/50 border border-slate-100/50">
             {navLinks.map((link) => {
               const isActive = location.hash === `#${link.id}` || (link.path && location.pathname === link.path);
               return (
@@ -75,15 +75,9 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                       document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth' }); 
                     }
                   }} 
-                  className={`relative px-4 py-2 text-[13px] font-bold tracking-tight transition-all duration-300 rounded-full ${isActive ? 'text-navy' : 'text-slate-500 hover:text-navy hover:bg-slate-50/50'}`}
+                  className={`relative px-5 py-2 text-[13px] font-black tracking-tight transition-all duration-300 rounded-full ${isActive ? 'text-[#0070E0] bg-white shadow-sm ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}
                 >
                   {link.name}
-                  {isActive && (
-                    <motion.div 
-                      layoutId="nav-active"
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-navy"
-                    />
-                  )}
                 </Link>
               );
             })}
@@ -91,77 +85,81 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         )}
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-3 md:gap-5">
           
-          {/* Compact Language Selector */}
-          <LanguageSelector 
-            className="flex-shrink-0" 
-            dropdownPosition="bottom" 
-            variant="minimal" 
-          />
+          <div className="hidden md:block">
+            <LanguageSelector 
+              className="flex-shrink-0" 
+              dropdownPosition="bottom" 
+              variant="minimal" 
+            />
+          </div>
 
           {user ? (
-            <div className="flex items-center gap-3">
-              {/* Notification Placeholder */}
-              <button className="hidden sm:flex p-2 rounded-full text-slate-400 hover:text-navy hover:bg-slate-50 transition-all">
+            <div className="flex items-center gap-4">
+              <button className="hidden lg:flex p-2.5 rounded-2xl text-slate-400 hover:text-[#0070E0] hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
                 <Bell className="w-5 h-5" />
               </button>
 
               <div className="relative" ref={accountMenuRef}>
                 <button 
                   onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                  className="flex items-center gap-2 p-1 pe-1 sm:pe-2 rounded-full border border-slate-100 bg-slate-50/50 hover:border-navy/20 hover:bg-white hover:shadow-sm transition-all group"
+                  className="flex items-center gap-2.5 p-1.5 pe-3 rounded-2xl border border-slate-100 bg-slate-50/50 hover:border-[#0070E0]/20 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all group"
                 >
-                  <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-white font-bold text-[10px] shadow-sm overflow-hidden ring-2 ring-white">
+                  <div className="w-9 h-9 rounded-xl bg-[#0070E0] flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20 overflow-hidden group-hover:scale-105 transition-transform">
                     {user?.user_metadata?.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                     ) : userInitial}
                   </div>
-                  <ChevronDown className={`hidden sm:block w-3 h-3 text-slate-400 group-hover:text-navy transition-transform duration-500 ${accountMenuOpen ? 'rotate-180' : ''}`} />
+                  <div className="hidden lg:block text-left">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('auth.account')}</p>
+                    <p className="text-[12px] font-bold text-slate-900 -mt-0.5">{user.email?.split('@')[0]}</p>
+                  </div>
+                  <ChevronDown className={`hidden sm:block w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070E0] transition-transform duration-500 ${accountMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
                   {accountMenuOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 12, scale: 0.95 }}
-                      className="absolute end-0 top-full mt-3 w-64 bg-white/95 backdrop-blur-2xl rounded-[28px] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.12)] z-[70] overflow-hidden p-2"
+                      exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                      className="absolute end-0 top-full mt-4 w-72 bg-white/95 backdrop-blur-2xl rounded-[32px] border border-slate-100/80 shadow-[0_30px_70px_rgba(0,0,0,0.15)] z-[70] overflow-hidden p-2"
                     >
-                      <div className="px-4 py-4 mb-1 border-b border-slate-50">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('auth.account')}</p>
-                        <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-navy font-bold text-sm overflow-hidden">
+                      <div className="px-5 py-5 mb-1 border-b border-slate-50/80">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">{t('auth.account')}</p>
+                        <div className="flex items-center gap-4">
+                           <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#0070E0] font-black text-lg overflow-hidden border border-slate-100">
                              {user?.user_metadata?.avatar_url ? (
                                <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                              ) : userInitial}
                            </div>
                             <div className="min-w-0 text-start">
-                              <p className="text-sm font-bold text-slate-900 truncate">{user.email?.split('@')[0]}</p>
-                              <p className="text-[11px] text-slate-400 truncate tracking-tight">{user.email}</p>
+                              <p className="text-sm font-black text-slate-900 truncate">{user.email?.split('@')[0]}</p>
+                              <p className="text-[11px] text-slate-400 truncate font-medium tracking-tight mt-0.5">{user.email}</p>
                             </div>
                         </div>
                       </div>
                       
-                      <div className="p-1 space-y-0.5">
-                        <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
-                          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors">
-                            <LayoutDashboard className="w-4 h-4 text-slate-400 group-hover:text-navy" />
+                      <div className="p-1.5 space-y-1">
+                        <Link to="/dashboard" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-[#F0F7FF] hover:text-[#0070E0] transition-all group" onClick={() => setAccountMenuOpen(false)}>
+                          <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors border border-transparent group-hover:border-[#0070E0]/10 shadow-sm group-hover:shadow-blue-500/5">
+                            <LayoutDashboard className="w-4.5 h-4.5 text-slate-400 group-hover:text-[#0070E0]" />
                           </div>
-                          <span className="text-sm font-bold">{t('nav.dashboard')}</span>
+                          <span className="text-sm font-bold tracking-tight">{t('nav.dashboard')}</span>
                         </Link>
-                        <Link to="/my-account" className="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-navy transition-all group" onClick={() => setAccountMenuOpen(false)}>
-                          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors">
-                            <User className="w-4 h-4 text-slate-400 group-hover:text-navy" />
+                        <Link to="/my-account" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-600 hover:bg-[#F0F7FF] hover:text-[#0070E0] transition-all group" onClick={() => setAccountMenuOpen(false)}>
+                          <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors border border-transparent group-hover:border-[#0070E0]/10 shadow-sm group-hover:shadow-blue-500/5">
+                            <User className="w-4.5 h-4.5 text-slate-400 group-hover:text-[#0070E0]" />
                           </div>
-                          <span className="text-sm font-bold">{t('common.my_account')}</span>
+                          <span className="text-sm font-bold tracking-tight">{t('common.my_account')}</span>
                         </Link>
-                        <div className="h-px bg-slate-50 my-1" />
-                        <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-red-500 hover:bg-red-50 transition-all text-start">
-                          <div className="w-8 h-8 rounded-xl bg-red-50/50 flex items-center justify-center">
-                            <LogOut className="w-4 h-4 rtl:-scale-x-100" />
+                        <div className="h-px bg-slate-50 my-2 mx-4" />
+                        <button onClick={() => signOut()} className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 transition-all text-start group">
+                          <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-white transition-colors border border-transparent group-hover:border-red-100 shadow-sm">
+                            <LogOut className="w-4.5 h-4.5 rtl:-scale-x-100" />
                           </div>
-                          <span className="text-sm font-bold">{t('common.logout')}</span>
+                          <span className="text-sm font-bold tracking-tight">{t('common.logout')}</span>
                         </button>
                       </div>
                     </motion.div>
@@ -170,9 +168,11 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login?mode=login" className="hidden sm:block px-4 py-2 text-[13px] font-bold text-slate-500 hover:text-navy transition-colors">{t('auth.login.button')}</Link>
-              <Link to="/login" className="px-5 py-2.5 rounded-full bg-slate-900 text-white text-[12px] font-black shadow-lg shadow-slate-900/10 hover:bg-black hover:-translate-y-0.5 transition-all flex items-center justify-center whitespace-nowrap">{t('auth.signup.button')}</Link>
+            <div className="flex items-center gap-3">
+              <Link to="/login?mode=login" className="hidden lg:block px-5 py-2.5 text-[14px] font-black text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-widest">{t('auth.login.button')}</Link>
+              <Link to="/login" className="px-8 py-3.5 rounded-2xl bg-[#0070E0] text-white text-[13px] font-black uppercase tracking-[0.1em] shadow-[0_15px_30px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-10px_rgba(0,112,224,0.5)] transition-all flex items-center justify-center whitespace-nowrap active:scale-[0.98] border border-white/10">
+                {t('auth.signup.button')}
+              </Link>
             </div>
           )}
         </div>

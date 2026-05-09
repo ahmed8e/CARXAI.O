@@ -506,44 +506,48 @@ export default function Landing() {
             </motion.div>
           )}
         </AnimatePresence>
+        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-[90vh] w-full flex items-start md:items-center justify-center pt-[100px] md:pt-20 pb-16 px-6 md:overflow-hidden overflow-x-hidden">
+          {/* Background Decorative Elements */}
+          <div className="absolute top-1/4 left-10 w-96 h-96 bg-blue-100/30 rounded-full blur-[120px] -z-10 animate-pulse-slow" />
+          <div className="absolute bottom-1/4 right-10 w-[500px] h-[500px] bg-indigo-50/40 rounded-full blur-[140px] -z-10" />
 
-        {/* Immersive Scroll Hero Section */}
-        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-[85vh] w-full flex items-start md:items-center justify-center pt-[120px] md:pt-16 pb-16 px-6 md:overflow-hidden touch-action-pan-y">
-          <div className="max-w-7xl mx-auto w-full relative z-10 mt-0 md:-mt-10">
-              <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-20 items-center">
+          <div className="max-w-[1440px] mx-auto w-full relative z-10 mt-0 lg:-mt-12">
+              <div className="grid lg:grid-cols-[1.1fr,0.9fr] gap-12 lg:gap-16 items-center">
                 
                 {/* Left Column: Fixed Headlines */}
                 <motion.div style={{ y: textY }} className="text-center lg:text-left">
                   <motion.div 
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     style={{ opacity: initialFadeOut }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 border border-[#0070E0]/20 bg-gradient-to-r from-[#0070E0]/5 to-transparent backdrop-blur-md shadow-[0_0_15px_rgba(0,112,224,0.1)] relative overflow-hidden group"
+                    className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 border border-[#0070E0]/10 bg-white/50 backdrop-blur-md shadow-sm relative overflow-hidden group"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                    <div className="w-5 h-5 rounded-full bg-[#0070E0]/10 flex items-center justify-center">
-                      <Zap className="w-3 h-3 text-[#0070E0]" />
+                    <div className="w-6 h-6 rounded-full bg-[#0070E0] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                      <Zap className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-[#0070E0] to-[#004A99] font-black pr-1">{t('landing.hero.badge')}</span>
+                    <span className="text-[10px] md:text-[12px] uppercase tracking-[0.25em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
                   </motion.div>
 
                   <motion.h1 
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.1 }}
-                    className="font-display font-bold text-4xl md:text-7xl lg:text-8xl leading-[1.05] mb-4 md:mb-8 text-[#0F172A] tracking-tight"
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="font-display font-black text-5xl md:text-8xl lg:text-[100px] leading-[0.95] mb-8 text-[#0F172A] tracking-[-0.03em]"
                   >
                     {t('landing.hero.title_line1')} <br />
-                    <span className="text-[#0070E0]">{t('landing.hero.title_line2')}</span>
+                    <span className="text-[#0070E0] relative inline-block">
+                      {t('landing.hero.title_line2')}
+                      <div className="absolute -bottom-2 left-0 w-full h-1.5 bg-[#0070E0]/10 rounded-full" />
+                    </span>
                   </motion.h1>
 
                   <motion.p 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.2 }}
-                    className="text-slate-500 text-base md:text-lg lg:text-xl mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                    transition={{ delay: 0.2, duration: 0.8 }}
+                    className="text-slate-500 text-lg md:text-xl lg:text-2xl mb-12 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
                   >
                     {t('landing.hero.subtitle')}
                   </motion.p>
@@ -552,57 +556,131 @@ export default function Landing() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.3 }}
-                    className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 md:gap-4"
+                    transition={{ delay: 0.3, duration: 0.8 }}
+                    className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 md:gap-6"
                   >
-                    {/* Primary CTA — Premium Gradient */}
+                    {/* Primary CTA */}
                     <button 
                       onClick={() => navigate('/login?mode=register')} 
                       className="w-full sm:w-auto relative group"
                     >
-                      <div className="relative px-8 py-5 flex items-center justify-center gap-2.5 rounded-[20px] font-black uppercase tracking-wider text-white text-[14px] transition-all duration-300 bg-gradient-to-br from-[#0073e7] via-[#005BB5] to-[#004A99] shadow-[0_15px_35px_-10px_rgba(0,115,231,0.4)] border border-white/20 group-hover:-translate-y-0.5 group-hover:shadow-[0_20px_45px_-10px_rgba(0,115,231,0.5)]">
+                      <div className="relative px-10 py-6 flex items-center justify-center gap-3 rounded-2xl font-black uppercase tracking-widest text-white text-[15px] transition-all duration-500 bg-[#0070E0] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] border border-white/20 group-hover:-translate-y-1.5 group-hover:shadow-[0_25px_50px_-10px_rgba(0,112,224,0.5)] active:scale-95">
                         {t('landing.hero.cta_start')}
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </button>
 
-                    {/* Secondary CTA — Refined Glass */}
+                    {/* Secondary CTA */}
                     <button 
                       onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
-                      className="w-full sm:w-auto px-8 py-4 md:py-5 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm text-slate-600 font-bold text-[15px] hover:border-[#0070E0]/30 hover:text-[#0070E0] hover:bg-[#F0F7FF]/60 transition-all duration-300 shadow-sm hover:shadow-md"
+                      className="w-full sm:w-auto px-10 py-6 rounded-2xl border border-slate-200 bg-white text-slate-700 font-black text-[15px] uppercase tracking-widest hover:border-[#0070E0]/30 hover:text-[#0070E0] hover:bg-[#F0F7FF]/50 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 active:scale-95"
                     >
                       {t('landing.hero.cta_demo')}
                     </button>
                   </motion.div>
 
-                  {/* Trust Line */}
+                  {/* Trust Signals */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.4 }}
-                    className="flex flex-wrap items-center justify-center lg:justify-start gap-2 md:gap-3 text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6"
+                    transition={{ delay: 0.5 }}
+                    className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6"
                   >
-                    <span>{t('landing.hero.trust_drivers')}</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
-                    <span>{t('landing.hero.trust_results')}</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300 hidden md:block" />
-                    <span>{t('landing.hero.trust_signup')}</span>
+                    <div className="flex items-center -space-x-3">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center shadow-sm overflow-hidden">
+                          <img src={`/JBJ RIV ${i}.jpg`} alt="User" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-start">
+                      <div className="flex items-center gap-1 mb-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                        <span className="text-xs font-black text-slate-900 ml-1">4.9/5</span>
+                      </div>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t('landing.hero.trust_drivers')}</p>
+                    </div>
                   </motion.div>
                 </motion.div>
 
-                {/* Right Column: Scroll-Synced Phone Demo */}
-                <div className="relative flex justify-center perspective-1000 -mt-2 md:mt-0">
+                {/* Right Column: Immersive Phone with Floating Cards */}
+                <div className="relative perspective-1000 hidden lg:block">
                   <motion.div 
                     style={{ 
                       rotateY: phoneRotate, 
                       scale: phoneScale,
                       y: phoneY 
                     }}
-                    className="w-full flex justify-center"
+                    className="relative z-20"
                   >
                     <ScrollChatDemo />
                   </motion.div>
+
+                  {/* Floating Value Cards */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6, duration: 1 }}
+                    className="absolute -top-10 -right-4 z-30 p-5 rounded-[28px] bg-white border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-float-slow"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center border border-red-100">
+                        <ShieldAlert className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Risk Level</p>
+                        <p className="text-sm font-black text-red-600">CRITICAL</p>
+                      </div>
+                    </div>
+                    <div className="w-32 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="w-[85%] h-full bg-red-500 rounded-full" />
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8, duration: 1 }}
+                    className="absolute top-1/2 -left-20 z-30 p-5 rounded-[28px] bg-white border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-float"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0070E0] flex items-center justify-center border border-blue-100">
+                        <DollarSign className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Repair Estimate</p>
+                        <p className="text-lg font-black text-slate-900">$185 - $320</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1, duration: 1 }}
+                    className="absolute bottom-10 -right-12 z-30 p-5 rounded-[28px] bg-[#0F172A] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] animate-float-slow"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center">
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">AI Status</p>
+                        <p className="text-sm font-black text-white">ANALYSIS READY</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Decorative Glow */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-blue-100/20 rounded-full blur-[100px] -z-10" />
+                </div>
+
+                {/* Mobile Hero (Phone only) */}
+                <div className="lg:hidden mt-8">
+                   <ScrollChatDemo />
                 </div>
 
               </div>
@@ -611,9 +689,9 @@ export default function Landing() {
             {/* Scroll Indicator */}
             <motion.div 
               style={{ opacity: initialFadeOut }}
-              className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 hidden md:flex"
             >
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('landing.hero.scroll_more')}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">{t('landing.hero.scroll_more')}</span>
               <motion.div 
                 animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -623,7 +701,7 @@ export default function Landing() {
         </section>
 
         {/* Problem Section */}
-        <section id="problem" className="relative py-20 md:py-24 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
+        <section id="problem" className="relative py-16 md:py-20 px-6 bg-slate-50/60 backdrop-blur-sm overflow-hidden border-t border-slate-100">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.problem.badge')}</span>
@@ -651,7 +729,7 @@ export default function Landing() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="relative py-24 md:py-28 px-6 bg-gradient-to-b from-slate-50/50 to-white overflow-hidden border-t border-slate-100">
+        <section id="how-it-works" className="relative py-16 md:py-24 px-6 bg-gradient-to-b from-slate-50/50 to-white overflow-hidden border-t border-slate-100">
           <div className="max-w-6xl mx-auto flex flex-col relative z-10">
             <div className="text-center flex flex-col items-center mb-16">
               <motion.div 
@@ -790,7 +868,7 @@ export default function Landing() {
         </Suspense>
 
         {/* Features */}
-        <section id="features" className="relative py-20 md:py-24 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
+        <section id="features" className="relative py-16 md:py-20 px-0 overflow-hidden bg-white/70 backdrop-blur-sm border-t border-slate-100">
           <div className="max-w-6xl mx-auto px-6 mb-16 text-center flex flex-col items-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border border-navy/10 bg-navy/5 backdrop-blur-md">
               <span className="text-[10px] uppercase tracking-[0.2em] text-navy font-black">{t('landing.features_section.badge')}</span>
