@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -6,7 +6,6 @@ import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { Logo, Wordmark } from '../components/ui/Brand'
 import CarxGradientBg from '../components/ui/CarxGradientBg'
 
 // Lazy loaded components for bundle optimization
@@ -18,10 +17,10 @@ const SymptomCarousel = lazy(() => import('../components/ui/SymptomCarousel'))
 const TrustSection = lazy(() => import('../components/TrustSection'))
 
 import { 
-  Bot, CheckCircle2, Zap, Clock, CheckCircle, Activity, 
-  Mic, ImagePlus, ShieldAlert, FileText,
-  UserCircle, X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
-  Send, ChevronDown, HelpCircle, Camera, AlertTriangle, Star
+  Bot, CheckCircle2, Zap, Clock, Activity, 
+  Mic, ImagePlus, ShieldAlert,
+  X, ChevronRight, DollarSign, LayoutDashboard, User, LogOut, 
+  ChevronDown, HelpCircle, Camera, AlertTriangle, Star
 } from 'lucide-react'
 
 import { CarSafetySpotlightHero } from '../components/ui/CarSafetySpotlightHero'
@@ -132,7 +131,6 @@ export default function Landing() {
   const userInitial = user?.email?.[0].toUpperCase() ?? 'U'
   const [storyOpen, setStoryOpen] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState(-1)
-  const heroRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="relative min-h-screen bg-white text-on-surface selection:bg-navy/10 transition-colors duration-300">

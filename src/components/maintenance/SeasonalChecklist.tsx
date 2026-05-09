@@ -39,7 +39,7 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
 
   const handleAskAI = (item: ChecklistItem) => {
     navigate('/dashboard/ai-mechanic', {
-      state: { initialIssue: `${checklist.title}: ${item.label} — ${item.description}` }
+      state: { initialIssue: `${t(checklist.titleKey)}: ${t(item.labelKey)} — ${t(item.descriptionKey)}` }
     })
   }
 
@@ -57,7 +57,7 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
             <CheckIcon className="w-5 h-5" style={{ color: checklist.color }} />
           </div>
           <div>
-            <h3 className="text-sm font-black text-on-surface tracking-tight">{checklist.title}</h3>
+            <h3 className="text-sm font-black text-on-surface tracking-tight">{t(checklist.titleKey)}</h3>
             <p className="text-[10px] text-muted font-medium">
               {t('maintenance.seasonal_tool.completed', { done, total })}
             </p>
@@ -118,14 +118,14 @@ export default function SeasonalChecklist({ checklist, onUpdate }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`text-[13px] font-black text-on-surface ${item.checked ? 'line-through' : ''}`}>
-                        {item.label}
+                        {t(item.labelKey)}
                       </span>
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${warnCfg.bg} ${warnCfg.color}`}>
                         <WarnIcon className="w-2.5 h-2.5" />
                         {t(`maintenance.seasonal_tool.warning_levels.${warnCfg.key}`)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted font-medium leading-relaxed">{item.description}</p>
+                    <p className="text-[11px] text-muted font-medium leading-relaxed">{t(item.descriptionKey)}</p>
                   </div>
 
                   {/* Ask AI */}

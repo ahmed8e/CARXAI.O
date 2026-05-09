@@ -45,17 +45,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-1.5 sm:gap-2 transition-all duration-300 group ${
+        className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 group ${
           variant === 'minimal' 
-            ? 'p-2 rounded-full hover:bg-slate-50 text-slate-400 hover:text-navy'
-            : 'ps-2.5 pe-1.5 py-1.5 rounded-full bg-slate-50/50 border border-slate-100 hover:border-navy/20 hover:bg-white text-[11px] font-bold text-slate-500 uppercase tracking-tight'
+            ? 'p-2 rounded-full hover:bg-slate-100/50 text-slate-400 hover:text-navy'
+            : 'ps-2 pe-1 py-1 rounded-full bg-slate-50/50 border border-slate-100 hover:border-navy/20 hover:bg-white text-[10px] font-bold text-slate-500 uppercase tracking-tight'
         }`}
       >
         <Globe className={`w-3.5 h-3.5 sm:w-4 h-4 transition-colors ${isOpen ? 'text-navy' : 'text-slate-400 group-hover:text-navy'}`} />
         {variant === 'full' && (
           <span className="truncate max-w-[60px]">{currentLanguage.short}</span>
         )}
-        <ChevronDown className={`w-3 h-3 transition-transform duration-500 opacity-40 group-hover:opacity-100 ${isOpen ? 'rotate-180 text-navy' : ''}`} />
+        <ChevronDown className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform duration-500 opacity-30 group-hover:opacity-100 ${isOpen ? 'rotate-180 text-navy' : ''}`} />
       </button>
 
       <AnimatePresence>
