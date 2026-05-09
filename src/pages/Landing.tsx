@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollProgress } from '../components/ui/scroll-progress-1'
 import { useAuth } from '../contexts/AuthContext'
 import Navbar from '../components/Navbar'
@@ -397,26 +397,6 @@ export default function Landing() {
   const [storyOpen, setStoryOpen] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState(-1)
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end end"]
-  });
-
-  const scrollProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  // Natural Hero - Scroll-Driven Focus
-  const textY = useTransform(scrollProgress, [0, 0.5], [0, -50]);
-  const initialFadeOut = useTransform(scrollProgress, [0, 0.4], [1, 0]);
-  const phoneRotate = useTransform(scrollProgress, [0, 0.5, 1], [0, -3, 0]);
-  const phoneScale = useTransform(scrollProgress, [0, 0.5], [1, 1.08]);
-  const phoneY = useTransform(scrollProgress, [0, 0.5, 0.95, 1], [0, -180, -185, -260]); 
-
-
-
 
   return (
     <div className="relative min-h-screen bg-white text-on-surface selection:bg-navy/10 transition-colors duration-300">
@@ -506,198 +486,163 @@ export default function Landing() {
             </motion.div>
           )}
         </AnimatePresence>
-        <section ref={heroRef} className="relative min-h-[100dvh] md:min-h-[90vh] w-full flex items-start md:items-center justify-center pt-[100px] md:pt-20 pb-16 px-6 md:overflow-hidden overflow-x-hidden">
-          {/* Background Decorative Elements */}
-          <div className="absolute top-1/4 left-10 w-96 h-96 bg-blue-100/30 rounded-full blur-[120px] -z-10 animate-pulse-slow" />
-          <div className="absolute bottom-1/4 right-10 w-[500px] h-[500px] bg-indigo-50/40 rounded-full blur-[140px] -z-10" />
+        <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen w-full flex items-center justify-center pt-[80px] md:pt-0 pb-16 px-6 overflow-hidden">
+          {/* Subtle Background Elements */}
+          <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-50/40 rounded-full blur-[120px] -z-10" />
+          <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-indigo-50/30 rounded-full blur-[140px] -z-10" />
 
-          <div className="max-w-[1440px] mx-auto w-full relative z-10 mt-0 lg:-mt-12">
-              <div className="grid lg:grid-cols-[1.1fr,0.9fr] gap-12 lg:gap-16 items-center">
-                
-                {/* Left Column: Fixed Headlines */}
-                <motion.div style={{ y: textY }} className="text-center lg:text-left">
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    style={{ opacity: initialFadeOut }}
-                    className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 border border-[#0070E0]/10 bg-white/50 backdrop-blur-md shadow-sm relative overflow-hidden group"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-[#0070E0] flex items-center justify-center shadow-lg shadow-blue-500/20">
-                      <Zap className="w-3.5 h-3.5 text-white" />
-                    </div>
-                    <span className="text-[10px] md:text-[12px] uppercase tracking-[0.25em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
-                  </motion.div>
-
-                  <motion.h1 
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ opacity: initialFadeOut }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="font-display font-black text-5xl md:text-8xl lg:text-[100px] leading-[0.95] mb-8 text-[#0F172A] tracking-[-0.03em]"
-                  >
-                    {t('landing.hero.title_line1')} <br />
-                    <span className="text-[#0070E0] relative inline-block">
-                      {t('landing.hero.title_line2')}
-                      <div className="absolute -bottom-2 left-0 w-full h-1.5 bg-[#0070E0]/10 rounded-full" />
-                    </span>
-                  </motion.h1>
-
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
-                    className="text-slate-500 text-lg md:text-xl lg:text-2xl mb-12 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed"
-                  >
-                    {t('landing.hero.subtitle')}
-                  </motion.p>
-
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 md:gap-6"
-                  >
-                    {/* Primary CTA */}
-                    <button 
-                      onClick={() => navigate('/login?mode=register')} 
-                      className="w-full sm:w-auto relative group"
-                    >
-                      <div className="relative px-10 py-6 flex items-center justify-center gap-3 rounded-2xl font-black uppercase tracking-widest text-white text-[15px] transition-all duration-500 bg-[#0070E0] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] border border-white/20 group-hover:-translate-y-1.5 group-hover:shadow-[0_25px_50px_-10px_rgba(0,112,224,0.5)] active:scale-95">
-                        {t('landing.hero.cta_start')}
-                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0" />
-                      </div>
-                    </button>
-
-                    {/* Secondary CTA */}
-                    <button 
-                      onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} 
-                      className="w-full sm:w-auto px-10 py-6 rounded-2xl border border-slate-200 bg-white text-slate-700 font-black text-[15px] uppercase tracking-widest hover:border-[#0070E0]/30 hover:text-[#0070E0] hover:bg-[#F0F7FF]/50 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 active:scale-95"
-                    >
-                      {t('landing.hero.cta_demo')}
-                    </button>
-                  </motion.div>
-
-                  {/* Trust Signals */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    style={{ opacity: initialFadeOut }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6"
-                  >
-                    <div className="flex items-center -space-x-3">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center shadow-sm overflow-hidden">
-                          <img src={`/JBJ RIV ${i}.jpg`} alt="User" className="w-full h-full object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="text-start">
-                      <div className="flex items-center gap-1 mb-1">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        ))}
-                        <span className="text-xs font-black text-slate-900 ml-1">4.9/5</span>
-                      </div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t('landing.hero.trust_drivers')}</p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-
-                {/* Right Column: Immersive Phone with Floating Cards */}
-                <div className="relative perspective-1000 hidden lg:block">
-                  <motion.div 
-                    style={{ 
-                      rotateY: phoneRotate, 
-                      scale: phoneScale,
-                      y: phoneY 
-                    }}
-                    className="relative z-20"
-                  >
-                    <ScrollChatDemo />
-                  </motion.div>
-
-                  {/* Floating Value Cards */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6, duration: 1 }}
-                    className="absolute -top-10 -right-4 z-30 p-5 rounded-[28px] bg-white border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-float-slow"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center border border-red-100">
-                        <ShieldAlert className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Risk Level</p>
-                        <p className="text-sm font-black text-red-600">CRITICAL</p>
-                      </div>
-                    </div>
-                    <div className="w-32 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="w-[85%] h-full bg-red-500 rounded-full" />
-                    </div>
-                  </motion.div>
-
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8, duration: 1 }}
-                    className="absolute top-1/2 -left-20 z-30 p-5 rounded-[28px] bg-white border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-float"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0070E0] flex items-center justify-center border border-blue-100">
-                        <DollarSign className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Repair Estimate</p>
-                        <p className="text-lg font-black text-slate-900">$185 - $320</p>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1, duration: 1 }}
-                    className="absolute bottom-10 -right-12 z-30 p-5 rounded-[28px] bg-[#0F172A] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] animate-float-slow"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center">
-                        <Bot className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">AI Status</p>
-                        <p className="text-sm font-black text-white">ANALYSIS READY</p>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Decorative Glow */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-blue-100/20 rounded-full blur-[100px] -z-10" />
+          <div className="max-w-[1440px] mx-auto w-full relative z-10">
+            <div className="grid lg:grid-cols-[1.1fr,0.9fr] gap-12 lg:gap-24 items-center">
+              
+              {/* Left Column: Core Value Proposition */}
+              <motion.div 
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="text-center lg:text-left flex flex-col items-center lg:items-start"
+              >
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 border border-blue-100 bg-blue-50/50 backdrop-blur-md">
+                  <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center">
+                    <Zap className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
                 </div>
 
-                {/* Mobile Hero (Phone only) */}
-                <div className="lg:hidden mt-8">
+                <h1 className="font-display font-black text-5xl md:text-7xl xl:text-[84px] leading-[1.05] mb-8 text-slate-900 tracking-tight">
+                  {t('landing.hero.title')}
+                </h1>
+
+                <p className="text-slate-500 text-lg md:text-xl xl:text-2xl mb-12 max-w-2xl font-medium leading-relaxed">
+                  {t('landing.hero.subtitle')}
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full sm:w-auto mb-12">
+                  <button 
+                    onClick={() => navigate('/login?mode=register')} 
+                    className="w-full sm:w-auto relative group"
+                  >
+                    <div className="relative px-10 py-6 flex items-center justify-center gap-3 rounded-2xl font-black uppercase tracking-widest text-white text-[15px] transition-all duration-500 bg-[#0070E0] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] border border-white/20 group-hover:-translate-y-1.5 group-hover:shadow-[0_25px_50px_-10px_rgba(0,112,224,0.5)] active:scale-95">
+                      {t('landing.hero.cta_start')}
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0" />
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} 
+                    className="w-full sm:w-auto px-10 py-6 rounded-2xl border border-slate-200 bg-white text-slate-700 font-black text-[15px] uppercase tracking-widest hover:border-[#0070E0]/30 hover:text-[#0070E0] transition-all duration-500 shadow-sm active:scale-95"
+                  >
+                    {t('landing.hero.cta_demo')}
+                  </button>
+                </div>
+
+                {/* Trust Row */}
+                <div className="flex flex-col sm:flex-row items-center gap-5 pt-4 border-t border-slate-100 w-full sm:w-auto lg:w-full">
+                  <div className="flex items-center -space-x-2.5">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center shadow-sm overflow-hidden">
+                        <img src={`/JBJ RIV ${i}.jpg`} alt="User" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-center sm:text-left">
+                    <div className="flex items-center justify-center sm:justify-start gap-1 mb-0.5">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-xs font-bold text-slate-500">{t('landing.hero.trust_row')}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Right Column: Integrated Mockup & Cards */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="relative flex justify-center lg:justify-end"
+              >
+                <div className="relative z-20">
                    <ScrollChatDemo />
                 </div>
 
-              </div>
-            </div>
+                {/* Floating Insight Cards - Compact & Connected */}
+                
+                {/* Risk Level Card */}
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="absolute -top-6 lg:-top-10 right-0 lg:-right-12 z-30 p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-red-100 shadow-[0_20px_40px_-15px_rgba(220,38,38,0.15)] animate-float-slow"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
+                      <ShieldAlert className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Risk Level</p>
+                      <p className="text-xs font-black text-red-600">CRITICAL</p>
+                    </div>
+                  </div>
+                </motion.div>
 
-            {/* Scroll Indicator */}
-            <motion.div 
-              style={{ opacity: initialFadeOut }}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 hidden md:flex"
-            >
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">{t('landing.hero.scroll_more')}</span>
-              <motion.div 
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-1 h-8 rounded-full bg-gradient-to-b from-[#0070E0] to-transparent"
-              />
-            </motion.div>
+                {/* Repair Cost Card */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 }}
+                  className="absolute top-1/3 -left-4 lg:-left-20 z-30 p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-blue-100 shadow-[0_20px_40px_-15px_rgba(0,112,224,0.15)] animate-float"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#0070E0] flex items-center justify-center">
+                      <DollarSign className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Repair Estimate</p>
+                      <p className="text-sm font-black text-slate-900">$185 – $320</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Report Ready Card */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 }}
+                  className="absolute bottom-12 -right-4 lg:-right-16 z-30 p-4 rounded-2xl bg-[#0F172A] border border-white/10 shadow-2xl animate-float-slow"
+                >
+                  <div className="flex items-center gap-3 pr-4">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">AI Scan</p>
+                      <p className="text-xs font-black text-white uppercase">Report Ready</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Safe to Drive? Card */}
+                <motion.div 
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4 }}
+                  className="absolute -bottom-4 left-0 lg:-left-8 z-30 p-4 rounded-2xl bg-amber-50 border border-amber-100 shadow-lg animate-float"
+                >
+                   <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                      <AlertTriangle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-amber-700/60 uppercase tracking-widest leading-none mb-1">Safe to Drive?</p>
+                      <p className="text-xs font-black text-amber-800">NO</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+              </motion.div>
+            </div>
+          </div>
         </section>
 
         {/* Problem Section */}

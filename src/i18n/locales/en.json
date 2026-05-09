@@ -61,15 +61,12 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Automotive Intelligence",
-      "title_line1": "Reliable car help,",
-      "title_line2": "instantly.",
-      "subtitle": "Stop guessing and start fixing. Our AI mechanic gives you expert automotive advice and diagnosis in seconds.",
-      "cta_start": "Start Diagnosis Free",
-      "cta_demo": "See How it Works",
-      "trust_drivers": "5k+ Drivers",
-      "trust_results": "Instant Results",
-      "trust_signup": "No Signup Required",
+      "badge": "New: AI Mechanic 2.0",
+      "title": "Stop guessing what’s wrong with your car.",
+      "subtitle": "Get instant AI diagnosis, safety guidance, and repair cost warnings before you overpay.",
+      "cta_start": "Start Free Diagnosis",
+      "cta_demo": "See How It Works",
+      "trust_row": "5K+ drivers helped · 4.9/5 rating · No sign-up required",
       "scroll_more": "Scroll for more"
     },
     "demo": {

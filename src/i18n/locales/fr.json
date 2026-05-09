@@ -62,15 +62,12 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Intelligence Automobile",
-      "title_line1": "Aide auto fiable,",
-      "title_line2": "instantanément.",
-      "subtitle": "Arrêtez de deviner et commencez à réparer. Notre mécanicien IA vous donne des conseils et un diagnostic expert en quelques secondes.",
+      "badge": "Nouveau : Mécanicien IA 2.0",
+      "title": "Arrêtez de deviner ce qui ne va pas avec votre voiture.",
+      "subtitle": "Obtenez un diagnostic IA instantané, des conseils de sécurité et des alertes de prix de réparation avant de surpayer.",
       "cta_start": "Démarrer le diagnostic gratuit",
       "cta_demo": "Voir comment ça marche",
-      "trust_drivers": "+5k Conducteurs",
-      "trust_results": "Résultats instantanés",
-      "trust_signup": "Sans inscription",
+      "trust_row": "+5K conducteurs aidés · Note 4.9/5 · Sans inscription",
       "scroll_more": "Défiler pour en savoir plus"
     },
     "demo": {

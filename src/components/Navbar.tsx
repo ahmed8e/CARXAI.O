@@ -43,7 +43,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
   ]
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[60] h-16 md:h-24 flex items-center transition-all duration-700 ${transparent ? 'bg-transparent' : 'bg-white/80 backdrop-blur-2xl border-b border-slate-100/40 shadow-[0_2px_15px_-10px_rgba(0,0,0,0.05)]'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-[60] h-16 md:h-20 flex items-center transition-all duration-700 ${transparent ? 'bg-transparent' : 'bg-white/70 backdrop-blur-2xl border-b border-slate-100/50'}`}>
       <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
         
         {/* Left: Logo & Mobile Toggle */}
@@ -56,13 +56,13 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           </button>
 
           <Link to={user ? "/dashboard" : "/"} className="flex items-center group transition-transform active:scale-95">
-            <BrandLockup size="lg" className="scale-90 md:scale-110" />
+            <BrandLockup size="lg" className="scale-90 md:scale-105" />
           </Link>
         </div>
 
-        {/* Center: Elegant Inline Navigation */}
+        {/* Center: Minimalist Navigation */}
         {showNavLinks && (
-          <div className="hidden md:flex items-center gap-1.5 p-1.5 rounded-full bg-slate-50/50 border border-slate-100/50">
+          <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = location.hash === `#${link.id}` || (link.path && location.pathname === link.path);
               return (
@@ -75,7 +75,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
                       document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth' }); 
                     }
                   }} 
-                  className={`relative px-5 py-2 text-[13px] font-black tracking-tight transition-all duration-300 rounded-full ${isActive ? 'text-[#0070E0] bg-white shadow-sm ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}
+                  className={`relative px-4 py-2 text-[13px] font-bold tracking-tight transition-all duration-300 rounded-xl ${isActive ? 'text-[#0070E0] bg-blue-50/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50/50'}`}
                 >
                   {link.name}
                 </Link>
@@ -85,7 +85,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         )}
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-3 md:gap-5">
+        <div className="flex items-center gap-3 md:gap-6">
           
           <div className="hidden md:block">
             <LanguageSelector 
@@ -97,25 +97,21 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
 
           {user ? (
             <div className="flex items-center gap-4">
-              <button className="hidden lg:flex p-2.5 rounded-2xl text-slate-400 hover:text-[#0070E0] hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+              <button className="hidden lg:flex p-2 rounded-xl text-slate-400 hover:text-[#0070E0] transition-all">
                 <Bell className="w-5 h-5" />
               </button>
 
               <div className="relative" ref={accountMenuRef}>
                 <button 
                   onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pe-3 rounded-2xl border border-slate-100 bg-slate-50/50 hover:border-[#0070E0]/20 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all group"
+                  className="flex items-center gap-2.5 p-1 rounded-full border border-slate-100 hover:border-[#0070E0]/20 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all group"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-[#0070E0] flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20 overflow-hidden group-hover:scale-105 transition-transform">
+                  <div className="w-8 h-8 rounded-full bg-[#0070E0] flex items-center justify-center text-white font-black text-[10px] shadow-lg shadow-blue-500/20 overflow-hidden group-hover:scale-105 transition-transform">
                     {user?.user_metadata?.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                     ) : userInitial}
                   </div>
-                  <div className="hidden lg:block text-left">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('auth.account')}</p>
-                    <p className="text-[12px] font-bold text-slate-900 -mt-0.5">{user.email?.split('@')[0]}</p>
-                  </div>
-                  <ChevronDown className={`hidden sm:block w-3.5 h-3.5 text-slate-400 group-hover:text-[#0070E0] transition-transform duration-500 ${accountMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`hidden sm:block w-3 h-3 text-slate-400 group-hover:text-[#0070E0] transition-transform duration-500 me-2 ${accountMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
@@ -168,10 +164,10 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <Link to="/login?mode=login" className="hidden lg:block px-5 py-2.5 text-[14px] font-black text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-widest">{t('auth.login.button')}</Link>
-              <Link to="/login" className="px-8 py-3.5 rounded-2xl bg-[#0070E0] text-white text-[13px] font-black uppercase tracking-[0.1em] shadow-[0_15px_30px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-10px_rgba(0,112,224,0.5)] transition-all flex items-center justify-center whitespace-nowrap active:scale-[0.98] border border-white/10">
-                {t('auth.signup.button')}
+            <div className="flex items-center gap-3 lg:gap-6">
+              <Link to="/login?mode=login" className="hidden lg:block px-4 py-2 text-[14px] font-bold text-slate-500 hover:text-[#0070E0] transition-colors uppercase tracking-widest">{t('auth.login.button')}</Link>
+              <Link to="/login" className="px-8 py-4 rounded-2xl bg-[#0070E0] text-white text-[13px] font-black uppercase tracking-[0.15em] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.3)] hover:bg-[#005BB5] hover:-translate-y-1 hover:shadow-[0_25px_50px_-10px_rgba(0,112,224,0.4)] transition-all flex items-center justify-center whitespace-nowrap active:scale-[0.98] border border-white/10">
+                {t('landing.hero.cta_start')}
               </Link>
             </div>
           )}

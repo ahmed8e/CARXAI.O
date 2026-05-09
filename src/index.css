@@ -418,6 +418,10 @@
     animation: float 6s ease-in-out infinite;
   }
 
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out;
   }
@@ -431,6 +435,11 @@
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1deg); }
 }
 
 @keyframes scan {
