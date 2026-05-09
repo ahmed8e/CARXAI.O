@@ -21,10 +21,14 @@
   --color-surface-highest: #E2E8F0;
   --color-surface-container: #FFFFFF;
 
-  --color-chart-2: var(--color-chart-2);
-  --color-chart-3: var(--color-chart-3);
-  --color-chart-4: var(--color-chart-4);
-  --color-chart-5: var(--color-chart-5);
+  --color-primary: oklch(0.5854 0.2041 277.1173);
+  --color-primary-foreground: oklch(1.0000 0 0);
+  --color-secondary: oklch(0.9276 0.0058 264.5313);
+  --color-secondary-foreground: oklch(0.3729 0.0306 259.7328);
+  --color-accent: oklch(0.9299 0.0334 272.7879);
+  --color-accent-foreground: oklch(0.3729 0.0306 259.7328);
+  --color-destructive: oklch(0.6368 0.2078 25.3313);
+  --color-destructive-foreground: oklch(1.0000 0 0);
 
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -32,6 +36,14 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
   --radius-4xl: 2rem;
+
+  --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 1px 2px -2px hsl(0 0% 0% / 0.10);
+  --shadow-md: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 2px 4px -2px hsl(0 0% 0% / 0.10);
+  --shadow-lg: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 4px 6px -2px hsl(0 0% 0% / 0.10);
+  --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 8px 10px -2px hsl(0 0% 0% / 0.10);
+  --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
 
   --shadow-glow: 0 0 30px rgba(0, 112, 224, 0.4);
   --shadow-glow-lg: 0 0 60px rgba(0, 112, 224, 0.4);

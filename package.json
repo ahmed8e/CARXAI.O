@@ -16,6 +16,7 @@
     "@hugeicons/react": "^1.1.6",
     "@number-flow/react": "^0.6.0",
     "@paypal/react-paypal-js": "^9.1.1",
+    "@radix-ui/react-slot": "^1.2.4",
     "@supabase/supabase-js": "^2.99.3",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
