@@ -46,16 +46,20 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
     <nav className={`fixed top-0 left-0 right-0 z-[60] h-16 md:h-20 flex items-center transition-all duration-700 ${transparent ? 'bg-transparent' : 'bg-white/70 backdrop-blur-2xl border-b border-slate-100/50'}`}>
       <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
         
-        <div className="flex items-center gap-4 order-1 lg:order-1">
+        {/* Left: Hamburger (Mobile Only) */}
+        <div className="flex md:hidden items-center order-1">
           <button 
             onClick={onMenuClick}
-            className="p-2 -mx-2 rounded-full hover:bg-slate-50 transition-colors text-slate-500 md:hidden"
+            className="p-2 -ms-2 rounded-full hover:bg-slate-50 transition-colors text-slate-500"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-6 h-6" />
           </button>
+        </div>
 
+        {/* Center (Mobile) / Left (Desktop): Logo */}
+        <div className="flex items-center justify-center md:justify-start flex-1 md:flex-none order-2 lg:order-1">
           <Link to={user ? "/dashboard" : "/"} className="flex items-center group transition-all active:scale-95 shrink-0">
-            <BrandLockup size="md" className="md:scale-105" />
+            <BrandLockup size="md" className="scale-90 md:scale-105" />
           </Link>
         </div>
 
@@ -86,7 +90,7 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
         {/* Right Actions: Auth & Language (Order 3) */}
         <div className="flex items-center gap-4 md:gap-8 order-3 lg:order-3">
           
-          <div className="hidden md:block">
+          <div className="">
             <LanguageSelector 
               className="flex-shrink-0" 
               dropdownPosition="bottom" 
@@ -165,8 +169,13 @@ export default function Navbar({ onMenuClick, showNavLinks = false, transparent 
           ) : (
             <div className="flex items-center gap-2 lg:gap-4">
               <Link to="/login?mode=login" className="hidden lg:block px-3 py-2 text-[13px] font-bold text-slate-500 hover:text-[#0070E0] transition-colors uppercase tracking-widest">{t('auth.login.button')}</Link>
-              <Link to="/login" className="px-5 py-3 md:px-6 md:py-3.5 rounded-xl bg-[#0070E0] text-white text-[11px] md:text-[12px] font-black uppercase tracking-[0.1em] shadow-lg shadow-blue-500/25 hover:bg-[#005BB5] hover:-translate-y-0.5 transition-all flex items-center justify-center whitespace-nowrap active:scale-[0.98] border border-white/20">
+              {/* Desktop Only CTA */}
+              <Link to="/login" className="hidden md:flex px-6 py-3.5 rounded-xl bg-[#0070E0] text-white text-[12px] font-black uppercase tracking-[0.1em] shadow-lg shadow-blue-500/25 hover:bg-[#005BB5] hover:-translate-y-0.5 transition-all items-center justify-center whitespace-nowrap active:scale-[0.98] border border-white/20">
                 {t('landing.hero.cta_start')}
+              </Link>
+              {/* Mobile Compact Login Button (Optional but cleaner) */}
+              <Link to="/login" className="md:hidden p-2 rounded-full bg-slate-50 text-[#0070E0] hover:bg-blue-50 transition-colors">
+                <User className="w-5 h-5" />
               </Link>
             </div>
           )}
