@@ -61,12 +61,12 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Smart Photo Diagnosis + Price Check",
-      "title": "Photo your car problem and know instantly: Is it dangerous, how much it costs, and if the price is fair?",
-      "subtitle": "Car Safety analyzes photos of faults and symptoms, identifies the risk level, gives you a repair cost estimate, and alerts you before you agree to unclear or overpriced repairs.",
-      "cta_start": "Start Free Diagnosis",
-      "cta_demo": "See How It Works",
-      "trust_row": "No registration · Results in seconds · Helps you avoid overpaying",
+      "badge": "Smart Car Assistant",
+      "title": "Track maintenance, understand faults, and avoid overpaying.",
+      "subtitle": "Car Safety brings smart diagnostics, maintenance reminders, car health score, and repair price checking into one place — so you know when to fix, what to do, and how much to pay.",
+      "cta_start": "Start for Free",
+      "cta_demo": "See how it works",
+      "trust_row": "Diagnostics · Maintenance · Price Check · Repair History",
       "scroll_more": "Scroll for more",
       "cards": {
         "analyzing": "Analyzing...",
@@ -88,8 +88,15 @@
         "ready": "Diagnosis Report Ready",
         "safe_drive": "Is it safe to drive?",
         "no": "No, Danger",
-        "risk_label": "Risk Level",
-        "risk_value": "HIGH"
+        "risk_value": "HIGH",
+        "car_health_score": "Car Health Score: 75/100",
+        "urgent_maintenance": "Urgent Maintenance: Battery Check Overdue",
+        "next_oil_change": "Next Oil Change: Due in 1,200 miles",
+        "price_check_val": "Price Check: $185–$320",
+        "ai_diagnosis": "AI Diagnosis: High risk level",
+        "floating_maintenance": "Maintenance Reminder",
+        "floating_price": "Price Check",
+        "floating_health": "Health Score 75/100"
       },
       "scenarios": {
         "brakes": {

@@ -61,124 +61,75 @@ const IPhoneMockup = ({ isRTL, isMobile = false }: { isRTL: boolean, isMobile?: 
           </div>
           
           {/* App Header */}
-          <div className="pt-12 pb-3 px-5 bg-slate-950 flex items-center justify-between z-40 relative shadow-md">
+          <div className="pt-12 pb-4 px-5 bg-blue-600 flex items-center justify-between z-40 relative shadow-sm">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center">
-                <Camera className="w-3.5 h-3.5 text-white" />
+              <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <Activity className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-[12px] font-black text-white tracking-tight">Car Safety</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-full backdrop-blur-md">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-[8px] font-black text-white uppercase tracking-widest">
-                {t('landing.hero.cards.analyzing')}
-              </span>
+              <span className="text-[14px] font-black text-white tracking-tight">Car Safety</span>
             </div>
           </div>
           
-          {/* Camera / Scan Area */}
-          <div className="relative flex-1 bg-slate-900 overflow-hidden">
-             {/* Realistic Car Problem Photo */}
-             <img 
-                src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop" 
-                alt="Engine Warning"
-                className="w-full h-full object-cover opacity-60 mix-blend-luminosity"
-             />
-             
-             {/* Scanning Overlays */}
-             <motion.div 
-                initial={{ top: "5%" }}
-                animate={{ top: "95%" }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                className="absolute left-0 right-0 h-[3px] bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,1)] z-20"
-             />
-             
-             {/* Detection Box */}
-             <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: [0, 1, 1, 0], scale: [0.9, 1, 1, 0.9] }}
-                transition={{ duration: 3, repeat: Infinity, times: [0, 0.2, 0.8, 1] }}
-                className="absolute top-[30%] left-[20%] w-[60%] h-[40%] border-2 border-blue-400 rounded-xl z-20 bg-blue-500/10"
-             >
-                <div className="absolute -top-3 -left-1 px-2 py-0.5 bg-blue-600 text-[8px] text-white font-black uppercase rounded shadow-lg">
-                  Object Detected
+          <div className="flex-1 bg-slate-50 p-4 space-y-3 overflow-y-auto no-scrollbar pb-10">
+            {/* Health Score Module */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-blue-600" />
                 </div>
-                {/* Crosshairs */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 opacity-50">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-full bg-blue-300" />
-                  <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[1px] bg-blue-300" />
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('landing.hero.cards.car_health_score').split(':')[0]}</p>
+                  <p className="text-[14px] font-black text-slate-800">75<span className="text-[10px] text-slate-400 font-bold">/100</span></p>
                 </div>
-             </motion.div>
+              </div>
+            </div>
 
-             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
-               <div className="px-3 py-1.5 bg-slate-900/80 backdrop-blur-md rounded-full border border-white/20 shadow-lg">
-                 <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest whitespace-nowrap">
-                   {t('landing.hero.cards.image_analyzed')}
-                 </span>
+            {/* Urgent Maintenance Module */}
+            <div className="bg-red-50/50 rounded-2xl p-4 shadow-sm border border-red-100 flex items-start gap-3">
+               <div className="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                 <AlertTriangle className="w-4 h-4 text-red-600" />
                </div>
-             </div>
-             
-             {/* Inner Shadow for depth */}
-             <div className="absolute inset-0 shadow-[inset_0_20px_40px_rgba(0,0,0,0.8)] pointer-events-none" />
-          </div>
-          
-          {/* Compact Result Panel (Bottom 45%) */}
-          <div className="h-[48%] bg-white p-5 rounded-t-[32px] -mt-6 relative z-30 shadow-[0_-15px_30px_rgba(0,0,0,0.2)] flex flex-col">
-             
-             {/* Handle */}
-             <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
-             
-             {/* Diagnostic Results */}
-             <div className="space-y-3.5 mb-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                      <Wrench className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Issue</p>
-                      <p className="text-[12px] font-bold text-slate-800">{t('landing.hero.cards.probable_fault')}</p>
-                    </div>
-                  </div>
-                </div>
+               <div>
+                 <p className="text-[10px] font-bold text-red-600/80 uppercase tracking-widest mb-0.5">{t('landing.hero.cards.urgent_maintenance').split(':')[0]}</p>
+                 <p className="text-[13px] font-bold text-slate-800">{t('landing.hero.cards.urgent_maintenance').split(':')[1]}</p>
+               </div>
+            </div>
 
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center">
-                      <ShieldAlert className="w-4 h-4 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Risk & Safety</p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[12px] font-bold text-red-600">{t('landing.hero.cards.risk_level')}</span>
-                        <span className="text-slate-300">•</span>
-                        <span className="text-[11px] font-bold text-slate-600">{t('landing.hero.cards.is_safe')}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-             </div>
+            {/* Next Maintenance Module */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+               <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                 <Wrench className="w-4 h-4 text-indigo-600" />
+               </div>
+               <div>
+                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t('landing.hero.cards.next_oil_change').split(':')[0]}</p>
+                 <p className="text-[13px] font-bold text-slate-800">{t('landing.hero.cards.next_oil_change').split(':')[1]}</p>
+               </div>
+            </div>
 
-             {/* Estimate & Price Warning */}
-             <div className="mt-auto bg-slate-950 rounded-2xl p-4 shadow-lg border border-slate-800">
-               <div className="flex justify-between items-end mb-3">
-                 <div>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Repair Estimate</p>
-                   <p className="text-[16px] font-black text-white">$185–$320</p>
-                 </div>
-                 <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                   <DollarSign className="w-4 h-4 text-white" />
-                 </div>
+            {/* Price Check Module */}
+            <div className="bg-slate-900 rounded-2xl p-4 shadow-lg flex items-center justify-between">
+               <div>
+                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t('landing.hero.cards.price_check_val').split(':')[0]}</p>
+                 <p className="text-[16px] font-black text-white">{t('landing.hero.cards.price_check_val').split(':')[1]}</p>
                </div>
-               
-               <div className="flex items-center gap-2 p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                 <span className="text-[9px] font-bold text-amber-500">Price warning: Check before approving</span>
+               <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                 <DollarSign className="w-4 h-4 text-emerald-400" />
                </div>
-             </div>
-             
-             {/* Home Indicator */}
-             <div className="w-1/3 h-1 bg-slate-300 rounded-full mx-auto mt-4" />
+            </div>
+
+            {/* AI Diagnosis Module */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+               <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                 <Zap className="w-4 h-4 text-amber-500" />
+               </div>
+               <div>
+                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{t('landing.hero.cards.ai_diagnosis').split(':')[0]}</p>
+                 <p className="text-[13px] font-bold text-slate-800">{t('landing.hero.cards.ai_diagnosis').split(':')[1]}</p>
+               </div>
+            </div>
+            
+            {/* Home Indicator */}
+            <div className="w-1/3 h-1 bg-slate-300 rounded-full mx-auto mt-6" />
           </div>
         </div>
       </motion.div>
@@ -186,53 +137,53 @@ const IPhoneMockup = ({ isRTL, isMobile = false }: { isRTL: boolean, isMobile?: 
       {/* Floating Glass Cards (Desktop Only) */}
       {!isMobile && (
         <>
-          {/* Card 1: Photo analyzed */}
+          {/* Card 1: Maintenance Reminder */}
           <motion.div 
             initial={{ opacity: 0, x: isRTL ? -40 : 40, y: -60 }}
             animate={{ opacity: 1, x: isRTL ? -90 : 90, y: -80 }}
             transition={{ delay: 1, duration: 1, type: "spring", stiffness: 100 }}
-            className="absolute top-1/4 left-1/2 z-30"
+            className="absolute top-[20%] left-1/2 z-30"
           >
             <div className="bg-white/95 backdrop-blur-xl border border-white rounded-[20px] p-3 shadow-[0_20px_40px_rgba(0,112,224,0.15)] flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                <ScanSearch className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                <Wrench className="w-5 h-5 text-indigo-600" />
               </div>
               <div className="pr-2">
-                <p className="text-[12px] font-black text-slate-900 leading-none">{t('landing.hero.cards.image_analyzed')}</p>
+                <p className="text-[12px] font-black text-slate-900 leading-none">{t('landing.hero.cards.floating_maintenance')}</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Card 2: Risk Level */}
+          {/* Card 2: Health Score */}
           <motion.div 
             initial={{ opacity: 0, x: isRTL ? 40 : -40, y: -10 }}
             animate={{ opacity: 1, x: isRTL ? 110 : -110, y: 10 }}
             transition={{ delay: 1.2, duration: 1, type: "spring", stiffness: 100 }}
-            className="absolute top-1/2 left-1/2 z-30"
+            className="absolute top-[45%] left-1/2 z-30"
           >
             <div className="bg-white/95 backdrop-blur-xl border border-white rounded-[20px] p-3 shadow-[0_20px_40px_rgba(0,112,224,0.15)] flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
-                <ShieldAlert className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-600" />
               </div>
               <div className="pr-2">
-                <p className="text-[12px] font-black text-slate-900 leading-none">{t('landing.hero.cards.risk_level')}</p>
+                <p className="text-[12px] font-black text-slate-900 leading-none">{t('landing.hero.cards.floating_health')}</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Card 3: Estimate Ready */}
+          {/* Card 3: Price Check */}
           <motion.div 
             initial={{ opacity: 0, x: isRTL ? -20 : 20, y: 100 }}
             animate={{ opacity: 1, x: isRTL ? -100 : 100, y: 120 }}
             transition={{ delay: 1.4, duration: 1, type: "spring", stiffness: 100 }}
-            className="absolute bottom-[20%] left-1/2 z-30"
+            className="absolute bottom-[25%] left-1/2 z-30"
           >
             <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-[20px] p-3 shadow-[0_30px_60px_rgba(0,0,0,0.3)] flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-inner">
-                <DollarSign className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center shadow-inner">
+                <DollarSign className="w-5 h-5 text-emerald-400" />
               </div>
               <div className="pr-2">
-                <p className="text-[12px] font-black text-white leading-none">Estimate ready: $185–$320</p>
+                <p className="text-[12px] font-black text-white leading-none">{t('landing.hero.cards.floating_price')}</p>
               </div>
             </div>
           </motion.div>
@@ -310,6 +261,12 @@ export const CarSafetySpotlightHero = () => {
               >
                 {t('landing.hero.cta_demo')}
               </Button>
+            </div>
+            
+            {/* Trust Line */}
+            <div className="pt-3 w-full flex items-center justify-center lg:justify-start gap-2.5 text-slate-500/80">
+              <CheckCircle className="w-4 h-4 text-emerald-500" />
+              <span className="text-[13px] font-bold tracking-wide">{t('landing.hero.trust_row')}</span>
             </div>
             {/* Mobile-only iPhone Mockup (directly below CTA) */}
             <div className="w-full pt-8 pb-4 lg:hidden">
