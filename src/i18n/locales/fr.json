@@ -62,14 +62,17 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Diagnostic + Prix + Entretien",
-      "title": "Comprenez le problème de votre voiture, connaissez le risque et évitez de surpayer",
-      "subtitle": "Car Safety vous aide à comprendre les pannes de véhicule, à savoir s'il est sûr de conduire, à comparer les coûts de réparation et à suivre l'entretien avant d'aller au garage.",
+      "badge": "Diagnostic Photo Intelligent + Vérif Prix",
+      "title": "Photographiez le problème de votre voiture et sachez instantanément : est-ce dangereux, combien ça coûte, et si le prix est juste ?",
+      "subtitle": "Car Safety analyse les photos de pannes et de symptômes, identifie le niveau de risque, vous donne une estimation du coût de réparation et vous alerte avant que vous n'acceptiez des réparations floues ou hors de prix.",
       "cta_start": "Démarrer le diagnostic gratuit",
       "cta_demo": "Voir comment ça marche",
       "trust_row": "Sans inscription · Résultat rapide · Vous aide à éviter de surpayer",
       "scroll_more": "Défiler pour en savoir plus",
       "cards": {
+        "analyzing": "Analyse en cours...",
+        "image_analyzed": "Image analysée",
+        "estimate_ready": "Estimation prête",
         "result_title": "Résultat Car Safety",
         "probable_fault": "Panne probable : Système de freinage",
         "risk_level": "Niveau de risque : Élevé",
