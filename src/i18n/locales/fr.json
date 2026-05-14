@@ -62,13 +62,19 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Nouveau : Mécanicien IA 2.0",
-      "title": "Arrêtez de deviner ce qui ne va pas avec votre voiture.",
-      "subtitle": "Obtenez un diagnostic IA instantané, des conseils de sécurité et des alertes de prix de réparation avant de surpayer.",
+      "badge": "Diagnostic intelligent en quelques secondes",
+      "title": "Comprenez le problème de votre voiture avant de payer trop cher",
+      "subtitle": "Obtenez un diagnostic instantané, un niveau de risque clair et des alertes sur les coûts de réparation avant d'aller au garage.",
       "cta_start": "Démarrer le diagnostic gratuit",
       "cta_demo": "Voir comment ça marche",
-      "trust_row": "+5K conducteurs aidés · Note 4.9/5 · Sans inscription",
-      "scroll_more": "Défiler pour en savoir plus"
+      "trust_row": "Sans inscription · Résultat rapide · Vous aide à éviter de surpayer",
+      "scroll_more": "Défiler pour en savoir plus",
+      "cards": {
+        "result_title": "Résultat du diagnostic",
+        "risk_level": "Niveau de risque : Élevé",
+        "is_safe": "Conduite sûre ? Non",
+        "repair_estimate": "Estimation réparation : 185€–320€"
+      }
     },
     "demo": {
       "msg1": "Mon tableau de bord affiche un voyant ABS jaune et un bruit de frottement bizarre quand je freine. Est-ce sûr ?",
@@ -448,6 +454,36 @@
       "preventive_desc": "Éléments à long terme pour que votre voiture fonctionne correctement pendant des années.",
       "why_label": "Pourquoi est-ce recommandé ?",
       "action_label": "Comment gérer cela ?"
+    },
+    "story_modal": {
+      "eyebrow": "L'Histoire d'Origine",
+      "title": "Comment Car Safety est Né",
+      "intro_1": "Car Safety n'a pas commencé par du code.",
+      "intro_2": "Tout a commencé par un sentiment que j'ai vu trop souvent dans la vraie vie : ce moment où un conducteur sait que quelque chose ne va pas, mais n'a aucune idée précise de ce que la voiture essaie de dire.",
+      "quote_1": "Un voyant s'allume.",
+      "quote_2": "Le moteur fait un bruit différent.",
+      "quote_3": "La voiture perd de la puissance.",
+      "quote_4": "Et avant même que la réparation ne commence, le stress s'installe.",
+      "body_1": "En tant que mécanicien, j'ai vu ce moment encore et encore. Pas seulement la panne elle-même, mais l'incertitude qui l'entoure. Les gens essayaient de décider s'ils devaient continuer à conduire, si c'était grave ou s'ils allaient aggraver les choses.",
+      "emphasis_title": "Ce moment compte plus que ce que la plupart des gens réalisent.",
+      "emphasis_desc": "Quand une voiture change, la première chose dont un conducteur a besoin n'est pas du bruit — il a besoin de clarté.",
+      "body_2": "L'idée n'a jamais été de construire un autre outil d'IA générique. C'était d'adopter la façon de penser d'un vrai mécanicien — symptôme par symptôme, risque par risque, étape par étape — et de transformer cela en conseils auxquels les gens pourraient accéder dès qu'ils en ont besoin.",
+      "pillar_1": "Quelque chose de plus calme.",
+      "pillar_2": "Quelque chose de plus utile.",
+      "pillar_3": "Quelque chose construit autour des vraies questions que se posent les conducteurs.",
+      "body_3": "Car Safety a été façonné à partir de modèles réels, de problèmes répétés et du type de raisonnement pratique qui ne devient précieux que lorsque la confiance est en jeu.",
+      "badge_1_label": "Raisonnement de vrai mécanicien",
+      "badge_1_desc": "Formé sur des modèles de diagnostic réels",
+      "badge_2_label": "Conseils axés sur l'urgence",
+      "badge_2_desc": "Donne la priorité à votre sécurité avant tout",
+      "closing_1": "Parce que lorsqu'un problème de voiture commence, la confiance ne se gagne pas en paraissant intelligent.",
+      "closing_2": "Elle se gagne en aidant quelqu'un à se sentir plus clair, plus serein et moins seul dans la décision qu'il doit prendre ensuite.",
+      "closing_final": "C'est pour cela que Car Safety a été conçu.",
+      "reactions_title": "Comment cela résonne-t-il ?",
+      "reactions_count_singular": "{{count}} réaction",
+      "reactions_count_plural": "{{count}} réactions",
+      "cta_button": "Découvrez comment Car Safety réfléchit",
+      "cta_footer": "Commencez gratuitement · Aucune carte de crédit requise"
     }
   },
   "legal": {

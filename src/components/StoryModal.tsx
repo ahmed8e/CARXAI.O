@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Zap, Wrench, ShieldCheck, Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useStoryReactions, type ReactionType } from '../hooks/useStoryReactions';
 
 interface StoryModalProps {
@@ -10,13 +11,28 @@ interface StoryModalProps {
 }
 
 const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) => {
+  const { t, i18n } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const { counts, userReaction, submitReaction, totalEngaged } = useStoryReactions('car safety-origin');
+  const isRTL = i18n.language === 'ar';
 
   const reactions: { type: ReactionType; label: string; icon: any }[] = [
-    { type: 'relate', label: 'I relate', icon: Heart },
-    { type: 'powerful', label: 'Powerful', icon: Zap },
-    { type: 'respect', label: 'Respect', icon: ShieldCheck },
+    { type: 'relate', label: t('landing.trust_section.reactions.relate'), icon: Heart },
+    { type: 'powerful', label: t('landing.trust_section.reactions.powerful'), icon: Zap },
+    { type: 'respect', label: t('landing.trust_section.reactions.respect'), icon: ShieldCheck },
+  ];
+
+  const quoteLines = [
+    t('landing.story_modal.quote_1'),
+    t('landing.story_modal.quote_2'),
+    t('landing.story_modal.quote_3'),
+    t('landing.story_modal.quote_4'),
+  ];
+
+  const pillarLines = [
+    t('landing.story_modal.pillar_1'),
+    t('landing.story_modal.pillar_2'),
+    t('landing.story_modal.pillar_3'),
   ];
 
   useEffect(() => {
@@ -90,13 +106,13 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                         className="text-[10px] font-black uppercase tracking-[0.22em] mb-0.5"
                         style={{ color: '#0070E0' }}
                       >
-                        The Origin Story
+                        {t('landing.story_modal.eyebrow')}
                       </p>
                       <h3
                         className="text-[18px] font-display font-black leading-tight tracking-tight"
                         style={{ color: '#0E1628' }}
                       >
-                        How Car Safety Was Born
+                        {t('landing.story_modal.title')}
                       </h3>
                     </div>
                   </div>
@@ -125,12 +141,13 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 {/* Opening — Editorial typography */}
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p style={{ color: '#374151' }}>
-                    Car Safety did not begin with code.
+                    {t('landing.story_modal.intro_1')}
                   </p>
-                  <p>
-                    It began with a feeling I saw too often in real life — that moment when a driver knows something is wrong,
-                    but has no clear idea what the car is trying to say.
-                  </p>
+                  {t('landing.story_modal.intro_2') && (
+                    <p>
+                      {t('landing.story_modal.intro_2')}
+                    </p>
+                  )}
                 </div>
 
                 {/* Italic Pull Quote */}
@@ -141,12 +158,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                     border: '1px solid rgba(0,112,224,0.10)',
                   }}
                 >
-                  {[
-                    'A warning light comes on.',
-                    'The engine sounds different.',
-                    'The car loses power.',
-                    'And before any repair even starts — stress takes over.',
-                  ].map((line, i) => (
+                  {quoteLines.map((line, i) => (
                     <p
                       key={i}
                       className="text-[13.5px] italic leading-relaxed"
@@ -159,8 +171,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
 
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    As a mechanic, I saw that moment again and again. Not just the fault itself — but the uncertainty around it.
-                    People were trying to decide whether to keep driving, whether it was serious, or whether they were about to make it worse.
+                    {t('landing.story_modal.body_1')}
                   </p>
                 </div>
 
@@ -180,33 +191,31 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                     className="text-[15px] font-bold leading-relaxed"
                     style={{ color: '#0E3882' }}
                   >
-                    That moment matters more than most people realise.
+                    {t('landing.story_modal.emphasis_title')}
                   </p>
                   <p
                     className="mt-1.5 text-[13.5px] leading-relaxed font-medium"
                     style={{ color: '#4B6EA8' }}
                   >
-                    When a car changes, the first thing a driver needs is not noise — they need clarity.
+                    {t('landing.story_modal.emphasis_desc')}
                   </p>
                 </div>
 
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    The idea was never to build another generic AI tool. It was to take the way a real mechanic thinks —
-                    symptom by symptom, risk by risk, step by step — and turn that into guidance people could access the moment they needed it.
+                    {t('landing.story_modal.body_2')}
                   </p>
                 </div>
 
                 {/* Pillars */}
                 <div
                   className="my-4 py-3 space-y-2"
-                  style={{ borderLeft: '2px solid rgba(0,112,224,0.2)', paddingLeft: '16px' }}
+                  style={{ 
+                    borderInlineStart: '2px solid rgba(0,112,224,0.2)', 
+                    paddingInlineStart: '16px' 
+                  }}
                 >
-                  {[
-                    'Something calmer.',
-                    'Something more useful.',
-                    'Something built around the real questions drivers ask.',
-                  ].map((line, i) => (
+                  {pillarLines.map((line, i) => (
                     <p
                       key={i}
                       className="text-[13.5px] italic leading-relaxed font-medium"
@@ -219,16 +228,15 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
 
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    Car Safety was shaped from real patterns, repeated problems, and the kind of practical reasoning
-                    that only becomes valuable when trust is on the line.
+                    {t('landing.story_modal.body_3')}
                   </p>
                 </div>
 
                 {/* Trust Badges */}
                 <div className="grid grid-cols-2 gap-3 my-6">
                   {[
-                    { icon: Wrench, label: 'Real mechanic reasoning', desc: 'Trained on real diagnostic patterns' },
-                    { icon: ShieldCheck, label: 'Urgency-first guidance', desc: 'Prioritises your safety above all' },
+                    { icon: Wrench, label: t('landing.story_modal.badge_1_label'), desc: t('landing.story_modal.badge_1_desc') },
+                    { icon: ShieldCheck, label: t('landing.story_modal.badge_2_label'), desc: t('landing.story_modal.badge_2_desc') },
                   ].map(({ icon: Icon, label, desc }) => (
                     <div
                       key={label}
@@ -256,11 +264,13 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 {/* Closing */}
                 <div className="space-y-4 text-[14.5px] leading-[1.8] text-slate-500 font-medium">
                   <p>
-                    Because when a car problem begins, trust is not earned by sounding intelligent.
-                    It is earned by helping someone feel more clear, more grounded, and less alone in the decision they have to make next.
+                    {t('landing.story_modal.closing_1')}
+                  </p>
+                  <p>
+                    {t('landing.story_modal.closing_2')}
                   </p>
                   <p style={{ color: '#1e3a5f', fontWeight: 700 }}>
-                    That is what Car Safety was built to do.
+                    {t('landing.story_modal.closing_final')}
                   </p>
                 </div>
 
@@ -268,11 +278,14 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 <div className="mt-8 pt-6 border-t border-slate-100">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">
-                      How does this resonate?
+                      {t('landing.story_modal.reactions_title')}
                     </p>
                     {totalEngaged > 0 && (
                       <span className="text-[10px] font-bold text-[#0E3882]/60 bg-[#0E3882]/5 px-2 py-0.5 rounded-full">
-                        {totalEngaged.toLocaleString()} {totalEngaged === 1 ? 'reaction' : 'reactions'}
+                        {totalEngaged === 1 
+                          ? t('landing.story_modal.reactions_count_singular', { count: totalEngaged.toLocaleString() })
+                          : t('landing.story_modal.reactions_count_plural', { count: totalEngaged.toLocaleString() })
+                        }
                       </span>
                     )}
                   </div>
@@ -325,12 +338,12 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, onCTAClick }) 
                 >
                   {/* Shimmer line */}
                   <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-                  See how Car Safety thinks
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform shrink-0" />
+                  {t('landing.story_modal.cta_button')}
+                  <ArrowRight size={16} className={`group-hover:translate-x-1 transition-transform shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
                 </motion.button>
 
                 <p className="text-center text-[11px] text-slate-400 font-medium mt-3 tracking-wide">
-                  Start free · No credit card required
+                  {t('landing.story_modal.cta_footer')}
                 </p>
               </div>
             </div>

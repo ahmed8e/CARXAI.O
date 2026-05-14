@@ -159,13 +159,84 @@ const ProductShowcase = ({ isRTL }: { isRTL: boolean }) => {
   )
 }
 
+/**
+ * Mobile-Specific Product Preview Card
+ */
+const MobileProductPreview = ({ isRTL }: { isRTL: boolean }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.6 }}
+      className="mt-12 w-full max-w-[340px] mx-auto px-4 lg:hidden"
+    >
+      <div className="relative group">
+        {/* Background Glow */}
+        <div className="absolute -inset-4 bg-blue-100/50 rounded-[40px] blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
+        
+        {/* Card Content */}
+        <div className="relative bg-white/80 backdrop-blur-xl border border-white rounded-[32px] p-5 shadow-[0_20px_50px_rgba(0,112,224,0.08)] overflow-hidden">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-blue-50">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                {t('landing.hero.cards.result_title')}
+              </span>
+            </div>
+            <Zap className="w-4 h-4 text-blue-600" />
+          </div>
+          
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center border border-red-100">
+                  <ShieldAlert className="w-4 h-4 text-red-600" />
+                </div>
+                <span className="text-xs font-bold text-red-600">{t('landing.hero.cards.risk_level')}</span>
+              </div>
+              <div className="px-2 py-1 bg-red-50 rounded-lg text-[9px] font-black text-red-600 uppercase tracking-tighter">
+                {t('landing.how_it_works.step2.dangerous')}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="text-xs font-bold text-slate-700">{t('landing.hero.cards.is_safe')}</span>
+            </div>
+            
+            <div className="mt-2 pt-3 border-t border-blue-50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                  <DollarSign className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-black text-slate-900">
+                    {t('landing.hero.cards.repair_estimate')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Subtle decoration */}
+          <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-40" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export const CarSafetySpotlightHero = () => {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const isRTL = i18n.dir() === 'rtl'
 
   return (
-    <section className="relative min-h-screen flex items-center pt-32 pb-24 lg:pt-48 lg:pb-36 overflow-hidden bg-white">
+    <section className="relative min-h-screen flex items-center pt-24 pb-20 lg:pt-48 lg:pb-36 overflow-hidden bg-white">
       {/* Background Decoration */}
       <div className="absolute top-0 inset-x-0 h-full pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[10%] w-[40%] h-[40%] bg-blue-50/40 rounded-full blur-[120px]" />
@@ -173,49 +244,60 @@ export const CarSafetySpotlightHero = () => {
       </div>
 
       <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
           
           {/* Content Block */}
           <motion.div 
-            className="flex flex-col items-center lg:items-start text-center lg:text-start space-y-10"
+            className="flex flex-col items-center lg:items-start text-center lg:text-start space-y-8 md:space-y-10"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="space-y-6">
+            <div className="space-y-5 md:space-y-6">
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-blue-50/80 border border-blue-100/50">
                 <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center shadow-lg shadow-blue-500/20">
                   <Zap className="w-3 h-3 text-white" />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#0070E0] font-black">{t('landing.hero.badge')}</span>
+                <span className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-[#0070E0] font-black">
+                  {t('landing.hero.badge')}
+                </span>
               </div>
               
-              <h1 className="text-4xl md:text-6xl lg:text-[80px] font-black tracking-tight text-slate-900 leading-[1.1] lg:leading-[1.02]">
+              <h1 className={cn(
+                "text-[34px] sm:text-4xl md:text-6xl lg:text-[80px] font-black tracking-tight text-slate-900 leading-[1.2] lg:leading-[1.02] max-w-[18ch] mx-auto lg:mx-0",
+                isRTL && "leading-[1.4] sm:leading-[1.3] md:leading-[1.2]"
+              )}>
                 {t('landing.hero.title')}
               </h1>
               
-              <p className="text-lg md:text-xl text-slate-500 max-w-xl font-medium leading-relaxed opacity-90">
+              <p className={cn(
+                "text-base md:text-xl text-slate-500 max-w-xl font-medium leading-relaxed opacity-90 mx-auto lg:mx-0",
+                isRTL && "leading-[1.7]"
+              )}>
                 {t('landing.hero.subtitle')}
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-5 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-5 w-full sm:w-auto">
               <Button 
                 onClick={() => navigate('/login?mode=register')}
-                className="w-full sm:w-auto h-auto py-5 px-10 rounded-2xl bg-[#0070E0] text-white font-black uppercase tracking-widest text-[14px] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-1 transition-all duration-500"
+                className="w-full sm:w-auto h-auto py-4.5 md:py-5 px-10 rounded-2xl bg-[#0070E0] text-white font-black uppercase tracking-widest text-[14px] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-1 transition-all duration-500"
               >
                 {t('landing.hero.cta_start')}
                 <ChevronRight className={cn("w-5 h-5 transition-transform", isRTL ? "rotate-180 mr-1" : "ml-1")} />
               </Button>
               
               <Button 
-                variant="outline"
+                variant="ghost"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full sm:w-auto h-auto py-5 px-10 rounded-2xl border-slate-200 text-slate-600 font-black uppercase tracking-widest text-[14px] hover:border-[#0070E0]/30 transition-all duration-500"
+                className="w-full sm:w-auto h-auto py-4 md:py-5 px-8 text-slate-500 font-black uppercase tracking-widest text-[12px] md:text-[14px] hover:text-[#0070E0] transition-all duration-300"
               >
                 {t('landing.hero.cta_demo')}
               </Button>
             </div>
+
+            {/* Mobile Product Preview */}
+            <MobileProductPreview isRTL={isRTL} />
 
             {/* Trust Row */}
             <div className="flex flex-col sm:flex-row items-center gap-6 pt-10 border-t border-slate-100 w-full lg:w-full">
@@ -238,9 +320,9 @@ export const CarSafetySpotlightHero = () => {
             </div>
           </motion.div>
 
-          {/* Visual Block */}
+          {/* Visual Block - Hidden on mobile, shown on large screens */}
           <motion.div 
-            className="relative flex justify-center items-center"
+            className="relative hidden lg:flex justify-center items-center"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
