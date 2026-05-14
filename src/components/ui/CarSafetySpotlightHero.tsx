@@ -170,60 +170,99 @@ const MobileProductPreview = ({ isRTL }: { isRTL: boolean }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.6 }}
-      className="mt-12 w-full max-w-[340px] mx-auto px-4 lg:hidden"
+      className="mt-8 w-full max-w-[360px] mx-auto px-4 lg:hidden"
     >
       <div className="relative group">
         {/* Background Glow */}
-        <div className="absolute -inset-4 bg-blue-100/50 rounded-[40px] blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
+        <div className="absolute -inset-4 bg-blue-100/40 rounded-[40px] blur-2xl opacity-50 group-hover:opacity-75 transition-opacity" />
         
         {/* Card Content */}
-        <div className="relative bg-white/80 backdrop-blur-xl border border-white rounded-[32px] p-5 shadow-[0_20px_50px_rgba(0,112,224,0.08)] overflow-hidden">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-blue-50">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+        <div className="relative bg-white/90 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-[0_20px_60px_rgba(0,112,224,0.12)] overflow-hidden">
+          <div className="flex items-center justify-between mb-5 pb-3 border-b border-blue-50/50">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[11px] font-black text-slate-900 uppercase tracking-widest">
                 {t('landing.hero.cards.result_title')}
               </span>
             </div>
-            <Zap className="w-4 h-4 text-blue-600" />
+            <div className="px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">
+               <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">
+                 {t('landing.hero.cards.health_score')}
+               </span>
+            </div>
           </div>
           
-          <div className="space-y-3.5">
+          <div className="space-y-4">
+            {/* Fault & Risk */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center border border-red-100">
-                  <ShieldAlert className="w-4 h-4 text-red-600" />
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                  <Activity className="w-4.5 h-4.5 text-blue-600" />
                 </div>
-                <span className="text-xs font-bold text-red-600">{t('landing.hero.cards.risk_level')}</span>
+                <span className="text-[13px] font-bold text-slate-700">{t('landing.hero.cards.probable_fault')}</span>
               </div>
-              <div className="px-2 py-1 bg-red-50 rounded-lg text-[9px] font-black text-red-600 uppercase tracking-tighter">
+              <div className="px-2.5 py-1 bg-red-50 rounded-lg text-[9px] font-black text-red-600 uppercase tracking-tight">
                 {t('landing.how_it_works.step2.dangerous')}
               </div>
             </div>
-            
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+
+            {/* Risk Level Detail */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center border border-red-100">
+                <ShieldAlert className="w-4.5 h-4.5 text-red-600" />
               </div>
-              <span className="text-xs font-bold text-slate-700">{t('landing.hero.cards.is_safe')}</span>
+              <span className="text-[13px] font-bold text-red-600">{t('landing.hero.cards.risk_level')}</span>
             </div>
             
-            <div className="mt-2 pt-3 border-t border-blue-50">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
-                  <DollarSign className="w-4 h-4 text-blue-600" />
+            {/* Safety Status */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100">
+                <AlertTriangle className="w-4.5 h-4.5 text-amber-600" />
+              </div>
+              <span className="text-[13px] font-bold text-slate-700">{t('landing.hero.cards.is_safe')}</span>
+            </div>
+            
+            {/* Price Check Row */}
+            <div className="pt-3 border-t border-blue-50/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <DollarSign className="w-4.5 h-4.5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-black text-slate-900 leading-none mb-1">
+                      {t('landing.hero.cards.repair_estimate')}
+                    </p>
+                    <p className="text-[11px] font-bold text-red-500 flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-red-500" />
+                      {t('landing.hero.cards.price_alert')}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[13px] font-black text-slate-900">
-                    {t('landing.hero.cards.repair_estimate')}
-                  </p>
+                <div className="px-2 py-1 bg-blue-50 rounded-lg text-[8px] font-black text-blue-600 uppercase tracking-widest border border-blue-100">
+                  {t('landing.hero.cards.price_check')}
+                </div>
+              </div>
+            </div>
+
+            {/* Maintenance Row */}
+            <div className="pt-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                    <Zap className="w-4.5 h-4.5 text-slate-400" />
+                  </div>
+                  <span className="text-[12px] font-bold text-slate-500">{t('landing.hero.cards.next_maintenance')}</span>
+                </div>
+                <div className="px-2 py-1 bg-slate-50 rounded-lg text-[8px] font-black text-slate-400 uppercase tracking-widest border border-slate-100">
+                  {t('landing.hero.cards.maintenance_alert')}
                 </div>
               </div>
             </div>
           </div>
           
           {/* Subtle decoration */}
-          <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-40" />
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-40" />
         </div>
       </div>
     </motion.div>
@@ -236,7 +275,7 @@ export const CarSafetySpotlightHero = () => {
   const isRTL = i18n.dir() === 'rtl'
 
   return (
-    <section className="relative min-h-screen flex items-center pt-24 pb-20 lg:pt-48 lg:pb-36 overflow-hidden bg-white">
+    <section className="relative min-h-screen flex items-center pt-24 pb-16 lg:pt-48 lg:pb-36 overflow-hidden bg-white">
       {/* Background Decoration */}
       <div className="absolute top-0 inset-x-0 h-full pointer-events-none -z-10">
         <div className="absolute top-[-10%] left-[10%] w-[40%] h-[40%] bg-blue-50/40 rounded-full blur-[120px]" />
@@ -244,16 +283,16 @@ export const CarSafetySpotlightHero = () => {
       </div>
 
       <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-center">
           
           {/* Content Block */}
           <motion.div 
-            className="flex flex-col items-center lg:items-start text-center lg:text-start space-y-8 md:space-y-10"
+            className="flex flex-col items-center lg:items-start text-center lg:text-start space-y-6 md:space-y-8"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="space-y-5 md:space-y-6">
+            <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-blue-50/80 border border-blue-100/50">
                 <div className="w-5 h-5 rounded-full bg-[#0070E0] flex items-center justify-center shadow-lg shadow-blue-500/20">
                   <Zap className="w-3 h-3 text-white" />
@@ -264,14 +303,14 @@ export const CarSafetySpotlightHero = () => {
               </div>
               
               <h1 className={cn(
-                "text-[34px] sm:text-4xl md:text-6xl lg:text-[80px] font-black tracking-tight text-slate-900 leading-[1.2] lg:leading-[1.02] max-w-[18ch] mx-auto lg:mx-0",
+                "text-[34px] sm:text-4xl md:text-6xl lg:text-[80px] font-black tracking-tight text-slate-900 leading-[1.2] lg:leading-[1.02] max-w-[20ch] mx-auto lg:mx-0",
                 isRTL && "leading-[1.4] sm:leading-[1.3] md:leading-[1.2]"
               )}>
                 {t('landing.hero.title')}
               </h1>
               
               <p className={cn(
-                "text-base md:text-xl text-slate-500 max-w-xl font-medium leading-relaxed opacity-90 mx-auto lg:mx-0",
+                "text-[15px] md:text-xl text-slate-500 max-w-xl font-medium leading-relaxed opacity-90 mx-auto lg:mx-0",
                 isRTL && "leading-[1.7]"
               )}>
                 {t('landing.hero.subtitle')}
@@ -281,7 +320,7 @@ export const CarSafetySpotlightHero = () => {
             <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-5 w-full sm:w-auto">
               <Button 
                 onClick={() => navigate('/login?mode=register')}
-                className="w-full sm:w-auto h-auto py-4.5 md:py-5 px-10 rounded-2xl bg-[#0070E0] text-white font-black uppercase tracking-widest text-[14px] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-1 transition-all duration-500"
+                className="w-full sm:w-auto h-auto py-4 md:py-5 px-10 rounded-2xl bg-[#0070E0] text-white font-black uppercase tracking-widest text-[14px] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] hover:bg-[#005BB5] hover:-translate-y-1 transition-all duration-500"
               >
                 {t('landing.hero.cta_start')}
                 <ChevronRight className={cn("w-5 h-5 transition-transform", isRTL ? "rotate-180 mr-1" : "ml-1")} />
@@ -290,7 +329,7 @@ export const CarSafetySpotlightHero = () => {
               <Button 
                 variant="ghost"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full sm:w-auto h-auto py-4 md:py-5 px-8 text-slate-500 font-black uppercase tracking-widest text-[12px] md:text-[14px] hover:text-[#0070E0] transition-all duration-300"
+                className="w-full sm:w-auto h-auto py-4 md:py-5 px-8 text-slate-400 font-black uppercase tracking-widest text-[11px] md:text-[14px] hover:text-[#0070E0] transition-all duration-300"
               >
                 {t('landing.hero.cta_demo')}
               </Button>

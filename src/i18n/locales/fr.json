@@ -62,18 +62,24 @@
       "guides": "Guides"
     },
     "hero": {
-      "badge": "Diagnostic intelligent en quelques secondes",
-      "title": "Comprenez le problème de votre voiture avant de payer trop cher",
-      "subtitle": "Obtenez un diagnostic instantané, un niveau de risque clair et des alertes sur les coûts de réparation avant d'aller au garage.",
+      "badge": "Diagnostic + Prix + Entretien",
+      "title": "Comprenez le problème de votre voiture, connaissez le risque et évitez de surpayer",
+      "subtitle": "Car Safety vous aide à comprendre les pannes de véhicule, à savoir s'il est sûr de conduire, à comparer les coûts de réparation et à suivre l'entretien avant d'aller au garage.",
       "cta_start": "Démarrer le diagnostic gratuit",
       "cta_demo": "Voir comment ça marche",
       "trust_row": "Sans inscription · Résultat rapide · Vous aide à éviter de surpayer",
       "scroll_more": "Défiler pour en savoir plus",
       "cards": {
-        "result_title": "Résultat du diagnostic",
+        "result_title": "Résultat Car Safety",
+        "probable_fault": "Panne probable : Système de freinage",
         "risk_level": "Niveau de risque : Élevé",
         "is_safe": "Conduite sûre ? Non",
-        "repair_estimate": "Estimation réparation : 185€–320€"
+        "repair_estimate": "Estimation réparation : 185€ – 320€",
+        "price_alert": "Alerte prix : Vérifier avant d'approuver",
+        "next_maintenance": "Prochain entretien : Test batterie",
+        "price_check": "Vérif Prix",
+        "maintenance_alert": "Alerte Entretien",
+        "health_score": "Score Santé 75/100"
       }
     },
     "demo": {
