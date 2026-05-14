@@ -257,60 +257,60 @@ export const CarSafetySpotlightHero = () => {
 
       <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          
-          {/* Content Block */}
+               {/* Content Block */}
           <motion.div 
             className={cn(
-              "flex flex-col items-center lg:items-start text-center lg:text-start space-y-6 md:space-y-8 order-1",
+              "flex flex-col items-center lg:items-start text-center lg:text-start space-y-7 md:space-y-9 order-1",
               isRTL ? "lg:order-2" : "lg:order-1"
             )}
             initial={{ opacity: 0, x: isRTL ? 40 : -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="space-y-4 md:space-y-6 w-full">
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-blue-50/80 border border-blue-100/50">
-                <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                  <Zap className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-blue-600 font-black">
+            <div className="space-y-5 md:space-y-6 w-full flex flex-col items-center lg:items-start">
+              {/* Premium Badge */}
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-100/80 shadow-sm backdrop-blur-sm">
+                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+                <span className="text-[11px] font-black uppercase tracking-[0.1em] text-blue-700">
                   {t('landing.hero.badge')}
                 </span>
               </div>
               
+              {/* Premium Headline */}
               <h1 className={cn(
-                "text-[32px] sm:text-4xl md:text-5xl lg:text-[68px] font-black tracking-tight text-slate-900 leading-[1.2] lg:leading-[1.05] max-w-[18ch] mx-auto lg:mx-0",
-                isRTL && "leading-[1.4] sm:leading-[1.3] md:leading-[1.2]"
+                "text-[32px] sm:text-4xl md:text-5xl lg:text-[64px] font-black tracking-tight text-slate-950 max-w-[20ch]",
+                isRTL ? "leading-[1.35] sm:leading-[1.25] md:leading-[1.15]" : "leading-[1.1]"
               )}>
                 {t('landing.hero.title')}
               </h1>
               
+              {/* Refined Subtitle */}
               <p className={cn(
-                "text-[15px] md:text-lg text-slate-500 max-w-xl font-medium leading-relaxed opacity-90 mx-auto lg:mx-0",
-                isRTL && "leading-[1.7]"
+                "text-[15px] md:text-[17px] text-slate-600 max-w-[540px] font-semibold opacity-90",
+                isRTL ? "leading-[1.8]" : "leading-relaxed"
               )}>
                 {t('landing.hero.subtitle')}
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            {/* High-Converting CTA Group */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto pt-2">
               <Button 
                 onClick={() => navigate('/login?mode=register')}
-                className="w-full sm:w-auto h-auto py-4 md:py-5 px-8 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[13px] md:text-[14px] shadow-[0_20px_40px_-10px_rgba(0,112,224,0.4)] hover:bg-blue-700 hover:-translate-y-1 transition-all duration-500"
+                className="w-full sm:w-auto h-14 px-8 rounded-2xl bg-blue-600 text-white font-black text-[15px] shadow-[0_20px_40px_-12px_rgba(37,99,235,0.5)] hover:bg-blue-700 hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.6)] hover:-translate-y-0.5 transition-all duration-300 ring-1 ring-blue-700/50"
               >
                 {t('landing.hero.cta_start')}
-                <ChevronRight className={cn("w-5 h-5 transition-transform", isRTL ? "rotate-180 mr-1" : "ml-1")} />
+                <ChevronRight className={cn("w-5 h-5 transition-transform", isRTL ? "rotate-180 mr-2" : "ml-2")} />
               </Button>
               
               <Button 
                 variant="ghost"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full sm:w-auto h-auto py-4 md:py-5 px-6 text-slate-500 font-black uppercase tracking-widest text-[11px] md:text-[13px] hover:text-blue-600 transition-all duration-300"
+                className="w-full sm:w-auto h-14 px-6 rounded-2xl text-slate-500 font-bold text-[14px] hover:text-blue-600 hover:bg-blue-50/50 transition-all duration-300"
               >
                 {t('landing.hero.cta_demo')}
               </Button>
             </div>
-
             {/* Mobile-only iPhone Mockup (directly below CTA) */}
             <div className="w-full pt-8 pb-4 lg:hidden">
                <IPhoneMockup isRTL={isRTL} isMobile={true} />
