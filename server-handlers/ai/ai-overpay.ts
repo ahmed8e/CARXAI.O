@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { logger } from './utils/logger.js';
-import { assertRateLimit } from './utils/rate-limit.js';
+import { logger } from '../utils/logger.js';
+import { assertRateLimit } from '../utils/rate-limit.js';
 
 export const maxDuration = 60;
 

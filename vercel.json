@@ -21,6 +21,46 @@
   ],
   "rewrites": [
     {
+      "source": "/api/chat",
+      "destination": "/api/ai?action=chat"
+    },
+    {
+      "source": "/api/transcribe",
+      "destination": "/api/ai?action=transcribe"
+    },
+    {
+      "source": "/api/speech",
+      "destination": "/api/ai?action=speech"
+    },
+    {
+      "source": "/api/negotiate",
+      "destination": "/api/ai?action=negotiate"
+    },
+    {
+      "source": "/api/ai-overpay",
+      "destination": "/api/ai?action=ai-overpay"
+    },
+    {
+      "source": "/api/reports",
+      "destination": "/api/user?action=reports"
+    },
+    {
+      "source": "/api/profile",
+      "destination": "/api/user?action=profile"
+    },
+    {
+      "source": "/api/vehicles",
+      "destination": "/api/user?action=vehicles"
+    },
+    {
+      "source": "/api/leads",
+      "destination": "/api/user?action=leads"
+    },
+    {
+      "source": "/api/admin-providers",
+      "destination": "/api/admin?action=providers"
+    },
+    {
       "source": "/((?!api/|assets/|sitemap\\.xml|robots\\.txt).*)",
       "destination": "/index.html"
     }

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { logger } from './utils/logger.js';
-import { assertRateLimit } from './utils/rate-limit.js';
+import { logger } from '../utils/logger.js';
+import { assertRateLimit } from '../utils/rate-limit.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers

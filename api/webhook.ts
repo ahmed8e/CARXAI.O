@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import { logger } from './utils/logger.js';
+import { logger } from '../server-handlers/utils/logger.js';
 
 // Stripe needs the raw body for signature verification
 export const config = {

@@ -38,10 +38,11 @@ async function loadAndCall(filePath: string, req: express.Request, res: express.
       throw new Error(`No default export found in ${filePath}`);
     }
     await handler(req, res);
-  } catch (err: any) {
-    console.error(`[API Error] ${filePath}:`, err.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[API Error] ${filePath}:`, message);
     if (!res.headersSent) {
-      res.status(500).json({ error: err.message || 'Internal Server Error' });
+      res.status(500).json({ error: message || 'Internal Server Error' });
     }
   }
 }
@@ -57,6 +58,27 @@ if (fs.existsSync(apiDir)) {
     const filePath = `api/${file}`;
     app.all(`/api/${routeName}`, (req, res) => loadAndCall(filePath, req, res));
     console.log(`[Server] Mounted: /api/${routeName}`);
+  }
+
+  const legacyApiRoutes: Record<string, { filePath: string; action: string }> = {
+    'chat': { filePath: 'api/ai.ts', action: 'chat' },
+    'transcribe': { filePath: 'api/ai.ts', action: 'transcribe' },
+    'speech': { filePath: 'api/ai.ts', action: 'speech' },
+    'negotiate': { filePath: 'api/ai.ts', action: 'negotiate' },
+    'ai-overpay': { filePath: 'api/ai.ts', action: 'ai-overpay' },
+    'reports': { filePath: 'api/user.ts', action: 'reports' },
+    'profile': { filePath: 'api/user.ts', action: 'profile' },
+    'vehicles': { filePath: 'api/user.ts', action: 'vehicles' },
+    'leads': { filePath: 'api/user.ts', action: 'leads' },
+    'admin-providers': { filePath: 'api/admin.ts', action: 'providers' },
+  };
+
+  for (const [routeName, target] of Object.entries(legacyApiRoutes)) {
+    app.all(`/api/${routeName}`, (req, res) => {
+      (req.query as Record<string, string | string[] | undefined>).action = target.action;
+      return loadAndCall(target.filePath, req, res);
+    });
+    console.log(`[Server] Mounted legacy route: /api/${routeName}`);
   }
 } else {
   console.warn('[Server] No api/ directory found');
